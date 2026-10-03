@@ -1,11 +1,52 @@
-# Hamigo
+# Décisions de conception Hamigo
 
-Application native Android en Kotlin / Jetpack Compose et Material 3. Nom : une petite onde, une courte leçon. Mascotte **Pico**, petit poste radio crème et corail.
+## Application locale et contenu
 
-Le parcours est écrit et stable ; l'entraînement mélange les questions locales. Aucun modèle d'IA ni serveur n'est nécessaire pour apprendre. Les rappels sont des alarmes Android inexactes, adaptées aux économies d'énergie.
+Hamigo est une application Android native en Kotlin, Jetpack Compose et Material 3. Le parcours, la banque de questions, les illustrations, les outils et la répétition espacée fonctionnent hors ligne. Aucun modèle d'IA ni serveur applicatif n'est nécessaire pour apprendre.
 
-Les épreuves officielles actuelles comportent chacune 20 QCM : réglementation (15 min) et technique (30 min), 1 point par bonne réponse, 0 autrement, réussite à 10/20 dans chaque partie. Sources et date de vérification se trouvent dans SOURCES-COURSES.md.
+Le parcours contient **21 chapitres, 94 leçons et 826 exercices originaux**. Les identifiants des anciennes leçons restent stables pour préserver la progression. Les nouveaux chapitres approfondissent les maths, les circuits RLC, les mesures RF, les antennes, le numérique et les méthodes de résolution. Le chapitre Morse, placé après les premiers usages opérateur, comprend 14 leçons : lettres, chiffres, ponctuation, écoute, composition et groupes de trafic.
 
-Le système de répétition espacée est une variante SM-2 explicite, distincte de l'algorithme propriétaire de Duolingo. Les réponses incorrectes sont revues après dix minutes puis selon les intervalles calculés. L'XP est enregistré à chaque réponse ; terminer la session valide une leçon.
+La banque Exam1 REF conserve ses **2 961 questions et ses illustrations archivées** ; 11 exclusions documentées donnent un ensemble courant de 2 950 questions. L'examen blanc utilise exclusivement cet ensemble. Les cours sont écrits pour Hamigo ; les variantes procédurales sont produites localement par des règles explicites. Le catalogue de **5 188 variantes** possède des identifiants reproductibles, récupérables pour les révisions SRS. Les variantes supplémentaires d'une leçon restent limitées aux concepts identifiés comme enseignés dans cette leçon.
 
-Social sans serveur dédié : partage Android d'image, fichiers et nudges ; comparaison de profils importés. Option GitHub Gists secrets pour publier automatiquement un résumé et actualiser les amis, avec jeton fourni par l'utilisateur ou application OAuth personnelle. Un Gist secret est accessible à toute personne qui connaît son URL. Aucun jeton personnel de développement n'est intégré à l'APK.
+Les attributions pédagogiques sont conservées dans [SOURCES-COURSES.md](SOURCES-COURSES.md) et [SOURCES-EXAM1.md](SOURCES-EXAM1.md). Les adaptations des ressources F6KGL conservent l'attribution CC BY-NC-SA 4.0. Le statut de licence propre de la banque Exam1 n'est pas présumé ; son archive reste destinée à ce projet privé personnel. Aucun code de l'application Android Exam1RA n'a été repris.
+
+## Maîtrise et révision
+
+Les règles officielles actuelles sont deux parties de 20 QCM : réglementation en 15 minutes et technique en 30 minutes. Une bonne réponse rapporte un point, une réponse incorrecte ou absente zéro ; il faut au moins 10/20 dans chaque partie. Le Morse enrichit l'apprentissage, sans être une épreuve obligatoire du certificat actuel. Les sources sont référencées dans SOURCES-COURSES.md.
+
+Une leçon se valide avec **au moins 80 % de réponses justes au premier essai et aucune erreur restant à corriger**. Les reprises pendant la séance servent à consolider les acquis ; elles ne transforment pas une première tentative ratée en validation automatique. Les erreurs peuvent revenir jusqu'à deux fois dans la même séance et restent accessibles ensuite en révision.
+
+L'XP est volontairement modéré : 3 XP pour une réponse juste, 1 XP pour une réponse incorrecte, au plus une attribution par question et par jour, puis 6 XP pour la première validation d'une leçon. Les bonus de leçon ne sont pas renouvelés. La répétition espacée est une variante SM-2 explicite : une erreur revient après dix minutes, puis les réussites allongent les intervalles. Relire tôt une carte acquise n'allonge pas artificiellement son échéance.
+
+## Interactions et repères visuels
+
+Hamigo propose **15 formats d'exercice et de révision**, dont 13 dans les cours : QCM, vrai/faux, phrases à compléter, sélection multiple, associations, ordre, calculs, résistances visuelles, estimation, bits binaires, formes d'onde, écoute et composition Morse, auxquels s'ajoutent le cadran de fréquence et les flashcards. Chaque format affiche une consigne explicite et un repère visuel ; les associations dessinent les connexions créées.
+
+La page Défis distingue l'examen blanc, le labo de 12 exercices renouvelés et le mix sur mesure. Le mix propose 10, 20, 40, 80 ou 150 questions, avec une saisie de 1 à 1 000 ouverte uniquement par « Nombre libre ». Les thèmes sont regroupés sous Réglementation et Technique dans une section repliable ; chaque groupe contrôle ses sous-thèmes. Le mélange de variantes procédurales reste optionnel et le nombre demandé doit être disponible dans la sélection.
+
+Les **17 fiches et 364 flashcards** proposent une révision selon les échéances ou dans un ordre aléatoire. Les couleurs de résistances sont représentées par des anneaux et des pastilles ; les points et traits Morse sont dessinés sur un même axe avec leur rapport de longueur. Les fiches pertinentes intègrent six outils : résistance à quatre/cinq anneaux, associations série/parallèle, traduction Morse dans les deux sens avec écoute, rapports/décibels, loi d'Ohm et fréquence/longueur d'onde.
+
+Pico, le petit poste radio, possède **8 expressions et 6 poses**. Un même dessin vectoriel original est utilisé dans les questions, les rappels et les images partageables. Les rappels quotidiens adaptent texte, expression, pose et illustration au jour, à la série et à l'objectif : démarrage, poursuite, reprise après interruption, objectif en cours ou atteint. Les alarmes Android sont inexactes et les notifications utilisent les modèles Android ; leur livraison et leur présentation restent soumises au système et aux réglages du téléphone.
+
+## Compte et synchronisation GitHub
+
+La connexion est facultative, proposée à l'onboarding et directement dans Équipe. L'application OAuth **Hamigo commune** utilise Device Flow avec le scope `gist`. Seul son Client ID public est intégré à l'APK ; aucun secret OAuth ni jeton personnel de développement n'est embarqué. Le jeton utilisateur est chiffré avec Android Keystore et n'est jamais exporté dans une sauvegarde ou une image.
+
+Deux Gists distincts séparent les données :
+
+- La sauvegarde complète contient XP, jours actifs, tentatives, leçons validées, échéances SRS, pseudo et préférences d'objectif/rappel. Elle permet la restauration et la fusion avec le même compte sur plusieurs appareils. Les jetons, les clés Keystore et la liste locale des amis en sont exclus.
+- Le résumé social contient uniquement pseudo, XP, série, nombre de leçons, XP hebdomadaires, date de mise à jour et points journaliers destinés aux graphiques. Seul son identifiant est partagé dans les invitations.
+
+Les deux Gists sont créés avec `public: false` : **secrets/non répertoriés, mais accessibles à toute personne qui possède leur URL**. La sauvegarde complète n'est pas chiffrée ; elle n'est donc jamais présentée comme privée. Déconnecter le compte supprime les credentials locaux et les travaux programmés, sans supprimer les Gists du compte GitHub.
+
+La synchronisation lit les sauvegardes, les fusionne avec l'état local puis republie la sauvegarde et le résumé. Elle se déclenche à la connexion, au retour au premier plan, en fin de séance, après modification du profil/préférences et sur actualisation manuelle. Les réponses déclenchent aussi un travail persistant **8 secondes après la dernière réponse**. WorkManager demande un rafraîchissement **toutes les heures**, avec réseau et batterie suffisante ; Android peut le différer. Désactiver l'automatisation annule ces travaux et conserve l'action manuelle.
+
+La fusion repose sur un socle historique et des événements immuables identifiés par UUID. Elle conserve les leçons par union, déduplique les événements et les attributions XP, et utilise les dates de modification pour les révisions et préférences. Chaque installation garde également son propre fichier dans le Gist de sauvegarde pour conserver les événements de publications concurrentes. Une mutation locale pendant un appel réseau attend au besoin la publication suivante. Le détail des déclencheurs, de la fusion et des limites se trouve dans [SOCIAL.md](SOCIAL.md).
+
+## Invitations et partage
+
+Le lien `https://alexmalfr.github.io/hamigo/?invite=<identifiant-social>` et son QR code passent par les messageries qui reconnaissent HTTPS. Android App Links associe le domaine au package et au certificat release ; une page statique GitHub Pages propose aussi un bouton vers le schéma `hamigo://`. Aucun serveur applicatif ni stockage de progression sur cette page n'est nécessaire. Le parseur vérifie hôte, schéma, identifiant et paramètres ; ajouter un équipier demande une confirmation dans l'app.
+
+Le partage Android « Partager ma progression » génère deux images distinctes : statistiques et graphique d'activité personnel depuis Moi, puis classement et graphiques d'équipe depuis Équipe. Les encouragements utilisent l'application de messagerie choisie par l'utilisateur.
+
+Le partage et l'import de profils par JSON sont supprimés. L'export/import JSON de sauvegarde complète reste disponible dans une section avancée repliable des réglages, pour les migrations manuelles.

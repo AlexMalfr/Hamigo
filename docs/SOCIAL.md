@@ -1,40 +1,52 @@
-# Progression entre amis, partage et rappels
+# Progression, synchronisation et invitations
 
-Hamigo fonctionne hors ligne. Les leçons, réponses, échéances de révision et paramètres restent sur le téléphone. Le volet social utilise au choix des fichiers échangés ou un Gist GitHub contenant un résumé de progression. Aucune API personnelle, clé GitHub ou configuration serveur n'est nécessaire pour le partage par image.
+Hamigo reste utilisable hors ligne. Le stockage local enregistre immédiatement les réponses, l'XP, les leçons et les échéances SRS. La connexion GitHub est facultative et passe par l'application OAuth Hamigo commune : l'utilisateur autorise le scope `gist` dans le navigateur. Aucun jeton manuel ni Client ID personnel n'est demandé, et aucun secret OAuth n'est embarqué dans l'APK. Voir le [Device Flow GitHub](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow).
 
-## Sans compte
+## Deux Gists distincts
 
-- La carte de progression est un PNG 1080 × 1350, dessiné sur l'appareil, avec pseudo, XP, série, leçons terminées et XP de la semaine.
-- Un encouragement ouvre le menu de partage Android avec un message prêt à envoyer ; l'utilisateur choisit lui-même le destinataire et l'application.
-- Un fichier de comparaison contient uniquement `schema`, `name`, `xp`, `streak`, `lessons`, `weeklyXp` et `updatedAt`. L'import de ce résumé met à jour la comparaison avec l'ami ; il ne remplace pas les données de révision personnelles.
-- La sauvegarde complète est un fichier JSON partagé explicitement depuis le téléphone. Elle est distincte du résumé social et n'est jamais envoyée au Gist par le client social. Elle ne doit contenir aucun jeton GitHub.
+- `hamigo-progress.json` contient le résumé partageable : pseudo, XP, série, nombre de leçons terminées, XP de la semaine, date de mise à jour et jusqu'à 30 jours de points journaliers pour les graphiques. Il ne contient ni réponses, ni échéances SRS, ni jeton.
+- `hamigo-backup.json`, dans un **autre Gist**, contient la progression complète : XP et jours actifs, compteurs de réponses, leçons terminées, révisions SRS, historique des nouveaux événements, pseudo et préférences d'objectif/rappel. Il est retrouvé avec le même compte GitHub sur une nouvelle installation. Le jeton OAuth, les clés Keystore et la liste locale des amis ne font pas partie de cette sauvegarde.
+- Chaque installation conserve aussi son fichier `hamigo-device-<UUID>.json` dans le Gist de sauvegarde. Un PATCH ne touche que le fichier de cette installation et le résumé agrégé. Les autres fichiers restent intacts, conformément au [contrat PATCH des Gists](https://docs.github.com/en/rest/gists/gists#update-a-gist). Cela conserve les événements de deux appareils qui publient simultanément.
 
-## GitHub, pour deux personnes sans serveur
+Les deux Gists sont créés avec `public: false`, donc **secrets / non répertoriés**. GitHub ne propose pas de Gist réellement privé : une personne ayant son URL peut le lire, et GitHub garde son historique. La sauvegarde complète n'est pas chiffrée. Son identifiant n'est jamais inclus dans l'invitation d'amis, le QR code ou l'image partagée. L'interface doit annoncer ces propriétés sans qualifier la sauvegarde de « privée ». Voir la [confidentialité des Gists](https://docs.github.com/en/get-started/writing-on-github/editing-and-sharing-content-with-gists/creating-gists).
 
-1. Créer un [jeton personnel GitHub classique](https://github.com/settings/tokens/new?scopes=gist&description=Hamigo) avec uniquement le scope `gist`, ou un jeton fin disposant de l'autorisation utilisateur **Gists: write**. Choisir une date d'expiration.
-2. Dans l'application, saisir le jeton et connecter le compte. Le client vérifie l'identité GitHub avant de le conserver.
-3. Publier une première fois la progression. Le client crée un Gist **secret** contenant `hamigo-progress.json`, ou retrouve et met à jour le Gist secret existant du même compte avec ce nom de fichier.
-4. Partager le lien du Gist avec l'ami ; chacun colle le lien de l'autre pour consulter sa progression.
-5. Les publications suivantes mettent à jour ce résumé. L'UI peut les déclencher en fin de session ou au retour au premier plan ; un échec de connexion ne doit jamais interrompre une révision. Les comparaisons se rafraîchissent lors d'une action explicite de lecture.
+La suppression locale de la connexion supprime le jeton et les travaux programmés ; elle ne détruit pas les Gists sur GitHub. L'utilisateur peut supprimer les Gists depuis son compte. Une autorisation expirée demande une nouvelle connexion.
 
-Un Gist secret est **non répertorié, pas privé** : toute personne ayant le lien peut le lire. Le résumé contient donc seulement des indicateurs choisis pour le partage. Il ne comporte ni historique de réponses, ni identifiant d'appareil, ni échéances SRS, ni adresse email, ni token. GitHub conserve les versions précédentes du Gist. Ces propriétés sont documentées par [GitHub sur les Gists](https://docs.github.com/en/get-started/writing-on-github/editing-and-sharing-content-with-gists/creating-gists).
+## Déclencheurs et fréquence
 
-Le jeton est chiffré en AES-256-GCM dans les préférences privées. La clé reste dans Android Keystore ; chaque écriture utilise un IV aléatoire. Le jeton n'est ni journalisé ni inclus dans les exports. La déconnexion supprime le jeton et la clé locale, mais conserve le Gist sur GitHub. Un jeton expiré se remplace par une nouvelle connexion. Le mécanisme suit les [recommandations Android Keystore](https://developer.android.com/privacy-and-security/keystore) et le [contrat AES-GCM](https://developer.android.com/reference/android/security/keystore/KeyGenParameterSpec.Builder#setRandomizedEncryptionRequired(boolean)).
+La lecture de la sauvegarde personnelle, sa fusion avec les données locales, puis l'écriture de la sauvegarde complète et du résumé social se font :
 
-## OAuth facultatif
+1. lors de la connexion GitHub ;
+2. au retour de l'application au premier plan ;
+3. à la fin d'une session ou en la quittant ;
+4. sur l'action explicite d'actualisation de l'équipe ;
+5. après les réponses enregistrées, via un travail persistant retardé de **8 secondes après la dernière réponse** ;
+6. en arrière-plan, avec un travail unique demandé **toutes les heures**, dans une fenêtre flexible de 15 minutes.
 
-Il faut enregistrer sa propre application OAuth GitHub et activer **Device Flow**. Aucun Client ID ni secret n'est embarqué par défaut. Avec le Client ID saisi par l'utilisateur, `DeviceOAuth.start(clientId)` fournit une URL de vérification et un code. Après validation dans le navigateur, `DeviceOAuth.awaitToken(clientId, session)` attend l'autorisation en respectant l'intervalle demandé et `slow_down`. Le jeton obtenu se valide et se conserve via `GitHubSync.connect(token)`. L'attente est annulable et expire en fonction du code. Les jetons expirants demandent une nouvelle connexion ; le client ne conserve pas de refresh token. Voir le [flux officiel GitHub](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps#device-flow).
+Les actualisations de l'équipe relisent les résumés des amis et conservent leur dernière carte si un ami est inaccessible. Le travail en arrière-plan actualise aussi ces cartes. Une modification du pseudo, de l'objectif, des rappels ou une restauration programme également le même déclencheur persistant à huit secondes. Sans connexion GitHub, les amis se relisent au premier plan ; le travail périodique est réservé aux comptes connectés.
 
-## Intégration Android
+Le travail persistant demande une connexion réseau et une batterie suffisamment chargée. Ce n'est pas un minuteur exact : Android peut le retarder avec Doze et les restrictions constructeur. Les erreurs réseau temporaires provoquent au maximum trois nouvelles tentatives avec délai croissant. Désactiver la synchronisation automatique annule les deux travaux ; l'actualisation explicite demeure possible. Voir les [contraintes et travaux périodiques WorkManager](https://developer.android.com/develop/background-work/background-tasks/persistent/getting-started/define-work).
 
-- `DailyReminder.configure(context, enabled, hour, minute)` écrit les clés `reminderEnabled`, `reminderHour` et `reminderMinute` dans les préférences `hamigo` puis programme ou annule le rappel. Valeurs initiales : désactivé, 20:00.
-- Un `AlarmManager.setAndAllowWhileIdle` **inexact** est recalculé chaque jour en heure locale et après redémarrage, changement de fuseau ou d'heure. Le système peut retarder sa livraison pour économiser la batterie. Il n'est pas nécessaire de demander l'autorisation des alarmes exactes. Voir les [rappels Android](https://developer.android.com/develop/background-work/services/alarms).
-- L'UI demande `POST_NOTIFICATIONS` sur Android 13 et suivants avant activation. Le canal `daily_practice` est créé, et toucher le rappel ouvre l'application. Voir l'[autorisation Android de notification](https://developer.android.com/develop/ui/compose/notifications/notification-permission).
-- Déclarer `INTERNET`, `RECEIVE_BOOT_COMPLETED`, `POST_NOTIFICATIONS`, le receiver `.platform.ReminderReceiver` (non exporté) pour `BOOT_COMPLETED`, `TIME_SET`, `TIMEZONE_CHANGED`, `MY_PACKAGE_REPLACED`, et un `FileProvider` non exporté avec l'autorité `${applicationId}.files`.
-- Les partages utilisent uniquement `<cache-path name="shared" path="share/"/>`, un URI `content://`, `ClipData` et une permission de lecture temporaire. Aucun accès général au stockage n'est demandé. Voir le [FileProvider Android](https://developer.android.com/reference/androidx/core/content/FileProvider).
-- Les lectures d'amis sont anonymes et utilisent une URL API reconstruite après validation stricte de l'hôte. Le jeton n'est jamais envoyé à un lien fourni par l'utilisateur. Les connexions n'acceptent pas de redirection, ont des délais de 15 secondes et bornent les réponses.
-- `GitHubSync.push(ShareProgress)` renvoie `GistSnapshot(id, url, progress)` ; `read(urlOrId)` renvoie un `ShareProgress`. Les erreurs réseau ont des messages compréhensibles. La création utilise `public: false`, et les publications suivantes utilisent PATCH. Les appels respectent les [endpoints REST Gist officiels](https://docs.github.com/en/rest/gists/gists).
+## Fusion entre appareils
+
+`CloudProgress` conserve un socle pour les données antérieures à la mise à jour. Les anciens totaux et XP journaliers se fusionnent par maximum, et les leçons terminées par union : l'ancien format ne permet pas de distinguer deux historiques indépendants qui avaient déjà été cumulés.
+
+Les nouvelles tentatives sont des événements immuables identifiés par UUID. Leur union additionne les réponses sans les compter à nouveau lors d'une seconde lecture. L'XP associé à la même question et au même jour se fusionne par maximum ; le bonus d'une même leçon n'est attribué qu'une fois. Chaque révision porte une date de modification : la plus récente gagne, avec une règle déterministe en cas d'égalité. Le pseudo et les préférences sont horodatés uniquement lorsque l'utilisateur les modifie, afin que les valeurs par défaut d'un nouvel appareil n'écrasent pas le profil existant.
+
+Les fichiers de tous les appareils sont fusionnés à chaque lecture, puis republient une vue agrégée. Les lectures et mutations locales sont protégées par `Progress.CLOUD_LOCK`, et les publications dans un même processus par une coroutine `Mutex`. Le Gist n'est pas une base transactionnelle : une activité locale survenant pendant une publication peut attendre la prochaine actualisation, mais ses événements restent conservés localement et dans le fichier de son appareil dès publication. Aucune fusion ne remplace aveuglément l'état local par le dernier fichier reçu.
+
+## Lien HTTPS et QR code
+
+`FriendInvite.link` produit `https://alexmalfr.github.io/hamigo/?invite=<identifiant-du-Gist-social>`. Ce lien peut circuler dans Discord et les autres messageries qui reconnaissent HTTPS. Android App Links ouvre Hamigo ; la page statique GitHub Pages propose aussi un bouton vers `hamigo://join?invite=...`. Si l'application est absente, elle invite à demander l'APK à l'ami : les releases restent dans le dépôt privé. Le fichier `/.well-known/assetlinks.json` lie le domaine au package Android et au certificat de signature. Aucun serveur applicatif n'est nécessaire.
+
+Le QR code encode exactement le même lien HTTPS, avec une marge blanche et une correction d'erreur M. L'appareil photo du téléphone suffit pour le lire ; Hamigo ne demande donc pas une permission caméra uniquement pour partager son invitation. Le parseur refuse les hôtes différents, les identifiants invalides, les URL contenant des identifiants de connexion, les fragments et les paramètres ambigus/répétés. L'import de profils via JSON est supprimé. Une sauvegarde JSON complète reste un outil avancé de migration, distinct du partage social.
+
+## Protection du jeton et limites
+
+Le jeton est chiffré en AES-256-GCM dans les préférences privées, avec une clé Android Keystore et un IV aléatoire. Il n'est ni journalisé, ni exporté, ni inclus dans les Gists. Les appels API reconstruisent l'hôte fixe `api.github.com` après validation de l'identifiant ; une URL d'invitation n'est jamais appelée avec le jeton. Les lectures d'amis utilisent la connexion GitHub lorsqu'elle existe, sinon elles sont anonymes et soumises au plafond anonyme de GitHub. Voir [Android Keystore](https://developer.android.com/privacy-and-security/keystore).
+
+Les connexions ont des délais de 15 secondes, n'acceptent aucune redirection et bornent les réponses API à 20 Mio. Une sauvegarde est bornée à 8 Mio et 100 000 nouveaux événements, avec au maximum 20 000 révisions. Une sauvegarde tronquée par l'API Gist est lue uniquement sur une URL `gist.githubusercontent.com` strictement validée à partir de l'identité, du Gist, de sa révision et du nom de fichier ; cette lecture brute ne porte aucun jeton. Le format social est borné à 32 Kio et accepte les anciens résumés de schéma 1 ainsi que le schéma 2 avec graphiques.
 
 ## Vérification
 
-Les tests instrumentés `PlatformInstrumentedTest` couvrent le cycle de vie d'un jeton isolé, les IV aléatoires, l'absence de clair dans les préférences, le contrat JSON social, le PNG et son URI FileProvider, l'heure locale lors du changement d'heure, ainsi que la programmation/annulation sans autorisation d'alarme exacte. Ils ne réalisent aucune connexion GitHub ni publication, et ne touchent pas le véritable jeton de l'utilisateur.
+`CloudSyncInstrumentedTest` vérifie hors réseau la fusion commutative et idempotente, les événements de deux appareils, la déduplication XP question/jour et bonus de leçon, les anciens socles, le choix des révisions/préférences, le rejet des données malformées, les liens d'invitation et le décodage réel du QR produit. Les tests de plateforme existants couvrent le chiffrement du jeton, les URI de partage et les rappels. Ces tests n'utilisent aucun compte réel et ne publient aucun Gist.

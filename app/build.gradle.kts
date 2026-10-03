@@ -15,6 +15,11 @@ val commitCount = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
 val revision = git("rev-parse", "--short=8", "HEAD").ifEmpty { "local" }
 val dirty = git("status", "--porcelain").isNotEmpty()
 
+// Optional fresh output directory when Windows/OneDrive locks an earlier generated package.
+providers.gradleProperty("hamigoBuildRoot").orNull?.let { buildRoot ->
+    layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("$buildRoot/app"))
+}
+
 android {
     namespace = "com.malfreyt.alexandre.hamigo"
     compileSdk = 36
@@ -58,6 +63,8 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.3.2")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("com.google.zxing:core:3.5.3")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")

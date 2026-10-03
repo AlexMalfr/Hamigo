@@ -7,6 +7,10 @@ import java.time.LocalDate
 import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import com.malfreyt.alexandre.hamigo.platform.CloudProgress
+import com.malfreyt.alexandre.hamigo.platform.DailyPoint
+import com.malfreyt.alexandre.hamigo.platform.DailyReminder
+import com.malfreyt.alexandre.hamigo.platform.ProgressSyncScheduler
 
 data class PairItem(val left: String, val right: String)
 data class Question(
@@ -48,6 +52,7 @@ object LearningRules {
         return value.isFinite() && kotlin.math.abs(value - expected) <= max(tolerance, 1e-8) + max(1e-10, kotlin.math.abs(expected)*1e-12)
     }
     fun examPassed(regulation: Int, technique: Int) = regulation >= 10 && technique >= 10
+    fun lessonPassed(correct: Int, count: Int) = count > 0 && correct * 5 >= count * 4
 }
 
 class Content(private val context: Context) {
@@ -75,7 +80,7 @@ class Content(private val context: Context) {
         Question("flash-${cat.id}-$i", row.term, listOf(row.description), 0, row.extra,
             topic = cat.id, kind = "flash", source = cat.title)
     } }
-    val procedural = (0..250).flatMap { PracticeGenerator.create(it) }.distinctBy { it.id }
+    val procedural = ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
     val allQuestions = (lessons.flatMap { it.questions } + exam + flashcards + procedural).associateBy { it.id }
     val topics = activeExam.groupBy { it.topic }.toSortedMap()
     fun nextLesson(completed: Set<String>) = lessons.firstOrNull { it.id !in completed }
@@ -93,11 +98,15 @@ fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
 fun JSONArray.strings() = (0 until length()).map { getString(it) }
 
 class Progress(private val context: Context) {
+    companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
     var name: String
         get() = prefs.getString("name", "Pilote des ondes")!!
-        set(value) { prefs.edit().putString("name", value.take(40).ifBlank { "Pilote des ondes" }).apply() }
+        set(value) {
+            synchronized(CLOUD_LOCK) { prefs.edit().putString("name", value.take(40).ifBlank { "Pilote des ondes" }).putLong("profileUpdatedAt",System.currentTimeMillis()).apply() }
+            ProgressSyncScheduler.enqueue(context)
+        }
     val completed: Set<String> get() = (root.optJSONArray("completed") ?: JSONArray()).strings().toSet()
     val reviews: Map<String, Review> get() {
         val obj = root.optJSONObject("reviews") ?: JSONObject()
@@ -115,27 +124,36 @@ class Progress(private val context: Context) {
     fun dayXp(day: LocalDate) = root.optJSONObject("dailyXp")?.optInt(day.toString()) ?: 0
     fun due(content: Content) = reviews.filter { (id, r) -> r.due <= System.currentTimeMillis() && id in content.allQuestions }
         .toList().sortedBy { it.second.due }.mapNotNull { content.allQuestions[it.first] }
-    fun answer(id: String, correct: Boolean, quality: Int = if (correct) 4 else 1): Int {
+    fun answer(id: String, correct: Boolean, quality: Int = if (correct) 4 else 1): Int = synchronized(CLOUD_LOCK) {
+        reload()
+        CloudProgress.ensureLedger(root)
         val now = System.currentTimeMillis()
         val previous = reviews[id] ?: Review()
         // Early successful rereading isn't a spaced recall. Failed items may be corrected immediately.
         val review = if(correct && previous.repetitions>0 && previous.due>now) previous else SpacedRepetition.next(previous, quality, now)
         val obj = root.optJSONObject("reviews") ?: JSONObject().also { root.put("reviews", it) }
         obj.put(id, JSONObject().put("due", review.due).put("interval", review.interval).put("ease", review.ease)
-            .put("repetitions", review.repetitions).put("lapses", review.lapses))
+            .put("repetitions", review.repetitions).put("lapses", review.lapses).put("updatedAt",now))
         // Revisiting a card early is allowed, but can't farm XP on the same item in the same day.
         val awarded = root.optJSONObject("awarded") ?: JSONObject().also { root.put("awarded", it) }
         val day = LocalDate.now().toString()
-        val gain = if (awarded.optString(id) == day) 0 else if (correct) 10 else 2
+        val gain = if (awarded.optString(id) == day) 0 else if (correct) 3 else 1
         awarded.put(id, day)
         root.put("answers", totalAnswers + 1).put("correct", totalCorrect + if (correct) 1 else 0)
-        addXp(gain); save(); return gain
+        addXp(gain)
+        CloudProgress.recordEvent(root,day,gain,answers=1,correct=if(correct)1 else 0,awardKey=if(gain>0)"answer:$id:$day" else null)
+        save(); gain
     }
-    fun complete(id: String): Int {
+    fun complete(id: String): Int = synchronized(CLOUD_LOCK) {
+        reload()
+        CloudProgress.ensureLedger(root)
         if (id !in completed) {
-            root.put("completed", JSONArray((completed + id).toList())); addXp(20); save();return 20
+            root.put("completed", JSONArray((completed + id).toList())); addXp(6)
+            CloudProgress.recordEvent(root,LocalDate.now().toString(),6,completed=id)
+            save(); 6
+        } else {
+            0
         }
-        return 0
     }
     private fun addXp(gain: Int) {
         root.put("xp", xp + gain)
@@ -144,12 +162,50 @@ class Progress(private val context: Context) {
             val day = LocalDate.now().toString(); days.put(day, days.optInt(day) + gain)
         }
     }
-    private fun save() { root.put("schema", 1); prefs.edit().putString("progress", root.toString()).apply() }
-    fun export() = JSONObject().put("app", "hamigo").put("schema", 1).put("name", name).put("progress", root).toString(2)
+    private fun save() { root.put("schema", 2); prefs.edit().putString("progress", root.toString()).apply() }
+    fun reload() = synchronized(CLOUD_LOCK) {
+        root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
+    }
+    fun setDailyGoal(goal:Int) {
+        require(goal in 1..1000)
+        prefs.edit().putInt("dailyGoal",goal).putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
+        ProgressSyncScheduler.enqueue(context)
+    }
+    fun cloudExport():String = synchronized(CLOUD_LOCK) {
+        reload(); CloudProgress.ensureLedger(root); save()
+        JSONObject().put("app","hamigo").put("schema",2).put("name",name)
+            .put("profileUpdatedAt",prefs.getLong("profileUpdatedAt",if(name!="Pilote des ondes")1 else 0))
+            .put("preferencesUpdatedAt",prefs.getLong("preferencesUpdatedAt",if(prefs.contains("dailyGoal") || prefs.contains("reminderHour"))1 else 0))
+            .put("preferences",JSONObject().put("dailyGoal",dailyGoal)
+                .put("reminderEnabled",prefs.getBoolean("reminderEnabled",false))
+                .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0)))
+            .put("progress",root).toString()
+    }
+    fun mergeCloud(json:String):Boolean = synchronized(CLOUD_LOCK) {
+        val previousReminder=reminderSettings()
+        val before=cloudExport()
+        val merged=CloudProgress.merge(before,json)
+        val candidate=JSONObject(merged)
+        root=candidate.getJSONObject("progress")
+        val editor=prefs.edit().putString("name",candidate.optString("name",name))
+            .putLong("profileUpdatedAt",candidate.optLong("profileUpdatedAt"))
+            .putLong("preferencesUpdatedAt",candidate.optLong("preferencesUpdatedAt"))
+        candidate.optJSONObject("preferences")?.let { settings ->
+            editor.putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal).coerceIn(1,1000))
+                .putInt("reminderHour",settings.optInt("reminderHour",20).coerceIn(0,23))
+                .putInt("reminderMinute",settings.optInt("reminderMinute",0).coerceIn(0,59))
+                .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
+        }
+        editor.apply(); save()
+        if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
+        before != cloudExport()
+    }
+    fun export() = cloudExport()
     fun import(json: String) {
         val candidate = JSONObject(json)
-        require(candidate.optString("app") == "hamigo" && candidate.optInt("schema") == 1) { "Ce fichier n'est pas une sauvegarde Hamigo." }
+        require(candidate.optString("app") == "hamigo" && candidate.optInt("schema") in 1..2) { "Ce fichier n'est pas une sauvegarde Hamigo." }
         val state = candidate.getJSONObject("progress")
+        CloudProgress.validate(json)
         require(state.optInt("xp") >= 0 && state.optInt("answers") >= 0) { "Sauvegarde invalide." }
         val importedReviews = state.optJSONObject("reviews") ?: JSONObject()
         require(importedReviews.length() <= 20_000) { "Sauvegarde trop volumineuse." }
@@ -157,9 +213,23 @@ class Progress(private val context: Context) {
             val r = importedReviews.getJSONObject(key)
             require(r.getDouble("ease").isFinite() && r.getDouble("ease") >= 1.3 && r.getDouble("interval").isFinite() && r.getDouble("interval") >= 0 && r.getLong("due") >= 0)
         }
-        root = state; name = candidate.optString("name", name); save()
+        synchronized(CLOUD_LOCK) {
+            val previousReminder=reminderSettings()
+            root = state; name = candidate.optString("name", name)
+            candidate.optJSONObject("preferences")?.let {settings ->
+                prefs.edit().putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal))
+                    .putInt("reminderHour",settings.optInt("reminderHour",20)).putInt("reminderMinute",settings.optInt("reminderMinute",0))
+                    .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
+                    .putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
+            }
+            save()
+            if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
+        }
+        ProgressSyncScheduler.enqueue(context)
     }
-    fun snapshot() = com.malfreyt.alexandre.hamigo.platform.ShareProgress(name, xp, streak, completed.size, weeklyXp)
+    private fun reminderSettings() = Triple(prefs.getBoolean("reminderEnabled",false),prefs.getInt("reminderHour",20),prefs.getInt("reminderMinute",0))
+    fun snapshot() = com.malfreyt.alexandre.hamigo.platform.ShareProgress(name, xp, streak, completed.size, weeklyXp,
+        dailyXp=(0L..13L).reversed().map { LocalDate.now().minusDays(it).let { day->DailyPoint(day.toString(),dayXp(day)) } })
 }
 
 object PracticeGenerator {

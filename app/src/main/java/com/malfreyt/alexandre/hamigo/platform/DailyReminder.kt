@@ -10,7 +10,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Build
+import com.malfreyt.alexandre.hamigo.Progress
+import com.malfreyt.alexandre.hamigo.R
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
 
@@ -22,11 +26,16 @@ object DailyReminder {
 
     fun configure(context: Context, enabled: Boolean, hour: Int = 20, minute: Int = 0) {
         require(hour in 0..23 && minute in 0..59)
-        context.getSharedPreferences("hamigo", Context.MODE_PRIVATE).edit()
-            .putBoolean("reminderEnabled", enabled)
-            .putInt("reminderHour", hour)
-            .putInt("reminderMinute", minute)
-            .apply()
+        synchronized(Progress.CLOUD_LOCK) {
+            val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
+            val changed = prefs.getBoolean("reminderEnabled", false) != enabled ||
+                prefs.getInt("reminderHour", 20) != hour || prefs.getInt("reminderMinute", 0) != minute
+            val edit = prefs.edit().putBoolean("reminderEnabled", enabled)
+                .putInt("reminderHour", hour).putInt("reminderMinute", minute)
+            if (changed) edit.putLong("preferencesUpdatedAt", System.currentTimeMillis())
+            edit.apply()
+            if (changed) ProgressSyncScheduler.enqueue(context)
+        }
         schedule(context)
     }
 
@@ -63,9 +72,15 @@ object DailyReminder {
         return next.toInstant().toEpochMilli()
     }
 
-    fun showTest(context: Context): Boolean = notify(context, "On se remet sur la bonne fréquence ?")
+    fun showTest(context: Context): Boolean = notify(context)
 
-    internal fun notify(context: Context, message: String = "5 minutes, quelques XP et une série qui continue !"): Boolean {
+    internal fun notify(context: Context, message: String? = null): Boolean {
+        val content = ReminderContent.build(Progress(context.applicationContext), LocalDate.now())
+        return showPreview(context, if (message == null) content else content.copy(message = message))
+    }
+
+    /** Also used by visual QA: the same artwork and Android template as a scheduled reminder. */
+    fun showPreview(context: Context, reminder: ReminderMessage): Boolean {
         createChannel(context)
         val manager = context.getSystemService(NotificationManager::class.java)
         if (!manager.areNotificationsEnabled()) return false
@@ -75,16 +90,25 @@ object DailyReminder {
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
             ?: Intent().setClassName(context.packageName, "${context.packageName}.MainActivity")
         launch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        launch.putExtra("hamigo_route", "path")
         val content = PendingIntent.getActivity(context, REQUEST_CODE, launch,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = Notification.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("Hamigo t'attend 📻")
-            .setContentText(message)
-            .setStyle(Notification.BigTextStyle().bigText(message))
+            .setSmallIcon(R.drawable.ic_notification_radio)
+            .setLargeIcon(ReminderArtwork.avatar(reminder))
+            .setContentTitle(reminder.title)
+            .setContentText(reminder.message)
+            .setStyle(Notification.BigPictureStyle()
+                .bigPicture(ReminderArtwork.render(reminder))
+                .bigLargeIcon(null as Bitmap?)
+                .setBigContentTitle(reminder.title)
+                .setSummaryText(reminder.message))
             .setContentIntent(content)
             .setAutoCancel(true)
-            .setColor(0xff14796b.toInt())
+            .setColor(reminder.accent)
+            .setCategory(Notification.CATEGORY_REMINDER)
+            .setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setTimeoutAfter(20L * 60 * 60 * 1000)
             .build()
         return try { manager.notify(REQUEST_CODE, notification); true } catch (_: SecurityException) { false }
     }

@@ -1,6 +1,7 @@
 package com.malfreyt.alexandre.hamigo
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.malfreyt.alexandre.hamigo.platform.GitHubSync
 import com.malfreyt.alexandre.hamigo.platform.ShareProgress
+import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -17,6 +19,7 @@ data class Friend(val progress: ShareProgress, val gist: String = "")
 class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false) {
     var index = 0
     var correct = 0
+    var firstCorrect = 0
     var gain = 0
     var feedback: Boolean? = null
     var started = System.currentTimeMillis()
@@ -26,6 +29,7 @@ class Session(val title: String, val questions: MutableList<Question>, val lesso
     val missed = linkedMapOf<String, Question>()
     val unresolved = linkedSetOf<String>()
     val firstCount = questions.size
+    val lessonPassed get() = LearningRules.lessonPassed(firstCorrect,firstCount) && unresolved.isEmpty()
     val done get() = index >= questions.size
     val current get() = questions.getOrNull(index)
     val examTimeRemaining: Long get() = ((if (index < 20) 15 else 30) * 60_000L - (System.currentTimeMillis() - started)).coerceAtLeast(0)
@@ -35,6 +39,8 @@ class AppModel : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var context: Context
     lateinit var progress: Progress
+    var displayedProgress by mutableStateOf<Progress?>(null)
+        private set
     lateinit var sync: GitHubSync
     var content by mutableStateOf<Content?>(null)
     var error by mutableStateOf<String?>(null)
@@ -48,20 +54,33 @@ class AppModel : ViewModel() {
     var busy by mutableStateOf(false)
     private var taskJob: Job? = null
     private var socialJob: Job? = null
+    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key in setOf("progress", "friends", "name", "dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute",
+                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownGistUrl")) {
+            // Workers can finish while a screen remains open. Reload data without starting another sync.
+            scope.launch { refresh() }
+        }
+    }
     var incoming by mutableStateOf<String?>(null)
     var showWelcome by mutableStateOf(false)
+    var oauthSession by mutableStateOf<DeviceOAuth.Session?>(null)
+    var pendingInvite by mutableStateOf<String?>(null)
     fun initialize(ctx: Context) {
         if (::progress.isInitialized) return
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
+        displayedProgress=progress
+        progress.prefs.registerOnSharedPreferenceChangeListener(preferenceListener)
+        context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(preferenceListener)
+        DailyReminder.schedule(context)
         showWelcome = !progress.prefs.getBoolean("welcomed", false)
         scope.launch {
             runCatching { withContext(Dispatchers.IO) { Content(context) } }
-                .onSuccess { content = it; loadFriends(); refreshSocial() }
+                .onSuccess { content = it; loadFriends(); ProgressSyncScheduler.schedule(context); refreshSocial() }
                 .onFailure { error = "Chargement impossible : ${it.message}" }
         }
     }
-    fun welcome(name: String) { progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).apply(); showWelcome=false; revision++ }
+    fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).apply(); showWelcome=false; revision++ }
     fun startLesson(l: Lesson) { lesson=l; session=null }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
         require(questions.isNotEmpty())
@@ -72,10 +91,12 @@ class AppModel : ViewModel() {
         if (s.feedback != null) return
         if (!omitted) s.gain += progress.answer(q.id, correct, quality)
         if (correct) {
+            if(s.index<s.firstCount) s.firstCorrect++
             s.correct++; s.unresolved.remove(q.id)
             if(q.section == "regulation") s.regulationScore++ else s.techniqueScore++
         } else { s.missed[q.id]=q; s.unresolved.add(q.id); if(omitted) s.unanswered++ }
         s.feedback=correct; revision++
+        ProgressSyncScheduler.enqueue(context)
         if(s.exam) next()
     }
     fun next() {
@@ -85,7 +106,7 @@ class AppModel : ViewModel() {
         s.index++; s.feedback=null
         if(s.exam && s.index==20) s.started=System.currentTimeMillis()
         if(s.done) {
-            if(s.lessonId != null && s.unresolved.isEmpty()) { s.gain += progress.complete(s.lessonId) }
+            if(s.lessonId != null && s.lessonPassed) { s.gain += progress.complete(s.lessonId) }
             refreshSocial()
         }
         revision++
@@ -96,7 +117,14 @@ class AppModel : ViewModel() {
         val end=if(s.index<20) 20 else 40
         while(s.index < end && !s.done) answer(false, omitted=true)
     }
-    fun refresh() { revision++ }
+    fun refresh() {
+        if(::progress.isInitialized) {
+            progress.reload(); loadFriends()
+            // Compose also needs a new display value, rather than a mutated cached Progress instance.
+            displayedProgress=Progress(context)
+        }
+        revision++
+    }
     fun leaveSession() { session=null; lesson=null; refreshSocial() }
     private fun loadFriends() {
         friends = runCatching { JSONArray(progress.prefs.getString("friends","[]")).objects().map { f ->
@@ -106,16 +134,32 @@ class AppModel : ViewModel() {
         progress.prefs.edit().putString("friends", JSONArray(friends.map { JSONObject().put("progress", JSONObject(it.progress.toJson())).put("gist",it.gist) }).toString()).apply()
     }
     fun addFriend(friend: Friend) {
-        friends=(friends.filterNot { (friend.gist.isNotBlank() && it.gist == friend.gist) || it.progress.name == friend.progress.name } + friend).takeLast(30)
+        synchronized(Progress.CLOUD_LOCK) {
+        loadFriends()
+        val identity = runCatching { GitHubSync.gistId(friend.gist) }.getOrNull()
+        friends=(friends.filterNot { identity != null && runCatching { GitHubSync.gistId(it.gist) }.getOrNull() == identity } + friend).takeLast(30)
         saveFriends()
+        }
     }
-    fun removeFriend(friend: Friend) { friends=friends-friend; saveFriends() }
-    fun importFriend(json: String) { runCatching { addFriend(Friend(ShareProgress.fromJson(json))) }.onFailure { message=it.message } }
-    fun readFriend(gist: String) = task {
-        val friend=sync.read(gist.trim()); addFriend(Friend(friend,gist.trim())); message="${friend.name} rejoint ton équipe !"
+    fun removeFriend(friend: Friend) { synchronized(Progress.CLOUD_LOCK) { loadFriends();friends=friends.filterNot {it.gist==friend.gist && it.progress.name==friend.progress.name}; saveFriends() } }
+    fun startGitHubConnection() = task {
+        try {
+            val device=DeviceOAuth.start(GitHubApp.CLIENT_ID); oauthSession=device
+            val token=DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID,device)
+            val user=sync.connect(token); sync.synchronize(progress)
+            ProgressSyncScheduler.schedule(context); message="Bienvenue ${user.login} ! Ton voyage est synchronisé."
+        } finally { oauthSession=null }
     }
-    fun connect(token: String) = task {
-        val user=sync.connect(token); sync.push(progress.snapshot()); revision++; message="Compte ${user.login} connecté. Ta progression est synchronisée."
+    fun disconnectGitHub() { sync.disconnect(); ProgressSyncScheduler.cancel(context); refresh() }
+    fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }
+    fun acceptInvite() {
+        val invite=pendingInvite ?: return
+        pendingInvite=null
+        task {
+            if(sync.savedGistUrl?.let { GitHubSync.gistId(it) } == invite) {message="C'est ton propre lien d'invitation.";return@task}
+            val friend=sync.read(invite)
+            addFriend(Friend(friend,"https://gist.github.com/$invite"));route="friends";message="${friend.name} rejoint ton équipe !"
+        }
     }
     fun refreshSocial(manual: Boolean = false) {
         if(busy || socialJob?.isActive==true) return
@@ -123,14 +167,23 @@ class AppModel : ViewModel() {
         socialJob=scope.launch {
             if(manual) busy=true
             var failures=0
-            if(progress.prefs.getBoolean("autoSync",true) && runCatching { sync.tokens.get() }.getOrNull()!=null) {
-                try { sync.push(progress.snapshot()) } catch(e:CancellationException){throw e} catch(e:Exception){failures++}
+            if((manual || progress.prefs.getBoolean("autoSync",true)) && runCatching { sync.tokens.get() }.getOrNull()!=null) {
+                try { sync.synchronize(progress) } catch(e:CancellationException){throw e} catch(e:Exception){failures++}
             }
             val updates = friends.map { friend ->
                 if(friend.gist.isBlank()) friend else try { Friend(sync.read(friend.gist),friend.gist) } catch(e:CancellationException){throw e} catch(e:Exception){failures++;friend}
             }
             val byGist=updates.filter{it.gist.isNotBlank()}.associateBy{it.gist}
-            friends=friends.map{byGist[it.gist] ?: it}; saveFriends(); revision++
+            synchronized(Progress.CLOUD_LOCK) {
+                loadFriends()
+                friends=friends.map { previous ->
+                    val updated=byGist[previous.gist]
+                    val previousTime=runCatching { Instant.parse(previous.progress.updatedAt) }.getOrNull()
+                    val updateTime=updated?.let { runCatching { Instant.parse(it.progress.updatedAt) }.getOrNull() }
+                    if(updated==null || (previousTime!=null && updateTime!=null && previousTime.isAfter(updateTime))) previous else updated
+                }
+                saveFriends()
+            }; revision++
             if(manual) { busy=false; message=if(failures==0) "Progressions actualisées." else "Connexion indisponible. Les dernières progressions restent consultables." }
         }
     }
@@ -141,5 +194,11 @@ class AppModel : ViewModel() {
     }
     fun cancelTask() { taskJob?.cancel() }
     fun restore(json: String) { runCatching { progress.import(json);revision++;message="Sauvegarde restaurée." }.onFailure {message=it.message} }
-    override fun onCleared() { scope.cancel() }
+    override fun onCleared() {
+        if(::progress.isInitialized) {
+            progress.prefs.unregisterOnSharedPreferenceChangeListener(preferenceListener)
+            context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(preferenceListener)
+        }
+        scope.cancel()
+    }
 }

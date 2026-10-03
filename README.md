@@ -4,23 +4,29 @@ Ton compagnon pour préparer le **certificat d’opérateur des services d’ama
 
 ## Apprendre et réviser
 
-- Parcours stable de **14 chapitres, 56 leçons et 224 exercices originaux**.
-- QCM, associations, étapes à ordonner, saisie de calculs, résistances dessinées et cadran VHF interactif.
+- Parcours de **21 chapitres, 94 leçons et 826 exercices originaux**, avec un chapitre Morse de 14 leçons couvrant les lettres, les chiffres, la ponctuation, l'écoute et la transmission de groupes.
+- **15 formats d'exercice et de révision** : QCM, vrai/faux, phrases à compléter, sélection multiple, associations, étapes à ordonner, calculs, résistances dessinées, cadran VHF, estimation au curseur, interrupteurs binaires, formes d'onde, écoute Morse, composition Morse et flashcards. Treize de ces formats sont présents dans les cours.
 - **2 961 questions communautaires Exam1 REF**, avec toutes leurs illustrations archivées. Le mélange courant utilise 2 950 questions après 11 exclusions documentées.
-- Entraînement tous thèmes ou thèmes sélectionnés, séances de 5/10/20 questions, laboratoire de calculs à valeurs renouvelées.
+- **5 188 variantes procédurales** aux identifiants stables pour les retrouver en répétition espacée. Les séances de cours mélangent les questions et ajoutent, lorsque la notion le permet, des variantes des concepts enseignés.
+- Page Défis organisée en examen blanc, laboratoire de 12 exercices et mix sur mesure. Le mix propose 10/20/40/80/150 questions et un nombre libre de **1 à 1 000**, dans la limite des questions disponibles pour la sélection. Les sous-thèmes sont regroupés sous Réglementation et Technique dans une section repliable ; les variantes Hamigo peuvent être incluses.
 - Examen blanc : 20 questions de réglementation en 15 minutes, puis 20 de technique en 30 minutes. +1 bonne réponse, 0 autrement, 10/20 requis dans chaque partie.
-- **17 fiches mémo et 364 flashcards** : alphabet international, Morse avec écoute, codes Q, résistances, unités, formules, bandes, indicatifs, émissions, RST, propagation et examen.
-- Répétition espacée inspirée de SM-2, corrections expliquées, XP, niveaux, objectif quotidien, série de jours et rappels Android.
+- **17 fiches mémo et 364 flashcards**, avec un bouton de révision dans un ordre aléatoire. Les anneaux de résistances montrent leurs couleurs et les signaux Morse sont dessinés avec de grands points et traits alignés.
+- Outils interactifs dans les fiches adaptées : lecture et composition des résistances à quatre ou cinq anneaux, associations série/parallèle, traducteur texte ↔ Morse avec son, rapports ↔ décibels, loi d'Ohm et fréquence ↔ longueur d'onde.
+- Répétition espacée inspirée de SM-2, corrections expliquées, XP, niveaux, objectif quotidien, série de jours et rappels Android. Pico accompagne les questions avec **8 expressions et 6 poses** ; les notifications illustrées changent selon le jour et la progression de la série ou de l'objectif.
 
-Les mauvaises réponses reviennent après dix minutes, puis les bonnes réponses s’espacent. Relire prématurément une carte déjà acquise n’allonge pas artificiellement son intervalle. Le bonus de leçon est attribué une seule fois ; l’XP d’une même question ne peut pas être accumulé à répétition le même jour. Une leçon se valide quand toutes les erreurs ont été corrigées.
+Les mauvaises réponses reviennent après dix minutes, puis les bonnes réponses s'espacent. Relire prématurément une carte déjà acquise n'allonge pas artificiellement son intervalle. Une question rapporte 3 XP si elle est réussie, 1 XP en cas d'erreur, au plus une attribution par question et par jour ; une première validation de leçon ajoute 6 XP. Une leçon exige **au moins 80 % de bonnes réponses au premier essai et aucune erreur restante** : corriger ensuite une séance entièrement ratée ne suffit pas à valider la leçon.
 
 ## Jouer ensemble
 
-Partage une carte de progression via le menu Android, importe le profil JSON d’un ami, compare vos XP de la semaine et envoie un « coup d’antenne » via ton application de messagerie.
+Partage ta progression via le menu Android, compare vos XP de la semaine et envoie un « coup d'antenne » via ton application de messagerie. La page Moi produit une image personnelle avec un graphique d'activité ; la page Équipe produit une autre image avec les progrès des équipiers et leurs XP hebdomadaires.
 
-La connexion GitHub est facultative : un Gist secret conserve le résumé de progression, actualisé à l’ouverture et après les séances. Les amis s’actualisent grâce à leur lien. Connexion par jeton limité aux Gists, ou Device Flow d’une application OAuth personnelle. Aucun compte ni réseau n’est requis pour apprendre. Voir [la configuration sociale](docs/SOCIAL.md).
+La connexion GitHub est facultative et proposée dès l'onboarding, puis mise en avant dans Équipe. L'application OAuth **Hamigo commune** utilise Device Flow : aucun jeton à coller, aucun Client ID personnel et aucun secret OAuth embarqué. Aucun compte ni réseau n'est requis pour apprendre. Voir [la synchronisation et les invitations](docs/SOCIAL.md).
 
-Le résumé social ne contient pas ton historique de réponses ni tes credentials. Un Gist secret est non répertorié et accessible avec son URL. Les sauvegardes complètes sont exportées/importées localement depuis les réglages.
+Deux Gists distincts conservent la **sauvegarde complète** de l'apprentissage et le **résumé social**. La sauvegarde comprend les leçons, l'XP, les tentatives, les échéances de révision et les préférences ; le résumé ne contient que les statistiques partageables et leurs points journaliers. Les deux Gists sont secrets au sens GitHub : **non répertoriés, mais lisibles par toute personne possédant leur URL**. La sauvegarde complète n'est pas chiffrée ; les jetons, les clés Keystore et la liste locale des amis n'y figurent jamais.
+
+La lecture, la fusion et la publication se font à la connexion, au retour dans l'app, en fin de séance et sur actualisation manuelle. Les réponses déclenchent aussi un travail persistant regroupé **8 secondes après la dernière réponse**. En arrière-plan, WorkManager demande une actualisation **toutes les heures** avec réseau disponible et batterie suffisante ; Android peut retarder son exécution. La fusion conserve les événements de plusieurs appareils et évite de réattribuer l'XP lors d'une nouvelle lecture.
+
+Les invitations utilisent un **lien HTTPS et son QR code**, partageables dans Discord et les autres messageries. Android App Links ouvre Hamigo ; une page statique GitHub Pages propose également un bouton d'ouverture de l'app. L'invitation ne contient que l'identifiant du Gist social. Le partage et l'import de profils JSON sont supprimés ; une sauvegarde JSON complète reste disponible parmi les options avancées des réglages.
 
 ## Compiler
 
@@ -51,7 +57,7 @@ La clé et ses propriétés sont dans `.tools/`, exclus du dépôt. Les conserve
 .\gradlew.bat :app:testDebugUnitTest :app:connectedDebugAndroidTest
 ```
 
-Les tests portent sur le calendrier SRS, les séries de jours et changements d’heure, les seuils d’examen, les réponses numériques, les données importées, la sauvegarde, la protection des jetons, les fichiers partagés et les rappels.
+Les tests portent sur le calendrier SRS, les séries de jours et changements d'heure, les seuils d'examen et de maîtrise, les réponses numériques, les variantes procédurales, les outils de calcul, la fusion de sauvegardes, les liens et QR codes, la protection des jetons, les images partagées et les rappels contextuels.
 
 Les captures, résultats de validation et APK livrés sont dans `output/` (non versionné). La banque source complète et son import reproductible restent dans `data/sources/exam1/` et `tools/import_exam1.ps1`.
 

@@ -3,6 +3,7 @@ package com.malfreyt.alexandre.hamigo
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.lifecycle.ViewModelProvider
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,10 +18,10 @@ class ApplicationSmokeTest {
     @Before
     fun awaitContentAndDismissWelcomeWhenNeeded() {
         ui.waitUntil(timeoutMillis = 60_000) {
-            exists("C'est parti !") || exists("HAMIGO")
+            exists("Commencer sur cet appareil") || exists("HAMIGO")
         }
-        if (exists("C'est parti !")) {
-            ui.onNodeWithText("C'est parti !").performClick()
+        if (exists("Commencer sur cet appareil")) {
+            ui.onNodeWithText("Commencer sur cet appareil").performClick()
         }
         awaitText("HAMIGO")
         ui.onNodeWithText("Parcours").assertIsDisplayed()
@@ -57,7 +58,13 @@ class ApplicationSmokeTest {
             ui.onNodeWithText("Bienvenue sur les ondes").performClick()
         }
         ui.onNodeWithText("Le service amateur").performScrollTo().performClick()
-        ui.onNodeWithText("C'est compris · 4 défis").performClick()
+        ui.onNodeWithText("D'abord le déclic.\nEnsuite, à toi de jouer.").assertExists()
+        // Keep this correction/matching smoke path stable while normal lesson sessions randomize.
+        val model = ViewModelProvider(ui.activity)[AppModel::class.java]
+        ui.runOnIdle {
+            val lesson = model.lesson!!
+            model.startQuestions(lesson.title, lesson.questions.take(2), lesson.id)
+        }
 
         awaitText("Quel est l’objectif du service amateur ?")
         ui.onNodeWithText("Diffuser des publicités").performScrollTo().performClick()

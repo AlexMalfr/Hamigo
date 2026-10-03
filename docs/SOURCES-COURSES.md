@@ -1,6 +1,20 @@
 # Sources pédagogiques et vérifications
 
-Contenu préparé le 3 octobre 2026 pour Hamigo. Le parcours est fixe : **14 chapitres, 56 leçons, 224 exercices**. Les fiches de référence contiennent **17 catégories et 364 entrées**. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application; ils ne recopient pas les paragraphes du cours.
+Contenu préparé le 3 octobre 2026 pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **17 catégories et 364 entrées**. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application; ils ne recopient pas les paragraphes du cours.
+
+## Approfondissements du parcours
+
+Les identifiants des 14 chapitres, 56 leçons et 224 questions initiales sont conservés. Sept chapitres supplémentaires sont placés après les notions nécessaires :
+
+- **c15 — Le Morse, de A à Z** : 14 leçons; les 26 lettres, les dix chiffres, la ponctuation courante, la temporisation, l’écoute, la composition, les mots et les groupes d’indicatif. Cette compétence reste facultative pour le certificat français, qui ne comporte pas d’épreuve Morse actuelle.
+- **c16 — Les maths du poste** : conversions, isolation d’inconnues, carrés et racines, rapports et lecture d’oscilloscope.
+- **c17 — RLC, au-delà des recettes** : énergie stockée, réactances calculées, module/phase, accord, Q et chargement.
+- **c18 — RF : voir ce qui sort du poste** : spectres et harmoniques, mélangeurs et images, compression/intermodulation, dBm et rapport signal/bruit.
+- **c19 — Antennes et lignes à la loupe** : coefficient de réflexion, puissance réfléchie et ROS, longueur électrique, pertes et diagnostic mesuré.
+- **c20 — Le numérique décodé** : binaire, symboles et débit, échantillonnage/repliement, détection et correction d’erreurs.
+- **c21 — Le labo des bons réflexes** : reports honnêtes, diagnostic reproductible, réglage d’émission et méthodes de révision.
+
+Chaque nouveau chapitre technique contient quatre leçons à huit exercices. Les leçons Morse utilisent de plus grands réservoirs pour couvrir chaque caractère en lecture, écoute et composition. La progression conserve un ordre pédagogique; la sélection de questions en séance peut varier. Ces nouvelles questions sont distinctes de la banque Exam’1 et ne prétendent pas être des sujets officiels.
 
 ## Source principale
 
@@ -26,6 +40,7 @@ L’encodage original est Windows-1252. L’extraction est un outil d’analyse,
 - [ARCEP : décision 2013-1515](https://www.arcep.fr/uploads/tx_gsavis/13-1515.pdf), puis [décision 2019-1412 et annexe](https://www.arcep.fr/uploads/tx_gsavis/19-1412.pdf) : tableau des bandes, puissances et statuts. Le tableau de 2012 seul omet les ouvertures ultérieures.
 - [OTAN : alphabet, codes et signaux](https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals) : alphabet international, notamment **Alfa** et **Juliett**.
 - [UIT-R M.1677-1 : code Morse international](https://www.itu.int/rec/R-REC-M.1677-1-200910-I) : caractères et temporisation.
+- [ARRL : apprentissage du Morse](https://www.arrl.org/learning-morse-code/) et [temporisation Farnsworth](https://www.arrl.org/files/file/Technology/x9004008.pdf) : entraînement auditif et espacement augmenté entre caractères.
 - [IARU région 1 : plans de bande](https://www.iaru-r1.org/on-the-air/band-plans/) : recommandations d’organisation des usages.
 - [INRS : opérations électriques](https://www.inrs.fr/risques/electriques/operations-installations.html) : principes de mise en sécurité.
 
@@ -39,13 +54,21 @@ Le contenu utilise la **France métropolitaine, région 1 UIT**, pour les limite
 
 ## Format des données
 
-`data/curriculum.json` contient `chapters[].lessons[]`, avec un identifiant stable, un thème, deux à quatre courts paragraphes et quatre exercices. Les types sont :
+`data/curriculum.json` contient `chapters[].lessons[]`, avec un identifiant stable, un thème, des paragraphes explicatifs et au moins huit exercices par leçon. `app/src/main/assets/curriculum.json` est sa copie distribuée identique. Les types sont :
 
 - `choice` : `choices` et `answer`, indice **commençant à zéro**.
 - `number` : `value`, `unit`, `tolerance` absolue. La liste de choix est vide.
 - `match` : `pairs[{left,right}]`.
 - `order` : `choices` contient la séquence correcte; l’interface en mélange la présentation.
 - `resistor` : choix et réponse comme un QCM, avec `bands` pour le dessin des anneaux.
+- `truefalse` : deux choix Vrai/Faux et un indice de réponse.
+- `cloze` : texte à compléter avec `___`, choix et indice de réponse.
+- `multiselect` : plusieurs bonnes réponses; `bands` contient leurs indices sous forme de chaînes.
+- `morseListen` : `bands[0]` contient les points et traits ASCII, les espaces séparent les lettres, `/` sépare les mots; choix et indice de réponse identifient le signal entendu.
+- `morseEncode` : la même notation dans `bands[0]` définit le signal à composer avec les boutons de points, traits et séparateurs.
+- `binary` : `value` est l’entier non signé à composer; `unit` est la largeur binaire (1 à 8 bits).
+- `waveform` : `bands` contient le nom de chaque illustration (`sine`, `square`, `dc`, `am`, `fm`, `noise`), aligné sur les choix.
+- `estimate` : `value`, `unit` et `tolerance`, plus `bands` avec minimum, maximum et pas du curseur.
 
 Les choix des QCM sont distribués de manière déterministe : la réponse correcte n’occupe pas systématiquement le premier emplacement. Chaque réponse dispose d’une explication. Les valeurs numériques sont choisies pour être réalisables sur la calculatrice autorisée, avec unités explicites.
 
@@ -53,7 +76,11 @@ Les choix des QCM sont distribués de manière déterministe : la réponse corre
 
 ## Contrôles de contenu
 
-Les contrôles structurels vérifient les identifiants uniques, les paragraphes, les indices de réponses, les valeurs finies, les tolérances, les séquences et les paires. Les exercices de calcul ont été recalculés à partir des relations exposées : loi d’Ohm, puissance, série/parallèle, pont, RC, sinusoïde, transformateur, mélangeur, décibels, longueur d’onde et bilan de liaison. Les règles datées ont été comparées aux sources officielles ci-dessus.
+Les contrôles structurels vérifient les identifiants uniques, les paragraphes, les indices de réponses, les valeurs finies, les tolérances, les séquences et les paires sans ambiguïté. Les exercices de calcul ont été recalculés à partir des relations exposées : loi d’Ohm, puissance, série/parallèle, pont, RC, sinusoïde, transformateur, mélangeur, décibels, longueur d’onde et bilan de liaison. Les règles datées ont été comparées aux sources officielles ci-dessus. Les nouvelles notions de spectre, échantillonnage et lignes s’appuient aussi sur les sections correspondantes du cours F6KGL/F5KFF déjà archivé.
+
+`node tools/expand_curriculum.mjs` produit l’extension à partir des données actuelles et contrôle les contrats des types. Le script est idempotent : il remplace ses propres questions `q05` à `q08`, conserve les quatre questions initiales et régénère ses sept nouveaux chapitres à IDs fixes. Il ne télécharge aucune donnée et ne génère pas de question arbitraire en substituant des mots. Les variations numériques en séance appartiennent au générateur de l’application.
+
+Pour le Morse, la table factuelle et les durées ont été recoupées avec la **recommandation UIT-R M.1677-1 en vigueur** ([PDF français](https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-F.pdf)). Les explications pédagogiques et les activités sont originales; les tableaux et paragraphes du PDF ne sont pas reproduits comme document.
 
 Les données d’Exam’1 sont archivées et traitées séparément du parcours original. Voir la documentation de leur import pour le nombre de questions, leur provenance, les médias et les exceptions détectées.
 

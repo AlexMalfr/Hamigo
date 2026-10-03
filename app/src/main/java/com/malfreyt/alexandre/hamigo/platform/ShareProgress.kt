@@ -1,25 +1,33 @@
 package com.malfreyt.alexandre.hamigo.platform
 
 import org.json.JSONObject
+import org.json.JSONArray
 import java.time.Instant
+import java.time.LocalDate
 
-/** The only data transmitted to a social Gist. It contains no answers, review history, or credentials. */
+data class DailyPoint(val day: String, val xp: Int)
+
+/** Publicly shareable statistics, deliberately separated from the complete learning backup. */
 data class ShareProgress(
     val name: String,
     val xp: Int,
     val streak: Int,
     val lessons: Int,
     val weeklyXp: Int = 0,
-    val updatedAt: String = Instant.now().toString()
+    val updatedAt: String = Instant.now().toString(),
+    val dailyXp: List<DailyPoint> = emptyList()
 ) {
     fun toJson(): String = JSONObject()
-        .put("schema", 1)
+        .put("schema", 2)
         .put("name", name.trim().take(48))
         .put("xp", xp.coerceAtLeast(0))
         .put("streak", streak.coerceAtLeast(0))
         .put("lessons", lessons.coerceAtLeast(0))
         .put("weeklyXp", weeklyXp.coerceAtLeast(0))
         .put("updatedAt", updatedAt)
+        .put("dailyXp", JSONArray(dailyXp.takeLast(30).map {
+            JSONObject().put("day", it.day).put("xp", it.xp.coerceAtLeast(0))
+        }))
         .toString(2)
 
     companion object {
@@ -29,7 +37,7 @@ data class ShareProgress(
                 throw IllegalArgumentException("Le fichier de progression n'est pas un JSON valide.")
             }
             val schema = data.opt("schema")
-            require(schema is Number && schema.toDouble() == 1.0) { "Version du fichier de progression non reconnue." }
+            require(schema is Number && schema.toDouble() in listOf(1.0, 2.0)) { "Version du fichier de progression non reconnue." }
             val suppliedName = data.opt("name")
             require(suppliedName is String) { "Pseudo absent ou invalide." }
             val name = suppliedName.trim()
@@ -45,8 +53,23 @@ data class ShareProgress(
             try { Instant.parse(date) } catch (_: Exception) {
                 throw IllegalArgumentException("Date de progression invalide.")
             }
+            val points = data.optJSONArray("dailyXp")?.let { array ->
+                require(array.length() <= 30) { "Historique de progression trop long." }
+                (0 until array.length()).map { index ->
+                    val point = array.getJSONObject(index)
+                    val day = point.getString("day")
+                    try { require(day.length == 10); LocalDate.parse(day) } catch (_: Exception) {
+                        throw IllegalArgumentException("Jour de progression invalide.")
+                    }
+                    val amount = point.opt("xp")
+                    require(amount is Number && amount.toDouble() % 1.0 == 0.0 && amount.toDouble() in 0.0..Int.MAX_VALUE.toDouble()) {
+                        "XP journaliers invalides."
+                    }
+                    DailyPoint(day, amount.toInt())
+                }.also { require(it.map { point -> point.day }.distinct().size == it.size) { "Jour de progression répété." } }.sortedBy { it.day }
+            } ?: emptyList()
             return ShareProgress(name, number("xp"), number("streak"), number("lessons"),
-                number("weeklyXp", optional = true), date)
+                number("weeklyXp", optional = true), date, points)
         }
     }
 }

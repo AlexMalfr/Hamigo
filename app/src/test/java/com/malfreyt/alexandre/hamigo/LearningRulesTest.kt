@@ -11,6 +11,19 @@ import java.time.ZoneId
 
 /** Pure JVM checks for the rules used by lessons, revision, streaks and exam practice. */
 class LearningRulesTest {
+    @Test fun aPoorInitialAttemptDoesNotPassALessonAfterCorrections() {
+        assertFalse(LearningRules.lessonPassed(0,8))
+        assertFalse(LearningRules.lessonPassed(6,8))
+        assertTrue(LearningRules.lessonPassed(7,8))
+        assertTrue(LearningRules.lessonPassed(8,10))
+        assertFalse(LearningRules.lessonPassed(0,0))
+        val session=Session("Consolider",MutableList(8){i->Question("q$i","?",listOf("A","B"),0,"")},"lesson")
+        session.firstCorrect=1;session.correct=8
+        assertFalse(session.lessonPassed)
+        session.firstCorrect=7;session.unresolved.add("q0")
+        assertFalse(session.lessonPassed)
+        session.unresolved.clear();assertTrue(session.lessonPassed)
+    }
     private val now = 1_800_000_000_000L
     private val dayMillis = 86_400_000L
 

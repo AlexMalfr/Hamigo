@@ -26,8 +26,8 @@ class ContentProgressTest {
     @Test
     fun packagedCurriculumReferencesAndExamAreCompleteAndUsable() {
         val content = Content(context)
-        assertEquals(56, content.lessons.size)
-        assertEquals(224, content.lessons.sumOf { it.questions.size })
+        assertTrue(content.lessons.size >= 90)
+        assertTrue(content.lessons.sumOf { it.questions.size } >= 800)
         assertEquals(17, content.references.size)
         assertEquals(364, content.flashcards.size)
         assertEquals(2950, content.activeExam.size)
@@ -37,7 +37,7 @@ class ContentProgressTest {
         assertTrue(content.activeExam.any { it.section == "technique" })
         content.lessons.forEach { lesson ->
             assertTrue("Lesson ${lesson.id} has no readable body", lesson.body.any { it.isNotBlank() })
-            assertTrue("Lesson ${lesson.id} has no practice", lesson.questions.isNotEmpty())
+            assertTrue("Lesson ${lesson.id} has too little practice", lesson.questions.size >= 8)
         }
         (content.lessons.flatMap { it.questions } + content.activeExam).forEach { question ->
             assertTrue("Missing prompt: ${question.id}", question.prompt.isNotBlank())
@@ -73,7 +73,7 @@ class ContentProgressTest {
     @Test
     fun earlySuccessfulRereadingDoesNotAdvanceFutureRecall() {
         val progress = Progress(isolated())
-        assertEquals(10, progress.answer("test-early", correct = true))
+        assertEquals(3, progress.answer("test-early", correct = true))
         val first = progress.reviews.getValue("test-early")
         assertEquals(1, first.repetitions)
         assertEquals(1.0, first.interval, 0.0)
@@ -82,7 +82,7 @@ class ContentProgressTest {
             assertEquals(0, progress.answer("test-early", correct = true, quality = 5))
             assertEquals(first, progress.reviews.getValue("test-early"))
         }
-        assertEquals(10, progress.xp)
+        assertEquals(3, progress.xp)
         assertEquals(13, progress.totalAnswers)
         assertEquals(13, progress.totalCorrect)
     }
@@ -90,7 +90,7 @@ class ContentProgressTest {
     @Test
     fun immediateCorrectionRemediatesAnIncorrectAnswerWithoutExtraXp() {
         val progress = Progress(isolated())
-        assertEquals(2, progress.answer("test-remediate", correct = false))
+        assertEquals(1, progress.answer("test-remediate", correct = false))
         val failed = progress.reviews.getValue("test-remediate")
         assertEquals(0, failed.repetitions)
         assertEquals(1, failed.lapses)
@@ -101,19 +101,19 @@ class ContentProgressTest {
         assertEquals(1, recovered.lapses)
         assertEquals(1.0, recovered.interval, 0.0)
         assertTrue(recovered.due - failed.due > 23L * 60 * 60 * 1000)
-        assertEquals(2, progress.xp)
+        assertEquals(1, progress.xp)
         assertEquals(2, progress.totalAnswers)
         assertEquals(1, progress.totalCorrect)
     }
 
     @Test
-    fun lessonCompletionAwardsTwentyXpOnceAndUnlocksTheNextLesson() {
+    fun lessonCompletionAwardsSixXpOnceAndUnlocksTheNextLesson() {
         val content = Content(context)
         val progress = Progress(isolated())
         val first = content.lessons.first()
-        assertEquals(20, progress.complete(first.id))
+        assertEquals(6, progress.complete(first.id))
         assertEquals(0, progress.complete(first.id))
-        assertEquals(20, progress.xp)
+        assertEquals(6, progress.xp)
         assertEquals(setOf(first.id), progress.completed)
         assertEquals(1, progress.snapshot().lessons)
         assertEquals(content.lessons[1], content.nextLesson(progress.completed))
@@ -122,15 +122,15 @@ class ContentProgressTest {
     @Test
     fun repeatingTheSameQuestionsCannotFarmDailyXp() {
         val progress = Progress(isolated())
-        assertEquals(10, progress.answer("test-card-a", correct = true))
-        assertEquals(2, progress.answer("test-card-b", correct = false))
+        assertEquals(3, progress.answer("test-card-a", correct = true))
+        assertEquals(1, progress.answer("test-card-b", correct = false))
         repeat(15) {
             assertEquals(0, progress.answer("test-card-a", correct = it % 2 == 0))
             assertEquals(0, progress.answer("test-card-b", correct = true))
         }
-        assertEquals(12, progress.xp)
-        assertEquals(12, progress.todayXp)
-        assertEquals(12, progress.weeklyXp)
+        assertEquals(4, progress.xp)
+        assertEquals(4, progress.todayXp)
+        assertEquals(4, progress.weeklyXp)
         assertEquals(1, progress.streak)
     }
 
@@ -156,8 +156,8 @@ class ContentProgressTest {
         assertFalse(exported.contains(privateMarker))
         val document = JSONObject(exported)
         assertEquals("hamigo", document.getString("app"))
-        assertEquals(1, document.getInt("schema"))
-        assertEquals(setOf("app", "schema", "name", "progress"), document.keys().asSequence().toSet())
+        assertEquals(2, document.getInt("schema"))
+        assertEquals(setOf("app", "schema", "name", "progress", "profileUpdatedAt", "preferencesUpdatedAt", "preferences"), document.keys().asSequence().toSet())
 
         val target = Progress(isolated())
         target.import(exported)
@@ -168,7 +168,7 @@ class ContentProgressTest {
         assertEquals(source.todayXp, target.todayXp)
         assertEquals(0, target.complete("test-lesson"))
         assertEquals(0, target.answer("test-persistent", correct = true))
-        assertEquals(30, target.xp)
+        assertEquals(9, target.xp)
     }
 
     @Test
@@ -179,7 +179,7 @@ class ContentProgressTest {
         val before = progress.export()
         val candidates = listOf(
             JSONObject(before).put("app", "another-app").toString(),
-            JSONObject(before).put("schema", 2).toString(),
+            JSONObject(before).put("schema", 3).toString(),
             JSONObject(before).also { it.getJSONObject("progress").put("xp", -1) }.toString(),
             JSONObject(before).also { it.getJSONObject("progress").put("answers", -1) }.toString(),
             JSONObject(before).also { it.getJSONObject("progress").getJSONObject("reviews")

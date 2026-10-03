@@ -54,14 +54,14 @@ class PlatformInstrumentedTest {
     }
 
     @Test
-    fun snapshotRoundTripsOnlyTheSevenPublicFields() {
+    fun snapshotRoundTripsOnlySocialFieldsAndChartDays() {
         val snapshot = ShareProgress("F4 Ami", 120, 3, 4, 75, "2026-10-03T16:00:00Z")
         val json = snapshot.toJson()
         assertEquals(snapshot, ShareProgress.fromJson(json))
         val objectValue = JSONObject(json)
-        assertEquals(setOf("schema", "name", "xp", "streak", "lessons", "weeklyXp", "updatedAt"),
+        assertEquals(setOf("schema", "name", "xp", "streak", "lessons", "weeklyXp", "updatedAt", "dailyXp"),
             objectValue.keys().asSequence().toSet())
-        assertRejected(json.replace("\"schema\": 1", "\"schema\": 2"))
+        assertRejected(JSONObject(json).put("schema",3).toString())
         assertRejected(JSONObject(json).put("schema", "1").toString())
         assertRejected(JSONObject(json).put("schema", 1.5).toString())
         assertRejected(JSONObject(json).put("name", 123).toString())
@@ -111,7 +111,7 @@ class PlatformInstrumentedTest {
         assertFalse(permissions.contains(Manifest.permission.SCHEDULE_EXACT_ALARM))
         assertFalse(permissions.contains(Manifest.permission.USE_EXACT_ALARM))
         val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
-        val previous = prefs.all.filterKeys { it in setOf("reminderEnabled", "reminderHour", "reminderMinute") }
+        val previous = prefs.all.filterKeys { it in setOf("reminderEnabled", "reminderHour", "reminderMinute", "preferencesUpdatedAt") }
         try {
             DailyReminder.configure(context, true, 21, 15)
             assertTrue(prefs.getBoolean("reminderEnabled", false))
@@ -120,10 +120,11 @@ class PlatformInstrumentedTest {
             DailyReminder.configure(context, false, 21, 15)
             assertFalse(prefs.getBoolean("reminderEnabled", true))
         } finally {
-            val edit = prefs.edit().remove("reminderEnabled").remove("reminderHour").remove("reminderMinute")
+            val edit = prefs.edit().remove("reminderEnabled").remove("reminderHour").remove("reminderMinute").remove("preferencesUpdatedAt")
             previous.forEach { (key, value) -> when (value) {
                 is Boolean -> edit.putBoolean(key, value)
                 is Int -> edit.putInt(key, value)
+                is Long -> edit.putLong(key,value)
             } }
             edit.commit()
             DailyReminder.schedule(context)

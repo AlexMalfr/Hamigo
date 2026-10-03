@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#087f82"><meta name="referrer" content="no-referrer">
+<meta property="og:title" content="Rejoins mon équipe Hamigo !"><meta property="og:description" content="On apprend la radio ensemble. Ouvre cette invitation dans Hamigo.">
+<title>Hamigo · Sur la même fréquence</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#faf8f2;color:#173f42;font:16px system-ui,sans-serif;display:grid;min-height:100svh;place-items:center;padding:24px}main{max-width:460px;width:100%;text-align:center;background:white;border:2px solid #e1f2ef;border-radius:32px;padding:32px 24px;box-shadow:0 12px 0 #e1f2ef}.mascot{font-size:72px;line-height:1.2}h1{font-size:32px;letter-spacing:-1px;margin:16px 0}p{line-height:1.55}a.button{display:block;text-decoration:none;background:#087f82;border-radius:16px;padding:16px;color:white;font-weight:750;margin:22px 0 12px;box-shadow:0 5px 0 #065d60}small{display:block;color:#647b7b;font-size:13px;line-height:1.6}a{color:#087f82}.badge{display:inline-block;background:#fff0cf;border-radius:12px;padding:6px 12px;font-weight:700;font-size:12px}.hidden{display:none}footer{margin-top:24px;font-size:12px;color:#647b7b}
+</style>
+<main><div class="mascot" aria-hidden="true">📻✨</div><span class="badge">HAMIGO</span><h1>Sur la même fréquence.</h1>
+<p id="intro">Quelques minutes par jour pour apprendre la radio, avec Pico et ton équipe.</p>
+<a id="open" class="button hidden">Rejoindre l’équipe dans Hamigo</a>
+<small id="help">Hamigo fonctionne sur Android. Cette page sert uniquement à ouvrir une invitation : aucune progression n’y est stockée.</small>
+<p id="desktop" class="hidden">Ouvre ce même lien sur le téléphone où Hamigo est installé, ou scanne le QR code de ton ami.</p>
+<footer>Pas encore Hamigo ? Demande l’APK à la personne qui t’a envoyé ce lien.<br>Les profils partagés sont des Gists GitHub non répertoriés, lisibles avec leur lien.</footer></main>
+<script>
+const invite=new URL(location.href).searchParams.get('invite');
+if(invite && /^[a-f0-9]{5,64}$/i.test(invite)){
+  document.querySelector('#intro').textContent='Ton équipier t’invite à apprendre la radio ensemble !';
+  const link=document.querySelector('#open');
+  link.href='hamigo://join?invite='+encodeURIComponent(invite);
+  if(/Android/i.test(navigator.userAgent)) link.href='intent://join?invite='+encodeURIComponent(invite)+'#Intent;scheme=hamigo;package=com.malfreyt.alexandre.hamigo;end';
+  link.classList.remove('hidden'); document.querySelector('#desktop').classList.remove('hidden');
+}else if(invite){document.querySelector('#intro').textContent='Ce lien d’invitation semble incomplet. Demande un nouveau lien à ton équipier.';}
+</script></html>

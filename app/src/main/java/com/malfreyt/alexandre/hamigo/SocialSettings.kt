@@ -1,25 +1,31 @@
 package com.malfreyt.alexandre.hamigo
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malfreyt.alexandre.hamigo.platform.*
@@ -29,104 +35,308 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-fun openLink(context:android.content.Context,url:String) {runCatching{context.startActivity(Intent(Intent.ACTION_VIEW,Uri.parse(url)))}}
-@Composable fun FriendsScreen(model:AppModel) {
-    val context=LocalContext.current
-    var gist by remember{mutableStateOf("")}
-    var pasted by remember{mutableStateOf("")}
-    var pasteOpen by remember{mutableStateOf(false)}
-    val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {uri->
-        if(uri!=null)model.task {model.incoming=withContext(Dispatchers.IO){readImport(context.contentResolver,uri)}}
-    }
-    val own=model.progress.snapshot()
-    val ranking=(listOf(own)+model.friends.map{it.progress}).sortedByDescending{it.weeklyXp}
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(18.dp)) {
-        item {BigTitle("Sur la même fréquence","À deux, c'est plus facile de garder le signal.")}
-        item {Panel(color=Mist){Row(verticalAlignment=Alignment.CenterVertically){Pico(Modifier.size(85.dp));Column(Modifier.weight(1f)){Text("Ton équipe radio",fontSize=22.sp,fontWeight=FontWeight.Bold);Text("Un défi amical, à votre rythme.",color=Muted,fontSize=13.sp)}};Action("Partager mon image"){NativeShare.progressImage(context,own)};OutlinedButton({NativeShare.snapshot(context,own)},Modifier.fillMaxWidth()){Text("Envoyer mon profil pour comparaison")}}}
-        item {Panel {Text("Le sprint des 7 jours",fontSize=20.sp,fontWeight=FontWeight.Bold)
-            ranking.forEachIndexed{index,profile->Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){Text("${index+1}",fontSize=20.sp,fontWeight=FontWeight.ExtraBold,color=if(index==0)Coral else Teal,modifier=Modifier.width(35.dp));Column(Modifier.weight(1f)){Text(profile.name+if(profile===own)" · toi" else "",fontWeight=FontWeight.Bold);Text("🔥 ${profile.streak} jours · ${profile.lessons} leçons",fontSize=12.sp,color=Muted)};Text("${profile.weeklyXp} XP",fontWeight=FontWeight.ExtraBold,color=Teal)}}
-            if(model.friends.isEmpty())Text("Ajoute le profil de ton ami pour comparer vos progressions.",fontSize=12.sp,color=Muted)
-        }}
-        items(model.friends){friend->Panel {Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(friend.progress.name,fontSize=20.sp,fontWeight=FontWeight.Bold);Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons",color=Muted,fontSize=13.sp)};IconButton({model.removeFriend(friend)}){Icon(Icons.Rounded.Close,"Retirer cet ami")}}
-            Text("Mis à jour le "+runCatching{DateTimeFormatter.ofPattern("dd/MM à HH:mm").withZone(ZoneId.systemDefault()).format(Instant.parse(friend.progress.updatedAt))}.getOrDefault("—"),fontSize=11.sp,color=Muted)
-            OutlinedButton({NativeShare.nudge(context,friend.progress.name)},Modifier.fillMaxWidth()){Icon(Icons.Rounded.WavingHand,null);Spacer(Modifier.width(8.dp));Text("Envoyer un petit coup d'antenne")}
-        }}
-        item {Panel {Text("Inviter un équipier",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("Importe son profil JSON, colle son profil ou ajoute son lien Gist pour l'actualiser automatiquement.",color=Muted,fontSize=13.sp,lineHeight=20.sp)
-            OutlinedButton({picker.launch(arrayOf("application/json","text/plain","application/octet-stream"))},Modifier.fillMaxWidth()){Text("Importer un fichier de profil")}
-            TextButton({pasteOpen=true}){Text("Coller un profil JSON")}
-            OutlinedTextField(gist,{gist=it},modifier=Modifier.fillMaxWidth(),singleLine=true,label={Text("Lien Gist de ton ami")})
-            Action("Ajouter ce lien",enabled=gist.isNotBlank()&&!model.busy){model.readFriend(gist)}
-            OutlinedButton({model.refreshSocial(true)},Modifier.fillMaxWidth(),enabled=!model.busy){Text(if(model.busy)"Actualisation…" else "Actualiser les progressions")}
-        }}
-        item {TextButton({model.route="settings"}){Text("Configurer ma synchronisation GitHub")}}
-    }
-    if(pasteOpen) AlertDialog(onDismissRequest={pasteOpen=false},title={Text("Un profil reçu")},text={OutlinedTextField(pasted,{pasted=it},label={Text("JSON du profil")},minLines=4,maxLines=7)},confirmButton={TextButton({model.importFriend(pasted);pasteOpen=false}){Text("Ajouter")}},dismissButton={TextButton({pasteOpen=false}){Text("Annuler")}})
+fun openLink(context: Context, url: String) {
+    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
 }
 
-@Composable fun SettingsScreen(model:AppModel) {
-    val context=LocalContext.current
-    val p=model.progress
-    var name by remember{mutableStateOf(p.name)}
-    var hour by remember{mutableStateOf(p.prefs.getInt("reminderHour",20).toString())}
-    var minute by remember{mutableStateOf(p.prefs.getInt("reminderMinute",0).toString().padStart(2,'0'))}
-    var enabled by remember{mutableStateOf(p.prefs.getBoolean("reminderEnabled",false))}
-    var token by remember{mutableStateOf("")}
-    var clientId by remember{mutableStateOf(p.prefs.getString("oauthClient","")!!)}
-    var oauth by remember{mutableStateOf<DeviceOAuth.Session?>(null)}
-    var advanced by remember{mutableStateOf(false)}
-    var permissionForTest by remember{mutableStateOf(false)}
-    val connected=runCatching{model.sync.tokens.get()!=null}.getOrDefault(false)
-    fun configure(on:Boolean) {
-        if(!on) {enabled=false;DailyReminder.configure(context,false,p.prefs.getInt("reminderHour",20),p.prefs.getInt("reminderMinute",0));model.refresh();return}
-        val h=hour.toIntOrNull();val m=minute.toIntOrNull()
-        if(h !in 0..23 || m !in 0..59) {model.message="Choisis une heure de 00:00 à 23:59.";return}
-        enabled=on;DailyReminder.configure(context,on,h!!,m!!);model.refresh()
-    }
-    val permission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()){granted->
-        if(granted) {if(permissionForTest)DailyReminder.showTest(context) else configure(true)} else {if(!permissionForTest)configure(false);model.message="L'autorisation de notification n'a pas été accordée."}
-        permissionForTest=false
-    }
-    val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->
-        if(uri!=null)model.task{model.incoming=withContext(Dispatchers.IO){readImport(context.contentResolver,uri)}}
-    }
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(18.dp)) {
-        item{PageHeader("À ta fréquence","Tes préférences et tes sauvegardes."){model.route="profile"}}
-        item{Panel {Text("Ton identité radio",fontSize=20.sp,fontWeight=FontWeight.Bold);OutlinedTextField(name,{name=it.take(40)},label={Text("Pseudo")},singleLine=true,modifier=Modifier.fillMaxWidth());Action("Enregistrer le pseudo"){p.name=name;model.refresh();model.message="Pseudo enregistré."}
-            Text("Objectif quotidien",fontWeight=FontWeight.Bold);Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){listOf(20,30,50).forEach{goal->FilterChip(p.dailyGoal==goal,{p.prefs.edit().putInt("dailyGoal",goal).apply();model.refresh()},label={Text("$goal XP")})}}
-        }}
-        item{Panel {Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("Le rendez-vous radio",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("Un rappel quotidien, à l'heure locale.",fontSize=12.sp,color=Muted)};Switch(enabled,{on->if(on&&Build.VERSION.SDK_INT>=33)permission.launch(Manifest.permission.POST_NOTIFICATIONS) else configure(on)})}
-            Row(horizontalArrangement=Arrangement.spacedBy(12.dp)){OutlinedTextField(hour,{hour=it.take(2)},label={Text("Heure")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.weight(1f),singleLine=true);OutlinedTextField(minute,{minute=it.take(2)},label={Text("Minute")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.weight(1f),singleLine=true)}
-            OutlinedButton({configure(enabled)},Modifier.fillMaxWidth()){Text("Enregistrer l'heure")}
-            TextButton({if(Build.VERSION.SDK_INT>=33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED) {permissionForTest=true;permission.launch(Manifest.permission.POST_NOTIFICATIONS)} else DailyReminder.showTest(context)}){Text("Tester la notification")}
-            Text("Android peut décaler légèrement le rappel pour préserver la batterie.",fontSize=11.sp,color=Muted)
-        }}
-        item{Panel {Text("Sauvegarder mon voyage",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("Le fichier contient tes leçons, tes révisions et ton XP. Garde-le pour changer de téléphone.",fontSize=13.sp,color=Muted,lineHeight=20.sp);Action("Exporter ma sauvegarde"){NativeShare.backup(context,p.export())};OutlinedButton({picker.launch(arrayOf("application/json","text/plain","application/octet-stream"))},Modifier.fillMaxWidth()){Text("Restaurer une sauvegarde")}}}
-        item{Panel {Text("GitHub · jouer ensemble",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("La synchronisation publie uniquement ton pseudo, XP, série de jours et nombre de leçons dans un Gist secret. Toute personne qui possède le lien peut lire ce résumé.",fontSize=13.sp,lineHeight=21.sp,color=Muted)
-            if(connected) {
-                Text("Compte connecté",fontWeight=FontWeight.Bold,color=Teal)
-                var auto by remember{mutableStateOf(p.prefs.getBoolean("autoSync",true))}
-                Row(verticalAlignment=Alignment.CenterVertically){Text("Sync à l'ouverture et après une séance",modifier=Modifier.weight(1f),fontSize=13.sp);Switch(auto,{auto=it;p.prefs.edit().putBoolean("autoSync",it).apply()})}
-                model.sync.savedGistUrl?.let{url->OutlinedButton({NativeShare.text(context,url,"Mon profil Hamigo")},Modifier.fillMaxWidth()){Text("Partager mon lien de progression")}}
-                Action("Synchroniser maintenant",enabled=!model.busy){model.task{model.sync.push(p.snapshot());model.message="Progression synchronisée."}}
-                TextButton({model.sync.disconnect();model.refresh()}){Text("Déconnecter GitHub")}
-            } else {
-                OutlinedTextField(token,{token=it},label={Text("Jeton personnel GitHub · scope gist")},visualTransformation=PasswordVisualTransformation(),modifier=Modifier.fillMaxWidth(),singleLine=true)
-                Action(if(model.busy)"Connexion…" else "Connecter et synchroniser",enabled=token.isNotBlank()&&!model.busy){val value=token;token="";model.connect(value)}
-                TextButton({openLink(context,"https://github.com/settings/tokens/new?scopes=gist&description=Hamigo")}){Text("Créer un jeton limité aux Gists")}
-                TextButton({advanced=!advanced}){Text("Connexion OAuth avec mon application GitHub")}
-                if(advanced) {
-                    Text("Crée une application OAuth GitHub avec Device Flow activé, puis colle son Client ID. Aucun secret client n'est nécessaire.",fontSize=12.sp,color=Muted)
-                    OutlinedTextField(clientId,{clientId=it},label={Text("Client ID OAuth")},modifier=Modifier.fillMaxWidth(),singleLine=true)
-                    OutlinedButton({model.task {try {p.prefs.edit().putString("oauthClient",clientId).apply();val s=DeviceOAuth.start(clientId);oauth=s;val value=DeviceOAuth.awaitToken(clientId,s);model.sync.connect(value);model.sync.push(p.snapshot());model.message="Compte GitHub connecté."} finally {oauth=null}}},Modifier.fillMaxWidth(),enabled=!model.busy&&clientId.isNotBlank()){Text("Lancer la connexion OAuth")}
+private fun syncDate(value: String?): String = value?.let {
+    runCatching {
+        DateTimeFormatter.ofPattern("dd/MM à HH:mm")
+            .withZone(ZoneId.systemDefault()).format(Instant.parse(it))
+    }.getOrNull()
+} ?: "pas encore effectuée"
+
+/** The same account controls are available from the team and preferences. */
+@Composable
+fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
+    val connected = remember(model.revision) { runCatching { model.sync.tokens.get() != null }.getOrDefault(false) }
+    val login = remember(model.revision) { model.sync.accountLogin }
+    val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
+    val lastError = remember(model.revision) { model.sync.lastSyncError }
+    val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
+    var details by remember { mutableStateOf(false) }
+    Panel(modifier, color = Mist) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(Icons.Rounded.CloudSync, null, tint = Teal, modifier = Modifier.size(32.dp))
+            Column(Modifier.weight(1f)) {
+                Eyebrow("SYNCHRONISATION GITHUB")
+                Text(if (connected) "Connecté · ${login ?: "GitHub"}" else "Retrouve ton voyage partout",
+                    fontWeight = FontWeight.ExtraBold, fontSize = 19.sp, color = Ink)
+            }
+        }
+        if (connected) {
+            Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
+            if (lastError != null) {
+                Surface(color = Color(0xFFFFE8E0), shape = RoundedCornerShape(12.dp)) {
+                    Text(lastError, Modifier.padding(10.dp), color = Ink, fontSize = 12.sp, lineHeight = 17.sp)
                 }
             }
-        }}
-        item{Panel {Text("Sources & version",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("Hamigo ${BuildConfig.VERSION_NAME}\n56 leçons originales · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",fontSize=13.sp,lineHeight=21.sp,color=Muted)
-            TextButton({openLink(context,"http://f6kgl.free.fr/COURS.html")}){Text("Cours F6KGL · CC BY-NC-SA 4.0")}
-            TextButton({openLink(context,"https://exam1.r-e-f.org/")}){Text("Questions communautaires Exam1 · REF")}
-            TextButton({openLink(context,"https://www.anfr.fr/gerer/radioamateurs/les-certificats")}){Text("Certificat · informations ANFR")}
-            Text("Entraînement indépendant de l'ANFR. Certaines questions communautaires peuvent conserver des formulations anciennes ; leur source est consultable pendant les révisions.",fontSize=11.sp,color=Muted,lineHeight=17.sp)
-        }}
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Synchronisation automatique", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text("Tes révisions suivent ton compte.", color = Muted, fontSize = 12.sp)
+                }
+                Switch(automatic, { model.setAutoSync(it) }, enabled = !model.busy)
+            }
+            Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
+                model.refreshSocial(manual = true)
+            }
+        } else {
+            Text("Connecte ton compte pour sauvegarder tes leçons, ton XP et tes révisions, et partager ta progression avec ton équipe.",
+                color = Muted, fontSize = 13.sp, lineHeight = 19.sp)
+            Action(if (model.busy) "Connexion en cours…" else "Se connecter avec GitHub", enabled = !model.busy) {
+                model.startGitHubConnection()
+            }
+            Text("Le compte GitHub est facultatif. Ton apprentissage reste enregistré sur ce téléphone.",
+                color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
+        }
+        TextButton({ details = !details }, contentPadding = PaddingValues(0.dp)) {
+            Icon(if (details) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null)
+            Spacer(Modifier.width(6.dp))
+            Text("Données sauvegardées et fréquence", fontSize = 12.sp)
+        }
+        if (details) {
+            Text("La sauvegarde complète conserve tes leçons, tes réponses, ton calendrier de révision, ton XP et tes préférences. Un second Gist contient les statistiques partagées avec ton équipe.",
+                fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+            Text("Les deux Gists sont non répertoriés : ils ne figurent pas dans les recherches publiques de GitHub, mais toute personne possédant leur URL peut les lire. Le lien d’invitation donne accès uniquement aux statistiques, jamais au Gist de sauvegarde.",
+                fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+            Text("Lecture et écriture au retour dans l’app, en fin de séance et après tes réponses regroupées pendant 8 secondes. En arrière-plan, Android essaie environ une fois par heure lorsque le réseau est disponible. Le bouton ci-dessus permet une mise à jour immédiate.",
+                fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+            if (connected) TextButton({ model.disconnectGitHub() }, enabled = !model.busy, contentPadding = PaddingValues(0.dp)) {
+                Text("Déconnecter GitHub")
+            }
+        }
     }
-    oauth?.let{s->AlertDialog(onDismissRequest={model.cancelTask();oauth=null},title={Text("Connexion GitHub")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)){Text("Entre ce code sur github.com/login/device :");Text(s.userCode,fontSize=30.sp,fontWeight=FontWeight.ExtraBold,color=Teal);Text("Cette fenêtre attend ta validation sur GitHub.");LinearProgressIndicator(Modifier.fillMaxWidth())}},confirmButton={TextButton({openLink(context,s.verificationUri)}){Text("Ouvrir GitHub")}},dismissButton={TextButton({model.cancelTask();oauth=null}){Text("Annuler")}})}
+}
+
+@Composable
+fun FriendsScreen(model: AppModel) {
+    val context = LocalContext.current
+    val own = remember(model.revision) { model.progress.snapshot() }
+    val invitation = remember(model.revision) { model.sync.savedGistUrl?.let { FriendInvite.link(it) } }
+    var showQr by remember { mutableStateOf(false) }
+    var addOpen by remember { mutableStateOf(false) }
+    var receivedLink by remember { mutableStateOf("") }
+    var inviteError by remember { mutableStateOf<String?>(null) }
+    val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
+        item { GitHubConnection(model) }
+        item {
+            Panel {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Pico(Modifier.size(64.dp), mood = MascotMood.HAPPY)
+                    Column(Modifier.weight(1f)) {
+                        Text("Ton équipe radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Un lien ou un QR suffit pour vous retrouver.", color = Muted, fontSize = 12.sp)
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button({ showQr = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = invitation != null && !model.busy) {
+                        Icon(Icons.Rounded.QrCode2, null, Modifier.size(19.dp))
+                        Spacer(Modifier.width(6.dp)); Text("Inviter")
+                    }
+                    OutlinedButton({ addOpen = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = !model.busy) {
+                        Icon(Icons.Rounded.PersonAdd, null, Modifier.size(19.dp))
+                        Spacer(Modifier.width(6.dp)); Text("Ajouter")
+                    }
+                }
+                if (invitation == null) Text("Connecte GitHub ci-dessus pour créer ton lien d’invitation.", fontSize = 12.sp, color = Muted)
+                Action("Partager ma progression") {
+                    NativeShare.teamImage(context, own, model.friends.map { it.progress })
+                }
+                Text("Une image de votre équipe, avec vos graphiques de progression.", fontSize = 11.sp, color = Muted)
+            }
+        }
+        item {
+            Panel {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Le sprint des 7 jours", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                    Icon(Icons.Rounded.Leaderboard, null, tint = Teal)
+                }
+                ranking.forEachIndexed { index, profile ->
+                    val isOwn = profile === own
+                    Row(Modifier.fillMaxWidth().background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("${index + 1}", fontSize = 19.sp, fontWeight = FontWeight.ExtraBold,
+                            color = if (index == 0) Coral else Teal, modifier = Modifier.width(22.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(profile.name + if (isOwn) " · toi" else "", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("${profile.streak} jours de série · ${profile.lessons} leçons", fontSize = 11.sp, color = Muted)
+                        }
+                        Text("${profile.weeklyXp} XP", fontWeight = FontWeight.ExtraBold, color = Teal, fontSize = 15.sp)
+                    }
+                }
+                if (model.friends.isEmpty()) Text("Invite un équipier pour suivre vos progrès et vous encourager.", fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
+            }
+        }
+        items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
+            Panel {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(friend.progress.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons", color = Muted, fontSize = 12.sp)
+                    }
+                    IconButton({ model.removeFriend(friend) }) { Icon(Icons.Rounded.Close, "Retirer cet équipier") }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Mis à jour le ${syncDate(friend.progress.updatedAt)}", fontSize = 11.sp, color = Muted, modifier = Modifier.weight(1f))
+                    TextButton({ NativeShare.nudge(context, friend.progress.name) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                        Icon(Icons.Rounded.WavingHand, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Encourager", fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+        item {
+            OutlinedButton({ model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
+                Icon(Icons.Rounded.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
+                Text(if (model.busy) "Actualisation…" else "Actualiser l’équipe")
+            }
+        }
+    }
+    if (showQr && invitation != null) {
+        val qr = remember(invitation) { FriendInvite.qr(invitation).asImageBitmap() }
+        AlertDialog(onDismissRequest = { showQr = false }, title = { Text("Invite ton équipe") }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(qr, "QR code d’invitation Hamigo", Modifier.size(224.dp))
+                Text("Ton ami ouvre ce lien ou scanne le QR avec l’appareil photo. Hamigo proposera de t’ajouter à son équipe.", fontSize = 13.sp, lineHeight = 19.sp)
+                OutlinedButton({ NativeShare.text(context, invitation, "Mon invitation Hamigo") }, Modifier.fillMaxWidth()) {
+                    Icon(Icons.Rounded.Link, null); Spacer(Modifier.width(8.dp)); Text("Partager le lien")
+                }
+                OutlinedButton({ NativeShare.inviteImage(context, invitation) }, Modifier.fillMaxWidth()) {
+                    Icon(Icons.Rounded.QrCode2, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
+                }
+            }
+        }, confirmButton = { TextButton({ showQr = false }) { Text("Fermer") } })
+    }
+    if (addOpen) {
+        AlertDialog(onDismissRequest = { addOpen = false }, title = { Text("Ajouter un équipier") }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Colle le lien d’invitation Hamigo reçu. Tu peux aussi l’ouvrir directement depuis votre conversation.", fontSize = 13.sp, lineHeight = 19.sp)
+                OutlinedTextField(receivedLink, { receivedLink = it.take(512); inviteError = null },
+                    label = { Text("Lien d’invitation Hamigo") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+                    isError = inviteError != null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
+                inviteError?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp) }
+            }
+        }, confirmButton = {
+            TextButton({
+                val parsed = FriendInvite.parse(receivedLink.trim())
+                if (parsed == null) inviteError = "Ce lien n’est pas une invitation Hamigo valide."
+                else { model.pendingInvite = parsed; addOpen = false; receivedLink = "" }
+            }, enabled = receivedLink.isNotBlank() && !model.busy) { Text("Continuer") }
+        }, dismissButton = { TextButton({ addOpen = false }) { Text("Annuler") } })
+    }
+}
+
+@Composable
+fun SettingsScreen(model: AppModel) {
+    val context = LocalContext.current
+    val p = model.displayedProgress ?: model.progress
+    var name by remember { mutableStateOf(p.name) }
+    var hour by remember { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
+    var minute by remember { mutableStateOf(p.prefs.getInt("reminderMinute", 0).toString().padStart(2, '0')) }
+    var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
+    var permissionForTest by remember { mutableStateOf(false) }
+    var backupExpanded by remember { mutableStateOf(false) }
+    fun configure(on: Boolean) {
+        if (!on) {
+            reminderEnabled = false
+            DailyReminder.configure(context, false, p.prefs.getInt("reminderHour", 20), p.prefs.getInt("reminderMinute", 0))
+            p.prefs.edit().putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
+            model.refresh(); model.refreshSocial(); return
+        }
+        val h = hour.toIntOrNull(); val m = minute.toIntOrNull()
+        if (h !in 0..23 || m !in 0..59) { model.message = "Choisis une heure de 00:00 à 23:59."; return }
+        reminderEnabled = true
+        DailyReminder.configure(context, true, h!!, m!!)
+        p.prefs.edit().putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
+        model.refresh(); model.refreshSocial()
+    }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) { if (permissionForTest) DailyReminder.showTest(context) else configure(true) }
+        else { if (!permissionForTest) configure(false); model.message = "L’autorisation de notification n’a pas été accordée." }
+        permissionForTest = false
+    }
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) model.task { model.incoming = withContext(Dispatchers.IO) { readImport(context.contentResolver, uri) } }
+    }
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        item { PageHeader("À ta fréquence", "Tes préférences et ton compte.") { model.route = "profile" } }
+        item {
+            Panel {
+                Text("Ton identité radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                OutlinedTextField(name, { name = it.take(40) }, label = { Text("Pseudo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                Action("Enregistrer le pseudo", enabled = name.isNotBlank()) {
+                    p.name = name.trim(); model.refresh(); model.refreshSocial(); model.message = "Pseudo enregistré."
+                }
+                Text("Objectif quotidien", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf(20, 30, 60, 100).forEach { goal ->
+                        FilterChip(p.dailyGoal == goal, { p.setDailyGoal(goal); model.refresh(); model.refreshSocial() }, label = { Text("$goal XP", fontSize = 12.sp) })
+                    }
+                }
+                Text("Une leçon de huit réponses justes rapporte environ 30 XP à sa première validation.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
+            }
+        }
+        item { GitHubConnection(model) }
+        item {
+            Panel {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Le rendez-vous radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Un message de Pico chaque jour, à l’heure locale.", fontSize = 12.sp, color = Muted)
+                    }
+                    Switch(reminderEnabled, { on ->
+                        if (on && Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                            permissionForTest = false; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else configure(on)
+                    })
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(hour, { hour = it.filter(Char::isDigit).take(2) }, label = { Text("Heure") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), singleLine = true)
+                    OutlinedTextField(minute, { minute = it.filter(Char::isDigit).take(2) }, label = { Text("Minute") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), singleLine = true)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton({ configure(reminderEnabled) }, Modifier.weight(1f).heightIn(min = 48.dp)) { Text("Enregistrer l’heure", fontSize = 12.sp) }
+                    OutlinedButton({
+                        if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                            permissionForTest = true; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else DailyReminder.showTest(context)
+                    }, Modifier.weight(1f).heightIn(min = 48.dp)) { Text("Tester le rappel", fontSize = 12.sp) }
+                }
+                Text("Android peut décaler le rappel pour préserver la batterie.", fontSize = 11.sp, color = Muted)
+            }
+        }
+        item {
+            Panel {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text("Sauvegarde manuelle", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text("Une copie de secours, si tu en as besoin.", fontSize = 12.sp, color = Muted)
+                    }
+                    IconButton({ backupExpanded = !backupExpanded }) {
+                        Icon(if (backupExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                            if (backupExpanded) "Masquer les options de sauvegarde" else "Afficher les options de sauvegarde")
+                    }
+                }
+                if (backupExpanded) {
+                    Text("La copie contient tout ton apprentissage. Tes identifiants GitHub n’y figurent jamais.", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+                    OutlinedButton({ NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
+                    TextButton({ picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
+                }
+            }
+        }
+        item {
+            Panel {
+                Text("Sources & version", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                val lessonCount = model.content?.lessons?.size ?: 0
+                Text("Hamigo ${BuildConfig.VERSION_NAME}\n$lessonCount leçons · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",
+                    fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+                TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") }, contentPadding = PaddingValues(0.dp)) { Text("Cours F6KGL · CC BY-NC-SA 4.0", fontSize = 12.sp) }
+                TextButton({ openLink(context, "https://exam1.r-e-f.org/") }, contentPadding = PaddingValues(0.dp)) { Text("Questions communautaires Exam1 · REF", fontSize = 12.sp) }
+                TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") }, contentPadding = PaddingValues(0.dp)) { Text("Certificat · informations ANFR", fontSize = 12.sp) }
+                Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
+            }
+        }
+    }
 }

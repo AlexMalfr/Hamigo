@@ -6,7 +6,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import java.net.URLEncoder
 
-/** Requires a user-owned GitHub OAuth app with device flow enabled; no client secret is embedded. */
+/** Hamigo's shared OAuth app uses Device Flow; no client secret is embedded. */
 object DeviceOAuth {
     class Session internal constructor(
         internal val deviceCode: String,
@@ -69,8 +69,7 @@ object DeviceOAuth {
     private fun oauthError(error: String): String = when (error) {
         "expired_token", "token_expired" -> "Le code a expiré. Lance une nouvelle connexion GitHub."
         "access_denied" -> "Connexion GitHub annulée."
-        "device_flow_disabled" -> "Active Device Flow dans les réglages de ton application OAuth GitHub."
-        "incorrect_client_credentials" -> "Ce Client ID OAuth GitHub n'est pas reconnu."
-        else -> "La connexion OAuth GitHub n'a pas abouti. Tu peux utiliser un jeton personnel à la place."
+        "device_flow_disabled", "incorrect_client_credentials" -> "La connexion GitHub de Hamigo est indisponible. Réessaie plus tard."
+        else -> "La connexion GitHub n'a pas abouti. Relance la connexion lorsque le réseau sera disponible."
     }
 }
