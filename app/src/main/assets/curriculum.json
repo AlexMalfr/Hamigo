@@ -1,0 +1,4140 @@
+{
+  "schemaVersion": 1,
+  "language": "fr-FR",
+  "verifiedAt": "2026-10-03",
+  "title": "Parcours du certificat d’opérateur",
+  "description": "56 petites leçons originales, du premier contact aux calculs radio. Progression fixe et révisions par notion.",
+  "sources": [
+    "http://f6kgl.free.fr/COURS.html",
+    "https://www.anfr.fr/gerer/radioamateurs/les-certificats",
+    "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-03",
+    "https://www.arcep.fr/uploads/tx_gsavis/19-1412.pdf"
+  ],
+  "chapters": [
+    {
+      "id": "c01",
+      "title": "Bienvenue sur les ondes",
+      "subtitle": "Obtenir son certificat et partager le spectre",
+      "color": "#88D44B",
+      "icon": "radio",
+      "lessons": [
+        {
+          "id": "c01-l01",
+          "title": "Le service amateur",
+          "summary": "Expérimenter, apprendre, communiquer",
+          "body": [
+            "Un radioamateur explore les ondes pour apprendre, expérimenter et échanger avec d’autres passionnés. Le service amateur s’adresse à des personnes autorisées qui s’intéressent à la technique radio à titre personnel, sans intérêt pécuniaire.",
+            "Pour émettre sur les bandes amateur françaises, il faut un certificat d’opérateur et un indicatif attribué. Le certificat prouve des connaissances; l’indicatif permet d’identifier la station. Une application d’entraînement ne remplace pas ces démarches."
+          ],
+          "topic": "Réglementation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel est l’objectif du service amateur ?",
+              "choices": [
+                "Remplacer un réseau de livraison",
+                "Diffuser des publicités",
+                "L’instruction et l’expérimentation personnelles",
+                "Vendre du temps d’antenne"
+              ],
+              "answer": 2,
+              "explanation": "Le service amateur est une activité personnelle sans intérêt pécuniaire.",
+              "id": "c01-l01-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe chaque élément à son rôle.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Certificat",
+                  "right": "Compétences de l’opérateur"
+                },
+                {
+                  "left": "Indicatif",
+                  "right": "Identification de la station"
+                },
+                {
+                  "left": "ANFR",
+                  "right": "Organisation de l’examen"
+                }
+              ],
+              "explanation": "Certificat et indicatif remplissent deux fonctions distinctes.",
+              "id": "c01-l01-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le certificat suffit-il à choisir soi-même un indicatif ?",
+              "choices": [
+                "Non, un indicatif doit être attribué",
+                "Oui, avec trois lettres au hasard",
+                "Oui, après dix contacts",
+                "Oui, sur les bandes VHF"
+              ],
+              "answer": 0,
+              "explanation": "L’indicatif est attribué par l’administration, pas inventé par l’opérateur.",
+              "id": "c01-l01-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un usage commercial régulier des bandes amateur correspond-il à leur objet ?",
+              "choices": [
+                "Oui, si le signal est faible",
+                "Oui, le dimanche",
+                "Oui, en Morse",
+                "Non"
+              ],
+              "answer": 3,
+              "explanation": "L’activité amateur est menée sans intérêt pécuniaire.",
+              "id": "c01-l01-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c01-l02",
+          "title": "L’examen en deux étapes",
+          "summary": "20 questions de chaque côté",
+          "body": [
+            "L’examen français comporte une épreuve de réglementation et une épreuve de technique. Chacune propose 20 QCM. Les durées ordinaires sont de 15 minutes en réglementation et de 30 minutes en technique.",
+            "Chaque bonne réponse rapporte 1 point; une erreur ou une absence de réponse vaut 0. Il faut au moins 10/20 dans chaque épreuve. Une épreuve réussie reste acquise pendant un an en cas d’échec à l’autre; le délai pour se représenter après un échec est de deux mois."
+          ],
+          "topic": "Réglementation",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Combien de questions comporte l’épreuve de technique ?",
+              "choices": [],
+              "answer": 0,
+              "value": 20,
+              "unit": "questions",
+              "tolerance": 0,
+              "explanation": "Les deux épreuves comportent chacune 20 questions.",
+              "id": "c01-l02-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "number",
+              "prompt": "Quelle est la durée ordinaire de réglementation ?",
+              "choices": [],
+              "answer": 0,
+              "value": 15,
+              "unit": "min",
+              "tolerance": 0,
+              "explanation": "La durée réglementaire est de 15 minutes.",
+              "id": "c01-l02-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une mauvaise réponse retire combien de points ?",
+              "choices": [
+                "Un point",
+                "Deux points",
+                "Un demi-point",
+                "Aucun"
+              ],
+              "answer": 3,
+              "explanation": "Depuis les règles entrées en vigueur en juin 2021 : 1 bonne réponse = 1 point; erreur ou omission = 0.",
+              "id": "c01-l02-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Résultat : 14 en technique et 9 en réglementation. Es-tu admis ?",
+              "choices": [
+                "Oui, si tu connais le Morse",
+                "Oui, car la technique compte double",
+                "Non, il faut 10 dans chaque épreuve",
+                "Oui, la moyenne générale dépasse 10"
+              ],
+              "answer": 2,
+              "explanation": "La moyenne est requise séparément à chacune des deux épreuves.",
+              "id": "c01-l02-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c01-l03",
+          "title": "Une identité dans le bruit",
+          "summary": "Indicatifs et identification",
+          "body": [
+            "Un indicatif français comporte un préfixe et une partie qui distingue la station. Par exemple, F4ABC est un exemple pédagogique d’indicatif métropolitain. Épeler les lettres avec l’alphabet international évite de confondre B et D dans le bruit.",
+            "Pendant une émission, donne ton indicatif au début, à la fin et au moins toutes les quinze minutes si l’émission dépasse quinze minutes sur la même fréquence. Un changement de fréquence impose une nouvelle identification au début de la période sur cette fréquence."
+          ],
+          "topic": "Réglementation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel élément identifie une station sur l’air ?",
+              "choices": [
+                "Son indicatif",
+                "Son prénom seul",
+                "Le modèle du poste",
+                "Sa puissance"
+              ],
+              "answer": 0,
+              "explanation": "L’indicatif d’appel est l’identité réglementaire de la station.",
+              "id": "c01-l03-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "number",
+              "prompt": "Quel intervalle maximal d’identification lors d’une longue émission sur la même fréquence ?",
+              "choices": [],
+              "answer": 0,
+              "value": 15,
+              "unit": "min",
+              "tolerance": 0,
+              "explanation": "Il faut s’identifier au moins toutes les quinze minutes, ainsi qu’au début et à la fin.",
+              "id": "c01-l03-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Après un changement de fréquence, quand annoncer l’indicatif ?",
+              "choices": [
+                "Après une heure",
+                "Jamais si l’on reste sur la même bande",
+                "Au début de la période d’émission",
+                "Seulement le lendemain"
+              ],
+              "answer": 2,
+              "explanation": "La nouvelle fréquence nécessite une identification au début de la nouvelle période.",
+              "id": "c01-l03-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe les suffixes aux situations.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "/P",
+                  "right": "Portable"
+                },
+                {
+                  "left": "/M",
+                  "right": "Mobile"
+                },
+                {
+                  "left": "/MM",
+                  "right": "Maritime mobile"
+                }
+              ],
+              "explanation": "Ces suffixes complètent l’indicatif personnel dans les situations prévues par l’arrêté.",
+              "id": "c01-l03-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c01-l04",
+          "title": "Des bandes à partager",
+          "summary": "Primaire, secondaire et écoute",
+          "body": [
+            "Une bande est une plage de fréquences autorisée, avec des conditions de puissance et parfois un partage avec d’autres services. Une attribution secondaire signifie que l’amateur ne doit pas brouiller un service primaire et ne peut exiger sa protection face à ce service.",
+            "Avant de lancer un appel, écoute et vérifie que la fréquence est libre. Le plan de bande organise les usages par accord entre amateurs; il complète les limites réglementaires. Il ne crée jamais une autorisation d’émettre hors d’une bande nationale."
+          ],
+          "topic": "Réglementation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Une station secondaire doit-elle protéger les services primaires ?",
+              "choices": [
+                "Non, si elle est arrivée avant",
+                "Seulement en FM",
+                "Seulement à plus de 100 W",
+                "Oui"
+              ],
+              "answer": 3,
+              "explanation": "L’attribution secondaire impose de ne pas causer de brouillage préjudiciable aux services primaires.",
+              "id": "c01-l04-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quelle action précède un appel CQ ?",
+              "choices": [
+                "Émettre immédiatement",
+                "Changer d’indicatif",
+                "Écouter et vérifier la disponibilité",
+                "Monter la puissance au maximum"
+              ],
+              "answer": 2,
+              "explanation": "L’écoute préalable réduit les collisions et les brouillages.",
+              "id": "c01-l04-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un plan de bande peut-il autoriser une fréquence hors des bandes nationales ?",
+              "choices": [
+                "Oui, en numérique",
+                "Non",
+                "Oui, avec accord d’un ami",
+                "Oui, après minuit"
+              ],
+              "answer": 1,
+              "explanation": "Les limites réglementaires restent prioritaires.",
+              "id": "c01-l04-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "En métropole, quelle plage appartient à la bande amateur des 2 m ?",
+              "choices": [
+                "144 à 146 MHz",
+                "146 à 148 MHz",
+                "150 à 152 MHz",
+                "118 à 136 MHz"
+              ],
+              "answer": 0,
+              "explanation": "La bande amateur française des 2 mètres est 144–146 MHz.",
+              "id": "c01-l04-q04",
+              "section": "regulation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c02",
+      "title": "Parler radio",
+      "subtitle": "Des lettres, des points et des contacts",
+      "color": "#52C7DA",
+      "icon": "chat",
+      "lessons": [
+        {
+          "id": "c02-l01",
+          "title": "L’alphabet international",
+          "summary": "Une lettre, un mot sans ambiguïté",
+          "body": [
+            "Pour transmettre un indicatif dans le bruit, prononce chaque lettre avec un mot fixé : A se dit Alfa, B Bravo, C Charlie. La graphie officielle est Alfa et Juliett, avec deux t pour ce dernier.",
+            "Ces mots ne traduisent pas les lettres; ils les rendent reconnaissables malgré un accent ou un signal faible. Les chiffres sont prononcés distinctement. En français, ne remplace pas spontanément ce code par des prénoms locaux."
+          ],
+          "topic": "Pratique opérateur",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Associe les lettres à leur mot.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "A",
+                  "right": "Alfa"
+                },
+                {
+                  "left": "B",
+                  "right": "Bravo"
+                },
+                {
+                  "left": "C",
+                  "right": "Charlie"
+                },
+                {
+                  "left": "D",
+                  "right": "Delta"
+                }
+              ],
+              "explanation": "L’alphabet international sert à épeler sans ambiguïté.",
+              "id": "c02-l01-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Comment épeler la lettre Q ?",
+              "choices": [
+                "Quebec",
+                "Queen",
+                "Quartz",
+                "Quality"
+              ],
+              "answer": 0,
+              "explanation": "Q se dit Quebec dans l’alphabet international.",
+              "id": "c02-l01-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel mot représente J ?",
+              "choices": [
+                "Juliette",
+                "Joker",
+                "Java",
+                "Juliett"
+              ],
+              "answer": 3,
+              "explanation": "Le mot international s’écrit Juliett.",
+              "id": "c02-l01-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "order",
+              "prompt": "Épelle FABC dans l’ordre.",
+              "choices": [
+                "Foxtrot",
+                "Alfa",
+                "Bravo",
+                "Charlie"
+              ],
+              "answer": 0,
+              "explanation": "F = Foxtrot, A = Alfa, B = Bravo, C = Charlie.",
+              "id": "c02-l01-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c02-l02",
+          "title": "Les codes Q",
+          "summary": "Trois lettres pour une idée",
+          "body": [
+            "Un code Q condense une information radio. Avec un point d’interrogation, il pose une question; sans, il donne une réponse. QTH ? demande la position; QTH Lyon indique une position.",
+            "Retenir le contexte est plus utile qu’une traduction mécanique. QRM désigne un brouillage par d’autres signaux; QRN des parasites, souvent naturels. QRP évoque la réduction de puissance, QRO son augmentation."
+          ],
+          "topic": "Pratique opérateur",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les codes à leur sens.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "QTH",
+                  "right": "Position"
+                },
+                {
+                  "left": "QRM",
+                  "right": "Brouillage par des signaux"
+                },
+                {
+                  "left": "QRN",
+                  "right": "Parasites atmosphériques"
+                },
+                {
+                  "left": "QSL",
+                  "right": "Accusé de réception"
+                }
+              ],
+              "explanation": "Les codes Q gardent le même sens général entre modes.",
+              "id": "c02-l02-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que demande QSY ?",
+              "choices": [
+                "Donner le prénom",
+                "Passer en émission continue",
+                "Augmenter la vitesse Morse",
+                "Changer de fréquence"
+              ],
+              "answer": 3,
+              "explanation": "QSY propose ou annonce un changement de fréquence.",
+              "id": "c02-l02-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que signifie QRT ?",
+              "choices": [
+                "Changer d’antenne",
+                "Émettre à faible puissance",
+                "Cesser la transmission",
+                "Parler plus fort"
+              ],
+              "answer": 2,
+              "explanation": "QRT indique l’arrêt de l’émission.",
+              "id": "c02-l02-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que demande QRZ ?",
+              "choices": [
+                "Quelle est ta position ?",
+                "Qui m’appelle ?",
+                "Quelle heure est-il ?",
+                "Quel est ton indicatif ?"
+              ],
+              "answer": 1,
+              "explanation": "QRZ demande quelle station appelle.",
+              "id": "c02-l02-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c02-l03",
+          "title": "Le rythme du Morse",
+          "summary": "Court, long, silence",
+          "body": [
+            "Le Morse international représente les caractères avec des points et des traits. Un point dure une unité et un trait trois. Dans un caractère, les éléments sont séparés par une unité; les caractères par trois et les mots par sept.",
+            "Il n’existe plus d’épreuve de Morse pour obtenir le certificat français actuel. Cela reste un mode efficace et amusant à apprendre : E est un point, T un trait, A point-trait et N trait-point."
+          ],
+          "topic": "Pratique opérateur",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les lettres aux signaux.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "E",
+                  "right": "."
+                },
+                {
+                  "left": "T",
+                  "right": "-"
+                },
+                {
+                  "left": "A",
+                  "right": ".-"
+                },
+                {
+                  "left": "N",
+                  "right": "-."
+                }
+              ],
+              "explanation": "Les signes les plus courts constituent de bons repères.",
+              "id": "c02-l03-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "number",
+              "prompt": "Un trait dure combien d’unités ?",
+              "choices": [],
+              "answer": 0,
+              "value": 3,
+              "unit": "unités",
+              "tolerance": 0,
+              "explanation": "Le trait dure trois fois le point.",
+              "id": "c02-l03-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel est le signal Morse de S ?",
+              "choices": [
+                "-.-",
+                "...",
+                "---",
+                ".-."
+              ],
+              "answer": 1,
+              "explanation": "S contient trois points; O contient trois traits.",
+              "id": "c02-l03-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Faut-il réussir une épreuve de Morse au certificat français actuel ?",
+              "choices": [
+                "Non",
+                "Oui, à 12 mots/minute",
+                "Oui, seulement pour VHF",
+                "Oui, à chaque renouvellement"
+              ],
+              "answer": 0,
+              "explanation": "L’examen actuel comprend réglementation et technique, sans épreuve de Morse.",
+              "id": "c02-l03-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c02-l04",
+          "title": "Ton premier QSO",
+          "summary": "Du CQ au 73",
+          "body": [
+            "Un QSO est un contact. Après avoir écouté, demande si la fréquence est libre, puis lance un appel général CQ avec ton indicatif. Laisse des pauses pour permettre à un correspondant de répondre.",
+            "Dans un échange simple, partage les indicatifs, un report, le prénom et la position. Le report RS en phonie décrit la lisibilité de 1 à 5 et la force de 1 à 9. Le T du RST ajoute la tonalité en télégraphie. 73 est une salutation amicale."
+          ],
+          "topic": "Pratique opérateur",
+          "questions": [
+            {
+              "kind": "order",
+              "prompt": "Place les étapes d’un premier contact.",
+              "choices": [
+                "Écouter",
+                "Vérifier que la fréquence est libre",
+                "Appeler CQ avec son indicatif",
+                "Échanger les informations"
+              ],
+              "answer": 0,
+              "explanation": "On vérifie la disponibilité avant l’appel.",
+              "id": "c02-l04-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que signifie CQ ?",
+              "choices": [
+                "Demande de puissance maximale",
+                "Appel général",
+                "Message secret",
+                "Arrêt des transmissions"
+              ],
+              "answer": 1,
+              "explanation": "CQ invite les stations qui entendent à répondre.",
+              "id": "c02-l04-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel report phonie décrit une lecture parfaite et un signal fort ?",
+              "choices": [
+                "59",
+                "95",
+                "11",
+                "73"
+              ],
+              "answer": 0,
+              "explanation": "5 est la lisibilité maximale; 9 la force maximale de l’échelle usuelle.",
+              "id": "c02-l04-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe les termes.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "QSO",
+                  "right": "Contact radio"
+                },
+                {
+                  "left": "QSL",
+                  "right": "Confirmation de réception"
+                },
+                {
+                  "left": "73",
+                  "right": "Salutations"
+                },
+                {
+                  "left": "UTC",
+                  "right": "Référence horaire"
+                }
+              ],
+              "explanation": "Le vocabulaire facilite des échanges courts et clairs.",
+              "id": "c02-l04-q04",
+              "section": "regulation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c03",
+      "title": "Électricité sans panique",
+      "subtitle": "Volts, ampères et premières formules",
+      "color": "#F6C84D",
+      "icon": "bolt",
+      "lessons": [
+        {
+          "id": "c03-l01",
+          "title": "Les unités et leurs préfixes",
+          "summary": "Apprivoiser les grands et petits nombres",
+          "body": [
+            "Une unité donne un sens au nombre : 12 V est une tension, 2 A un courant, 50 Ω une résistance. Les symboles d’unités ne prennent pas de s au pluriel. k signifie mille, M un million, m un millième et µ un millionième.",
+            "Avant un calcul, convertis toutes les grandeurs dans les unités cohérentes. 4,7 kΩ = 4 700 Ω, tandis que 220 mA = 0,220 A. Attention à la majuscule : MHz n’est pas mHz."
+          ],
+          "topic": "Électricité",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie chaque unité à sa grandeur.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "V",
+                  "right": "Tension"
+                },
+                {
+                  "left": "A",
+                  "right": "Courant"
+                },
+                {
+                  "left": "Ω",
+                  "right": "Résistance"
+                },
+                {
+                  "left": "W",
+                  "right": "Puissance"
+                }
+              ],
+              "explanation": "Les unités sont les étiquettes indispensables des nombres.",
+              "id": "c03-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Combien d’ohms font 4,7 kΩ ?",
+              "choices": [],
+              "answer": 0,
+              "value": 4700,
+              "unit": "Ω",
+              "tolerance": 0,
+              "explanation": "k = 1 000, donc 4,7 × 1 000 = 4 700 Ω.",
+              "id": "c03-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Convertis 250 mA en ampères.",
+              "choices": [],
+              "answer": 0,
+              "value": 0.25,
+              "unit": "A",
+              "tolerance": 0.001,
+              "explanation": "m = 1/1 000 : 250/1 000 = 0,25 A.",
+              "id": "c03-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel préfixe signifie un million ?",
+              "choices": [
+                "µ",
+                "M",
+                "m",
+                "k"
+              ],
+              "answer": 1,
+              "explanation": "M est méga, soit 10⁶; m est milli, soit 10⁻³.",
+              "id": "c03-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c03-l02",
+          "title": "Le courant continu",
+          "summary": "Une boucle pour les charges",
+          "body": [
+            "La tension est une différence de potentiel entre deux points. Le courant mesure la quantité de charge qui traverse un point chaque seconde. En courant continu idéal, le sens et la valeur restent constants dans le temps.",
+            "Une pile, des fils et une charge forment un circuit. Un circuit ouvert interrompt le courant. Le sens conventionnel du courant dans le circuit extérieur va du pôle positif au négatif; les électrons se déplacent dans le sens opposé."
+          ],
+          "formula": "I = Q / t",
+          "topic": "Électricité",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quelle situation permet le passage d’un courant ?",
+              "choices": [
+                "Un fil coupé",
+                "Un interrupteur ouvert",
+                "Une pile sans liaison",
+                "Un circuit fermé"
+              ],
+              "answer": 3,
+              "explanation": "Il faut une boucle conductrice fermée.",
+              "id": "c03-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le sens conventionnel dans le circuit extérieur d’une pile va…",
+              "choices": [
+                "Toujours vers le nord",
+                "Du milieu vers les deux pôles",
+                "Du + vers le −",
+                "Du − vers le +"
+              ],
+              "answer": 2,
+              "explanation": "Le sens conventionnel est opposé au déplacement des électrons.",
+              "id": "c03-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Une charge de 6 coulombs traverse un point en 3 s. Quel courant ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2,
+              "unit": "A",
+              "tolerance": 0.01,
+              "explanation": "I = Q/t = 6/3 = 2 A.",
+              "id": "c03-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que mesure une tension ?",
+              "choices": [
+                "Une différence de potentiel",
+                "Un débit de charges",
+                "Une énergie par seconde",
+                "Une longueur de fil"
+              ],
+              "answer": 0,
+              "explanation": "La tension compare deux points; le courant décrit un débit de charge.",
+              "id": "c03-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c03-l03",
+          "title": "La loi d’Ohm",
+          "summary": "Une relation, trois inconnues",
+          "body": [
+            "Dans une résistance ohmique, la tension U est proportionnelle au courant I : U = R × I. Une résistance plus grande laisse passer moins de courant pour une même tension.",
+            "Dessine les données et cherche l’inconnue. Pour le courant, I = U/R; pour la résistance, R = U/I. Exemple : 12 V sur 60 Ω donnent 0,2 A. Vérifie les unités avant de taper sur la calculatrice."
+          ],
+          "formula": "U = R × I",
+          "topic": "Électricité",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "12 V sur une résistance de 60 Ω : quel courant ?",
+              "choices": [],
+              "answer": 0,
+              "value": 0.2,
+              "unit": "A",
+              "tolerance": 0.001,
+              "explanation": "I = 12/60 = 0,2 A.",
+              "id": "c03-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "3 A traversent 4 Ω. Quelle tension ?",
+              "choices": [],
+              "answer": 0,
+              "value": 12,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "U = R × I = 4 × 3 = 12 V.",
+              "id": "c03-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Une résistance reçoit 9 V et 0,3 A. Quelle valeur ?",
+              "choices": [],
+              "answer": 0,
+              "value": 30,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "R = U/I = 9/0,3 = 30 Ω.",
+              "id": "c03-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "À tension constante, si R double, le courant…",
+              "choices": [
+                "Double",
+                "Reste identique",
+                "Est multiplié par quatre",
+                "Est divisé par deux"
+              ],
+              "answer": 3,
+              "explanation": "I = U/R : doubler le dénominateur divise I par deux.",
+              "id": "c03-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c03-l04",
+          "title": "Puissance et énergie",
+          "summary": "Chauffer, alimenter, durer",
+          "body": [
+            "La puissance est une énergie consommée ou produite par seconde. En courant continu, P = U × I. Pour une résistance, la loi d’Ohm donne aussi P = R × I² et P = U²/R.",
+            "L’énergie ajoute une durée : E = P × t. Une charge de 10 W pendant 2 h utilise 20 Wh. La résistance choisie doit supporter la puissance dissipée, avec une marge. La puissance d’une alimentation n’est pas automatiquement la puissance radio émise."
+          ],
+          "formula": "P = U × I ; E = P × t",
+          "topic": "Électricité",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Un appareil prend 2 A sous 12 V. Quelle puissance ?",
+              "choices": [],
+              "answer": 0,
+              "value": 24,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "P = U × I = 12 × 2 = 24 W.",
+              "id": "c03-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "10 W pendant 2 h : quelle énergie ?",
+              "choices": [],
+              "answer": 0,
+              "value": 20,
+              "unit": "Wh",
+              "tolerance": 0.01,
+              "explanation": "E = 10 × 2 = 20 Wh.",
+              "id": "c03-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "10 V aux bornes de 100 Ω : quelle puissance dissipée ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "P = U²/R = 100/100 = 1 W.",
+              "id": "c03-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une résistance dissipe 1 W. Quelle puissance nominale donne une marge raisonnable parmi ces choix ?",
+              "choices": [
+                "0,5 W",
+                "0,125 W",
+                "2 W",
+                "0,25 W"
+              ],
+              "answer": 2,
+              "explanation": "La puissance nominale doit dépasser la dissipation attendue dans les conditions d’utilisation.",
+              "id": "c03-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c04",
+      "title": "Les circuits se connectent",
+      "subtitle": "Série, parallèle et équilibre",
+      "color": "#F39A6A",
+      "icon": "circuit",
+      "lessons": [
+        {
+          "id": "c04-l01",
+          "title": "Résistances en série",
+          "summary": "Un chemin, un courant",
+          "body": [
+            "Des résistances en série sont traversées par le même courant : il n’existe qu’un chemin. Leurs valeurs s’additionnent : Rtot = R1 + R2 + …",
+            "La tension de la source se répartit entre les résistances. À courant identique, une résistance plus élevée prend une plus grande tension. Deux résistances égales partagent la tension en deux parts égales."
+          ],
+          "formula": "Rtot = R1 + R2 + …",
+          "topic": "Circuits",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "100 Ω et 220 Ω en série : résistance totale ?",
+              "choices": [],
+              "answer": 0,
+              "value": 320,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "En série, on additionne : 100 + 220 = 320 Ω.",
+              "id": "c04-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Deux résistances de 100 Ω en série sous 12 V : tension sur chacune ?",
+              "choices": [],
+              "answer": 0,
+              "value": 6,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "Deux valeurs égales se partagent 12 V en 6 V chacune.",
+              "id": "c04-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quelle grandeur est commune à toutes les résistances en série ?",
+              "choices": [
+                "La température",
+                "Le courant",
+                "La tension",
+                "La puissance"
+              ],
+              "answer": 1,
+              "explanation": "Le même courant traverse tout le chemin série.",
+              "id": "c04-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "10 Ω, 20 Ω et 30 Ω en série : total ?",
+              "choices": [],
+              "answer": 0,
+              "value": 60,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "10 + 20 + 30 = 60 Ω.",
+              "id": "c04-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c04-l02",
+          "title": "Résistances en parallèle",
+          "summary": "Plusieurs chemins, une tension",
+          "body": [
+            "Des résistances en parallèle sont reliées aux mêmes deux points : elles ont la même tension. Le courant total se répartit entre les branches.",
+            "On additionne les conductances : 1/Rtot = 1/R1 + 1/R2. Avec deux résistances, Rtot = R1R2/(R1+R2). Le résultat est inférieur à la plus petite résistance; deux valeurs égales donnent la moitié de l’une."
+          ],
+          "formula": "Rtot = R1 × R2 / (R1 + R2)",
+          "topic": "Circuits",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Deux résistances de 100 Ω en parallèle : total ?",
+              "choices": [],
+              "answer": 0,
+              "value": 50,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "Deux résistances égales en parallèle donnent R/2.",
+              "id": "c04-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "100 Ω et 300 Ω en parallèle : total ?",
+              "choices": [],
+              "answer": 0,
+              "value": 75,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "Rtot = 100 × 300/(100 + 300) = 75 Ω.",
+              "id": "c04-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quelle grandeur est identique dans les branches parallèles ?",
+              "choices": [
+                "La tension",
+                "Le courant",
+                "La résistance",
+                "La puissance"
+              ],
+              "answer": 0,
+              "explanation": "Toutes les branches sont connectées aux mêmes deux points.",
+              "id": "c04-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le total de résistances positives en parallèle est…",
+              "choices": [
+                "Supérieur à leur somme",
+                "Toujours égal à 1 Ω",
+                "Égal à la plus grande",
+                "Inférieur à la plus petite"
+              ],
+              "answer": 3,
+              "explanation": "Ajouter un chemin conducteur augmente le courant total et réduit la résistance équivalente.",
+              "id": "c04-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c04-l03",
+          "title": "Diviseur de tension et pont",
+          "summary": "Choisir un rapport",
+          "body": [
+            "Un diviseur de tension place deux résistances en série. Si la sortie est prise sur R2 et n’est pas chargée, Us = Ue × R2/(R1+R2). Brancher une charge change l’équivalent de R2 et donc la tension.",
+            "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Avec R1 en haut à gauche, R2 en bas à gauche, R3 en haut à droite et R4 en bas à droite : R1/R2 = R3/R4."
+          ],
+          "formula": "Us = Ue × R2 / (R1 + R2)",
+          "topic": "Circuits",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Ue = 12 V; R1 = 2 kΩ et R2 = 1 kΩ, sortie non chargée sur R2. Us ?",
+              "choices": [],
+              "answer": 0,
+              "value": 4,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "Us = 12 × 1/(2 + 1) = 4 V.",
+              "id": "c04-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une charge branchée sur la sortie d’un diviseur peut…",
+              "choices": [
+                "Modifier la tension de sortie",
+                "Supprimer la source",
+                "Doubler toujours la sortie",
+                "Rendre la sortie indépendante des résistances"
+              ],
+              "answer": 0,
+              "explanation": "La charge est en parallèle avec R2 et modifie le rapport effectif.",
+              "id": "c04-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "À l’équilibre d’un pont de Wheatstone, le courant dans la diagonale de mesure est…",
+              "choices": [
+                "Maximal",
+                "Toujours 1 A",
+                "Négatif par définition",
+                "Nul"
+              ],
+              "answer": 3,
+              "explanation": "Les points de la diagonale sont au même potentiel à l’équilibre.",
+              "id": "c04-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Pont équilibré : R1=100 Ω, R2=200 Ω, R3=300 Ω. R4 ?",
+              "choices": [],
+              "answer": 0,
+              "value": 600,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "100/200 = 300/R4 donne R4 = 600 Ω.",
+              "id": "c04-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c04-l04",
+          "title": "Les lois de Kirchhoff",
+          "summary": "Rien ne se perd au nœud",
+          "body": [
+            "À un nœud, la somme des courants entrants égale celle des courants sortants. Les charges ne s’accumulent pas indéfiniment : si 2 A arrivent et 0,7 A repartent dans une branche, 1,3 A prennent l’autre.",
+            "Dans une boucle fermée, la somme algébrique des tensions est nulle. Une source de 12 V peut alimenter deux chutes de 5 V et 7 V. Ces règles prolongent la loi d’Ohm aux circuits avec plusieurs branches."
+          ],
+          "formula": "Σ Ientrants = Σ Isortants ; Σ U dans une maille = 0",
+          "topic": "Circuits",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "2 A arrivent à un nœud, 0,7 A sortent par une branche. Courant de l’autre ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1.3,
+              "unit": "A",
+              "tolerance": 0.01,
+              "explanation": "2 − 0,7 = 1,3 A.",
+              "id": "c04-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Source 12 V, première chute 5 V. Deuxième chute dans la boucle ?",
+              "choices": [],
+              "answer": 0,
+              "value": 7,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "12 − 5 = 7 V.",
+              "id": "c04-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La loi des nœuds exprime la conservation de…",
+              "choices": [
+                "La résistance",
+                "La température",
+                "La charge",
+                "La fréquence"
+              ],
+              "answer": 2,
+              "explanation": "La charge électrique se conserve au point de jonction.",
+              "id": "c04-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe le montage à la règle.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Série",
+                  "right": "Même courant"
+                },
+                {
+                  "left": "Parallèle",
+                  "right": "Même tension"
+                },
+                {
+                  "left": "Nœud",
+                  "right": "Somme des courants"
+                },
+                {
+                  "left": "Maille",
+                  "right": "Somme algébrique des tensions"
+                }
+              ],
+              "explanation": "Chaque règle décrit une partie du circuit.",
+              "id": "c04-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c05",
+      "title": "Les composants passifs",
+      "subtitle": "Couleurs, champs et stockage",
+      "color": "#B99BE8",
+      "icon": "resistor",
+      "lessons": [
+        {
+          "id": "c05-l01",
+          "title": "Lire une résistance",
+          "summary": "Les anneaux deviennent des nombres",
+          "body": [
+            "Sur une résistance à quatre anneaux, les deux premiers donnent deux chiffres, le troisième un multiplicateur et le quatrième une tolérance. La tolérance est l’écart permis autour de la valeur nominale; l’anneau souvent espacé aide à trouver le sens.",
+            "Le code des chiffres est noir 0, brun 1, rouge 2, orange 3, jaune 4, vert 5, bleu 6, violet 7, gris 8, blanc 9. Pour le multiplicateur, ces couleurs donnent 10 à la puissance du chiffre. Or multiplie par 0,1 et argent par 0,01."
+          ],
+          "formula": "R = (10 × chiffre1 + chiffre2) × multiplicateur",
+          "topic": "Composants",
+          "questions": [
+            {
+              "kind": "resistor",
+              "prompt": "Lis les anneaux : jaune, violet, rouge, or.",
+              "bands": [
+                "jaune",
+                "violet",
+                "rouge",
+                "or"
+              ],
+              "value": 4700,
+              "choices": [
+                "470 Ω ±10 %",
+                "47 kΩ ±5 %",
+                "4,7 kΩ ±5 %",
+                "47 Ω ±5 %"
+              ],
+              "answer": 2,
+              "explanation": "47 × 10² = 4 700 Ω; or signifie ±5 %.",
+              "id": "c05-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "resistor",
+              "prompt": "Lis les anneaux : brun, noir, orange, or.",
+              "bands": [
+                "brun",
+                "noir",
+                "orange",
+                "or"
+              ],
+              "value": 10000,
+              "choices": [
+                "100 kΩ ±1 %",
+                "10 kΩ ±5 %",
+                "1 kΩ ±5 %",
+                "100 Ω ±10 %"
+              ],
+              "answer": 1,
+              "explanation": "10 × 10³ = 10 000 Ω.",
+              "id": "c05-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Relie les tolérances aux couleurs.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Or",
+                  "right": "±5 %"
+                },
+                {
+                  "left": "Argent",
+                  "right": "±10 %"
+                },
+                {
+                  "left": "Brun",
+                  "right": "±1 %"
+                },
+                {
+                  "left": "Rouge",
+                  "right": "±2 %"
+                }
+              ],
+              "explanation": "L’anneau de tolérance n’utilise pas le même sens que l’anneau des chiffres.",
+              "id": "c05-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Une résistance de 100 Ω à ±5 % peut descendre à quelle valeur ?",
+              "choices": [],
+              "answer": 0,
+              "value": 95,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "5 % de 100 = 5 Ω; minimum = 95 Ω.",
+              "id": "c05-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c05-l02",
+          "title": "Les condensateurs",
+          "summary": "Un champ électrique comme réserve",
+          "body": [
+            "Un condensateur stocke de l’énergie dans un champ électrique entre deux armatures. Sa capacité C se mesure en farads. Pour une même tension, une plus grande capacité stocke plus de charge : Q = C × U.",
+            "En continu, après la charge, un condensateur idéal ne laisse plus passer de courant. En alternatif, il présente une réactance qui diminue quand la fréquence augmente. Respecte la polarité d’un condensateur polarisé et sa tension nominale."
+          ],
+          "formula": "Q = C × U ; Xc = 1 / (2πfC)",
+          "topic": "Composants",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Associe les propriétés.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Capacité",
+                  "right": "Farad"
+                },
+                {
+                  "left": "Charge",
+                  "right": "Coulomb"
+                },
+                {
+                  "left": "Énergie stockée",
+                  "right": "Champ électrique"
+                }
+              ],
+              "explanation": "C, Q et l’énergie décrivent trois aspects du condensateur.",
+              "id": "c05-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Après charge en continu, un condensateur idéal se comporte comme…",
+              "choices": [
+                "Un circuit ouvert",
+                "Un court-circuit permanent",
+                "Une résistance de 1 Ω",
+                "Une pile infinie"
+              ],
+              "answer": 0,
+              "explanation": "Le courant de charge cesse lorsque la tension est stable.",
+              "id": "c05-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Deux condensateurs de 100 nF en parallèle donnent…",
+              "choices": [],
+              "answer": 0,
+              "value": 200,
+              "unit": "nF",
+              "tolerance": 0.01,
+              "explanation": "Les capacités s’additionnent en parallèle.",
+              "id": "c05-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quand la fréquence augmente, la réactance capacitive…",
+              "choices": [
+                "Reste constante",
+                "Devient une puissance",
+                "Diminue",
+                "Augmente"
+              ],
+              "answer": 2,
+              "explanation": "Xc = 1/(2πfC), donc augmenter f réduit Xc.",
+              "id": "c05-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c05-l03",
+          "title": "Les bobines",
+          "summary": "L’énergie du champ magnétique",
+          "body": [
+            "Une bobine oppose les variations du courant et stocke de l’énergie dans un champ magnétique. Son inductance L se mesure en henrys. Le courant ne peut pas changer instantanément dans une inductance idéale.",
+            "En continu stable, une bobine idéale est un court-circuit; une vraie bobine possède aussi la résistance de son fil. En alternatif, sa réactance XL augmente avec la fréquence. Sans couplage mutuel, les inductances en série s’additionnent."
+          ],
+          "formula": "XL = 2πfL",
+          "topic": "Composants",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Dans quel champ une bobine stocke-t-elle de l’énergie ?",
+              "choices": [
+                "Magnétique",
+                "Électrique uniquement",
+                "Thermique uniquement",
+                "Gravitationnel"
+              ],
+              "answer": 0,
+              "explanation": "L’énergie d’une inductance est associée au champ magnétique.",
+              "id": "c05-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quand la fréquence double, XL…",
+              "choices": [
+                "Est divisée par deux",
+                "Reste constante",
+                "Est multipliée par quatre",
+                "Double"
+              ],
+              "answer": 3,
+              "explanation": "XL est proportionnelle à f.",
+              "id": "c05-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Deux inductances non couplées de 2 mH et 3 mH en série donnent…",
+              "choices": [],
+              "answer": 0,
+              "value": 5,
+              "unit": "mH",
+              "tolerance": 0.01,
+              "explanation": "Sans couplage, Ltot = L1 + L2.",
+              "id": "c05-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Relie les composants à leur unité.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Résistance",
+                  "right": "Ohm"
+                },
+                {
+                  "left": "Condensateur",
+                  "right": "Farad"
+                },
+                {
+                  "left": "Bobine",
+                  "right": "Henry"
+                }
+              ],
+              "explanation": "R, C et L sont les trois composants passifs de base.",
+              "id": "c05-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c05-l04",
+          "title": "Charge et décharge RC",
+          "summary": "Le temps a sa constante",
+          "body": [
+            "Avec une résistance et un condensateur, les changements se font progressivement. La constante de temps τ vaut R × C, avec R en ohms et C en farads; le résultat est en secondes.",
+            "Après une constante de temps, la charge atteint environ 63 % de sa variation finale. Lors d’une décharge, il reste environ 37 % de la tension initiale. Après cinq constantes de temps, le changement est pratiquement achevé; vérifie quand même la tension avant toute intervention."
+          ],
+          "formula": "τ = R × C",
+          "topic": "Composants",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "R = 10 kΩ et C = 100 µF : constante de temps ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1,
+              "unit": "s",
+              "tolerance": 0.01,
+              "explanation": "10 000 × 100 × 10⁻⁶ = 1 s.",
+              "id": "c05-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Après une constante de temps en charge, on atteint environ…",
+              "choices": [
+                "5 %",
+                "37 % de la variation finale",
+                "63 % de la variation finale",
+                "100 %"
+              ],
+              "answer": 2,
+              "explanation": "Une exponentielle de charge atteint 1 − e⁻¹, soit environ 63 %.",
+              "id": "c05-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Après une constante de temps en décharge, il reste environ…",
+              "choices": [
+                "100 %",
+                "37 % de la tension initiale",
+                "63 %",
+                "0 %"
+              ],
+              "answer": 1,
+              "explanation": "La décharge donne e⁻¹, soit environ 37 %.",
+              "id": "c05-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "τ = 2 s. Combien de secondes pour cinq constantes de temps ?",
+              "choices": [],
+              "answer": 0,
+              "value": 10,
+              "unit": "s",
+              "tolerance": 0.01,
+              "explanation": "5 × 2 = 10 s.",
+              "id": "c05-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c06",
+      "title": "Les signaux alternatifs",
+      "subtitle": "Les ondes prennent leur rythme",
+      "color": "#65ADD9",
+      "icon": "wave",
+      "lessons": [
+        {
+          "id": "c06-l01",
+          "title": "Une sinusoïde",
+          "summary": "Amplitude, fréquence et moyenne",
+          "body": [
+            "Un signal alternatif change de sens. La sinusoïde est une forme régulière qui monte et descend périodiquement. Sa fréquence indique le nombre de cycles par seconde, en hertz; son amplitude décrit la valeur de crête.",
+            "Une sinusoïde centrée sur zéro a une moyenne nulle, mais peut chauffer une résistance. La valeur crête à crête est deux fois la valeur de crête pour cette sinusoïde symétrique."
+          ],
+          "formula": "Upp = 2 × Ucrête",
+          "topic": "Courant alternatif",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "La fréquence se mesure en…",
+              "choices": [
+                "Ohms",
+                "Hertz",
+                "Volts",
+                "Watts"
+              ],
+              "answer": 1,
+              "explanation": "Un hertz correspond à un cycle par seconde.",
+              "id": "c06-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Sinusoïde centrée sur zéro de crête 5 V : valeur crête à crête ?",
+              "choices": [],
+              "answer": 0,
+              "value": 10,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "Upp = 2 × 5 = 10 V.",
+              "id": "c06-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La moyenne d’une sinusoïde centrée sur zéro est…",
+              "choices": [
+                "Égale à sa crête",
+                "Égale à sa valeur efficace",
+                "Toujours 1 V",
+                "Nulle"
+              ],
+              "answer": 3,
+              "explanation": "Les parties positive et négative se compensent.",
+              "id": "c06-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une moyenne de tension nulle implique-t-elle une puissance dissipée nulle dans une résistance ?",
+              "choices": [
+                "Oui, sauf en HF",
+                "Seulement si la fréquence est faible",
+                "Non",
+                "Oui, toujours"
+              ],
+              "answer": 2,
+              "explanation": "La puissance dépend du carré de la tension, qui reste positif.",
+              "id": "c06-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c06-l02",
+          "title": "Période et fréquence",
+          "summary": "Un nombre et son inverse",
+          "body": [
+            "La période T est la durée d’un cycle. La fréquence f est le nombre de cycles par seconde. Elles sont inverses : f = 1/T et T = 1/f, avec T en secondes.",
+            "Pour 1 kHz, T = 1/1 000 = 0,001 s = 1 ms. Quand la fréquence augmente, les cycles sont plus serrés et la période raccourcit. Convertir les préfixes d’abord évite la plupart des erreurs."
+          ],
+          "formula": "f = 1 / T",
+          "topic": "Courant alternatif",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Une période de 1 ms correspond à quelle fréquence ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1000,
+              "unit": "Hz",
+              "tolerance": 0.01,
+              "explanation": "1 ms = 0,001 s; f = 1/0,001 = 1 000 Hz.",
+              "id": "c06-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Fréquence 50 Hz : période en millisecondes ?",
+              "choices": [],
+              "answer": 0,
+              "value": 20,
+              "unit": "ms",
+              "tolerance": 0.01,
+              "explanation": "T = 1/50 = 0,02 s = 20 ms.",
+              "id": "c06-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Si la fréquence est multipliée par deux, la période…",
+              "choices": [
+                "Est multipliée par quatre",
+                "Ne change pas",
+                "Est divisée par deux",
+                "Double"
+              ],
+              "answer": 2,
+              "explanation": "T = 1/f : les variations sont inverses.",
+              "id": "c06-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Une fréquence de 2 MHz possède une période de combien de µs ?",
+              "choices": [],
+              "answer": 0,
+              "value": 0.5,
+              "unit": "µs",
+              "tolerance": 0.001,
+              "explanation": "1/(2 × 10⁶) = 0,5 × 10⁻⁶ s.",
+              "id": "c06-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c06-l03",
+          "title": "Valeur efficace et phase",
+          "summary": "Ce qui chauffe et ce qui se décale",
+          "body": [
+            "La valeur efficace d’une tension est celle d’une tension continue produisant la même puissance moyenne dans une résistance. Pour une sinusoïde seule, Ueff = Ucrête/√2. Cette relation ne vaut pas pour toute forme de signal.",
+            "Deux signaux de même fréquence peuvent être décalés dans le temps : c’est un déphasage. Un cycle entier vaut 360°, un quart de cycle 90°. En résistance pure, tension et courant sont en phase."
+          ],
+          "formula": "Ueff = Ucrête / √2",
+          "topic": "Courant alternatif",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Sinusoïde de crête 10 V : valeur efficace, au centième ?",
+              "choices": [],
+              "answer": 0,
+              "value": 7.07,
+              "unit": "V",
+              "tolerance": 0.02,
+              "explanation": "10/√2 ≈ 7,07 V.",
+              "id": "c06-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Un quart de cycle représente quel angle ?",
+              "choices": [],
+              "answer": 0,
+              "value": 90,
+              "unit": "°",
+              "tolerance": 0,
+              "explanation": "360/4 = 90°.",
+              "id": "c06-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Dans une résistance pure, courant et tension sont…",
+              "choices": [
+                "À des fréquences différentes",
+                "En phase",
+                "Décalés de 90°",
+                "Opposés à 180°"
+              ],
+              "answer": 1,
+              "explanation": "La loi d’Ohm s’applique instantanément à une résistance pure.",
+              "id": "c06-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La formule crête/√2 s’applique directement à…",
+              "choices": [
+                "Une sinusoïde",
+                "Tout signal carré",
+                "Tout signal impulsionnel",
+                "Toute tension, sans condition"
+              ],
+              "answer": 0,
+              "explanation": "La relation dépend de la forme de l’onde.",
+              "id": "c06-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c06-l04",
+          "title": "Réactance et impédance",
+          "summary": "Une opposition qui dépend de la fréquence",
+          "body": [
+            "La résistance dissipe de l’énergie; la réactance idéale l’échange avec un champ. L’impédance Z combine résistance et réactance et se mesure aussi en ohms. Dans un montage série R et X, son module vaut √(R² + X²).",
+            "Pour une bobine idéale, le courant retarde la tension de 90°; pour un condensateur idéal, il l’avance de 90°. Dans un circuit série RLC, la réactance totale est XL − XC : les deux effets peuvent se compenser."
+          ],
+          "formula": "|Z| = √(R² + (XL − XC)²)",
+          "topic": "Courant alternatif",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Circuit série : R = 30 Ω et réactance X = 40 Ω. Module Z ?",
+              "choices": [],
+              "answer": 0,
+              "value": 50,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "√(30² + 40²) = √2 500 = 50 Ω.",
+              "id": "c06-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Dans un condensateur idéal, le courant…",
+              "choices": [
+                "Est opposé de 180°",
+                "Avance la tension de 90°",
+                "Retarde la tension de 90°",
+                "Est toujours nul"
+              ],
+              "answer": 1,
+              "explanation": "Le courant capacitif est en avance d’un quart de cycle.",
+              "id": "c06-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Dans une bobine idéale, le courant…",
+              "choices": [
+                "Retarde la tension de 90°",
+                "Avance la tension de 90°",
+                "A une fréquence double",
+                "Est toujours continu"
+              ],
+              "answer": 0,
+              "explanation": "Le courant inductif est en retard d’un quart de cycle.",
+              "id": "c06-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "RLC série : XL = 100 Ω, XC = 60 Ω. Réactance résultante ?",
+              "choices": [],
+              "answer": 0,
+              "value": 40,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "X = XL − XC = 40 Ω, inductive.",
+              "id": "c06-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c07",
+      "title": "Sélectionner une fréquence",
+      "subtitle": "Résonance, filtres et décibels",
+      "color": "#6CC5A3",
+      "icon": "filter",
+      "lessons": [
+        {
+          "id": "c07-l01",
+          "title": "La résonance LC",
+          "summary": "Quand la bobine et le condensateur s’accordent",
+          "body": [
+            "À la résonance, XL et XC ont le même module. La fréquence propre d’un circuit LC idéal vaut f0 = 1/(2π√LC). Augmenter L ou C abaisse cette fréquence; multiplier C par quatre divise f0 par deux.",
+            "À la résonance, un circuit RLC série présente son impédance minimale, fixée par la résistance. Un circuit parallèle résonant présente généralement une impédance maximale. Le facteur de qualité Q décrit notamment la finesse de sélection."
+          ],
+          "formula": "f0 = 1 / (2π√(LC))",
+          "topic": "Circuits radio",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "À la résonance d’un LC idéal…",
+              "choices": [
+                "XL = XC",
+                "L = C en unités SI",
+                "La fréquence est nulle",
+                "R devient négative"
+              ],
+              "answer": 0,
+              "explanation": "Les réactances inductive et capacitive se compensent.",
+              "id": "c07-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Si C est multipliée par quatre et L inchangée, f0…",
+              "choices": [
+                "Double",
+                "Est divisée par quatre",
+                "Reste identique",
+                "Est divisée par deux"
+              ],
+              "answer": 3,
+              "explanation": "La fréquence dépend de l’inverse de la racine carrée de C.",
+              "id": "c07-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un RLC série à résonance a une impédance…",
+              "choices": [
+                "Infinie par définition",
+                "Toujours 50 Ω",
+                "Minimale",
+                "Maximale"
+              ],
+              "answer": 2,
+              "explanation": "Les réactances se compensent; il reste la résistance série.",
+              "id": "c07-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "f0 = 1 MHz et bande passante = 10 kHz. Facteur Q = f0/B ?",
+              "choices": [],
+              "answer": 0,
+              "value": 100,
+              "unit": "",
+              "tolerance": 0.01,
+              "explanation": "1 000 000/10 000 = 100.",
+              "id": "c07-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c07-l02",
+          "title": "Des filtres pour nettoyer",
+          "summary": "Laisser passer le bon morceau",
+          "body": [
+            "Un filtre passe-bas laisse les fréquences basses et atténue les hautes; un passe-haut fait l’inverse. Un passe-bande conserve une plage autour d’une fréquence, tandis qu’un coupe-bande rejette une plage.",
+            "Le filtre n’a pas une frontière parfaite : son atténuation augmente progressivement. La fréquence de coupure usuelle à −3 dB correspond à une puissance divisée par deux. Un filtre passe-bas en sortie d’émetteur réduit les harmoniques au-dessus de la fréquence utile."
+          ],
+          "formula": "fc(RC) = 1 / (2πRC)",
+          "topic": "Circuits radio",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les filtres à leur action.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Passe-bas",
+                  "right": "Garde les fréquences basses"
+                },
+                {
+                  "left": "Passe-haut",
+                  "right": "Garde les fréquences hautes"
+                },
+                {
+                  "left": "Passe-bande",
+                  "right": "Garde une plage"
+                },
+                {
+                  "left": "Coupe-bande",
+                  "right": "Rejette une plage"
+                }
+              ],
+              "explanation": "Le nom décrit la partie conservée ou rejetée du spectre.",
+              "id": "c07-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel filtre réduit les harmoniques au-dessus de la fréquence d’un émetteur ?",
+              "choices": [
+                "Aucun filtre",
+                "Un potentiomètre",
+                "Passe-bas",
+                "Passe-haut"
+              ],
+              "answer": 2,
+              "explanation": "Les harmoniques sont des multiples supérieurs de la fréquence fondamentale.",
+              "id": "c07-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "À −3 dB, la puissance est approximativement…",
+              "choices": [
+                "Inchangée",
+                "Divisée par deux",
+                "Doublée",
+                "Divisée par dix"
+              ],
+              "answer": 1,
+              "explanation": "10 log10(0,5) ≈ −3 dB.",
+              "id": "c07-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La pente d’un filtre décrit…",
+              "choices": [
+                "La variation d’atténuation avec la fréquence",
+                "La hauteur physique du boîtier",
+                "La tension d’alimentation",
+                "La puissance consommée au repos"
+              ],
+              "answer": 0,
+              "explanation": "La pente se donne par exemple en dB par octave ou décennie.",
+              "id": "c07-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c07-l03",
+          "title": "Le transformateur",
+          "summary": "Changer tension et impédance",
+          "body": [
+            "Un transformateur utilise un champ magnétique variable pour transférer de l’énergie entre bobinages. Pour le transformateur idéal, Us/Up = Ns/Np : la tension suit le rapport de spires.",
+            "La puissance se conserve dans le modèle idéal : une tension multipliée par deux s’accompagne d’un courant divisé par deux. Une impédance se transforme avec le carré du rapport de spires. Un transformateur classique ne fonctionne pas en continu stable."
+          ],
+          "formula": "Us / Up = Ns / Np",
+          "topic": "Circuits radio",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Np = 100 spires, Ns = 50, Up = 12 V alternatif. Us ?",
+              "choices": [],
+              "answer": 0,
+              "value": 6,
+              "unit": "V",
+              "tolerance": 0.01,
+              "explanation": "Us = 12 × 50/100 = 6 V.",
+              "id": "c07-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un transformateur idéal qui double la tension disponible divise le courant disponible par…",
+              "choices": [
+                "Rien",
+                "Deux",
+                "Quatre",
+                "Dix"
+              ],
+              "answer": 1,
+              "explanation": "À puissance conservée, doubler U divise I par deux.",
+              "id": "c07-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un rapport de spires de 2 transforme l’impédance selon un rapport de…",
+              "choices": [
+                "4",
+                "2",
+                "0",
+                "√2"
+              ],
+              "answer": 0,
+              "explanation": "Le rapport d’impédances est le carré du rapport de spires.",
+              "id": "c07-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pourquoi un transformateur classique demande-t-il une variation du courant ?",
+              "choices": [
+                "Pour créer une résistance négative",
+                "Pour refroidir les spires",
+                "Pour convertir la fréquence en chaleur",
+                "Pour induire une tension dans l’autre bobinage"
+              ],
+              "answer": 3,
+              "explanation": "L’induction dépend de la variation du flux magnétique.",
+              "id": "c07-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c07-l04",
+          "title": "Les décibels",
+          "summary": "Additionner des gains et des pertes",
+          "body": [
+            "Un décibel exprime un rapport logarithmique. Pour des puissances, GdB = 10 log10(Psortie/Pentrée). Un rapport de 2 vaut environ +3 dB, de 10 +10 dB et de 100 +20 dB.",
+            "Pour des tensions sous la même impédance, on utilise 20 log10(U2/U1). Les gains d’une chaîne s’additionnent en dB, les pertes se soustraient. Le dBm est une puissance référencée à 1 mW : 0 dBm = 1 mW."
+          ],
+          "formula": "GdB = 10 log10(P2 / P1)",
+          "topic": "Circuits radio",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Une puissance passe de 1 W à 10 W. Gain ?",
+              "choices": [],
+              "answer": 0,
+              "value": 10,
+              "unit": "dB",
+              "tolerance": 0.01,
+              "explanation": "10 log10(10) = 10 dB.",
+              "id": "c07-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Gain 10 dB suivi d’une perte 3 dB : gain total ?",
+              "choices": [],
+              "answer": 0,
+              "value": 7,
+              "unit": "dB",
+              "tolerance": 0.01,
+              "explanation": "10 − 3 = 7 dB.",
+              "id": "c07-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "0 dBm correspond à…",
+              "choices": [
+                "0 W",
+                "1 W",
+                "1 V",
+                "1 mW"
+              ],
+              "answer": 3,
+              "explanation": "Le dBm est référencé à un milliwatt.",
+              "id": "c07-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "20 dBm représentent combien de milliwatts ?",
+              "choices": [],
+              "answer": 0,
+              "value": 100,
+              "unit": "mW",
+              "tolerance": 0.01,
+              "explanation": "20 dB au-dessus de 1 mW = facteur 100.",
+              "id": "c07-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c08",
+      "title": "Les composants actifs",
+      "subtitle": "Redresser, amplifier, osciller",
+      "color": "#EB96B5",
+      "icon": "chip",
+      "lessons": [
+        {
+          "id": "c08-l01",
+          "title": "Diodes et redressement",
+          "summary": "Un passage surtout dans un sens",
+          "body": [
+            "Une diode conduit principalement dans le sens direct et bloque dans le sens inverse, dans ses limites. Pour une diode silicium ordinaire, la chute directe typique est voisine de 0,6 à 0,7 V; elle dépend du courant et de la température.",
+            "Un pont de quatre diodes redresse les deux alternances d’une tension. Un condensateur peut ensuite lisser la tension redressée. Une diode Zener est utilisée dans sa zone de claquage inverse contrôlée pour une référence de tension, avec limitation de courant."
+          ],
+          "topic": "Électronique",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Le rôle usuel d’une diode de redressement est de…",
+              "choices": [
+                "Amplifier le courant",
+                "Stocker un champ magnétique",
+                "Créer une fréquence",
+                "Conduire principalement dans un sens"
+              ],
+              "answer": 3,
+              "explanation": "La diode se comporte comme un élément conducteur asymétrique.",
+              "id": "c08-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Combien de diodes possède un pont redresseur classique ?",
+              "choices": [],
+              "answer": 0,
+              "value": 4,
+              "unit": "diodes",
+              "tolerance": 0,
+              "explanation": "Le pont double alternance contient quatre diodes.",
+              "id": "c08-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel composant lisse souvent une tension redressée ?",
+              "choices": [
+                "Un quartz seul",
+                "Un condensateur",
+                "Un interrupteur ouvert",
+                "Une antenne"
+              ],
+              "answer": 1,
+              "explanation": "Le condensateur stocke de la charge entre les crêtes.",
+              "id": "c08-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une Zener sert souvent à…",
+              "choices": [
+                "Stabiliser une référence de tension",
+                "Mesurer une longueur d’onde",
+                "Amplifier une antenne",
+                "Supprimer toute résistance"
+              ],
+              "answer": 0,
+              "explanation": "La Zener exploite une tension de claquage inverse contrôlée.",
+              "id": "c08-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c08-l02",
+          "title": "Transistors bipolaires et FET",
+          "summary": "Un petit signal pilote un plus grand",
+          "body": [
+            "Un transistor permet de commander un courant. Le transistor bipolaire possède une base, un collecteur et un émetteur. Dans une approche simple, un faible courant de base commande un courant collecteur plus grand.",
+            "Le transistor à effet de champ possède une grille, un drain et une source. Sa commande est surtout une tension de grille et son entrée a généralement une forte impédance. Amplifier demande aussi une polarisation et une alimentation adaptées."
+          ],
+          "formula": "β ≈ Ic / Ib",
+          "topic": "Électronique",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les bornes à leur famille.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Base",
+                  "right": "Bipolaire : commande"
+                },
+                {
+                  "left": "Collecteur",
+                  "right": "Bipolaire : circuit de sortie"
+                },
+                {
+                  "left": "Grille",
+                  "right": "FET : commande"
+                },
+                {
+                  "left": "Drain",
+                  "right": "FET : circuit de sortie"
+                }
+              ],
+              "explanation": "Les deux familles utilisent des noms de bornes différents.",
+              "id": "c08-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Ic = 100 mA et Ib = 1 mA : gain en courant β ?",
+              "choices": [],
+              "answer": 0,
+              "value": 100,
+              "unit": "",
+              "tolerance": 0.01,
+              "explanation": "β = 100/1 = 100.",
+              "id": "c08-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un transistor FET est principalement commandé par…",
+              "choices": [
+                "Une tension de grille",
+                "La couleur du boîtier",
+                "Une onde sonore directe",
+                "Une résistance d’antenne uniquement"
+              ],
+              "answer": 0,
+              "explanation": "Le champ électrique de la grille contrôle le canal.",
+              "id": "c08-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pour amplifier un signal autour d’un point de fonctionnement, il faut…",
+              "choices": [
+                "Supprimer l’alimentation",
+                "Court-circuiter l’entrée",
+                "Toujours saturer le transistor",
+                "Une polarisation adaptée"
+              ],
+              "answer": 3,
+              "explanation": "La polarisation permet de reproduire les variations sans écrêtage indésirable.",
+              "id": "c08-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c08-l03",
+          "title": "Amplificateurs et rendement",
+          "summary": "Plus de signal, une alimentation",
+          "body": [
+            "Un amplificateur reçoit de l’énergie de son alimentation et l’utilise pour augmenter un signal. Il ne crée pas l’énergie. Le rendement vaut Psortie utile/Pentrée alimentation. Le reste part notamment en chaleur.",
+            "La classe A conduit pendant tout le cycle et favorise la linéarité au prix du rendement. La classe C conduit moins d’un demi-cycle et convient à des usages RF adaptés; elle ne reproduit pas directement une BLU sans distorsion. Une contre-réaction négative peut améliorer stabilité et linéarité."
+          ],
+          "formula": "η = Putile / Palimentation",
+          "topic": "Électronique",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Un amplificateur reçoit 100 W électriques et délivre 60 W RF. Rendement ?",
+              "choices": [],
+              "answer": 0,
+              "value": 60,
+              "unit": "%",
+              "tolerance": 0.01,
+              "explanation": "60/100 × 100 = 60 %.",
+              "id": "c08-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Même amplificateur : puissance non convertie en RF utile ?",
+              "choices": [],
+              "answer": 0,
+              "value": 40,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "100 − 60 = 40 W, principalement dissipés en chaleur.",
+              "id": "c08-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quelle classe conduit pendant tout le cycle ?",
+              "choices": [
+                "Classe C",
+                "Classe B idéale",
+                "Aucune",
+                "Classe A"
+              ],
+              "answer": 3,
+              "explanation": "La conduction de classe A couvre 360° du cycle.",
+              "id": "c08-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La contre-réaction négative peut…",
+              "choices": [
+                "Supprimer le besoin d’alimentation",
+                "Multiplier toujours la fréquence",
+                "Améliorer la linéarité",
+                "Créer de l’énergie"
+              ],
+              "answer": 2,
+              "explanation": "Elle échange souvent du gain contre de meilleures performances.",
+              "id": "c08-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c08-l04",
+          "title": "Oscillateurs et logique",
+          "summary": "Produire un rythme, combiner des états",
+          "body": [
+            "Un oscillateur produit un signal périodique grâce à une alimentation et une réaction entretenue. Un circuit LC ou un quartz fixe la fréquence. Le quartz présente une bonne stabilité et une sélection très fine.",
+            "Les circuits logiques manipulent des niveaux représentant 0 et 1. Une porte ET sort 1 seulement si ses deux entrées valent 1; une porte OU sort 1 si au moins une entrée vaut 1. Une porte NON inverse son entrée."
+          ],
+          "topic": "Électronique",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel élément donne souvent une fréquence très stable ?",
+              "choices": [
+                "Un quartz",
+                "Une résistance seule",
+                "Un fusible",
+                "Un interrupteur manuel"
+              ],
+              "answer": 0,
+              "explanation": "La résonance mécanique du quartz fournit une référence stable.",
+              "id": "c08-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une porte ET avec entrées 1 et 0 produit…",
+              "choices": [
+                "1",
+                "2",
+                "Une sinusoïde",
+                "0"
+              ],
+              "answer": 3,
+              "explanation": "ET exige que les deux entrées soient à 1.",
+              "id": "c08-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une porte OU avec entrées 1 et 0 produit…",
+              "choices": [
+                "2",
+                "Un courant nul par définition",
+                "1",
+                "0"
+              ],
+              "answer": 2,
+              "explanation": "OU produit 1 si au moins une entrée vaut 1.",
+              "id": "c08-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Relie les fonctions.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Oscillateur",
+                  "right": "Produit un signal périodique"
+                },
+                {
+                  "left": "Amplificateur",
+                  "right": "Augmente un signal"
+                },
+                {
+                  "left": "Redresseur",
+                  "right": "Rend le courant unidirectionnel"
+                },
+                {
+                  "left": "Porte NON",
+                  "right": "Inverse un état logique"
+                }
+              ],
+              "explanation": "Chaque bloc remplit une fonction différente.",
+              "id": "c08-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c09",
+      "title": "Transporter un message",
+      "subtitle": "AM, FM, BLU et numérique",
+      "color": "#F5AD4C",
+      "icon": "mic",
+      "lessons": [
+        {
+          "id": "c09-l01",
+          "title": "La modulation d’amplitude",
+          "summary": "Faire varier la hauteur de la porteuse",
+          "body": [
+            "Moduler signifie faire porter une information par un signal radio. En AM, l’amplitude de la porteuse varie au rythme du message. Une modulation par un ton crée une bande latérale de chaque côté de la porteuse.",
+            "Avec une fréquence audio maximale F, l’AM double bande occupe environ 2F. Une modulation excessive déforme l’enveloppe et produit des émissions indésirables. L’AM phonie usuelle est désignée A3E."
+          ],
+          "formula": "BAM ≈ 2 × Faudio max",
+          "topic": "Modulation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "En AM, quelle grandeur de la porteuse varie avec le message ?",
+              "choices": [
+                "L’indicatif",
+                "La résistance de la charge",
+                "L’amplitude",
+                "La longueur du câble"
+              ],
+              "answer": 2,
+              "explanation": "AM signifie modulation d’amplitude.",
+              "id": "c09-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Audio jusqu’à 3 kHz : largeur approximative d’une AM double bande ?",
+              "choices": [],
+              "answer": 0,
+              "value": 6,
+              "unit": "kHz",
+              "tolerance": 0.01,
+              "explanation": "Deux bandes latérales de 3 kHz donnent 6 kHz.",
+              "id": "c09-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La porteuse et deux bandes latérales appartiennent à…",
+              "choices": [
+                "L’AM double bande",
+                "La BLU à porteuse supprimée",
+                "La CW non modulée",
+                "Un courant continu"
+              ],
+              "answer": 0,
+              "explanation": "L’AM classique possède une porteuse et deux bandes latérales.",
+              "id": "c09-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que peut causer une surmodulation AM ?",
+              "choices": [
+                "Une réception parfaite garantie",
+                "Une résistance infinie",
+                "Une suppression totale de l’alimentation",
+                "Distorsion et élargissement indésirable du spectre"
+              ],
+              "answer": 3,
+              "explanation": "Une enveloppe mal formée entraîne des produits indésirables.",
+              "id": "c09-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c09-l02",
+          "title": "FM et modulation de phase",
+          "summary": "Faire varier le rythme de la porteuse",
+          "body": [
+            "En FM, la fréquence instantanée de la porteuse varie avec le signal; en PM, c’est sa phase. La FM idéale garde une amplitude constante. L’excursion de fréquence est l’écart maximal autour de la fréquence centrale.",
+            "La règle de Carson estime la largeur de bande FM : B ≈ 2(Δf + Fmax). Avec une excursion de 2,5 kHz et une audio maximale de 3 kHz, cela donne environ 11 kHz. Une excursion excessive déborde dans les canaux voisins."
+          ],
+          "formula": "BFM ≈ 2 × (Δf + Faudio max)",
+          "topic": "Modulation",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Associe les modulations.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "AM",
+                  "right": "Amplitude"
+                },
+                {
+                  "left": "FM",
+                  "right": "Fréquence instantanée"
+                },
+                {
+                  "left": "PM",
+                  "right": "Phase"
+                }
+              ],
+              "explanation": "La modulation change une caractéristique de la porteuse.",
+              "id": "c09-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Δf = 2,5 kHz et Fmax = 3 kHz. Largeur Carson ?",
+              "choices": [],
+              "answer": 0,
+              "value": 11,
+              "unit": "kHz",
+              "tolerance": 0.01,
+              "explanation": "2 × (2,5 + 3) = 11 kHz.",
+              "id": "c09-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "L’amplitude d’une FM idéale est…",
+              "choices": [
+                "Nulle",
+                "Le double de la fréquence",
+                "Toujours sinusoïdale à 50 Hz",
+                "Constante"
+              ],
+              "answer": 3,
+              "explanation": "Le message est porté par la fréquence, pas par l’amplitude.",
+              "id": "c09-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une excursion FM trop forte peut…",
+              "choices": [
+                "Modifier l’indicatif",
+                "Supprimer tous les parasites",
+                "Brouiller les canaux voisins",
+                "Réduire forcément la portée à zéro"
+              ],
+              "answer": 2,
+              "explanation": "L’excursion augmente l’occupation spectrale.",
+              "id": "c09-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c09-l03",
+          "title": "BLU et CW",
+          "summary": "Concentrer le signal utile",
+          "body": [
+            "La BLU conserve une seule bande latérale et supprime normalement la porteuse. Elle utilise moins de bande passante et de puissance qu’une AM transmettant la même information audio. USB désigne la bande supérieure, LSB l’inférieure.",
+            "En CW, l’information Morse est portée par la mise en marche et l’arrêt d’une porteuse. Un récepteur utilise un oscillateur de battement pour rendre cette porteuse audible. Un amplificateur de BLU doit respecter les variations d’enveloppe."
+          ],
+          "formula": "BBLU ≈ largeur audio utile",
+          "topic": "Modulation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "La BLU à porteuse supprimée transmet…",
+              "choices": [
+                "Une seule bande latérale",
+                "La porteuse et deux bandes latérales",
+                "Seulement du courant continu",
+                "Trois porteuses sans message"
+              ],
+              "answer": 0,
+              "explanation": "La BLU élimine la redondance de l’AM.",
+              "id": "c09-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "USB signifie…",
+              "choices": [
+                "Bande latérale inférieure",
+                "Une alimentation radio",
+                "Un canal FM étroit",
+                "Bande latérale supérieure"
+              ],
+              "answer": 3,
+              "explanation": "Upper Side Band = bande latérale supérieure.",
+              "id": "c09-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un BFO sert notamment à…",
+              "choices": [
+                "Redresser le secteur",
+                "Mesurer les spires",
+                "Rendre une porteuse CW audible par battement",
+                "Refroidir l’antenne"
+              ],
+              "answer": 2,
+              "explanation": "Le battement entre la porteuse et le BFO crée un ton audio.",
+              "id": "c09-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Relie les émissions aux codes.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "CW sans sous-porteuse",
+                  "right": "A1A"
+                },
+                {
+                  "left": "AM phonie",
+                  "right": "A3E"
+                },
+                {
+                  "left": "BLU phonie",
+                  "right": "J3E"
+                },
+                {
+                  "left": "FM phonie",
+                  "right": "F3E"
+                }
+              ],
+              "explanation": "Le code classe l’émission selon la modulation et la nature de l’information.",
+              "id": "c09-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c09-l04",
+          "title": "Les modes numériques",
+          "summary": "Des bits sur les ondes",
+          "body": [
+            "Les modes numériques transportent des symboles correspondant à des bits. En FSK, la fréquence commute entre des états; en PSK, c’est la phase. Le débit de symboles, en bauds, n’est pas toujours égal au débit de bits par seconde.",
+            "Un symbole peut coder plusieurs bits. Avec quatre états distincts, il peut représenter deux bits; 1 000 symboles/s transportent alors 2 000 bit/s avant les surcoûts. Le codage de données ne doit pas être confondu avec un chiffrement destiné à obscurcir le sens."
+          ],
+          "formula": "Débit binaire = débit symboles × bits par symbole",
+          "topic": "Modulation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "En FSK, les symboles sont distingués par…",
+              "choices": [
+                "Le nom de l’antenne",
+                "La température seule",
+                "La couleur du câble",
+                "La fréquence"
+              ],
+              "answer": 3,
+              "explanation": "FSK signifie Frequency Shift Keying.",
+              "id": "c09-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "En PSK, les symboles sont distingués par…",
+              "choices": [
+                "La taille de l’alimentation",
+                "L’indicatif",
+                "La phase",
+                "La longueur du microphone"
+              ],
+              "answer": 2,
+              "explanation": "PSK signifie Phase Shift Keying.",
+              "id": "c09-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "4 états représentent combien de bits par symbole ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2,
+              "unit": "bits",
+              "tolerance": 0,
+              "explanation": "2² = 4 états, donc deux bits par symbole.",
+              "id": "c09-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "1 000 bauds, 2 bits/symbole, sans surcoût : débit binaire ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2000,
+              "unit": "bit/s",
+              "tolerance": 0,
+              "explanation": "1 000 × 2 = 2 000 bit/s.",
+              "id": "c09-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "title": "Dans la boîte du poste",
+      "subtitle": "Émettre, recevoir et mesurer",
+      "color": "#A8ABE8",
+      "icon": "receiver",
+      "lessons": [
+        {
+          "id": "c10-l01",
+          "title": "La chaîne d’émission",
+          "summary": "Du microphone à l’antenne",
+          "body": [
+            "Le microphone transforme la voix en signal électrique audio. Le modulateur l’applique à un signal RF; les étages d’amplification fournissent la puissance et le filtre de sortie réduit les émissions indésirables avant l’antenne.",
+            "Un mélangeur produit notamment la somme et la différence de deux fréquences. Un filtre sélectionne le produit souhaité. Un changement de fréquence permet de travailler sur plusieurs bandes tout en gardant des étages internes à une fréquence pratique."
+          ],
+          "formula": "fmélange = f1 + f2 ou |f1 − f2|",
+          "topic": "Émetteurs et récepteurs",
+          "questions": [
+            {
+              "kind": "order",
+              "prompt": "Ordonne une chaîne d’émission simplifiée.",
+              "choices": [
+                "Microphone",
+                "Modulateur",
+                "Amplificateur RF",
+                "Filtre de sortie",
+                "Antenne"
+              ],
+              "answer": 0,
+              "explanation": "Le message est créé, modulé, amplifié puis filtré avant de rayonner.",
+              "id": "c10-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Mélange de 10 MHz et 2 MHz : produit somme ?",
+              "choices": [],
+              "answer": 0,
+              "value": 12,
+              "unit": "MHz",
+              "tolerance": 0.01,
+              "explanation": "10 + 2 = 12 MHz.",
+              "id": "c10-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Même mélange : produit différence positif ?",
+              "choices": [],
+              "answer": 0,
+              "value": 8,
+              "unit": "MHz",
+              "tolerance": 0.01,
+              "explanation": "|10 − 2| = 8 MHz.",
+              "id": "c10-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pourquoi filtrer la sortie RF ?",
+              "choices": [
+                "Pour multiplier les contacts automatiquement",
+                "Pour produire du secteur",
+                "Pour réduire les émissions indésirables",
+                "Pour effacer l’indicatif"
+              ],
+              "answer": 2,
+              "explanation": "Le filtre atténue notamment les harmoniques.",
+              "id": "c10-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c10-l02",
+          "title": "Le superhétérodyne",
+          "summary": "Recevoir en changeant de fréquence",
+          "body": [
+            "Un récepteur superhétérodyne mélange le signal reçu avec un oscillateur local. Le signal utile est transposé vers une fréquence intermédiaire fixe, où l’amplification et le filtrage sont plus faciles à réaliser.",
+            "Le détecteur ou démodulateur récupère ensuite l’information audio. Une fréquence image peut donner le même produit intermédiaire et doit être rejetée par la sélection d’entrée. Dans une SDR, une partie de ces opérations est effectuée numériquement."
+          ],
+          "formula": "FI = |fRF − fOL|",
+          "topic": "Émetteurs et récepteurs",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Signal 14 MHz et oscillateur local 23 MHz : FI différence ?",
+              "choices": [],
+              "answer": 0,
+              "value": 9,
+              "unit": "MHz",
+              "tolerance": 0.01,
+              "explanation": "|14 − 23| = 9 MHz.",
+              "id": "c10-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "order",
+              "prompt": "Ordonne un récepteur superhétérodyne simplifié.",
+              "choices": [
+                "Filtre d’entrée RF",
+                "Mélangeur avec oscillateur local",
+                "Filtre et ampli FI",
+                "Démodulateur",
+                "Amplificateur audio"
+              ],
+              "answer": 0,
+              "explanation": "La transposition précède la sélection FI puis la récupération du message.",
+              "id": "c10-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La fréquence image est…",
+              "choices": [
+                "Toujours 50 Hz",
+                "Le premier harmonique audio",
+                "Une autre fréquence donnant la même FI",
+                "L’image affichée sur le poste"
+              ],
+              "answer": 2,
+              "explanation": "Deux signaux de part et d’autre de l’oscillateur local peuvent produire la même différence.",
+              "id": "c10-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel bloc récupère l’information portée par le signal radio ?",
+              "choices": [
+                "Le connecteur d’antenne",
+                "Le démodulateur",
+                "Le fusible",
+                "Le dissipateur"
+              ],
+              "answer": 1,
+              "explanation": "La démodulation extrait le message de la porteuse.",
+              "id": "c10-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c10-l03",
+          "title": "Sensibilité et sélectivité",
+          "summary": "Entendre faible, séparer proche",
+          "body": [
+            "La sensibilité décrit la capacité de recevoir un faible signal pour un critère de qualité donné. La sélectivité décrit la capacité de distinguer le signal voulu de signaux voisins en fréquence. Un bon chiffre dans l’une ne garantit pas l’autre.",
+            "La dynamique décrit la plage de niveaux gérables sans pertes excessives de performance. Des signaux forts peuvent produire de l’intermodulation dans des étages non linéaires. Une commande automatique de gain, AGC, adapte le gain aux niveaux reçus."
+          ],
+          "topic": "Émetteurs et récepteurs",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les qualités d’un récepteur.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Sensibilité",
+                  "right": "Recevoir un signal faible"
+                },
+                {
+                  "left": "Sélectivité",
+                  "right": "Séparer des fréquences proches"
+                },
+                {
+                  "left": "Dynamique",
+                  "right": "Gérer une plage de niveaux"
+                },
+                {
+                  "left": "AGC",
+                  "right": "Adapter automatiquement le gain"
+                }
+              ],
+              "explanation": "Ces qualités décrivent des problèmes différents.",
+              "id": "c10-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Deux stations proches en fréquence sont difficiles à séparer. Quelle qualité améliorer ?",
+              "choices": [
+                "La puissance de l’éclairage",
+                "Le nombre de piles",
+                "La sélectivité",
+                "La couleur du poste"
+              ],
+              "answer": 2,
+              "explanation": "Un filtrage plus approprié peut mieux isoler la station utile.",
+              "id": "c10-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une intermodulation est favorisée par…",
+              "choices": [
+                "Un journal de bord incomplet",
+                "La non-linéarité en présence de signaux",
+                "Une résistance idéale seule",
+                "L’absence de tout signal"
+              ],
+              "answer": 1,
+              "explanation": "Des signaux mélangés dans un étage non linéaire génèrent des produits supplémentaires.",
+              "id": "c10-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "L’AGC agit généralement sur…",
+              "choices": [
+                "Le gain du récepteur",
+                "L’indicatif",
+                "La longueur d’onde de toutes les stations",
+                "La réglementation"
+              ],
+              "answer": 0,
+              "explanation": "L’AGC évite des variations de niveau trop importantes.",
+              "id": "c10-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c10-l04",
+          "title": "Bien mesurer",
+          "summary": "Le bon appareil au bon endroit",
+          "body": [
+            "Le voltmètre se branche en parallèle et possède idéalement une forte impédance. L’ampèremètre se place en série et possède une faible résistance. Un ohmmètre s’utilise sur un circuit hors tension, avec les précautions adaptées.",
+            "Un oscilloscope montre une tension dans le temps; un analyseur de spectre montre les composantes en fréquence. Une charge fictive non rayonnante adaptée permet de tester un émetteur en limitant le rayonnement. Il faut respecter sa puissance admissible."
+          ],
+          "topic": "Émetteurs et récepteurs",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Associe les appareils.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Voltmètre",
+                  "right": "En parallèle"
+                },
+                {
+                  "left": "Ampèremètre",
+                  "right": "En série"
+                },
+                {
+                  "left": "Oscilloscope",
+                  "right": "Signal dans le temps"
+                },
+                {
+                  "left": "Analyseur de spectre",
+                  "right": "Signal en fréquence"
+                }
+              ],
+              "explanation": "Le branchement et la représentation dépendent de la mesure.",
+              "id": "c10-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Avant une mesure de résistance, le circuit doit être…",
+              "choices": [
+                "Toujours à 50 V",
+                "Hors tension",
+                "En émission maximale",
+                "Branché au secteur"
+              ],
+              "answer": 1,
+              "explanation": "L’ohmmètre applique sa propre mesure; une tension externe fausse la mesure et peut le détériorer.",
+              "id": "c10-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un ampèremètre directement en parallèle sur une source peut provoquer…",
+              "choices": [
+                "Un court-circuit dangereux",
+                "Une mesure parfaite de tension",
+                "Une conversion en Morse",
+                "Un gain de 3 dB"
+              ],
+              "answer": 0,
+              "explanation": "Sa faible résistance laisse passer un courant trop élevé.",
+              "id": "c10-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pour tester un émetteur sans antenne rayonnante, on utilise…",
+              "choices": [
+                "Un fil ouvert au hasard",
+                "Un voltmètre comme antenne",
+                "Une pile seule",
+                "Une charge fictive adaptée"
+              ],
+              "answer": 3,
+              "explanation": "La charge doit avoir l’impédance et la puissance admissible appropriées.",
+              "id": "c10-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c11",
+      "title": "Antennes et lignes",
+      "subtitle": "Transformer les watts en ondes",
+      "color": "#72C45B",
+      "icon": "antenna",
+      "lessons": [
+        {
+          "id": "c11-l01",
+          "title": "Longueur d’onde",
+          "summary": "Une fréquence devient une distance",
+          "body": [
+            "Dans le vide, l’onde radio se propage à environ 300 000 000 m/s. Sa longueur d’onde λ vaut c/f. Une formule pratique est λ en mètres = 300/f en MHz.",
+            "Une fréquence plus haute correspond à une onde plus courte. À 150 MHz, λ est d’environ 2 m; à 30 MHz, 10 m. Dans un câble, la propagation est plus lente; son facteur de vélocité doit être pris en compte pour sa longueur électrique."
+          ],
+          "formula": "λ(m) ≈ 300 / f(MHz)",
+          "topic": "Antennes",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "À 150 MHz, quelle longueur d’onde approximative ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2,
+              "unit": "m",
+              "tolerance": 0.01,
+              "explanation": "300/150 = 2 m.",
+              "id": "c11-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "À 30 MHz, quelle longueur d’onde ?",
+              "choices": [],
+              "answer": 0,
+              "value": 10,
+              "unit": "m",
+              "tolerance": 0.01,
+              "explanation": "300/30 = 10 m.",
+              "id": "c11-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quand la fréquence double dans le même milieu, λ…",
+              "choices": [
+                "Reste identique",
+                "Est multipliée par quatre",
+                "Est divisée par deux",
+                "Double"
+              ],
+              "answer": 2,
+              "explanation": "λ = c/f : la longueur d’onde varie en sens inverse de f.",
+              "id": "c11-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Un câble de facteur de vélocité 0,66 : vitesse en fraction de c ?",
+              "choices": [],
+              "answer": 0,
+              "value": 0.66,
+              "unit": "c",
+              "tolerance": 0.001,
+              "explanation": "Le facteur de vélocité est directement v/c.",
+              "id": "c11-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c11-l02",
+          "title": "Dipôle et quart d’onde",
+          "summary": "Les premières antennes",
+          "body": [
+            "Un dipôle demi-onde possède deux bras d’environ un quart d’onde chacun. Sa longueur totale théorique est λ/2, mais les effets d’extrémité et l’environnement la raccourcissent légèrement; on ajuste avec des mesures.",
+            "Une antenne verticale quart d’onde utilise un plan de sol ou des radiales comme retour. Une antenne symétrique alimentée par un coaxial peut bénéficier d’un balun ou d’une self de mode commun pour réduire les courants indésirables sur l’extérieur de la ligne."
+          ],
+          "formula": "Dipôle théorique : Ltot ≈ λ / 2",
+          "topic": "Antennes",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "À 100 MHz, longueur totale théorique d’un dipôle demi-onde ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1.5,
+              "unit": "m",
+              "tolerance": 0.01,
+              "explanation": "λ = 300/100 = 3 m; λ/2 = 1,5 m.",
+              "id": "c11-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Pour λ = 20 m, longueur théorique d’un quart d’onde ?",
+              "choices": [],
+              "answer": 0,
+              "value": 5,
+              "unit": "m",
+              "tolerance": 0.01,
+              "explanation": "20/4 = 5 m.",
+              "id": "c11-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une verticale quart d’onde utilise souvent…",
+              "choices": [
+                "Un câble forcément ouvert",
+                "Un plan de sol ou des radiales",
+                "Une seule résistance isolée",
+                "Un condensateur audio uniquement"
+              ],
+              "answer": 1,
+              "explanation": "Le retour participe au système rayonnant.",
+              "id": "c11-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un balun est utile notamment entre…",
+              "choices": [
+                "Une ligne asymétrique et une antenne symétrique",
+                "Deux batteries en série",
+                "Un microphone et une pile",
+                "Un écran et son support"
+              ],
+              "answer": 0,
+              "explanation": "Balun vient de balanced/unbalanced; il facilite la transition de symétrie selon sa conception.",
+              "id": "c11-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c11-l03",
+          "title": "Gain et polarisation",
+          "summary": "Concentrer l’énergie dans une direction",
+          "body": [
+            "Le gain d’une antenne compare son rayonnement dans une direction à celui d’une antenne de référence. L’antenne ne crée pas de puissance : elle répartit l’énergie différemment. dBi se réfère à l’isotrope; dBd au dipôle demi-onde.",
+            "La polarisation décrit l’orientation du champ électrique. Deux antennes linéaires doivent avoir des polarisations compatibles pour bien échanger. Une Yagi dirige le rayonnement; une verticale rayonne généralement dans de nombreuses directions en azimut, selon son installation."
+          ],
+          "formula": "dBi ≈ dBd + 2,15 dB",
+          "topic": "Antennes",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Le gain d’une antenne vient principalement de…",
+              "choices": [
+                "Une puissance électrique propre",
+                "Un indicatif plus long",
+                "La concentration du rayonnement",
+                "Une création d’énergie"
+              ],
+              "answer": 2,
+              "explanation": "Le gain décrit une répartition directionnelle de la puissance.",
+              "id": "c11-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "3 dBd correspondent à combien de dBi ?",
+              "choices": [],
+              "answer": 0,
+              "value": 5.15,
+              "unit": "dBi",
+              "tolerance": 0.01,
+              "explanation": "3 + 2,15 = 5,15 dBi.",
+              "id": "c11-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Deux antennes linéaires croisées à 90° ont idéalement…",
+              "choices": [
+                "Une forte perte de couplage",
+                "Un gain infini",
+                "La même polarisation",
+                "Une puissance créée supplémentaire"
+              ],
+              "answer": 0,
+              "explanation": "Des polarisations orthogonales couplent mal dans le modèle idéal.",
+              "id": "c11-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une Yagi sert principalement à…",
+              "choices": [
+                "Redresser le secteur",
+                "Rendre toutes les directions identiques",
+                "Remplacer le journal de bord",
+                "Favoriser certaines directions"
+              ],
+              "answer": 3,
+              "explanation": "Ses éléments créent un diagramme de rayonnement directionnel.",
+              "id": "c11-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c11-l04",
+          "title": "Coaxial et ROS",
+          "summary": "Livrer la puissance à la charge",
+          "body": [
+            "Une ligne possède une impédance caractéristique, souvent 50 Ω pour les installations amateur. Si la charge présente cette impédance au point de raccordement, il n’y a pas de réflexion dans le modèle idéal.",
+            "Le ROS, rapport d’ondes stationnaires, décrit une désadaptation. ROS = 1 correspond à l’adaptation. ROS = (1+|Γ|)/(1−|Γ|), où Γ est le coefficient de réflexion en tension. Un ROS faible ne prouve pas à lui seul que l’antenne rayonne bien : une charge fictive peut avoir ROS = 1."
+          ],
+          "formula": "ROS = (1 + |Γ|) / (1 − |Γ|)",
+          "topic": "Antennes",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel ROS indique une adaptation idéale ?",
+              "choices": [
+                "Infini",
+                "1",
+                "0",
+                "10"
+              ],
+              "answer": 1,
+              "explanation": "Sans onde réfléchie, le rapport vaut 1.",
+              "id": "c11-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Une charge résistive 100 Ω sur une ligne 50 Ω donne quel ROS ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2,
+              "unit": "",
+              "tolerance": 0.01,
+              "explanation": "Pour une charge purement résistive supérieure à Z0, ROS = R/Z0 = 100/50.",
+              "id": "c11-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un ROS de 1 garantit-il un bon rayonnement ?",
+              "choices": [
+                "Oui, toujours",
+                "Oui, même sans antenne",
+                "Oui, uniquement en HF",
+                "Non, une charge fictive peut aussi être adaptée"
+              ],
+              "answer": 3,
+              "explanation": "Le ROS décrit l’adaptation et non le rendement rayonnant.",
+              "id": "c11-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Émetteur 100 W, ligne de perte 3 dB : puissance approximative à l’antenne ?",
+              "choices": [],
+              "answer": 0,
+              "value": 50,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "Une perte de 3 dB divise approximativement la puissance par deux.",
+              "id": "c11-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c12",
+      "title": "Le voyage des ondes",
+      "subtitle": "Ionosphère, horizon et satellites",
+      "color": "#6AC1DF",
+      "icon": "earth",
+      "lessons": [
+        {
+          "id": "c12-l01",
+          "title": "La propagation HF",
+          "summary": "Des bonds au-delà de l’horizon",
+          "body": [
+            "Une onde peut arriver directement, suivre partiellement le sol ou revenir après interaction avec l’ionosphère. En HF, les couches ionisées peuvent réfracter le signal vers la Terre et permettre de longues distances.",
+            "Le comportement varie avec l’heure, la saison, la fréquence et l’activité solaire. La couche D absorbe notamment une partie des HF le jour; les couches F jouent un rôle majeur dans les liaisons lointaines. Une fréquence trop haute peut traverser l’ionosphère sans revenir vers la zone souhaitée."
+          ],
+          "topic": "Propagation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel milieu permet de nombreux contacts HF lointains ?",
+              "choices": [
+                "Le noyau terrestre",
+                "Le vide dans les câbles",
+                "Le microphone",
+                "L’ionosphère"
+              ],
+              "answer": 3,
+              "explanation": "Les couches ionisées modifient le trajet de certaines ondes HF.",
+              "id": "c12-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La couche D est notamment associée à…",
+              "choices": [
+                "La fabrication du Morse",
+                "Une suppression du Soleil",
+                "Une absorption diurne des HF",
+                "Un gain électrique de 100 dB"
+              ],
+              "answer": 2,
+              "explanation": "Elle contribue à l’absorption pendant la journée.",
+              "id": "c12-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La propagation HF reste-t-elle identique toute la journée ?",
+              "choices": [
+                "Oui, dès que le ROS vaut 1",
+                "Non",
+                "Oui, toujours",
+                "Oui, sur toutes les bandes"
+              ],
+              "answer": 1,
+              "explanation": "L’ionisation varie avec l’éclairage solaire et d’autres conditions.",
+              "id": "c12-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une fréquence dépassant la MUF pour un trajet peut…",
+              "choices": [
+                "Traverser l’ionosphère au lieu de revenir sur ce trajet",
+                "Toujours porter plus loin",
+                "Devenir du courant continu",
+                "Changer automatiquement d’indicatif"
+              ],
+              "answer": 0,
+              "explanation": "La fréquence maximale utilisable dépend du trajet et de l’état de l’ionosphère.",
+              "id": "c12-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c12-l02",
+          "title": "VHF, UHF et satellites",
+          "summary": "Regarder l’horizon et le ciel",
+          "body": [
+            "Les liaisons VHF/UHF ordinaires dépendent souvent de la visibilité radio, de la hauteur des antennes et du relief. Des phénomènes comme la troposphère, le sporadique E ou des réflexions peuvent étendre la portée dans certaines conditions.",
+            "Un satellite change rapidement de position et parfois de fréquence apparente par effet Doppler. Quand il se rapproche, la fréquence reçue augmente; quand il s’éloigne, elle baisse. Une liaison satellite possède une montée vers l’espace et une descente vers la Terre."
+          ],
+          "topic": "Propagation",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Pour une liaison VHF ordinaire, quel facteur aide souvent la portée ?",
+              "choices": [
+                "Une fréquence audio plus grave",
+                "Un journal vide",
+                "La hauteur et le dégagement des antennes",
+                "Un prénom plus court"
+              ],
+              "answer": 2,
+              "explanation": "Un meilleur dégagement facilite la visibilité radio.",
+              "id": "c12-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un satellite se rapproche. La fréquence reçue est généralement…",
+              "choices": [
+                "Toujours inchangée",
+                "Plus haute",
+                "Plus basse",
+                "Nulle"
+              ],
+              "answer": 1,
+              "explanation": "Le rapprochement comprime les périodes reçues : effet Doppler.",
+              "id": "c12-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La liaison montante d’un satellite va…",
+              "choices": [
+                "De la Terre vers le satellite",
+                "Du satellite vers la Terre",
+                "D’une batterie à un fusible",
+                "Uniquement entre deux haut-parleurs"
+              ],
+              "answer": 0,
+              "explanation": "Montée = uplink; descente = downlink.",
+              "id": "c12-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe les phénomènes.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Doppler",
+                  "right": "Décalage de fréquence dû au mouvement"
+                },
+                {
+                  "left": "Troposphère",
+                  "right": "Propagation liée à la basse atmosphère"
+                },
+                {
+                  "left": "Relief",
+                  "right": "Obstacle possible en VHF/UHF"
+                }
+              ],
+              "explanation": "Ces effets influencent des liaisons de façons différentes.",
+              "id": "c12-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c12-l03",
+          "title": "Le bilan de liaison",
+          "summary": "Additionner ce qui aide et ce qui coûte",
+          "body": [
+            "Un bilan de liaison additionne les puissances et gains en unités logarithmiques. Puissance reçue = puissance émise + gains des antennes − pertes de lignes − pertes de propagation, lorsque tous ces termes sont exprimés de façon cohérente.",
+            "Ce calcul donne une estimation; l’environnement et les pertes de polarisation peuvent ajouter des écarts. La PIRE combine la puissance livrée à l’antenne et son gain par rapport à l’isotrope. Une puissance de 1 W avec 3 dBi de gain donne environ 2 W PIRE, si les pertes en amont sont déjà prises en compte."
+          ],
+          "formula": "Pr(dBm) = Pt(dBm) + Gt + Gr − pertes",
+          "topic": "Propagation",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Pt=30 dBm, Gt=3 dBi, Gr=3 dBi, pertes totales=100 dB. Pr ?",
+              "choices": [],
+              "answer": 0,
+              "value": -64,
+              "unit": "dBm",
+              "tolerance": 0.01,
+              "explanation": "30 + 3 + 3 − 100 = −64 dBm.",
+              "id": "c12-l03-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "1 W livré à une antenne de gain 3 dBi : PIRE approximative ?",
+              "choices": [],
+              "answer": 0,
+              "value": 2,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "3 dB correspond approximativement à un facteur 2.",
+              "id": "c12-l03-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "PIRE signifie…",
+              "choices": [
+                "Puissance interne du récepteur électrique",
+                "Période inverse de résistance effective",
+                "Plan international radio électrique",
+                "Puissance isotrope rayonnée équivalente"
+              ],
+              "answer": 3,
+              "explanation": "La référence de gain est une antenne isotrope.",
+              "id": "c12-l03-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une perte de câble de 6 dB correspond approximativement à…",
+              "choices": [
+                "Une puissance multipliée par six",
+                "Une tension inchangée",
+                "Une puissance divisée par quatre",
+                "Une puissance divisée par deux"
+              ],
+              "answer": 2,
+              "explanation": "Deux fois 3 dB de perte donnent environ 1/4 de la puissance.",
+              "id": "c12-l03-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c12-l04",
+          "title": "Choisir une bande et un mode",
+          "summary": "Un trajet, un usage, un cadre",
+          "body": [
+            "En France métropolitaine, les bandes HF courantes incluent notamment 3,5–3,8 MHz, 7–7,2 MHz et 14–14,35 MHz. Les bandes VHF/UHF courantes comprennent 144–146 MHz et 430–440 MHz. Les conditions d’utilisation varient selon la bande et le territoire.",
+            "Le plan de bande aide à trouver les zones recommandées pour CW, BLU, numérique ou relais. Il faut garder toute la largeur de son signal dans la bande autorisée : régler la porteuse exactement à une limite peut laisser une bande latérale dépasser."
+          ],
+          "topic": "Propagation",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie les bandes courantes.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "40 m",
+                  "right": "7 à 7,2 MHz"
+                },
+                {
+                  "left": "20 m",
+                  "right": "14 à 14,35 MHz"
+                },
+                {
+                  "left": "2 m",
+                  "right": "144 à 146 MHz"
+                },
+                {
+                  "left": "70 cm",
+                  "right": "430 à 440 MHz"
+                }
+              ],
+              "explanation": "Les noms en mètres sont des appellations approximatives des longueurs d’onde.",
+              "id": "c12-l04-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "En métropole, 7,25 MHz appartient-il à la bande amateur 40 m ?",
+              "choices": [
+                "Oui, toujours",
+                "Oui, seulement en CW",
+                "Oui, si la puissance est faible",
+                "Non"
+              ],
+              "answer": 3,
+              "explanation": "La limite supérieure est 7,2 MHz en région 1 française.",
+              "id": "c12-l04-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Que faut-il conserver dans la bande autorisée ?",
+              "choices": [
+                "Seulement le microphone",
+                "Uniquement la fréquence audio",
+                "L’ensemble du signal émis",
+                "Seulement le chiffre affiché"
+              ],
+              "answer": 2,
+              "explanation": "Une émission occupe une largeur autour de la fréquence réglée.",
+              "id": "c12-l04-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le plan de bande organise principalement…",
+              "choices": [
+                "Les dates d’examen",
+                "Les usages entre radioamateurs",
+                "L’attribution d’un indicatif",
+                "La tension secteur"
+              ],
+              "answer": 1,
+              "explanation": "Les recommandations facilitent la cohabitation des modes et activités.",
+              "id": "c12-l04-q04",
+              "section": "technique"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c13",
+      "title": "Une station responsable",
+      "subtitle": "Sécurité, brouillages et carnet de bord",
+      "color": "#EC8D70",
+      "icon": "shield",
+      "lessons": [
+        {
+          "id": "c13-l01",
+          "title": "La sécurité électrique",
+          "summary": "La maîtrise commence avant la mise sous tension",
+          "body": [
+            "Une installation radio peut associer secteur, fortes intensités, tensions élevées et énergie stockée. Un fusible protège principalement le circuit contre une surintensité; il ne remplace pas les protections des personnes. La terre de protection relie les masses prévues à cet effet.",
+            "Une intervention exige de couper les alimentations et d’appliquer les procédures adaptées de vérification et de mise en sécurité. Un condensateur peut rester chargé après débranchement. Ne pas improviser sur le secteur ou la haute tension : l’apprentissage du schéma peut se faire sur une maquette basse tension sûre."
+          ],
+          "topic": "Station et sécurité",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Après débranchement, un condensateur peut-il rester chargé ?",
+              "choices": [
+                "Seulement en Morse",
+                "Seulement sans résistance",
+                "Oui",
+                "Non, jamais"
+              ],
+              "answer": 2,
+              "explanation": "L’énergie stockée peut persister après la coupure.",
+              "id": "c13-l01-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le fusible protège principalement contre…",
+              "choices": [
+                "Une fréquence image",
+                "Une surintensité",
+                "Tous les contacts électriques dangereux",
+                "Un mauvais indicatif"
+              ],
+              "answer": 1,
+              "explanation": "Il doit être dimensionné pour le circuit; il ne remplace pas les dispositifs de protection des personnes.",
+              "id": "c13-l01-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Avant une intervention électrique, quelle étape est nécessaire ?",
+              "choices": [
+                "Mettre l’installation en sécurité selon la procédure adaptée",
+                "Augmenter la tension",
+                "Émettre en continu",
+                "Toucher les bornes pour tester"
+              ],
+              "answer": 0,
+              "explanation": "La mise hors tension et les vérifications appropriées précèdent l’intervention.",
+              "id": "c13-l01-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pour apprendre les montages, quel support est approprié ?",
+              "choices": [
+                "Le secteur sans protection",
+                "Un émetteur haute tension ouvert",
+                "Un câble sous tension",
+                "Une maquette basse tension encadrée et sûre"
+              ],
+              "answer": 3,
+              "explanation": "Un support d’apprentissage doit limiter les risques électriques.",
+              "id": "c13-l01-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c13-l02",
+          "title": "Antennes et exposition",
+          "summary": "La puissance demande de la distance",
+          "body": [
+            "Une antenne en émission crée des champs électromagnétiques. L’installation doit respecter les limites d’exposition du public et empêcher l’accès aux zones où ces limites seraient dépassées. La puissance, le gain, la fréquence et le temps d’émission influencent l’évaluation.",
+            "L’installation mécanique compte aussi : solidité du mât, accès, lignes électriques et conditions météorologiques. Une antenne ne doit jamais pouvoir entrer en contact avec une ligne électrique, même en tombant. Prépare les travaux avec les protections et compétences nécessaires."
+          ],
+          "topic": "Station et sécurité",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quel paramètre influence l’exposition autour d’une antenne ?",
+              "choices": [
+                "La couleur de l’antenne",
+                "La puissance et le gain",
+                "Le prénom de l’opérateur",
+                "Le nombre de contacts inscrits"
+              ],
+              "answer": 1,
+              "explanation": "L’exposition dépend des conditions réelles d’émission et de l’installation.",
+              "id": "c13-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une antenne peut-elle être placée à un endroit où sa chute toucherait une ligne électrique ?",
+              "choices": [
+                "Non",
+                "Oui, s’il ne pleut pas",
+                "Oui, seulement la nuit",
+                "Oui, si elle est en aluminium"
+              ],
+              "answer": 0,
+              "explanation": "Le risque inclut la chute ou le déplacement des éléments.",
+              "id": "c13-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "À qui s’appliquent les limites d’exposition du public ?",
+              "choices": [
+                "Aux opérateurs mobiles uniquement",
+                "Aux radios commerciales uniquement",
+                "À personne en HF",
+                "Aux installations amateur aussi"
+              ],
+              "answer": 3,
+              "explanation": "Les installations amateur doivent respecter les limites applicables.",
+              "id": "c13-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pour des travaux sur un mât, on prépare…",
+              "choices": [
+                "Seulement le Morse",
+                "Une hausse de puissance",
+                "La sécurité mécanique et les moyens adaptés",
+                "Uniquement l’indicatif"
+              ],
+              "answer": 2,
+              "explanation": "L’accès, le travail en hauteur et les conditions extérieures demandent une préparation réelle.",
+              "id": "c13-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c13-l03",
+          "title": "Compatibilité électromagnétique",
+          "summary": "Comprendre et réduire le brouillage",
+          "body": [
+            "Un brouillage peut venir d’harmoniques, d’un signal trop large, d’un mauvais blindage ou de courants de mode commun. Un équipement voisin peut aussi être sensible à des signaux pourtant correctement émis. Il faut rechercher le mécanisme, pas deviner une cause unique.",
+            "En présence d’un brouillage préjudiciable, interromps ou adapte l’émission pour le faire cesser puis analyse. Filtres, blindage, découplage et ferrites peuvent aider selon le trajet perturbateur. Une station automatique doit pouvoir cesser immédiatement ses émissions par télécommande."
+          ],
+          "topic": "Station et sécurité",
+          "questions": [
+            {
+              "kind": "match",
+              "prompt": "Relie le moyen à son rôle principal.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Blindage",
+                  "right": "Réduit certains couplages par rayonnement"
+                },
+                {
+                  "left": "Filtre",
+                  "right": "Atténue des fréquences indésirables"
+                },
+                {
+                  "left": "Découplage",
+                  "right": "Limite des perturbations d’alimentation"
+                },
+                {
+                  "left": "Ferrite de mode commun",
+                  "right": "Réduit certains courants parasites"
+                }
+              ],
+              "explanation": "Le bon remède dépend du chemin du brouillage.",
+              "id": "c13-l03-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un signal émis trop large peut…",
+              "choices": [
+                "Améliorer tous les récepteurs",
+                "Modifier la valeur d’une résistance",
+                "Réduire le besoin d’identification",
+                "Brouiller des fréquences voisines"
+              ],
+              "answer": 3,
+              "explanation": "Le spectre doit rester maîtrisé.",
+              "id": "c13-l03-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Pour une station automatique, quelle capacité est requise ?",
+              "choices": [
+                "Ignorer tous les brouillages",
+                "Changer de propriétaire seule",
+                "Cesser immédiatement l’émission par télécommande",
+                "Émettre sans indicatif"
+              ],
+              "answer": 2,
+              "explanation": "La télécommande permet de supprimer rapidement un brouillage préjudiciable.",
+              "id": "c13-l03-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un appareil perturbé prouve-t-il toujours que l’émetteur émet hors bande ?",
+              "choices": [
+                "Oui, à plus de 5 W",
+                "Non",
+                "Oui, toujours",
+                "Oui, si le signal est FM"
+              ],
+              "answer": 1,
+              "explanation": "Le problème peut venir de plusieurs mécanismes, y compris l’immunité du récepteur perturbé.",
+              "id": "c13-l03-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c13-l04",
+          "title": "Le carnet et les déplacements",
+          "summary": "Garder une trace de ses émissions",
+          "body": [
+            "Le journal de bord consigne chaque communication : date, heure, indicatifs, fréquence, classe d’émission et lieu d’émission. Il peut être numérique. Il doit être conservé au moins un an après la dernière inscription et présenté sur demande des autorités de contrôle.",
+            "Une installation amateur dont la PAR dépasse 5 W est à déclarer à l’ANFR dans les conditions applicables. Pour émettre en voyage, vérifie l’accord de réciprocité ou l’application de T/R 61-01, le préfixe et les règles du pays visité : ton certificat n’autorise pas automatiquement les mêmes bandes partout."
+          ],
+          "topic": "Station et sécurité",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "Durée minimale de conservation du journal après la dernière inscription ?",
+              "choices": [],
+              "answer": 0,
+              "value": 1,
+              "unit": "an",
+              "tolerance": 0,
+              "explanation": "La décision prévoit au moins un an.",
+              "id": "c13-l04-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel élément doit figurer dans le journal ?",
+              "choices": [
+                "Le niveau de batterie de chaque ami",
+                "La couleur du mât",
+                "La fréquence utilisée",
+                "Le prix du microphone"
+              ],
+              "answer": 2,
+              "explanation": "La fréquence fait partie des informations obligatoires du contact.",
+              "id": "c13-l04-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "En voyage à l’étranger, quelles règles de bandes respecter ?",
+              "choices": [
+                "Celles de son ami",
+                "Celles du pays d’accueil",
+                "Toujours les bandes françaises seulement",
+                "Aucune si le séjour est court"
+              ],
+              "answer": 1,
+              "explanation": "La réciprocité ne dispense pas des conditions du pays visité.",
+              "id": "c13-l04-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Le seuil cité pour la déclaration de station amateur est une PAR…",
+              "choices": [
+                "Supérieure à 5 W",
+                "Égale à zéro",
+                "Toujours 500 W",
+                "Supérieure à 5 kW seulement"
+              ],
+              "answer": 0,
+              "explanation": "Le seuil réglementaire concerne la puissance apparente rayonnée, pas seulement la puissance de l’émetteur.",
+              "id": "c13-l04-q04",
+              "section": "regulation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c14",
+      "title": "Prêt pour le certificat",
+      "subtitle": "Relier les notions et lancer le premier CQ",
+      "color": "#F5CE54",
+      "icon": "trophy",
+      "lessons": [
+        {
+          "id": "c14-l01",
+          "title": "Défi réglementation",
+          "summary": "Les pièges fréquents",
+          "body": [
+            "Le certificat et l’indicatif répondent à deux exigences différentes. Les obligations d’identification, de journal et de respect des bandes s’appliquent même si l’on émet peu ou seulement entre amis.",
+            "Les échanges amateur doivent rester dans l’objet du service et dans les remarques personnelles. Il est interdit d’obscurcir le sens des transmissions par codage, hors exception de commandes de satellites prévue par les textes. Les communications pour des tiers non amateurs sont limitées aux situations d’urgence ou aux secours en catastrophe."
+          ],
+          "topic": "Examen",
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Peut-on chiffrer une conversation amateur personnelle pour en cacher le sens ?",
+              "choices": [
+                "Oui, uniquement en numérique",
+                "Non",
+                "Oui, si les deux amis sont d’accord",
+                "Oui, à faible puissance"
+              ],
+              "answer": 1,
+              "explanation": "L’interdiction concerne l’obscurcissement du sens; les commandes de satellites constituent une exception précise.",
+              "id": "c14-l01-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Des communications pour des tiers non amateurs sont possibles notamment…",
+              "choices": [
+                "En urgence ou pour les secours en catastrophe",
+                "Pour une livraison commerciale",
+                "Pour des publicités régulières",
+                "Pour vendre du trafic radio"
+              ],
+              "answer": 0,
+              "explanation": "Les situations d’urgence et de catastrophe sont l’exception prévue.",
+              "id": "c14-l01-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Émettre seulement entre deux amis dispense-t-il de l’indicatif ?",
+              "choices": [
+                "Oui, si la portée est courte",
+                "Oui, la nuit",
+                "Oui, en FM",
+                "Non"
+              ],
+              "answer": 3,
+              "explanation": "Le caractère personnel du contact ne supprime pas les obligations.",
+              "id": "c14-l01-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La réglementation française actuelle prévoit une admission avec…",
+              "choices": [
+                "Une seule épreuve réussie",
+                "Une preuve de dix QSO",
+                "Au moins 10/20 à chacune des deux épreuves",
+                "20/40 au total sans autre condition"
+              ],
+              "answer": 2,
+              "explanation": "Chaque partie doit être réussie séparément.",
+              "id": "c14-l01-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c14-l02",
+          "title": "Défi technique",
+          "summary": "Des calculs qui changent de costume",
+          "body": [
+            "Les problèmes techniques cachent souvent les mêmes relations sous des unités différentes. Convertis d’abord, identifie le montage, puis choisis la formule. Après le calcul, compare l’ordre de grandeur au résultat attendu.",
+            "Une valeur plus grande en parallèle, une longueur d’onde qui augmente avec la fréquence ou un rendement supérieur à 100 % indiquent généralement une erreur. Ton but est de comprendre le lien entre les grandeurs, pas de mémoriser un chiffre isolé."
+          ],
+          "topic": "Examen",
+          "questions": [
+            {
+              "kind": "number",
+              "prompt": "13,8 V et 5 A : puissance électrique consommée ?",
+              "choices": [],
+              "answer": 0,
+              "value": 69,
+              "unit": "W",
+              "tolerance": 0.01,
+              "explanation": "P = 13,8 × 5 = 69 W.",
+              "id": "c14-l02-q01",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Deux résistances de 220 Ω en parallèle : total ?",
+              "choices": [],
+              "answer": 0,
+              "value": 110,
+              "unit": "Ω",
+              "tolerance": 0.01,
+              "explanation": "Deux valeurs égales en parallèle donnent la moitié.",
+              "id": "c14-l02-q02",
+              "section": "technique"
+            },
+            {
+              "kind": "resistor",
+              "prompt": "Lis : rouge, rouge, brun, or.",
+              "bands": [
+                "rouge",
+                "rouge",
+                "brun",
+                "or"
+              ],
+              "value": 220,
+              "choices": [
+                "2,2 kΩ ±5 %",
+                "220 Ω ±10 %",
+                "220 Ω ±5 %",
+                "22 Ω ±5 %"
+              ],
+              "answer": 2,
+              "explanation": "22 × 10 = 220 Ω, avec ±5 % pour or.",
+              "id": "c14-l02-q03",
+              "section": "technique"
+            },
+            {
+              "kind": "number",
+              "prompt": "Fréquence 14 MHz : longueur d’onde approchée, au dixième ?",
+              "choices": [],
+              "answer": 0,
+              "value": 21.4,
+              "unit": "m",
+              "tolerance": 0.1,
+              "explanation": "300/14 ≈ 21,4 m.",
+              "id": "c14-l02-q04",
+              "section": "technique"
+            }
+          ]
+        },
+        {
+          "id": "c14-l03",
+          "title": "Le jour de l’examen",
+          "summary": "Répondre avec méthode",
+          "body": [
+            "L’entraînement doit alterner questions de notions et examens complets. Lors d’un QCM, lis précisément les unités, les conditions et ce que l’on te demande. Une valeur de crête n’est pas une valeur efficace; PAR et puissance de sortie ne sont pas interchangeables.",
+            "Commence par les réponses que tu connais, réserve du temps aux calculs et reviens aux questions difficiles. Puisque les erreurs ne retirent pas de points, une réponse raisonnée peut être utile. L’inscription, le matériel admis et les aménagements se vérifient auprès de ton centre ANFR."
+          ],
+          "topic": "Examen",
+          "questions": [
+            {
+              "kind": "order",
+              "prompt": "Ordonne une méthode de calcul.",
+              "choices": [
+                "Lire la question et les unités",
+                "Convertir les données",
+                "Choisir la relation",
+                "Calculer puis vérifier"
+              ],
+              "answer": 0,
+              "explanation": "Cette méthode évite les erreurs de préfixes et d’interprétation.",
+              "id": "c14-l03-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une faute au QCM actuel vaut…",
+              "choices": [
+                "−3 points",
+                "+0,5 point",
+                "0 point",
+                "−1 point"
+              ],
+              "answer": 2,
+              "explanation": "Une bonne réponse vaut 1; erreur et omission valent 0.",
+              "id": "c14-l03-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "number",
+              "prompt": "Durée totale ordinaire des deux épreuves, sans pause ?",
+              "choices": [],
+              "answer": 0,
+              "value": 45,
+              "unit": "min",
+              "tolerance": 0,
+              "explanation": "15 min de réglementation + 30 min de technique = 45 min.",
+              "id": "c14-l03-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Une épreuve déjà réussie reste acquise pendant…",
+              "choices": [
+                "Un an",
+                "Un mois",
+                "Cinq ans",
+                "Toute la vie sans condition"
+              ],
+              "answer": 0,
+              "explanation": "En cas d’échec à l’autre partie, le bénéfice est conservé pendant un an.",
+              "id": "c14-l03-q04",
+              "section": "regulation"
+            }
+          ]
+        },
+        {
+          "id": "c14-l04",
+          "title": "Construire sa première station",
+          "summary": "Une fin qui devient un départ",
+          "body": [
+            "Commence avec un objectif réaliste : écouter un relais local, préparer un dipôle ou réussir un premier contact. Vérifie l’alimentation, la protection, l’antenne, la ligne et les conditions de puissance avant de transmettre.",
+            "Une charge fictive aide à tester le poste, puis une mesure d’adaptation vérifie l’installation. Sur l’air, écoute, identifie-toi et laisse des pauses. Après chaque contact, remplis le journal et note ce que tu as appris. La pratique et les révisions se renforcent l’une l’autre."
+          ],
+          "topic": "Examen",
+          "questions": [
+            {
+              "kind": "order",
+              "prompt": "Ordonne une préparation de station simplifiée.",
+              "choices": [
+                "Vérifier les branchements et protections",
+                "Tester dans les conditions adaptées",
+                "Écouter la fréquence",
+                "S’identifier et contacter",
+                "Renseigner le journal"
+              ],
+              "answer": 0,
+              "explanation": "La préparation technique précède le contact; le journal conserve sa trace.",
+              "id": "c14-l04-q01",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "La meilleure puissance à utiliser pour un contact est généralement…",
+              "choices": [
+                "Celle choisie au hasard",
+                "Celle nécessaire à une liaison correcte dans les limites autorisées",
+                "Toujours le maximum du poste",
+                "Toujours 500 W"
+              ],
+              "answer": 1,
+              "explanation": "Une puissance adaptée limite les perturbations tout en permettant la liaison.",
+              "id": "c14-l04-q02",
+              "section": "regulation"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Un test sur charge fictive exige…",
+              "choices": [
+                "Une impédance et une puissance admissible adaptées",
+                "Seulement un fil assez court",
+                "Un indicatif inventé",
+                "Aucun contrôle"
+              ],
+              "answer": 0,
+              "explanation": "La charge doit supporter le signal et l’énergie dissipée.",
+              "id": "c14-l04-q03",
+              "section": "regulation"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe les habitudes.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Écouter",
+                  "right": "Partager la fréquence"
+                },
+                {
+                  "left": "S’identifier",
+                  "right": "Rendre la station reconnaissable"
+                },
+                {
+                  "left": "Tenir le journal",
+                  "right": "Conserver les informations de contact"
+                },
+                {
+                  "left": "Réviser",
+                  "right": "Renforcer les connaissances"
+                }
+              ],
+              "explanation": "Technique et pratique opérateur se complètent.",
+              "id": "c14-l04-q04",
+              "section": "regulation"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "license": {
+    "course": "F6KGL/F5KFF, édition novembre 2025, CC BY-NC-SA 4.0",
+    "originalLessons": "Textes et exercices rédigés pour Hamigo à partir du programme officiel; attribution du cours de référence conservée.",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
+  }
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "305",
+    "section": "regulation",
+    "topic": "Questions entrainement",
+    "count": 361
+  },
+  {
+    "id": "206",
+    "section": "technique",
+    "topic": "Électricité de base",
+    "count": 162
+  },
+  {
+    "id": "202",
+    "section": "technique",
+    "topic": "Groupements de résistances",
+    "count": 91
+  },
+  {
+    "id": "207",
+    "section": "technique",
+    "topic": "Courants alternatifs",
+    "count": 110
+  },
+  {
+    "id": "208",
+    "section": "technique",
+    "topic": "Condensateurs et bobines (séparés)",
+    "count": 130
+  },
+  {
+    "id": "209",
+    "section": "technique",
+    "topic": "Transformateurs, ampli op, filtres RC LC RLC",
+    "count": 205
+  },
+  {
+    "id": "205",
+    "section": "technique",
+    "topic": "Rôle des différents étages RF, haut-parleur, micro",
+    "count": 110
+  },
+  {
+    "id": "203",
+    "section": "technique",
+    "topic": "Diodes et transistors, classes d'amplification",
+    "count": 114
+  },
+  {
+    "id": "210",
+    "section": "technique",
+    "topic": "Antennes, couplage, propagation, ligne de transmis",
+    "count": 207
+  },
+  {
+    "id": "204",
+    "section": "technique",
+    "topic": "Synoptiques d'émetteurs et de récepteurs",
+    "count": 142
+  },
+  {
+    "id": "201",
+    "section": "technique",
+    "topic": "Code des couleurs des résistances",
+    "count": 69
+  },
+  {
+    "id": "304",
+    "section": "regulation",
+    "topic": "Table d’épellation internationale",
+    "count": 110
+  },
+  {
+    "id": "309",
+    "section": "regulation",
+    "topic": "Adaptation, ROS, affaiblissement linéique, calcul",
+    "count": 99
+  },
+  {
+    "id": "307",
+    "section": "regulation",
+    "topic": "Teneur des messages, matériel obligatoire, exposition",
+    "count": 128
+  },
+  {
+    "id": "302",
+    "section": "regulation",
+    "topic": "Indicatifs d'appel français et préfixes européens",
+    "count": 285
+  },
+  {
+    "id": "306",
+    "section": "regulation",
+    "topic": "Sanctions,  examen, perturbation, bande passante",
+    "count": 159
+  },
+  {
+    "id": "308",
+    "section": "regulation",
+    "topic": "Caractéristiques des antennes, longueur d'onde-fréquence",
+    "count": 88
+  },
+  {
+    "id": "301",
+    "section": "regulation",
+    "topic": "Définition et autorisation des classes d’émission",
+    "count": 149
+  },
+  {
+    "id": "310",
+    "section": "regulation",
+    "topic": "Gammes d’onde, décibels, CEM, protection",
+    "count": 108
+  },
+  {
+    "id": "303",
+    "section": "regulation",
+    "topic": "Abréviations en code Q",
+    "count": 134
+  }
+]

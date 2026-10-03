@@ -1,0 +1,375 @@
+{
+  "questionCount": 2961,
+  "imageCount": 2961,
+  "missingImages": [],
+  "extraSourceImages": [
+    "10009.png",
+    "20433.png",
+    "20478.png",
+    "20479.png",
+    "20480.png",
+    "20481.png",
+    "20482.png",
+    "20483.png",
+    "20484.png",
+    "20559.png",
+    "20779.png",
+    "30003.png",
+    "30006.png",
+    "30009.png",
+    "30018.png",
+    "30024.png",
+    "30026.png",
+    "30030.png",
+    "30036.png",
+    "30040.png",
+    "30041.png",
+    "30044.png",
+    "30050.png",
+    "30057.png",
+    "30059.png",
+    "30067.png",
+    "30069.png",
+    "30070.png",
+    "30089.png",
+    "30096.png",
+    "30106.png",
+    "30155.png",
+    "30162.png",
+    "30171.png",
+    "30173.png",
+    "30183.png",
+    "30210.png",
+    "30214.png",
+    "30222.png",
+    "30239.png",
+    "30251.png",
+    "30262.png",
+    "30275.png",
+    "30285.png",
+    "30296.png",
+    "30298.png",
+    "30301.png",
+    "30303.png",
+    "30307.png",
+    "30328.png",
+    "30332.png",
+    "30378.png",
+    "30386.png",
+    "30405.png",
+    "30410.png",
+    "30418.png",
+    "30502.png",
+    "30514.png",
+    "30515.png",
+    "30517.png",
+    "30524.png",
+    "30525.png",
+    "30580.png",
+    "30660.png",
+    "30670.png",
+    "30720.png",
+    "30730.png",
+    "30751.png",
+    "30905.png",
+    "30908.png",
+    "30914.png",
+    "30917.png",
+    "30919.png",
+    "30921.png",
+    "30923.png",
+    "31005.png",
+    "31018.png",
+    "31019.png",
+    "31024.png",
+    "31033.png",
+    "31200.png",
+    "31255.png",
+    "31492.png",
+    "32101.png",
+    "32202.png",
+    "32270.png",
+    "32387.png",
+    "32502.png",
+    "32503.png",
+    "32504.png",
+    "32505.png",
+    "32507.png",
+    "32524.png",
+    "32525.png",
+    "32533.png",
+    "32534.png",
+    "32543.png",
+    "32546.png",
+    "32558.png",
+    "32624.png",
+    "33008.png",
+    "33009.png",
+    "33301.png",
+    "33402.png",
+    "33650.png",
+    "34002.png",
+    "34003.png",
+    "34005.png",
+    "34201.png",
+    "34279.png",
+    "34670.png",
+    "34790.png",
+    "35188.png",
+    "35201.png",
+    "35501.png",
+    "36050.png",
+    "36052.png",
+    "37006.png",
+    "37015.png",
+    "37050.png",
+    "37399.png",
+    "37748.png",
+    "38100.png",
+    "39666.png",
+    "39750.png",
+    "39980.png",
+    "40021.png",
+    "40029.png",
+    "60015.png",
+    "60016.png",
+    "60031.png"
+  ],
+  "emptyExplanationCount": 978,
+  "flaggedQuestions": [
+    {
+      "id": "20111",
+      "course": "http://f6kgl.free.fr/COURS.html#T037a1",
+      "sourceTopicId": 205,
+      "sourceTopic": "Rôle des différents étages RF, haut-parleur, micro",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "20146",
+      "course": "http://f6kgl.free.fr/COURS.html#T064c",
+      "sourceTopicId": 203,
+      "sourceTopic": "Diodes et transistors, classes d'amplification",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "20151",
+      "course": "http://f6kgl.free.fr/COURS.html#T074b2",
+      "sourceTopicId": 203,
+      "sourceTopic": "Diodes et transistors, classes d'amplification",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "20166",
+      "course": "http://f6kgl.free.fr/COURS.html#T083",
+      "sourceTopicId": 209,
+      "sourceTopic": "Transformateurs, ampli op, filtres RC LC RLC",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "20167",
+      "course": "http://f6kgl.free.fr/COURS.html#T083",
+      "sourceTopicId": 209,
+      "sourceTopic": "Transformateurs, ampli op, filtres RC LC RLC",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "23814",
+      "course": "http://f6kgl.free.fr/COURS.html#T017e",
+      "sourceTopicId": 202,
+      "sourceTopic": "Groupements de résistances",
+      "reviewFlags": [
+        "source_prompt_possible_transcription_error"
+      ]
+    },
+    {
+      "id": "30081",
+      "course": "http://f6kgl.free.fr/COURS.html#R52c",
+      "sourceTopicId": 308,
+      "sourceTopic": "Caractéristiques des antennes, longueur d'onde-fréquence",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "30680",
+      "course": "http://f6kgl.free.fr/COURS.html#R53a",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "31025",
+      "course": "http://f6kgl.free.fr/COURS.html#R11a",
+      "sourceTopicId": 305,
+      "sourceTopic": "Questions entrainement",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "32515",
+      "course": "http://f6kgl.free.fr/COURS.html#R51a",
+      "sourceTopicId": 310,
+      "sourceTopic": "Gammes d’onde, décibels, CEM, protection",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "32521",
+      "course": "http://f6kgl.free.fr/COURS.html#R53a",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "32531",
+      "course": "http://f6kgl.free.fr/COURS.html#R52f",
+      "sourceTopicId": 308,
+      "sourceTopic": "Caractéristiques des antennes, longueur d'onde-fréquence",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "32542",
+      "course": "http://f6kgl.free.fr/COURS.html#R53c",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "33409",
+      "course": "http://f6kgl.free.fr/COURS.html#R53c",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "34705",
+      "course": "http://f6kgl.free.fr/COURS.html#R32d",
+      "sourceTopicId": 303,
+      "sourceTopic": "Abréviations en code Q",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34713",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34714",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34715",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34716",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34717",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34718",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34766",
+      "course": "http://f6kgl.free.fr/COURS.html#R13",
+      "sourceTopicId": 306,
+      "sourceTopic": "Sanctions,  examen, perturbation, bande passante",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "34805",
+      "course": "http://f6kgl.free.fr/COURS.html#R52k",
+      "sourceTopicId": 308,
+      "sourceTopic": "Caractéristiques des antennes, longueur d'onde-fréquence",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "35061",
+      "course": "http://f6kgl.free.fr/COURS.html#R32d",
+      "sourceTopicId": 303,
+      "sourceTopic": "Abréviations en code Q",
+      "reviewFlags": [
+        "author_notes_historical_or_repealed"
+      ]
+    },
+    {
+      "id": "39080",
+      "course": "http://f6kgl.free.fr/COURS.html#R53c",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    },
+    {
+      "id": "39450",
+      "course": "http://f6kgl.free.fr/COURS.html#R53c",
+      "sourceTopicId": 309,
+      "sourceTopic": "Adaptation, ROS, affaiblissement linéique, calcul ",
+      "reviewFlags": [
+        "author_notes_out_of_program"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1684 @@
+{
+  "schemaVersion": 1,
+  "language": "fr-FR",
+  "verifiedAt": "2026-10-03",
+  "categories": [
+    {
+      "id": "nato",
+      "title": "Alphabet international",
+      "subtitle": "Épeler un indicatif sans ambiguïté",
+      "rows": [
+        {
+          "term": "A",
+          "description": "Alfa"
+        },
+        {
+          "term": "B",
+          "description": "Bravo"
+        },
+        {
+          "term": "C",
+          "description": "Charlie"
+        },
+        {
+          "term": "D",
+          "description": "Delta"
+        },
+        {
+          "term": "E",
+          "description": "Echo"
+        },
+        {
+          "term": "F",
+          "description": "Foxtrot"
+        },
+        {
+          "term": "G",
+          "description": "Golf"
+        },
+        {
+          "term": "H",
+          "description": "Hotel"
+        },
+        {
+          "term": "I",
+          "description": "India"
+        },
+        {
+          "term": "J",
+          "description": "Juliett"
+        },
+        {
+          "term": "K",
+          "description": "Kilo"
+        },
+        {
+          "term": "L",
+          "description": "Lima"
+        },
+        {
+          "term": "M",
+          "description": "Mike"
+        },
+        {
+          "term": "N",
+          "description": "November"
+        },
+        {
+          "term": "O",
+          "description": "Oscar"
+        },
+        {
+          "term": "P",
+          "description": "Papa"
+        },
+        {
+          "term": "Q",
+          "description": "Quebec"
+        },
+        {
+          "term": "R",
+          "description": "Romeo"
+        },
+        {
+          "term": "S",
+          "description": "Sierra"
+        },
+        {
+          "term": "T",
+          "description": "Tango"
+        },
+        {
+          "term": "U",
+          "description": "Uniform"
+        },
+        {
+          "term": "V",
+          "description": "Victor"
+        },
+        {
+          "term": "W",
+          "description": "Whiskey"
+        },
+        {
+          "term": "X",
+          "description": "X-ray"
+        },
+        {
+          "term": "Y",
+          "description": "Yankee"
+        },
+        {
+          "term": "Z",
+          "description": "Zulu"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "morse",
+      "title": "Morse : caractères",
+      "subtitle": "Un point = 1 unité · un trait = 3",
+      "rows": [
+        {
+          "term": "0",
+          "description": "-----"
+        },
+        {
+          "term": "1",
+          "description": ".----"
+        },
+        {
+          "term": "2",
+          "description": "..---"
+        },
+        {
+          "term": "3",
+          "description": "...--"
+        },
+        {
+          "term": "4",
+          "description": "....-"
+        },
+        {
+          "term": "5",
+          "description": "....."
+        },
+        {
+          "term": "6",
+          "description": "-...."
+        },
+        {
+          "term": "7",
+          "description": "--..."
+        },
+        {
+          "term": "8",
+          "description": "---.."
+        },
+        {
+          "term": "9",
+          "description": "----."
+        },
+        {
+          "term": "A",
+          "description": ".-"
+        },
+        {
+          "term": "B",
+          "description": "-..."
+        },
+        {
+          "term": "C",
+          "description": "-.-."
+        },
+        {
+          "term": "D",
+          "description": "-.."
+        },
+        {
+          "term": "E",
+          "description": "."
+        },
+        {
+          "term": "F",
+          "description": "..-."
+        },
+        {
+          "term": "G",
+          "description": "--."
+        },
+        {
+          "term": "H",
+          "description": "...."
+        },
+        {
+          "term": "I",
+          "description": ".."
+        },
+        {
+          "term": "J",
+          "description": ".---"
+        },
+        {
+          "term": "K",
+          "description": "-.-"
+        },
+        {
+          "term": "L",
+          "description": ".-.."
+        },
+        {
+          "term": "M",
+          "description": "--"
+        },
+        {
+          "term": "N",
+          "description": "-."
+        },
+        {
+          "term": "O",
+          "description": "---"
+        },
+        {
+          "term": "P",
+          "description": ".--."
+        },
+        {
+          "term": "Q",
+          "description": "--.-"
+        },
+        {
+          "term": "R",
+          "description": ".-."
+        },
+        {
+          "term": "S",
+          "description": "..."
+        },
+        {
+          "term": "T",
+          "description": "-"
+        },
+        {
+          "term": "U",
+          "description": "..-"
+        },
+        {
+          "term": "V",
+          "description": "...-"
+        },
+        {
+          "term": "W",
+          "description": ".--"
+        },
+        {
+          "term": "X",
+          "description": "-..-"
+        },
+        {
+          "term": "Y",
+          "description": "-.--"
+        },
+        {
+          "term": "Z",
+          "description": "--.."
+        },
+        {
+          "term": ".",
+          "description": ".-.-.-"
+        },
+        {
+          "term": ",",
+          "description": "--..--"
+        },
+        {
+          "term": "?",
+          "description": "..--.."
+        },
+        {
+          "term": "/",
+          "description": "-..-."
+        },
+        {
+          "term": "=",
+          "description": "-...-"
+        },
+        {
+          "term": "+",
+          "description": ".-.-."
+        },
+        {
+          "term": "-",
+          "description": "-....-"
+        },
+        {
+          "term": "@",
+          "description": ".--.-."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "morse-rhythm",
+      "title": "Morse : rythme et procédure",
+      "subtitle": "Les silences font partie du code",
+      "rows": [
+        {
+          "term": "Point",
+          "description": "1 unité"
+        },
+        {
+          "term": "Trait",
+          "description": "3 unités"
+        },
+        {
+          "term": "Entre éléments d’un caractère",
+          "description": "1 unité"
+        },
+        {
+          "term": "Entre caractères",
+          "description": "3 unités"
+        },
+        {
+          "term": "Entre mots",
+          "description": "7 unités"
+        },
+        {
+          "term": "SOS",
+          "description": "...---...",
+          "extra": "Signal de détresse transmis comme un signal continu, sans intervalles entre lettres."
+        },
+        {
+          "term": "AR",
+          "description": ".-.-.",
+          "extra": "Fin du message, éléments transmis sans intervalles de lettres."
+        },
+        {
+          "term": "SK",
+          "description": "...-.-",
+          "extra": "Fin du travail, transmis sans intervalle entre S et K."
+        },
+        {
+          "term": "K",
+          "description": "-.-",
+          "extra": "Invitation à transmettre."
+        },
+        {
+          "term": "Erreur",
+          "description": "........",
+          "extra": "Une suite de huit points signale une erreur."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "qcodes",
+      "title": "Codes Q essentiels",
+      "subtitle": "Sans ? : information · avec ? : question",
+      "rows": [
+        {
+          "term": "QRA",
+          "description": "Nom de la station"
+        },
+        {
+          "term": "QRB",
+          "description": "Distance entre les stations"
+        },
+        {
+          "term": "QRG",
+          "description": "Fréquence exacte"
+        },
+        {
+          "term": "QRI",
+          "description": "Tonalité de l’émission"
+        },
+        {
+          "term": "QRK",
+          "description": "Lisibilité des signaux"
+        },
+        {
+          "term": "QRL",
+          "description": "Je suis occupé / la fréquence est-elle occupée ?"
+        },
+        {
+          "term": "QRM",
+          "description": "Brouillage causé par d’autres signaux"
+        },
+        {
+          "term": "QRN",
+          "description": "Parasites atmosphériques"
+        },
+        {
+          "term": "QRO",
+          "description": "Augmenter la puissance"
+        },
+        {
+          "term": "QRP",
+          "description": "Diminuer la puissance"
+        },
+        {
+          "term": "QRQ",
+          "description": "Transmettre plus vite"
+        },
+        {
+          "term": "QRS",
+          "description": "Transmettre plus lentement"
+        },
+        {
+          "term": "QRT",
+          "description": "Cesser la transmission"
+        },
+        {
+          "term": "QRU",
+          "description": "Je n’ai rien pour vous / avez-vous quelque chose pour moi ?"
+        },
+        {
+          "term": "QRV",
+          "description": "Je suis prêt"
+        },
+        {
+          "term": "QRX",
+          "description": "Attendre / quand rappellerez-vous ?"
+        },
+        {
+          "term": "QRZ",
+          "description": "Qui m’appelle ?"
+        },
+        {
+          "term": "QSA",
+          "description": "Force des signaux"
+        },
+        {
+          "term": "QSB",
+          "description": "Variations de force du signal, fading"
+        },
+        {
+          "term": "QSL",
+          "description": "Accusé de réception"
+        },
+        {
+          "term": "QSO",
+          "description": "Communication / contact avec une station"
+        },
+        {
+          "term": "QSP",
+          "description": "Retransmettre un message"
+        },
+        {
+          "term": "QSY",
+          "description": "Changer de fréquence"
+        },
+        {
+          "term": "QTH",
+          "description": "Position de la station"
+        },
+        {
+          "term": "QTR",
+          "description": "Heure exacte"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "resistors",
+      "title": "Code des résistances",
+      "subtitle": "4 anneaux : 2 chiffres × multiplicateur ± tolérance",
+      "rows": [
+        {
+          "term": "Noir",
+          "description": "0 · ×1"
+        },
+        {
+          "term": "Brun",
+          "description": "1 · ×10 · ±1 %"
+        },
+        {
+          "term": "Rouge",
+          "description": "2 · ×100 · ±2 %"
+        },
+        {
+          "term": "Orange",
+          "description": "3 · ×1 000"
+        },
+        {
+          "term": "Jaune",
+          "description": "4 · ×10 000"
+        },
+        {
+          "term": "Vert",
+          "description": "5 · ×100 000 · ±0,5 %"
+        },
+        {
+          "term": "Bleu",
+          "description": "6 · ×1 000 000 · ±0,25 %"
+        },
+        {
+          "term": "Violet",
+          "description": "7 · ×10 000 000 · ±0,1 %"
+        },
+        {
+          "term": "Gris",
+          "description": "8 · ×100 000 000 · ±0,05 %"
+        },
+        {
+          "term": "Blanc",
+          "description": "9 · ×1 000 000 000"
+        },
+        {
+          "term": "Or",
+          "description": "Multiplicateur ×0,1 · tolérance ±5 %"
+        },
+        {
+          "term": "Argent",
+          "description": "Multiplicateur ×0,01 · tolérance ±10 %"
+        },
+        {
+          "term": "Sans anneau de tolérance",
+          "description": "±20 %"
+        },
+        {
+          "term": "Jaune · violet · rouge · or",
+          "description": "4,7 kΩ ±5 %"
+        },
+        {
+          "term": "Brun · noir · orange · or",
+          "description": "10 kΩ ±5 %"
+        },
+        {
+          "term": "5 anneaux",
+          "description": "3 chiffres × multiplicateur ± tolérance"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "units",
+      "title": "Grandeurs et unités",
+      "subtitle": "Les mots donnent le sens, les symboles servent au calcul",
+      "rows": [
+        {
+          "term": "Tension U",
+          "description": "Volt · V"
+        },
+        {
+          "term": "Courant I",
+          "description": "Ampère · A"
+        },
+        {
+          "term": "Résistance R",
+          "description": "Ohm · Ω"
+        },
+        {
+          "term": "Puissance P",
+          "description": "Watt · W"
+        },
+        {
+          "term": "Énergie E",
+          "description": "Joule · J",
+          "extra": "1 Wh = 3 600 J."
+        },
+        {
+          "term": "Charge Q",
+          "description": "Coulomb · C"
+        },
+        {
+          "term": "Capacité C",
+          "description": "Farad · F"
+        },
+        {
+          "term": "Inductance L",
+          "description": "Henry · H"
+        },
+        {
+          "term": "Fréquence f",
+          "description": "Hertz · Hz"
+        },
+        {
+          "term": "Période T",
+          "description": "Seconde · s"
+        },
+        {
+          "term": "Longueur d’onde λ",
+          "description": "Mètre · m"
+        },
+        {
+          "term": "Impédance Z",
+          "description": "Ohm · Ω"
+        },
+        {
+          "term": "Réactance X",
+          "description": "Ohm · Ω"
+        },
+        {
+          "term": "Conductance G",
+          "description": "Siemens · S"
+        },
+        {
+          "term": "Débit de symboles",
+          "description": "Baud · Bd"
+        },
+        {
+          "term": "Débit binaire",
+          "description": "Bit par seconde · bit/s"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "prefixes",
+      "title": "Préfixes SI",
+      "subtitle": "Respecter la casse : m ≠ M",
+      "rows": [
+        {
+          "term": "p · pico",
+          "description": "10⁻¹²"
+        },
+        {
+          "term": "n · nano",
+          "description": "10⁻⁹"
+        },
+        {
+          "term": "µ · micro",
+          "description": "10⁻⁶"
+        },
+        {
+          "term": "m · milli",
+          "description": "10⁻³"
+        },
+        {
+          "term": "c · centi",
+          "description": "10⁻²"
+        },
+        {
+          "term": "d · déci",
+          "description": "10⁻¹"
+        },
+        {
+          "term": "da · déca",
+          "description": "10¹"
+        },
+        {
+          "term": "h · hecto",
+          "description": "10²"
+        },
+        {
+          "term": "k · kilo",
+          "description": "10³"
+        },
+        {
+          "term": "M · méga",
+          "description": "10⁶"
+        },
+        {
+          "term": "G · giga",
+          "description": "10⁹"
+        },
+        {
+          "term": "T · téra",
+          "description": "10¹²"
+        },
+        {
+          "term": "1 kΩ",
+          "description": "1 000 Ω"
+        },
+        {
+          "term": "1 mA",
+          "description": "0,001 A"
+        },
+        {
+          "term": "1 µF",
+          "description": "1 000 nF"
+        },
+        {
+          "term": "1 MHz",
+          "description": "1 000 000 Hz"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "formulas",
+      "title": "Les formules utiles",
+      "subtitle": "Utiliser les unités SI sauf indication contraire",
+      "rows": [
+        {
+          "term": "Loi d’Ohm",
+          "description": "U = R × I",
+          "extra": "I = U/R; R = U/I."
+        },
+        {
+          "term": "Puissance en continu",
+          "description": "P = U × I"
+        },
+        {
+          "term": "Puissance dans une résistance",
+          "description": "P = U²/R = R × I²"
+        },
+        {
+          "term": "Énergie",
+          "description": "E = P × t",
+          "extra": "W × s donne J; W × h donne Wh."
+        },
+        {
+          "term": "Courant et charge",
+          "description": "I = Q/t"
+        },
+        {
+          "term": "Résistances en série",
+          "description": "Rtot = R1 + R2 + …"
+        },
+        {
+          "term": "Résistances en parallèle",
+          "description": "1/Rtot = 1/R1 + 1/R2 + …"
+        },
+        {
+          "term": "Deux résistances parallèles",
+          "description": "Rtot = R1R2/(R1 + R2)"
+        },
+        {
+          "term": "Diviseur non chargé",
+          "description": "Us = Ue × R2/(R1 + R2)",
+          "extra": "Sortie prise aux bornes de R2."
+        },
+        {
+          "term": "Condensateurs en parallèle",
+          "description": "Ctot = C1 + C2 + …"
+        },
+        {
+          "term": "Condensateurs en série",
+          "description": "1/Ctot = 1/C1 + 1/C2 + …"
+        },
+        {
+          "term": "Inductances série non couplées",
+          "description": "Ltot = L1 + L2 + …"
+        },
+        {
+          "term": "Réactance inductive",
+          "description": "XL = 2πfL"
+        },
+        {
+          "term": "Réactance capacitive",
+          "description": "XC = 1/(2πfC)"
+        },
+        {
+          "term": "Impédance RLC série",
+          "description": "|Z| = √(R² + (XL − XC)²)"
+        },
+        {
+          "term": "Résonance LC",
+          "description": "f0 = 1/(2π√(LC))"
+        },
+        {
+          "term": "Constante de temps RC",
+          "description": "τ = R × C"
+        },
+        {
+          "term": "Période et fréquence",
+          "description": "T = 1/f"
+        },
+        {
+          "term": "Sinusoïde",
+          "description": "Ueff = Ucrête/√2",
+          "extra": "Seulement pour une sinusoïde; Upp = 2Ucrête."
+        },
+        {
+          "term": "Longueur d’onde dans le vide",
+          "description": "λ(m) ≈ 300/f(MHz)"
+        },
+        {
+          "term": "Transformateur idéal",
+          "description": "Us/Up = Ns/Np",
+          "extra": "Is/Ip = Np/Ns; rapport d’impédances = carré du rapport de spires."
+        },
+        {
+          "term": "Gain de puissance",
+          "description": "G(dB) = 10 log10(P2/P1)"
+        },
+        {
+          "term": "Gain de tension",
+          "description": "G(dB) = 20 log10(U2/U1)",
+          "extra": "Les impédances doivent être identiques pour relier ce gain au gain de puissance."
+        },
+        {
+          "term": "ROS",
+          "description": "(1 + |Γ|)/(1 − |Γ|)"
+        },
+        {
+          "term": "Réflexion sur charge résistive",
+          "description": "Γ = (Rcharge − Z0)/(Rcharge + Z0)"
+        },
+        {
+          "term": "Rendement",
+          "description": "η = Putile/Palimentation"
+        },
+        {
+          "term": "Bande passante AM",
+          "description": "B ≈ 2 × Faudio max"
+        },
+        {
+          "term": "Bande FM, règle de Carson",
+          "description": "B ≈ 2(Δf + Faudio max)"
+        },
+        {
+          "term": "Qualité d’un circuit résonant",
+          "description": "Q = f0/B"
+        },
+        {
+          "term": "Bilan de liaison",
+          "description": "Pr = Pt + Gt + Gr − pertes",
+          "extra": "Pr et Pt en dBm; gains et pertes en dB."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "decibels",
+      "title": "Décibels en tête",
+      "subtitle": "Rapports de puissance et puissances absolues",
+      "rows": [
+        {
+          "term": "+3 dB",
+          "description": "×2 environ"
+        },
+        {
+          "term": "−3 dB",
+          "description": "÷2 environ"
+        },
+        {
+          "term": "+6 dB",
+          "description": "×4 environ"
+        },
+        {
+          "term": "−6 dB",
+          "description": "÷4 environ"
+        },
+        {
+          "term": "+10 dB",
+          "description": "×10"
+        },
+        {
+          "term": "−10 dB",
+          "description": "÷10"
+        },
+        {
+          "term": "+20 dB",
+          "description": "×100"
+        },
+        {
+          "term": "0 dBm",
+          "description": "1 mW"
+        },
+        {
+          "term": "10 dBm",
+          "description": "10 mW"
+        },
+        {
+          "term": "20 dBm",
+          "description": "100 mW"
+        },
+        {
+          "term": "30 dBm",
+          "description": "1 W"
+        },
+        {
+          "term": "40 dBm",
+          "description": "10 W"
+        },
+        {
+          "term": "50 dBm",
+          "description": "100 W"
+        },
+        {
+          "term": "0 dBW",
+          "description": "1 W"
+        },
+        {
+          "term": "dBi",
+          "description": "Gain par rapport à une antenne isotrope"
+        },
+        {
+          "term": "dBd",
+          "description": "Gain par rapport à un dipôle demi-onde"
+        },
+        {
+          "term": "dBi ↔ dBd",
+          "description": "dBi ≈ dBd + 2,15"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "bands",
+      "title": "Bandes amateur en métropole",
+      "subtitle": "Repères de fréquences · les conditions dépendent de la bande",
+      "rows": [
+        {
+          "term": "2 200 m",
+          "description": "135,7–137,8 kHz",
+          "extra": "Secondaire · puissance maximale exprimée en PIRE : 1 W."
+        },
+        {
+          "term": "630 m",
+          "description": "472–479 kHz",
+          "extra": "Secondaire · puissance maximale exprimée en PIRE : 1 W."
+        },
+        {
+          "term": "160 m",
+          "description": "1,810–1,850 MHz",
+          "extra": "Primaire · limite maximale à la sortie : 500 W crête."
+        },
+        {
+          "term": "80 m",
+          "description": "3,500–3,800 MHz",
+          "extra": "Primaire partagé · 500 W crête."
+        },
+        {
+          "term": "60 m",
+          "description": "5,3515–5,3665 MHz",
+          "extra": "Secondaire · 15 W PIRE maximum."
+        },
+        {
+          "term": "40 m",
+          "description": "7,000–7,200 MHz",
+          "extra": "Primaire · 500 W crête."
+        },
+        {
+          "term": "30 m",
+          "description": "10,100–10,150 MHz",
+          "extra": "Secondaire · 500 W crête."
+        },
+        {
+          "term": "20 m",
+          "description": "14,000–14,350 MHz",
+          "extra": "Primaire · 500 W crête."
+        },
+        {
+          "term": "17 m",
+          "description": "18,068–18,168 MHz",
+          "extra": "Primaire · 500 W crête."
+        },
+        {
+          "term": "15 m",
+          "description": "21,000–21,450 MHz",
+          "extra": "Primaire · 500 W crête."
+        },
+        {
+          "term": "12 m",
+          "description": "24,890–24,990 MHz",
+          "extra": "Primaire · 500 W crête."
+        },
+        {
+          "term": "10 m",
+          "description": "28,000–29,700 MHz",
+          "extra": "Primaire · 250 W crête."
+        },
+        {
+          "term": "6 m",
+          "description": "50,000–52,000 MHz",
+          "extra": "Secondaire en région 1 · 120 W crête."
+        },
+        {
+          "term": "2 m",
+          "description": "144,000–146,000 MHz",
+          "extra": "Primaire · 120 W crête."
+        },
+        {
+          "term": "70 cm",
+          "description": "430,000–440,000 MHz",
+          "extra": "430–434 MHz secondaire; 434–440 MHz primaire partagé · 120 W crête."
+        },
+        {
+          "term": "23 cm",
+          "description": "1 240–1 300 MHz",
+          "extra": "Secondaire, notamment vis-à-vis de la radionavigation; consulter les conditions nationales et les mesures de protection à jour."
+        },
+        {
+          "term": "13 cm",
+          "description": "2 300–2 450 MHz",
+          "extra": "Secondaire."
+        },
+        {
+          "term": "6 cm",
+          "description": "5 650–5 850 MHz",
+          "extra": "Secondaire."
+        },
+        {
+          "term": "3 cm",
+          "description": "10,000–10,500 GHz",
+          "extra": "Statuts variables dans la bande, voir l’annexe réglementaire."
+        },
+        {
+          "term": "1,2 cm",
+          "description": "24,000–24,250 GHz",
+          "extra": "24–24,05 GHz primaire; 24,05–24,25 GHz secondaire."
+        },
+        {
+          "term": "6 mm",
+          "description": "47,000–47,200 GHz",
+          "extra": "Primaire."
+        },
+        {
+          "term": "4 mm",
+          "description": "76,000–81,500 GHz",
+          "extra": "Statuts variables dans la bande."
+        },
+        {
+          "term": "2,5 mm",
+          "description": "122,250–123,000 GHz",
+          "extra": "Secondaire."
+        },
+        {
+          "term": "2 mm",
+          "description": "134,000–141,000 GHz",
+          "extra": "134–136 GHz primaire; 136–141 GHz secondaire."
+        },
+        {
+          "term": "1 mm",
+          "description": "241,000–250,000 GHz",
+          "extra": "241–248 GHz secondaire; 248–250 GHz primaire."
+        },
+        {
+          "term": "Région 1 UIT",
+          "description": "Europe, Afrique, partie de l’Asie",
+          "extra": "La France métropolitaine relève de la région 1."
+        },
+        {
+          "term": "Attribution secondaire",
+          "description": "Ne pas brouiller un service primaire",
+          "extra": "Pas de droit à protection contre les brouillages d’un service primaire."
+        },
+        {
+          "term": "Plan de bande IARU",
+          "description": "Organisation recommandée des modes",
+          "extra": "Les recommandations ne créent pas d’autorisation hors des bandes nationales."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "satellite",
+      "title": "Amateur par satellite",
+      "subtitle": "Des sous-bandes et parfois un sens de liaison précis",
+      "rows": [
+        {
+          "term": "40 m satellite",
+          "description": "7,000–7,100 MHz"
+        },
+        {
+          "term": "20 m satellite",
+          "description": "14,000–14,250 MHz"
+        },
+        {
+          "term": "17 m satellite",
+          "description": "18,068–18,168 MHz"
+        },
+        {
+          "term": "15 m satellite",
+          "description": "21,000–21,450 MHz"
+        },
+        {
+          "term": "12 m satellite",
+          "description": "24,890–24,990 MHz"
+        },
+        {
+          "term": "10 m satellite",
+          "description": "28,000–29,700 MHz"
+        },
+        {
+          "term": "2 m satellite",
+          "description": "144,000–146,000 MHz"
+        },
+        {
+          "term": "70 cm satellite, région 1",
+          "description": "435,000–438,000 MHz"
+        },
+        {
+          "term": "13 cm satellite",
+          "description": "2 400–2 450 MHz"
+        },
+        {
+          "term": "6 cm montant",
+          "description": "5 650–5 725 MHz · Terre vers espace"
+        },
+        {
+          "term": "6 cm descendant",
+          "description": "5 830–5 850 MHz · espace vers Terre"
+        },
+        {
+          "term": "Liaison montante",
+          "description": "Terre vers satellite"
+        },
+        {
+          "term": "Liaison descendante",
+          "description": "Satellite vers Terre"
+        },
+        {
+          "term": "Doppler au rapprochement",
+          "description": "Fréquence reçue plus haute"
+        },
+        {
+          "term": "Doppler à l’éloignement",
+          "description": "Fréquence reçue plus basse"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "callsigns",
+      "title": "Indicatifs et préfixes",
+      "subtitle": "France, territoires et activité mobile",
+      "rows": [
+        {
+          "term": "F",
+          "description": "France métropolitaine, hors Corse"
+        },
+        {
+          "term": "TK",
+          "description": "Corse"
+        },
+        {
+          "term": "FG",
+          "description": "Guadeloupe"
+        },
+        {
+          "term": "FM",
+          "description": "Martinique"
+        },
+        {
+          "term": "FR",
+          "description": "La Réunion"
+        },
+        {
+          "term": "FH",
+          "description": "Mayotte"
+        },
+        {
+          "term": "FK",
+          "description": "Nouvelle-Calédonie"
+        },
+        {
+          "term": "FO",
+          "description": "Polynésie française"
+        },
+        {
+          "term": "FW",
+          "description": "Wallis-et-Futuna"
+        },
+        {
+          "term": "FP",
+          "description": "Saint-Pierre-et-Miquelon"
+        },
+        {
+          "term": "FS",
+          "description": "Saint-Martin"
+        },
+        {
+          "term": "FJ",
+          "description": "Saint-Barthélemy"
+        },
+        {
+          "term": "FT",
+          "description": "Terres australes et antarctiques françaises",
+          "extra": "La sous-localisation précise le territoire."
+        },
+        {
+          "term": "/P",
+          "description": "Portable"
+        },
+        {
+          "term": "/M",
+          "description": "Mobile"
+        },
+        {
+          "term": "/MM",
+          "description": "Maritime mobile"
+        },
+        {
+          "term": "F4ABC",
+          "description": "Exemple pédagogique d’indicatif métropolitain",
+          "extra": "Préfixe + chiffre + suffixe; l’exemple ne désigne pas un utilisateur de l’application."
+        },
+        {
+          "term": "T/R 61-01",
+          "description": "Licence CEPT : exploitation temporaire dans les pays qui l’appliquent"
+        },
+        {
+          "term": "T/R 61-02",
+          "description": "Certificat HAREC : reconnaissance du niveau d’examen"
+        },
+        {
+          "term": "Voyage radio",
+          "description": "Respecter les conditions du pays visité",
+          "extra": "Vérifier réciprocité, préfixe et bandes autorisées."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "emissions",
+      "title": "Classes d’émission",
+      "subtitle": "Modulation · nature du signal · information",
+      "rows": [
+        {
+          "term": "A1A",
+          "description": "Télégraphie Morse, porteuse manipulée sans sous-porteuse modulante"
+        },
+        {
+          "term": "A2A",
+          "description": "Télégraphie Morse avec sous-porteuse modulante en amplitude"
+        },
+        {
+          "term": "A3E",
+          "description": "Téléphonie AM double bande latérale"
+        },
+        {
+          "term": "J3E",
+          "description": "Téléphonie BLU à porteuse supprimée"
+        },
+        {
+          "term": "R3E",
+          "description": "Téléphonie BLU à porteuse réduite"
+        },
+        {
+          "term": "H3E",
+          "description": "Téléphonie BLU à porteuse complète"
+        },
+        {
+          "term": "F3E",
+          "description": "Téléphonie en modulation de fréquence"
+        },
+        {
+          "term": "G3E",
+          "description": "Téléphonie en modulation de phase"
+        },
+        {
+          "term": "F1B",
+          "description": "Transmission de données par manipulation de fréquence, un canal numérique sans sous-porteuse"
+        },
+        {
+          "term": "J2B",
+          "description": "Données sur une sous-porteuse, BLU à porteuse supprimée"
+        },
+        {
+          "term": "A (1er symbole)",
+          "description": "Double bande latérale en modulation d’amplitude"
+        },
+        {
+          "term": "J (1er symbole)",
+          "description": "Bande latérale unique à porteuse supprimée"
+        },
+        {
+          "term": "F (1er symbole)",
+          "description": "Modulation de fréquence"
+        },
+        {
+          "term": "G (1er symbole)",
+          "description": "Modulation de phase"
+        },
+        {
+          "term": "A (3e symbole)",
+          "description": "Télégraphie destinée à être reçue auditivement"
+        },
+        {
+          "term": "B (3e symbole)",
+          "description": "Télégraphie destinée à une réception automatique"
+        },
+        {
+          "term": "E (3e symbole)",
+          "description": "Téléphonie, radiodiffusion sonore"
+        },
+        {
+          "term": "F (3e symbole)",
+          "description": "Télévision, vidéo"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "reports",
+      "title": "Reports RS et RST",
+      "subtitle": "R : lisibilité 1–5 · S : force 1–9 · T : tonalité 1–9",
+      "rows": [
+        {
+          "term": "R1",
+          "description": "Illisible"
+        },
+        {
+          "term": "R2",
+          "description": "Quelques mots compréhensibles"
+        },
+        {
+          "term": "R3",
+          "description": "Lisible avec beaucoup de difficulté"
+        },
+        {
+          "term": "R4",
+          "description": "Lisible avec peu de difficulté"
+        },
+        {
+          "term": "R5",
+          "description": "Parfaitement lisible"
+        },
+        {
+          "term": "S1",
+          "description": "À peine perceptible"
+        },
+        {
+          "term": "S2",
+          "description": "Très faible"
+        },
+        {
+          "term": "S3",
+          "description": "Faible"
+        },
+        {
+          "term": "S4",
+          "description": "Correct, faible"
+        },
+        {
+          "term": "S5",
+          "description": "Assez bon"
+        },
+        {
+          "term": "S6",
+          "description": "Bon"
+        },
+        {
+          "term": "S7",
+          "description": "Modérément fort"
+        },
+        {
+          "term": "S8",
+          "description": "Fort"
+        },
+        {
+          "term": "S9",
+          "description": "Très fort"
+        },
+        {
+          "term": "T1",
+          "description": "Tonalité très mauvaise, très rugueuse"
+        },
+        {
+          "term": "T9",
+          "description": "Tonalité pure"
+        },
+        {
+          "term": "59",
+          "description": "Phonie : parfaitement lisible, très fort"
+        },
+        {
+          "term": "599",
+          "description": "CW : parfaitement lisible, très fort, tonalité pure"
+        },
+        {
+          "term": "S-mètre",
+          "description": "Indication de niveau reçue",
+          "extra": "Une indication dépend aussi de l’étalonnage du récepteur; le report ne doit pas être confondu avec une mesure absolue universelle."
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "abbreviations",
+      "title": "Le vocabulaire de l’air",
+      "subtitle": "Petits mots, grandes conversations",
+      "rows": [
+        {
+          "term": "CQ",
+          "description": "Appel général"
+        },
+        {
+          "term": "DE",
+          "description": "De, utilisé avant l’indicatif émetteur"
+        },
+        {
+          "term": "DX",
+          "description": "Liaison lointaine"
+        },
+        {
+          "term": "OM",
+          "description": "Opérateur, terme traditionnel amateur"
+        },
+        {
+          "term": "YL",
+          "description": "Opératrice, terme traditionnel amateur"
+        },
+        {
+          "term": "73",
+          "description": "Salutations"
+        },
+        {
+          "term": "88",
+          "description": "Amitiés affectueuses"
+        },
+        {
+          "term": "BK",
+          "description": "Interruption / reprise rapide dans l’échange"
+        },
+        {
+          "term": "K",
+          "description": "Invitation à transmettre"
+        },
+        {
+          "term": "TNX",
+          "description": "Merci"
+        },
+        {
+          "term": "PSE",
+          "description": "S’il vous plaît"
+        },
+        {
+          "term": "AGN",
+          "description": "Encore"
+        },
+        {
+          "term": "R",
+          "description": "Reçu"
+        },
+        {
+          "term": "RST",
+          "description": "Lisibilité, force, tonalité"
+        },
+        {
+          "term": "CW",
+          "description": "Télégraphie par porteuse manipulée"
+        },
+        {
+          "term": "SSB / BLU",
+          "description": "Bande latérale unique"
+        },
+        {
+          "term": "USB / BLS",
+          "description": "Bande latérale supérieure"
+        },
+        {
+          "term": "LSB / BLI",
+          "description": "Bande latérale inférieure"
+        },
+        {
+          "term": "AM",
+          "description": "Modulation d’amplitude"
+        },
+        {
+          "term": "FM",
+          "description": "Modulation de fréquence"
+        },
+        {
+          "term": "PM",
+          "description": "Modulation de phase"
+        },
+        {
+          "term": "RF / HF",
+          "description": "Radiofréquence",
+          "extra": "HF peut aussi désigner précisément la gamme 3–30 MHz."
+        },
+        {
+          "term": "AF / BF",
+          "description": "Audiofréquence / basse fréquence"
+        },
+        {
+          "term": "IF / FI",
+          "description": "Fréquence intermédiaire"
+        },
+        {
+          "term": "BFO",
+          "description": "Oscillateur de battement"
+        },
+        {
+          "term": "AGC / CAG",
+          "description": "Commande automatique de gain"
+        },
+        {
+          "term": "PTT",
+          "description": "Commande de passage en émission"
+        },
+        {
+          "term": "SDR",
+          "description": "Radio définie par logiciel"
+        },
+        {
+          "term": "SWR / ROS",
+          "description": "Rapport d’ondes stationnaires"
+        },
+        {
+          "term": "UTC",
+          "description": "Temps universel coordonné"
+        },
+        {
+          "term": "QSL papier ou électronique",
+          "description": "Confirmation d’un contact"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "propagation",
+      "title": "Propagation et antennes",
+      "subtitle": "Un mémo des mots qui reviennent",
+      "rows": [
+        {
+          "term": "HF",
+          "description": "3 à 30 MHz"
+        },
+        {
+          "term": "VHF",
+          "description": "30 à 300 MHz"
+        },
+        {
+          "term": "UHF",
+          "description": "300 à 3 000 MHz"
+        },
+        {
+          "term": "SHF",
+          "description": "3 à 30 GHz"
+        },
+        {
+          "term": "Ionosphère",
+          "description": "Région ionisée de l’atmosphère influençant notamment la propagation HF"
+        },
+        {
+          "term": "Couche D",
+          "description": "Absorption diurne importante aux fréquences HF basses"
+        },
+        {
+          "term": "Couches F",
+          "description": "Rôle majeur dans les liaisons HF lointaines"
+        },
+        {
+          "term": "MUF",
+          "description": "Fréquence maximale utilisable pour un trajet et des conditions donnés"
+        },
+        {
+          "term": "LUF",
+          "description": "Fréquence minimale utilisable pour un trajet et des conditions donnés"
+        },
+        {
+          "term": "Fading",
+          "description": "Variation de l’amplitude d’un signal reçu"
+        },
+        {
+          "term": "Sporadique E",
+          "description": "Ionisation particulière de la couche E pouvant permettre des liaisons inhabituelles"
+        },
+        {
+          "term": "Troposphère",
+          "description": "Couche basse de l’atmosphère; influence certaines liaisons VHF/UHF"
+        },
+        {
+          "term": "Polarisation",
+          "description": "Orientation du champ électrique"
+        },
+        {
+          "term": "Balun",
+          "description": "Transition équilibrée / déséquilibrée selon sa conception"
+        },
+        {
+          "term": "Facteur de vélocité",
+          "description": "Vitesse dans la ligne divisée par la vitesse dans le vide"
+        },
+        {
+          "term": "Charge fictive",
+          "description": "Charge adaptée dissipant la puissance sans rayonnement volontaire"
+        },
+        {
+          "term": "PAR",
+          "description": "Puissance apparente rayonnée, référence dipôle"
+        },
+        {
+          "term": "PIRE",
+          "description": "Puissance isotrope rayonnée équivalente, référence isotrope"
+        }
+      ],
+      "flashcards": true
+    },
+    {
+      "id": "exam-rules",
+      "title": "Examen et règles clés",
+      "subtitle": "Vérification des sources officielles : 3 octobre 2026",
+      "rows": [
+        {
+          "term": "Réglementation",
+          "description": "20 QCM · 15 minutes"
+        },
+        {
+          "term": "Technique",
+          "description": "20 QCM · 30 minutes"
+        },
+        {
+          "term": "Bonne réponse",
+          "description": "1 point"
+        },
+        {
+          "term": "Erreur ou omission",
+          "description": "0 point"
+        },
+        {
+          "term": "Admission",
+          "description": "Au moins 10/20 dans chaque épreuve"
+        },
+        {
+          "term": "Une seule épreuve réussie",
+          "description": "Bénéfice conservé un an en cas d’échec à l’autre"
+        },
+        {
+          "term": "Après un échec",
+          "description": "Délai de deux mois avant une nouvelle présentation"
+        },
+        {
+          "term": "Morse au certificat actuel",
+          "description": "Pas d’épreuve de Morse"
+        },
+        {
+          "term": "Identification",
+          "description": "Début et fin de période d’émission; au moins toutes les 15 min pour une longue émission; début après changement de fréquence"
+        },
+        {
+          "term": "Journal de bord",
+          "description": "Date, heure, indicatifs, fréquence, classe d’émission, lieu"
+        },
+        {
+          "term": "Conservation du journal",
+          "description": "Au moins un an après la dernière inscription"
+        },
+        {
+          "term": "Déclaration d’installation",
+          "description": "PAR supérieure à 5 W : déclaration ANFR selon les conditions applicables"
+        },
+        {
+          "term": "Brouillage préjudiciable",
+          "description": "Faire cesser la perturbation; chercher et corriger sa cause"
+        },
+        {
+          "term": "Transmission chiffrée",
+          "description": "Interdiction d’obscurcir le sens, hors exception précise des commandes de satellites"
+        },
+        {
+          "term": "Messages pour des tiers non amateurs",
+          "description": "Seulement en urgence ou pour les secours en catastrophe"
+        }
+      ],
+      "flashcards": true
+    }
+  ],
+  "sources": [
+    {
+      "title": "Cours F6KGL/F5KFF, novembre 2025",
+      "url": "http://f6kgl.free.fr/COURS.html",
+      "license": "CC BY-NC-SA 4.0"
+    },
+    {
+      "title": "ANFR — Les certificats",
+      "url": "https://www.anfr.fr/gerer/radioamateurs/les-certificats"
+    },
+    {
+      "title": "Arrêté du 21 septembre 2000 consolidé",
+      "url": "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-03"
+    },
+    {
+      "title": "ARCEP — décision 2019-1412 et annexe",
+      "url": "https://www.arcep.fr/uploads/tx_gsavis/19-1412.pdf"
+    },
+    {
+      "title": "ARCEP — décision 2012-1241, articles",
+      "url": "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+    },
+    {
+      "title": "OTAN — alphabet international",
+      "url": "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals"
+    },
+    {
+      "title": "UIT — Morse international M.1677-1",
+      "url": "https://www.itu.int/rec/R-REC-M.1677-1-200910-I"
+    },
+    {
+      "title": "IARU région 1 — plans de bande",
+      "url": "https://www.iaru-r1.org/on-the-air/band-plans/"
+    },
+    {
+      "title": "INRS — sécurité des opérations électriques",
+      "url": "https://www.inrs.fr/risques/electriques/operations-installations.html"
+    }
+  ]
+}

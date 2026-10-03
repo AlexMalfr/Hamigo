@@ -1,0 +1,1131 @@
+{
+  "source": "http://f6kgl.free.fr/COURS.html",
+  "edition": "novembre 2025",
+  "downloadedAt": "2026-10-03T16:27:27.176566+00:00",
+  "license": "CC BY-NC-SA 4.0",
+  "pageSha256": "bbe11fc30b7ad1b2ca10d13984c661e6766cedb104aebc3be533c2415c6f214a",
+  "assets": [
+    {
+      "path": "COURS_fichiers/image001.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image001.gif",
+      "bytes": 2240,
+      "sha256": "8739d7ae965d2161a453f6c013b75ca471c9b791c2abd7d8c856085f562004ac"
+    },
+    {
+      "path": "COURS_fichiers/image002.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image002.gif",
+      "bytes": 1871,
+      "sha256": "f02184578a40402745a4a022b8aa7cc2c10e494fc695b391e89cf60c816cb79c"
+    },
+    {
+      "path": "COURS_fichiers/image003.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image003.gif",
+      "bytes": 15926,
+      "sha256": "f1ba46d2ba1f4bbc550e0c3b981339c71e7fc9e7f0266796634978ce0524e3d8"
+    },
+    {
+      "path": "COURS_fichiers/image004.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image004.gif",
+      "bytes": 13635,
+      "sha256": "ffab928bcf95fdb0e11a206128bcef04282948854aa9c27d88771305fd7130b2"
+    },
+    {
+      "path": "COURS_fichiers/image005.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image005.jpg",
+      "bytes": 26234,
+      "sha256": "061518da546c9a499342dcdfc953bc314fd5ebca5f47d471d1fb980ede89b810"
+    },
+    {
+      "path": "COURS_fichiers/image006.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image006.jpg",
+      "bytes": 6523,
+      "sha256": "fb4ea29052a558ba695e53394d70ad03adec6bc373f29f30c0d19bbefa447f76"
+    },
+    {
+      "path": "COURS_fichiers/image007.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image007.jpg",
+      "bytes": 1865,
+      "sha256": "0c905d1eb7db6686720a881a7884dcd3d8a42ec72bcc836f2657137d64e71b32"
+    },
+    {
+      "path": "COURS_fichiers/image008.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image008.jpg",
+      "bytes": 1738,
+      "sha256": "f680334e525a13a4426ffdd95814265f8bec0d90af192a8fea2b2c0ddce54a04"
+    },
+    {
+      "path": "COURS_fichiers/image009.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image009.gif",
+      "bytes": 2854,
+      "sha256": "1497013aff9bca23d395f7e7d039249bdd76fd38fa776e4cadded37478d66ab0"
+    },
+    {
+      "path": "COURS_fichiers/image010.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image010.gif",
+      "bytes": 3109,
+      "sha256": "29295d05482692f0ead60dafd27c594163919d7a3ea0e39f3d69b0abe985d3bc"
+    },
+    {
+      "path": "COURS_fichiers/image011.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image011.gif",
+      "bytes": 5299,
+      "sha256": "b75acd14d09e3d32aab82e2d44186dc153be2d935437b65574cecbfd92a62a4e"
+    },
+    {
+      "path": "COURS_fichiers/image012.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image012.jpg",
+      "bytes": 25601,
+      "sha256": "096bb425f52aa4137789d2f74a116c7480a0ba38f104a9ec9de2a4b1c8ebce96"
+    },
+    {
+      "path": "COURS_fichiers/image013.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image013.gif",
+      "bytes": 4453,
+      "sha256": "2cf737ee2c21abc578b9bfd4b8de6f4c65165f8eff520913ac9bc4a1a3a3ada4"
+    },
+    {
+      "path": "COURS_fichiers/image014.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image014.gif",
+      "bytes": 1789,
+      "sha256": "b8c514123e29a05d151080436db5c3a0c050b5664cada1c8c7f6fd697c686559"
+    },
+    {
+      "path": "COURS_fichiers/image015.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image015.gif",
+      "bytes": 13014,
+      "sha256": "3cb671f1cbb6274c97fe90250d0750cde377f5e44b7fd9f85eef6bf3e7dcfd9e"
+    },
+    {
+      "path": "COURS_fichiers/image016.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image016.gif",
+      "bytes": 7742,
+      "sha256": "efe06347c90ee0ce12b0bdbd27ace7c758531b92fe3c0ecbee3adf7ccbf46fc0"
+    },
+    {
+      "path": "COURS_fichiers/image017.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image017.jpg",
+      "bytes": 915,
+      "sha256": "a77d608e783d16e1d4ccb6df17a8a9bdd93f1e07ba2f06aaa4d83a7bfc5747b9"
+    },
+    {
+      "path": "COURS_fichiers/image018.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image018.jpg",
+      "bytes": 4532,
+      "sha256": "6addc123bc8ec04f910b694f28d69319027e9d291db4c7a09ee205b47b9e4f3d"
+    },
+    {
+      "path": "COURS_fichiers/image019.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image019.gif",
+      "bytes": 27012,
+      "sha256": "2f0064974c12e4f390d438895ddbec15dc4ac7fbacedd5f7c68d33af02f5fa2c"
+    },
+    {
+      "path": "COURS_fichiers/image020.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image020.gif",
+      "bytes": 149384,
+      "sha256": "57dffd394a92989517847a56e1650cc6d34c4eee191d980c35cd113e0b69d0d3"
+    },
+    {
+      "path": "COURS_fichiers/image021.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image021.gif",
+      "bytes": 7246,
+      "sha256": "80372aef2f8e4345e41df2f9952cc8f993627e5363dae1ac133f7aac50439291"
+    },
+    {
+      "path": "COURS_fichiers/image022.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image022.gif",
+      "bytes": 4916,
+      "sha256": "f05d43ce3cfaf94ef3b22e100f46a9d87d3e2bdc4def47e4a1f4e6f5c49a2252"
+    },
+    {
+      "path": "COURS_fichiers/image023.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image023.gif",
+      "bytes": 8697,
+      "sha256": "6095cda6bc08140ec64bed577416d740a8abe342377ac73a37c306be94f5b011"
+    },
+    {
+      "path": "COURS_fichiers/image024.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image024.gif",
+      "bytes": 3350,
+      "sha256": "5ad9bb6fadadb408813d497624cc80fd24f75bdf13bccf213d3d527e11c65744"
+    },
+    {
+      "path": "COURS_fichiers/image025.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image025.gif",
+      "bytes": 1753,
+      "sha256": "7da5bf083c6e60044047863ee48083e000ea1c1ac72226c9a47bf444b68642b8"
+    },
+    {
+      "path": "COURS_fichiers/image026.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image026.gif",
+      "bytes": 2035,
+      "sha256": "b9283136787b80e554aa82b4a175fbb3d41a2cc1d3d9d5e4dff594af15bdc21d"
+    },
+    {
+      "path": "COURS_fichiers/image027.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image027.gif",
+      "bytes": 1803,
+      "sha256": "ef0f4f4c55fbbd48c4e61f150cb85ec5cca82999e83f9105268aae7425894268"
+    },
+    {
+      "path": "COURS_fichiers/image028.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image028.gif",
+      "bytes": 2237,
+      "sha256": "2a4378015672958736a4eb99c9d12a60e21ad4a8184230f8e96f8037881e2344"
+    },
+    {
+      "path": "COURS_fichiers/image029.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image029.gif",
+      "bytes": 156,
+      "sha256": "897215caf3ad6a20fc3b1835b1529a7124a0beb1708699d8bd995ed0362cf42f"
+    },
+    {
+      "path": "COURS_fichiers/image030.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image030.jpg",
+      "bytes": 2014,
+      "sha256": "cbc495706c292b4a94f18e58af2f35b04a6a6095aea2b49c5b32db9deeb2ad1a"
+    },
+    {
+      "path": "COURS_fichiers/image031.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image031.gif",
+      "bytes": 1777,
+      "sha256": "a9aef1d3514dc23d824b769b2efbb2e401788e6d08abb8fc5a708e602144ea6d"
+    },
+    {
+      "path": "COURS_fichiers/image032.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image032.gif",
+      "bytes": 2874,
+      "sha256": "cd4b728e910fb31384e7b81425dc25494ad4f1deb18b011c9eb71ff19b9f5f87"
+    },
+    {
+      "path": "COURS_fichiers/image033.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image033.gif",
+      "bytes": 13194,
+      "sha256": "d3dbf32c0d0bc93601b06786b21f946e827de100808892aaf4c4b4bd82b431ed"
+    },
+    {
+      "path": "COURS_fichiers/image034.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image034.gif",
+      "bytes": 2547,
+      "sha256": "5f27d588ba79da853382c9b5c11516d6955ce208fe51c79a9f60f19e33564979"
+    },
+    {
+      "path": "COURS_fichiers/image035.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image035.gif",
+      "bytes": 3176,
+      "sha256": "9eec5a82cd61abb2ff5b1d1b55f903cd3f84d8d35e08228867c5088b8fe89aa0"
+    },
+    {
+      "path": "COURS_fichiers/image036.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image036.gif",
+      "bytes": 2161,
+      "sha256": "b23a982df279e420a839e74876d653dc55bf9d036a97a930a0a73ecd9df53d09"
+    },
+    {
+      "path": "COURS_fichiers/image037.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image037.gif",
+      "bytes": 2505,
+      "sha256": "38063e11ffc53c4b4eb0ca4db36b42b8acff6709a27f4a0e5e1a3067e6394c95"
+    },
+    {
+      "path": "COURS_fichiers/image038.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image038.gif",
+      "bytes": 7238,
+      "sha256": "84ef51fd2a33767b662b04a908a22db9f030ff35c26ef66d5d166c64eac4a3db"
+    },
+    {
+      "path": "COURS_fichiers/image039.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image039.jpg",
+      "bytes": 6762,
+      "sha256": "315701981d39ac6304a89e7e76779e3145c4d86d1a30e4d689a59acb8662097f"
+    },
+    {
+      "path": "COURS_fichiers/image040.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image040.gif",
+      "bytes": 3757,
+      "sha256": "427dc8251f2fd44f360b4f926f46e9fe337cfea6cd5f124f90e40e0c6974684c"
+    },
+    {
+      "path": "COURS_fichiers/image041.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image041.gif",
+      "bytes": 3395,
+      "sha256": "f7edfa59ac3862311393af40a1d246f96d37e431cb97f2f77a8efb04f5048577"
+    },
+    {
+      "path": "COURS_fichiers/image042.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image042.jpg",
+      "bytes": 4296,
+      "sha256": "cd9979e62c0167501b6db9db75cdf2d02f9f702578e1e5c05dd0001613bfe019"
+    },
+    {
+      "path": "COURS_fichiers/image043.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image043.gif",
+      "bytes": 4543,
+      "sha256": "6648a66b353f9fe6ec800ca91d08f848ba68a48b2d1537563ee9c735682e7c6d"
+    },
+    {
+      "path": "COURS_fichiers/image044.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image044.gif",
+      "bytes": 7032,
+      "sha256": "e3091a62c189b65c8a66c1dc3c5392c2ad43734b0359462be0948ce571e44b9c"
+    },
+    {
+      "path": "COURS_fichiers/image045.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image045.gif",
+      "bytes": 6461,
+      "sha256": "314af310f48249da810708fb52059b5a60aed2e071f2ed6cf0498e51a5e1d34b"
+    },
+    {
+      "path": "COURS_fichiers/image046.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image046.gif",
+      "bytes": 26587,
+      "sha256": "d3ddd1884b15b0b5d023d67e7e1e82d35a54afed791231a1c6b9520491ef01f6"
+    },
+    {
+      "path": "COURS_fichiers/image047.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image047.gif",
+      "bytes": 11646,
+      "sha256": "23472854564f7198a654ee26f2246643f91d55fdf9841b5510dbaece0c59e8e3"
+    },
+    {
+      "path": "COURS_fichiers/image048.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image048.gif",
+      "bytes": 10248,
+      "sha256": "0b0af1c15d841b43d633e92e5994728e0274fdb8810855dd9c49ad0f316f160d"
+    },
+    {
+      "path": "COURS_fichiers/image049.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image049.gif",
+      "bytes": 2414,
+      "sha256": "e6f1fcabf18977fde71a03141b42d17b7eb2e6ad431e29587c167e6757528457"
+    },
+    {
+      "path": "COURS_fichiers/image050.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image050.gif",
+      "bytes": 3077,
+      "sha256": "4b722bc94765f45870b26868bae0f4d958726461ea873f8908308869eeeed193"
+    },
+    {
+      "path": "COURS_fichiers/image051.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image051.gif",
+      "bytes": 100032,
+      "sha256": "490c19003d946c6ff04e34fc70efb409412a71f8b8d066a1761c6395d1d1cb6d"
+    },
+    {
+      "path": "COURS_fichiers/image052.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image052.gif",
+      "bytes": 1244,
+      "sha256": "25a5802cc6ffa1df05a862594db4c9940cc13fdf9c02ea98df90427c4c7569c8"
+    },
+    {
+      "path": "COURS_fichiers/image053.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image053.gif",
+      "bytes": 2636,
+      "sha256": "a2a6102871b14ce1e09e9f4a12d196e70d34370da69765c766c6c37c4695fc91"
+    },
+    {
+      "path": "COURS_fichiers/image054.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image054.gif",
+      "bytes": 1360,
+      "sha256": "c19816dab797a2c8e10f1d2467ec8ec719645b1274dd6abd664f0287b2e43538"
+    },
+    {
+      "path": "COURS_fichiers/image055.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image055.gif",
+      "bytes": 2064,
+      "sha256": "261702663862103d303566a49543298b3fa22df5a51e3e7825e2dc4bf63a6b44"
+    },
+    {
+      "path": "COURS_fichiers/image056.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image056.gif",
+      "bytes": 20542,
+      "sha256": "41f16970b91b0df3dc457c8da632a977767906e716d592b1712caed1720e7412"
+    },
+    {
+      "path": "COURS_fichiers/image057.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image057.gif",
+      "bytes": 5555,
+      "sha256": "58ea1bd0e7e4bdc2b753f0507917c83385a8a9e21c6a911ff3d79cdbf93c35e7"
+    },
+    {
+      "path": "COURS_fichiers/image058.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image058.jpg",
+      "bytes": 10531,
+      "sha256": "61a8da4dbd257b3b88a0ebff59e4d08bd1d699fd2aebf6614df5c8216e6547a6"
+    },
+    {
+      "path": "COURS_fichiers/image059.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image059.gif",
+      "bytes": 10064,
+      "sha256": "16f46cccf023e7fffa5235f588adbc6815f131319c8b092a3a1791527f8db325"
+    },
+    {
+      "path": "COURS_fichiers/image060.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image060.gif",
+      "bytes": 11296,
+      "sha256": "3f24003b4530a36236f16f7b0f696ad76674e04d01e068a7e871ce0f63a01205"
+    },
+    {
+      "path": "COURS_fichiers/image061.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image061.gif",
+      "bytes": 2052,
+      "sha256": "a41ccc26bcdd7839c0b710c487cc9d55085157128115058356f4ba25d2a00d6e"
+    },
+    {
+      "path": "COURS_fichiers/image062.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image062.gif",
+      "bytes": 3712,
+      "sha256": "e911e8b82bf067dea41b406a9fd7c85c7299a1c9a4349b15fed2362b0b59e536"
+    },
+    {
+      "path": "COURS_fichiers/image063.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image063.gif",
+      "bytes": 12434,
+      "sha256": "0e615946be1abb1b3253bb0b4ebca3c3bcd6003fd1bb8d13788f659fc7169b9a"
+    },
+    {
+      "path": "COURS_fichiers/image064.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image064.gif",
+      "bytes": 6956,
+      "sha256": "71634e5fde652ef19faba0b3ed197a8fdf98e7db9bcebf6f3e6abb0bd68380c2"
+    },
+    {
+      "path": "COURS_fichiers/image065.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image065.jpg",
+      "bytes": 2938,
+      "sha256": "a89b6e313a8917ea4a9f45218528976869b335f93222878b797876068a4f8ab6"
+    },
+    {
+      "path": "COURS_fichiers/image066.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image066.jpg",
+      "bytes": 6009,
+      "sha256": "f6aab8b2928fa1fe2e75fedb92d5d81d1a64162582ed94001e81fe3391c417cf"
+    },
+    {
+      "path": "COURS_fichiers/image067.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image067.gif",
+      "bytes": 14915,
+      "sha256": "374c1dc0c34008bb10b5f06b548860c5286a82425ac01d33575858b15eef7e50"
+    },
+    {
+      "path": "COURS_fichiers/image068.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image068.gif",
+      "bytes": 3262,
+      "sha256": "57dd25a443d973933e4d858312dc7baad53801a0371400178c74bc368f6a036f"
+    },
+    {
+      "path": "COURS_fichiers/image069.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image069.gif",
+      "bytes": 4037,
+      "sha256": "465185a0bcc0ebc703a43864caa7c3cb82e486280a1d4dbbb4ccb9be80030974"
+    },
+    {
+      "path": "COURS_fichiers/image070.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image070.gif",
+      "bytes": 5921,
+      "sha256": "88ff789ea8859dbbbb08cbbed0e4c840811d56dccf519df4f0d458e5bcb21f51"
+    },
+    {
+      "path": "COURS_fichiers/image071.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image071.gif",
+      "bytes": 3570,
+      "sha256": "ca635ebf61289482183d00e5a54341de7092e21a6ddecfde3597d9942e08fff4"
+    },
+    {
+      "path": "COURS_fichiers/image072.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image072.gif",
+      "bytes": 3615,
+      "sha256": "8d0b71b59f9cab5de1938477a4bc161d2a225bd6aa768cadfb294997c984d888"
+    },
+    {
+      "path": "COURS_fichiers/image073.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image073.gif",
+      "bytes": 2958,
+      "sha256": "27997f9b0a24dad107b8c003f218a76c7a774515a7df6ccade467829102de068"
+    },
+    {
+      "path": "COURS_fichiers/image074.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image074.gif",
+      "bytes": 2501,
+      "sha256": "3f4f08530fc6c5ac3a18f0237bdc8c8926e44d123e39ef25fa5925a10a9cb4e8"
+    },
+    {
+      "path": "COURS_fichiers/image075.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image075.gif",
+      "bytes": 9673,
+      "sha256": "02c8df9ae89de6afab4bcb0a00868d3d86ba91e9a121a9849f6c6cfb7c19902a"
+    },
+    {
+      "path": "COURS_fichiers/image076.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image076.jpg",
+      "bytes": 9723,
+      "sha256": "8ebb37aa89771876bb838682c57cec6fe1a31ce74de00e693685f3422ee6efb2"
+    },
+    {
+      "path": "COURS_fichiers/image077.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image077.gif",
+      "bytes": 2092,
+      "sha256": "ec7e333aa0c42bdc384097e5d96e29cc99b85161b0e0982199446a888189414d"
+    },
+    {
+      "path": "COURS_fichiers/image078.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image078.gif",
+      "bytes": 16022,
+      "sha256": "798b89db2a700ab43de70c61e98c46b913bc15dbae89a4bca4105e21ce6258e2"
+    },
+    {
+      "path": "COURS_fichiers/image079.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image079.gif",
+      "bytes": 2059,
+      "sha256": "8ecb758544661079b0f3b86dc63b92ab78ee94029f84f6ed93b3ef7544737220"
+    },
+    {
+      "path": "COURS_fichiers/image080.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image080.gif",
+      "bytes": 2400,
+      "sha256": "e0a60aa67776ae603370d7dcbf74c444d9888e0ad3caed202989fbe905e289fa"
+    },
+    {
+      "path": "COURS_fichiers/image081.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image081.gif",
+      "bytes": 3006,
+      "sha256": "5374257c85288912af7d62361f9a5e81985505ca19d9206b97ad0fd5e7fc0147"
+    },
+    {
+      "path": "COURS_fichiers/image082.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image082.gif",
+      "bytes": 8742,
+      "sha256": "27db2ff324ed10d5f3fd6ab2bdc1159c7967a999ab27c1996915e7707a7dcfbb"
+    },
+    {
+      "path": "COURS_fichiers/image083.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image083.gif",
+      "bytes": 27162,
+      "sha256": "e95d4b173a1f5f235bcbc5658767925afe64c3934770e2831062d460fe8d678a"
+    },
+    {
+      "path": "COURS_fichiers/image084.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image084.gif",
+      "bytes": 4118,
+      "sha256": "8680e1f8b90e0dba9d0dab7ac95e57d9267b995332d909246969b8550ec1404e"
+    },
+    {
+      "path": "COURS_fichiers/image085.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image085.gif",
+      "bytes": 18646,
+      "sha256": "16b5cece7e32e4669c181c855c605345d9ce97cc9d7ac8bcd807b661828b9862"
+    },
+    {
+      "path": "COURS_fichiers/image086.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image086.gif",
+      "bytes": 1017,
+      "sha256": "1decc826506a1853119ff5a1600d25db10d18fc31817ec3188416203004611ee"
+    },
+    {
+      "path": "COURS_fichiers/image087.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image087.gif",
+      "bytes": 2905,
+      "sha256": "cb5fd8550ec8e16d54fbf7270040164f5b809ca3accdcc141a88b99bd78c032d"
+    },
+    {
+      "path": "COURS_fichiers/image088.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image088.jpg",
+      "bytes": 7723,
+      "sha256": "ca80dcc34e529c263b5459c02637207a73454324e84d392fb009dda995ce5caf"
+    },
+    {
+      "path": "COURS_fichiers/image089.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image089.gif",
+      "bytes": 7216,
+      "sha256": "1cab80eac4913fd3e6385495969563783edc99fded48b49ce38c5212b0a67ad9"
+    },
+    {
+      "path": "COURS_fichiers/image090.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image090.gif",
+      "bytes": 10986,
+      "sha256": "a17e3502569f479a5e8be67f66a9d538e17201c4244f12baf1023ff9f140ac52"
+    },
+    {
+      "path": "COURS_fichiers/image091.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image091.gif",
+      "bytes": 5700,
+      "sha256": "119fed7f2688a566b20442ba835e95e0871640cd7cd3164ddcb12810eadced6c"
+    },
+    {
+      "path": "COURS_fichiers/image092.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image092.gif",
+      "bytes": 17208,
+      "sha256": "0f0507cf30420a559db74bc3a006e6354209b6f516ca9b7d1b319a8cf23071e6"
+    },
+    {
+      "path": "COURS_fichiers/image093.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image093.gif",
+      "bytes": 15038,
+      "sha256": "97f7746d5809d3496228dc778227cff20607f624f9c6febbdda236a2db813a05"
+    },
+    {
+      "path": "COURS_fichiers/image094.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image094.gif",
+      "bytes": 8119,
+      "sha256": "806f1710bd27bb98ce1a45ee9110c5c1148951c5e279bfcc5c55df3e5defcf09"
+    },
+    {
+      "path": "COURS_fichiers/image095.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image095.gif",
+      "bytes": 49811,
+      "sha256": "4fb20dd2761fd33c67ce8ddbad9951aaefa941aeeb2d1865021aa793fb107d35"
+    },
+    {
+      "path": "COURS_fichiers/image096.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image096.gif",
+      "bytes": 1731,
+      "sha256": "08a690e7918bb39b872ec32f4f7fdba2f48d4bec804f90e9d6045608194f4fca"
+    },
+    {
+      "path": "COURS_fichiers/image097.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image097.gif",
+      "bytes": 2106,
+      "sha256": "d9c04bce9ed55ee1555891d08574aaa89ca65f129c9fec11e8d330487ab55948"
+    },
+    {
+      "path": "COURS_fichiers/image098.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image098.gif",
+      "bytes": 2181,
+      "sha256": "f26286a3adf6474b2e39ff9a73e1fa22dbc0bdfe77daf76b4826e373be0b1b3b"
+    },
+    {
+      "path": "COURS_fichiers/image099.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image099.gif",
+      "bytes": 19244,
+      "sha256": "6d6e31f159714d79ef1eefd237b93ce46989853feea99762aa44eabc21ab1c98"
+    },
+    {
+      "path": "COURS_fichiers/image100.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image100.gif",
+      "bytes": 13441,
+      "sha256": "6b41e63842b5551f652ac6cd95c8a9939fb9947d119c279532637a65c6992680"
+    },
+    {
+      "path": "COURS_fichiers/image101.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image101.jpg",
+      "bytes": 9259,
+      "sha256": "2e36830964ab1cc33ebe28447377f71f3d266bec58d0fc12d38a867670a8662a"
+    },
+    {
+      "path": "COURS_fichiers/image102.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image102.gif",
+      "bytes": 5427,
+      "sha256": "206f62a99201a446c6ea7985c2bf9ebca490b09ef778de6cabd86ac3f3ab47fc"
+    },
+    {
+      "path": "COURS_fichiers/image103.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image103.gif",
+      "bytes": 6665,
+      "sha256": "fb2df1afe3f44b8fae72ce00c962106d6745b90211fb962d011cf85cfb7bf563"
+    },
+    {
+      "path": "COURS_fichiers/image104.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image104.gif",
+      "bytes": 21457,
+      "sha256": "b9087342d0de4e72536e4638264adbc2acf321cc6884a67652da5899f486d199"
+    },
+    {
+      "path": "COURS_fichiers/image105.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image105.gif",
+      "bytes": 9025,
+      "sha256": "658a369e50ea83a72cbe5c1a1dc76465ccfc924f3d99ba8ec9ef326dc022aef0"
+    },
+    {
+      "path": "COURS_fichiers/image106.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image106.gif",
+      "bytes": 9001,
+      "sha256": "f6075fbb31e5f9694a2c121e86b86640dd6a2807e1a828a1786b87a5c77e5fe4"
+    },
+    {
+      "path": "COURS_fichiers/image107.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image107.gif",
+      "bytes": 3705,
+      "sha256": "36386e0e286c380152f5a3d53969a911bb3c7efa0dd7185181894ad02c6ea8a5"
+    },
+    {
+      "path": "COURS_fichiers/image108.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image108.gif",
+      "bytes": 8654,
+      "sha256": "4ff080a8141485dfdc39df95c2f08b5f1896a1ab76e2972311d670527b00659b"
+    },
+    {
+      "path": "COURS_fichiers/image109.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image109.gif",
+      "bytes": 5129,
+      "sha256": "97f1f1e984c79a79af596c3f4947f90ae5d4ea76082a762579a6109d12d5c434"
+    },
+    {
+      "path": "COURS_fichiers/image110.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image110.gif",
+      "bytes": 3901,
+      "sha256": "e9dc261821427fc11db739914b769262a9e94bf5d72cbfbf83b5125086d2e0db"
+    },
+    {
+      "path": "COURS_fichiers/image111.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image111.gif",
+      "bytes": 5973,
+      "sha256": "45e66a117f00cb8c8e0854039b90bc706c2fcbd52a60f0d770ea0e470b97f1b2"
+    },
+    {
+      "path": "COURS_fichiers/image112.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image112.gif",
+      "bytes": 6521,
+      "sha256": "f73ff07d1a036d34dd95739b8502f65fe445202ac4219c2f26f8ebaea0ea32d0"
+    },
+    {
+      "path": "COURS_fichiers/image113.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image113.gif",
+      "bytes": 5642,
+      "sha256": "5cc0b40ca0fbad4aa372aa234f1a8c6f4a945766ebc9ab8c96f05aa0a04b3a01"
+    },
+    {
+      "path": "COURS_fichiers/image114.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image114.gif",
+      "bytes": 51244,
+      "sha256": "709efc9360dfea0255db0574783e6b0c161db3e92c05e8b1407d2cfbace35eb6"
+    },
+    {
+      "path": "COURS_fichiers/image115.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image115.gif",
+      "bytes": 7875,
+      "sha256": "1dd26cf400c138942d88597f2ec6294e1a95176c951ea6ae78d2fbed385531a2"
+    },
+    {
+      "path": "COURS_fichiers/image116.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image116.gif",
+      "bytes": 10595,
+      "sha256": "37b58c8095bf08c7a94d92e9c6cd8c6fc1d61d11c89697a68aefc9bce2195ecb"
+    },
+    {
+      "path": "COURS_fichiers/image117.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image117.gif",
+      "bytes": 6631,
+      "sha256": "368e3ec3536f1a8726a3bac9c208da947fb765107001bcdf97499bf916affa51"
+    },
+    {
+      "path": "COURS_fichiers/image118.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image118.gif",
+      "bytes": 4220,
+      "sha256": "3457a715b32abdf0493e1501d5e11dda79a1eee83493e29afda453980ef4c01d"
+    },
+    {
+      "path": "COURS_fichiers/image119.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image119.gif",
+      "bytes": 5992,
+      "sha256": "d4d3be68de0c0980670b2c5e77fd0b54fe38ea39bd29fc75a1dc3c3a736a7d95"
+    },
+    {
+      "path": "COURS_fichiers/image120.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image120.gif",
+      "bytes": 4082,
+      "sha256": "8e37c8ef0172d56c0b934708ada4d58d9eb03db1ffad6727290be8d7a1d12365"
+    },
+    {
+      "path": "COURS_fichiers/image121.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image121.gif",
+      "bytes": 6985,
+      "sha256": "b2469ce794796da42e4aac9d2d2b2eb07ca94f3137922a6bc4aaf0c16cbc92f4"
+    },
+    {
+      "path": "COURS_fichiers/image122.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image122.gif",
+      "bytes": 34955,
+      "sha256": "efff8054cb2b03a5705562f3c9938963af93a450f661cec78684963a556595f5"
+    },
+    {
+      "path": "COURS_fichiers/image123.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image123.gif",
+      "bytes": 10266,
+      "sha256": "f69abef80854a1bf17e5a34b9a6d15df7227b80af26c1d91e779847f95a0bb38"
+    },
+    {
+      "path": "COURS_fichiers/image124.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image124.gif",
+      "bytes": 9862,
+      "sha256": "757a29a63c3977d8f3a7ca4be465ea3189b793023c94274ce7df2a5b88093818"
+    },
+    {
+      "path": "COURS_fichiers/image125.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image125.gif",
+      "bytes": 4926,
+      "sha256": "dea4a5e0982bf294b3d45764ceafcac252979e9915009b023277c97018d29e11"
+    },
+    {
+      "path": "COURS_fichiers/image126.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image126.gif",
+      "bytes": 23314,
+      "sha256": "c33d0f590e77c94c8149b1b6f35a477667e9c326bed0f11a78cb52991389750e"
+    },
+    {
+      "path": "COURS_fichiers/image127.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image127.jpg",
+      "bytes": 6191,
+      "sha256": "8b7340da0dcb7f7627d9ac7fd788d9c55a40f991d692c8325bcc15b10aeb18b1"
+    },
+    {
+      "path": "COURS_fichiers/image128.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image128.gif",
+      "bytes": 7075,
+      "sha256": "82a0fba16b1a64982c67103cf0dbcbfdb3afbe3f30164ff27b4f426e4bc1d8bb"
+    },
+    {
+      "path": "COURS_fichiers/image129.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image129.jpg",
+      "bytes": 5224,
+      "sha256": "b6eca55e64758112b56b027f388bdfaf9bffdd2c34a2b30d264b62c13bc9c213"
+    },
+    {
+      "path": "COURS_fichiers/image130.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image130.gif",
+      "bytes": 2001,
+      "sha256": "ff0db5a610ea05c3e51938126c3ec673132610be759ccd6f2be78051ca1cf813"
+    },
+    {
+      "path": "COURS_fichiers/image131.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image131.jpg",
+      "bytes": 4327,
+      "sha256": "59fb72195ea2f2f47d8fc0c4b1f716aa57c3fbfc7c8bf70e1e412e5b0cd54a5d"
+    },
+    {
+      "path": "COURS_fichiers/image132.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image132.gif",
+      "bytes": 27482,
+      "sha256": "8442103adaa18efdfd3720d7f41c9b759ee13d1e853bd875f9e4aa79ff5ecc48"
+    },
+    {
+      "path": "COURS_fichiers/image133.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image133.gif",
+      "bytes": 17569,
+      "sha256": "980b1758c3a9b5b9563ad0d5de216ec01eb6e63e4f10eca6d16e7d83ca4cc71f"
+    },
+    {
+      "path": "COURS_fichiers/image134.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image134.gif",
+      "bytes": 2664,
+      "sha256": "fce81330a24a6163be56c1d36612844ff6607c87503217a35e4269d47bc04b6e"
+    },
+    {
+      "path": "COURS_fichiers/image135.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image135.jpg",
+      "bytes": 8400,
+      "sha256": "1f44c2e88e6762010f61decb8c93a93438858fd3a863c67f67e39e43864d3ccc"
+    },
+    {
+      "path": "COURS_fichiers/image136.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image136.jpg",
+      "bytes": 16024,
+      "sha256": "930b43bf469736ac2eb996f92ad643ebe2ea727d4b3b098f160938db8a77c594"
+    },
+    {
+      "path": "COURS_fichiers/image137.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image137.gif",
+      "bytes": 16687,
+      "sha256": "572e20917edf7861ad70ee4c1a44303b2026d4af57ffcdb56ac317befe5db43e"
+    },
+    {
+      "path": "COURS_fichiers/image138.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image138.gif",
+      "bytes": 1500,
+      "sha256": "1dec886ae17d8ebf2fcd783c2fb1fbd64e89a909f19c94208f1f38f37db3e59a"
+    },
+    {
+      "path": "COURS_fichiers/image139.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image139.gif",
+      "bytes": 1559,
+      "sha256": "dddd42601b4516b164497defa2b4150075b32280b45eecd6866026e4163ca009"
+    },
+    {
+      "path": "COURS_fichiers/image140.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image140.gif",
+      "bytes": 36026,
+      "sha256": "e4f8d9b2c26ff8c8b426846f9bb0bb32fd3fe6b98a3fc3ee1f393ef63aacf791"
+    },
+    {
+      "path": "COURS_fichiers/image141.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image141.gif",
+      "bytes": 17040,
+      "sha256": "23c1025594f21e6ee364c2853e672a90c48f3b589be49de19ec9a7c3d715d7fa"
+    },
+    {
+      "path": "COURS_fichiers/image142.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image142.gif",
+      "bytes": 14936,
+      "sha256": "713944113f90bcf36b889a00090b9162af314301ea5d3e5a7d6643657a28c850"
+    },
+    {
+      "path": "COURS_fichiers/image143.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image143.gif",
+      "bytes": 5254,
+      "sha256": "793be7b6b812fd30e9f36253fdb982dc00d084267c9a2b5b36ead07d28cb5740"
+    },
+    {
+      "path": "COURS_fichiers/image144.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image144.gif",
+      "bytes": 3664,
+      "sha256": "7a4d7f7fc76b3a8d1605f050900a58dd59e9b68b00145c7e5ecea8e12163862d"
+    },
+    {
+      "path": "COURS_fichiers/image145.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image145.gif",
+      "bytes": 2342,
+      "sha256": "7833dc80323d997fb797bfca8b364bfd4fe5cd9764f646927d17ad26e1cd33b2"
+    },
+    {
+      "path": "COURS_fichiers/image146.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image146.gif",
+      "bytes": 5540,
+      "sha256": "9fcfcbdef37ab36f071861ec517c12955caea9bc842561d31475107e2251f399"
+    },
+    {
+      "path": "COURS_fichiers/image147.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image147.gif",
+      "bytes": 4444,
+      "sha256": "ff4b9a15400b240b2b5a1306a5b2dcde0fd3777fc583a21d20177176ec7c7ace"
+    },
+    {
+      "path": "COURS_fichiers/image148.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image148.jpg",
+      "bytes": 25589,
+      "sha256": "eb8d57ae0393c3c9f836fc3ee3034ec3c61c67a81508f823efed7c6b6e2bfc98"
+    },
+    {
+      "path": "COURS_fichiers/image149.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image149.gif",
+      "bytes": 19115,
+      "sha256": "591374fad2f0d12cc2f92274d4caba2bef80a4a1e7ff3a4f30da152800424d9c"
+    },
+    {
+      "path": "COURS_fichiers/image150.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image150.gif",
+      "bytes": 9071,
+      "sha256": "c6ee4a4fef09b953030daa3128fdb199c8196842543eadb6ea10c3491343f39a"
+    },
+    {
+      "path": "COURS_fichiers/image151.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image151.gif",
+      "bytes": 8706,
+      "sha256": "10e102dffb330711e49c28ea6646c8656f5201b04a480ce2d0c22d0dc34f1f55"
+    },
+    {
+      "path": "COURS_fichiers/image152.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image152.gif",
+      "bytes": 7865,
+      "sha256": "fadeffc7ed16cd4ac1e697deb761f63a4607160b955dea6d5bde03eab3bc620d"
+    },
+    {
+      "path": "COURS_fichiers/image153.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image153.gif",
+      "bytes": 4230,
+      "sha256": "62e8b3c35c1755a6e59943c51e0ba6af3794a5d8545d47fdae26f1fb5042f847"
+    },
+    {
+      "path": "COURS_fichiers/image154.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image154.jpg",
+      "bytes": 5054,
+      "sha256": "8731cec75fd4d00c7017ce2737055bd4c0e466f7d741a41574414648de81e65a"
+    },
+    {
+      "path": "COURS_fichiers/image155.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image155.gif",
+      "bytes": 8956,
+      "sha256": "58e925fe296b550aff0a9101d04ef79054513545f8b988deaeb51d7403a4126e"
+    },
+    {
+      "path": "COURS_fichiers/image156.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image156.gif",
+      "bytes": 5154,
+      "sha256": "c2126863d27daff1f2c6f1dece810779cf85a22b75cbb18282657f4a22e78729"
+    },
+    {
+      "path": "COURS_fichiers/image157.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image157.gif",
+      "bytes": 18127,
+      "sha256": "f7ed253a3641c3f49b0992c6f5d340fccd884d487b1450018cdf7f53546c5767"
+    },
+    {
+      "path": "COURS_fichiers/image158.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image158.gif",
+      "bytes": 13748,
+      "sha256": "38046fb71ff274c31c0734cd6bf5c5182f1e13404e5d6e74575dc461587232f6"
+    },
+    {
+      "path": "COURS_fichiers/image159.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image159.gif",
+      "bytes": 5022,
+      "sha256": "1a9f383617dd2bb564c8098790013523dde1bc6d4c9812f3a48a60c18daa3c43"
+    },
+    {
+      "path": "COURS_fichiers/image160.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image160.jpg",
+      "bytes": 7001,
+      "sha256": "76ad96b6b47d7605397631039549ce894b211098dc36bbe98bab92bbf7e7d824"
+    },
+    {
+      "path": "COURS_fichiers/image161.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image161.gif",
+      "bytes": 3083,
+      "sha256": "6981771318a9c38c72d1fe3ce7056fb12f7196d0ec147883b326fabfbbf4181c"
+    },
+    {
+      "path": "COURS_fichiers/image162.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image162.gif",
+      "bytes": 22403,
+      "sha256": "ac083b1a52692290ef24be64db040b67fafa7748126a92a1624d48e7d7ae5c01"
+    },
+    {
+      "path": "COURS_fichiers/image163.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image163.jpg",
+      "bytes": 7743,
+      "sha256": "6f28a94dcf28534f06e1d61e3e545cd76265f911d124fc53c395a0f59e6dd465"
+    },
+    {
+      "path": "COURS_fichiers/image164.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image164.gif",
+      "bytes": 10498,
+      "sha256": "924b435833da76b338c0e921f4b463f4597a9754b3cb99f881d802d07f447cfa"
+    },
+    {
+      "path": "COURS_fichiers/image165.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image165.jpg",
+      "bytes": 24419,
+      "sha256": "d0edbdbc0ca2b397eef81f1e06750d109fb7271cf1e94ad062746b250c16c920"
+    },
+    {
+      "path": "COURS_fichiers/image166.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image166.gif",
+      "bytes": 9664,
+      "sha256": "08373f746f5fafa999fc13f2fb544e8fa4ccee68d1b5d9a280be97b7f227b770"
+    },
+    {
+      "path": "COURS_fichiers/image167.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image167.gif",
+      "bytes": 7913,
+      "sha256": "4ffa7c60d73d66ca2e90e4a336432bf4af938d26bb5ad3289abde15e308fe172"
+    },
+    {
+      "path": "COURS_fichiers/image168.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image168.gif",
+      "bytes": 8946,
+      "sha256": "1aaa0f240e82aadf5b1b0969c60eda602c36ca99c198191a1175b88d36d53f4c"
+    },
+    {
+      "path": "COURS_fichiers/image169.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image169.gif",
+      "bytes": 8023,
+      "sha256": "b0b88e3bbd9c9aca0030c2aa58b53d77277f94cde535a6a7c09d5a0368f5e3dc"
+    },
+    {
+      "path": "COURS_fichiers/image170.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image170.gif",
+      "bytes": 18832,
+      "sha256": "062de92475f50ef446a1779fd171f28a2058a406d1cdfbe3fdf9c514e8c51324"
+    },
+    {
+      "path": "COURS_fichiers/image171.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image171.gif",
+      "bytes": 52411,
+      "sha256": "2a9efa41b435a932a8c748dd439bd800ba65f78aa9201e7a5e14cb85adccee1a"
+    },
+    {
+      "path": "COURS_fichiers/image172.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image172.gif",
+      "bytes": 8607,
+      "sha256": "ffbd58a047f65ee25cfc32a85595f191ebe4c7eee172fb09f35ed33ce9b6fdec"
+    },
+    {
+      "path": "COURS_fichiers/image173.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image173.gif",
+      "bytes": 10971,
+      "sha256": "b93818680363be2154285bdaae945a27adb7f25b623122713722ae5b001e86c5"
+    },
+    {
+      "path": "COURS_fichiers/image174.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image174.jpg",
+      "bytes": 11932,
+      "sha256": "090382d5352cf42a50d3501c3b3859d4148993ae3e8da19c3ed7c1fdf192af5b"
+    },
+    {
+      "path": "COURS_fichiers/image175.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image175.gif",
+      "bytes": 19766,
+      "sha256": "6c4f65310385e9f01a2c42be2abf966480a140232bf2579b749bea84c8199c5b"
+    },
+    {
+      "path": "COURS_fichiers/image176.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image176.gif",
+      "bytes": 12446,
+      "sha256": "1362476bab1edcfe399e8a82e3e5ec3f8220f24fbfc9ae4230ac382eb244ee55"
+    },
+    {
+      "path": "COURS_fichiers/image177.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image177.gif",
+      "bytes": 2332,
+      "sha256": "3abef44ad85d85962d2186d9c43187693a5a7acd4dc4311947e9596170e5b1ef"
+    },
+    {
+      "path": "COURS_fichiers/image178.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image178.gif",
+      "bytes": 9239,
+      "sha256": "d45dd0855f44797c2d13723615a577f50b14bbebeab75276143c119bc82a0bb7"
+    },
+    {
+      "path": "COURS_fichiers/image179.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image179.gif",
+      "bytes": 3449,
+      "sha256": "dd7bff6ad94ff895817394cfdcbbb2e27d6a760bb2e98d623169123b5d84c586"
+    },
+    {
+      "path": "COURS_fichiers/image180.jpg",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image180.jpg",
+      "bytes": 19156,
+      "sha256": "1ad20d216edbeb87636aca9519ff1f5d9f78fff09a7cc6cfdbca2622e2e78269"
+    },
+    {
+      "path": "COURS_fichiers/image181.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image181.gif",
+      "bytes": 2746,
+      "sha256": "79127e680a166266a15bb99d133c1bb6f81c27364e2e02f678649b5ce0e3f7b0"
+    },
+    {
+      "path": "COURS_fichiers/image182.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image182.gif",
+      "bytes": 16122,
+      "sha256": "fbc12c9550a8cc73df34469b0d68c28b8d1f187fe21c5b4cc7ce106d2b718467"
+    },
+    {
+      "path": "COURS_fichiers/image183.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image183.gif",
+      "bytes": 9241,
+      "sha256": "6076a37ab3cfdb53c3c27898e2347b81395a6b18edb82177cb472f32b64f71fd"
+    },
+    {
+      "path": "COURS_fichiers/image184.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image184.gif",
+      "bytes": 6759,
+      "sha256": "9bf31101ca21d39cc08340bc0e925950c84540c3d18cb0004bad1ceb13fba615"
+    },
+    {
+      "path": "COURS_fichiers/image185.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image185.gif",
+      "bytes": 15734,
+      "sha256": "cd5a7e5e5c5280fb185e1e467f61215d4f339da6fc893f0fbe8fff7eddd3f6cb"
+    },
+    {
+      "path": "COURS_fichiers/image186.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image186.gif",
+      "bytes": 16175,
+      "sha256": "773cd3aa2f621d889051594106a9cba433eee5e94cb64dc4b2f4aaba4115876d"
+    },
+    {
+      "path": "COURS_fichiers/image187.gif",
+      "url": "http://f6kgl.free.fr/COURS_fichiers/image187.gif",
+      "bytes": 5398,
+      "sha256": "8a2c34e3e1c63041afb7eff63d9da63c33abe120a0ab892e568701f391bd0830"
+    }
+  ]
+}
