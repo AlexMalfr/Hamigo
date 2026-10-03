@@ -1,0 +1,4 @@
+<resources>
+    <!-- Full-bleed adaptive background; keep transparency in the separate foreground artwork. -->
+    <color name="ic_launcher_background">#087F82</color>
+</resources>
