@@ -31,9 +31,9 @@ val Purple=Color(0xFF8B77C5)
 val ChapterColors=listOf(Teal,Color(0xFF547FCD),Purple,Color(0xFFD47648))
 
 @Composable fun HamigoTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme=lightColorScheme(primary=Teal,onPrimary=Color.White,primaryContainer=Mist,
-        secondary=Coral,secondaryContainer=Color(0xFFFFE8E0),background=Cream,surface=Cream,
-        onBackground=Ink,onSurface=Ink,outline=Color(0xFFD4DEDA)),
+    MaterialTheme(colorScheme=lightColorScheme(primary=Teal,onPrimary=Color.White,primaryContainer=Mist,onPrimaryContainer=Ink,
+        secondary=Coral,onSecondary=Ink,secondaryContainer=Color(0xFFFFE8E0),onSecondaryContainer=Ink,background=Cream,surface=Cream,
+        onBackground=Ink,onSurface=Ink,onSurfaceVariant=Muted,surfaceVariant=Color(0xFFF2F0E8),surfaceContainerHigh=Color(0xFFFFFCF6),outline=Color(0xFFD4DEDA)),
         shapes=Shapes(small=RoundedCornerShape(12.dp),medium=RoundedCornerShape(20.dp),large=RoundedCornerShape(28.dp)),content=content)
 }
 @Composable fun Pico(modifier: Modifier=Modifier, happy: Boolean=true, animate: Boolean=true) {

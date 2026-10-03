@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Hamigo" parent="Theme.Hamigo.Base">
+        <item name="android:navigationBarColor">#FAF8F2</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>
