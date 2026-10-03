@@ -3,8 +3,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <application android:allowBackup="false" android:label="Hamigo" android:icon="@drawable/ic_hamigo"
-        android:roundIcon="@drawable/ic_hamigo" android:theme="@style/Theme.Hamigo" android:supportsRtl="true">
+    <application android:allowBackup="false" android:label="Hamigo" android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher" android:theme="@style/Theme.Hamigo" android:supportsRtl="true">
         <activity android:name=".MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
