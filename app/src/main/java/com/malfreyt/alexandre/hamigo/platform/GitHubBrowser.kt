@@ -12,40 +12,51 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.PersistableBundle
 import android.os.SystemClock
 import android.widget.Toast
+import android.widget.RemoteViews
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.malfreyt.alexandre.hamigo.MainActivity
+import com.malfreyt.alexandre.hamigo.R
 
 internal sealed interface GitHubBrowserCommand {
     class Open(val session: DeviceOAuth.Session) : GitHubBrowserCommand
     data object Close : GitHubBrowserCommand
 }
 
-/** Owned by the ViewModel so a recreated host still knows whether the browser covered it. */
+/** Owned by the ViewModel; resuming Hamigo does not imply the browser was dismissed. */
 internal class GitHubBrowserState {
     var open = false
-    var hostPaused = false
+    var launchesAwaitingResult = 0
 }
 
 /** Uses the default browser's ordinary cookie jar, never an ephemeral or embedded WebView. */
-internal class GitHubBrowser(private val activity: Activity, private val state: GitHubBrowserState) {
+internal class GitHubBrowser(private val activity: Activity, private val state: GitHubBrowserState,
+    private val launch: (Intent) -> Unit) {
 
     fun open(session: DeviceOAuth.Session) {
         copyGitHubCode(activity, session.userCode, notify = false)
         val intent = intentFor(activity, session)
-        state.hostPaused = false
+        val previouslyOpen = state.open
+        state.launchesAwaitingResult++
         state.open = true
-        try { activity.startActivity(intent) }
-        catch (e: Exception) { state.open = false; throw e }
+        try { launch(intent) }
+        catch (e: Exception) {
+            state.launchesAwaitingResult--
+            state.open = previouslyOpen
+            throw e
+        }
     }
 
-    fun onHostPause() { if (state.open) state.hostPaused = true }
-    fun onHostResume() { if (state.hostPaused) { state.open = false; state.hostPaused = false } }
+    fun onTabResult() {
+        state.launchesAwaitingResult = (state.launchesAwaitingResult - 1).coerceAtLeast(0)
+        if (state.launchesAwaitingResult == 0) state.open = false
+    }
 
     /** CLEAR_TOP removes the temporary browser activity from Hamigo's existing task. */
     fun close() {
@@ -60,6 +71,7 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
             val copy = PendingIntent.getBroadcast(context, 91,
                 Intent(context, GitHubCodeReceiver::class.java)
                     .setAction(GitHubCodeReceiver.ACTION)
+                    .setData(Uri.parse("hamigo-internal://github-code/${session.browserRequestId}"))
                     .putExtra("user_code", session.userCode)
                     .putExtra("expires_elapsed", session.expiresAtElapsed),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -69,7 +81,14 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
                 .setShareState(CustomTabsIntent.SHARE_STATE_OFF)
                 .setDefaultColorSchemeParams(CustomTabColorSchemeParams.Builder()
                     .setToolbarColor(0xFFE1F2EF.toInt()).build())
-                .setActionButton(copyIcon(), "Copier le code GitHub", copy, true)
+                .setColorScheme(CustomTabsIntent.COLOR_SCHEME_LIGHT)
+                .setActionButton(codeActionIcon(context, session.userCode),
+                    "Code ${session.userCode}, copier le code GitHub", copy, false)
+                .addMenuItem("Copier ${session.userCode}", copy)
+                .setSecondaryToolbarViews(RemoteViews(context.packageName, R.layout.github_code_toolbar).apply {
+                    setTextViewText(R.id.github_device_code, session.userCode)
+                    setContentDescription(R.id.github_copy_code, "Copier le code GitHub ${session.userCode}")
+                }, intArrayOf(R.id.github_device_code, R.id.github_copy_code), copy)
                 .build()
             // A generic web URL finds the browser rather than a GitHub deep-link handler.
             val browser = context.packageManager.resolveActivity(
@@ -84,20 +103,30 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
         internal fun returnIntent(context: Context) = Intent(context, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
-        private fun copyIcon(): Bitmap = Bitmap.createBitmap(24, 24, Bitmap.Config.ARGB_8888).apply {
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = 0xFF174C51.toInt(); style = Paint.Style.STROKE; strokeWidth = 2f
-            }
-            Canvas(this).apply {
-                drawRoundRect(8f, 7f, 21f, 22f, 1.5f, 1.5f, paint)
-                drawLine(4f, 17f, 4f, 2f, paint)
-                drawLine(4f, 2f, 17f, 2f, paint)
+        /** Custom Tabs limits the top action to 48 × 24 dp: two readable four-character rows. */
+        internal fun codeActionIcon(context: Context, code: String): Bitmap {
+            val density = context.resources.displayMetrics.density
+            return Bitmap.createBitmap((48 * density).toInt(), (24 * density).toInt(), Bitmap.Config.ARGB_8888).apply {
+                Canvas(this).apply {
+                    scale(density, density)
+                    val value = code.filter { it.isLetterOrDigit() }
+                    val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                        color = 0xFF174C51.toInt(); typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+                        textSize = 11f
+                    }
+                    drawText(value.take(4), 0f, 10f, paint)
+                    drawText(value.drop(4).take(4), 0f, 23f, paint)
+                    paint.style = Paint.Style.STROKE; paint.strokeWidth = 1.3f
+                    drawRoundRect(35f, 8f, 45f, 20f, 1f, 1f, paint)
+                    drawLine(32f, 17f, 32f, 5f, paint)
+                    drawLine(32f, 5f, 42f, 5f, paint)
+                }
             }
         }
     }
 }
 
-/** Eight significant characters also work with segmented fields that don't strip separators. */
+/** GitHub distributes a native paste across its fields; keyboard IME insertion is different. */
 fun copyGitHubCode(context: Context, code: String, notify: Boolean = true) {
     val value = code.replace("-", "").trim()
     if (!value.matches(Regex("[A-Za-z0-9]{8}"))) return

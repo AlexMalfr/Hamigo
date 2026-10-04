@@ -28,7 +28,7 @@ import com.malfreyt.alexandre.hamigo.platform.copyGitHubCode
             Icon(Icons.Rounded.OpenInBrowser, "Rouvrir l’onglet GitHub")
         }
     }
-    Text("Code copié : colle-le dans GitHub. Tu peux aussi le saisir sur un autre appareil.",
+    Text("Dans la première case GitHub : appui long → Coller. Le presse-papiers du clavier peut ne pas remplir les autres cases.",
         color = Muted, fontSize = 12.sp, lineHeight = 17.sp)
     TextButton({ model.cancelTask() }, contentPadding = PaddingValues(0.dp)) {
         Text("Annuler la connexion")

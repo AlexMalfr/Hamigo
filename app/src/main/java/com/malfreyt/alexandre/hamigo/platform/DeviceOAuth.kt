@@ -15,7 +15,9 @@ object DeviceOAuth {
         val expiresIn: Int,
         internal val interval: Int,
         internal val expiresAtElapsed: Long
-    ) // Intentionally not a data class: toString() must not expose the device credential.
+    ) { // Intentionally not a data class: toString() must not expose the device credential.
+        internal val browserRequestId = java.util.UUID.randomUUID().toString()
+    }
 
     suspend fun start(clientId: String): Session {
         validateClient(clientId)

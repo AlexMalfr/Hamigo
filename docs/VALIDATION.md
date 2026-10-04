@@ -1,5 +1,16 @@
 # Validation de Hamigo
 
+## Correctif OAuth 0.8 — 4 octobre 2026
+
+- **46 tests JVM réussis**, sans erreur ni échec, après les changements du navigateur.
+- **18 tests Android ciblés réussis en une passe** sur Pixel 9a API 36 (`output/android-tests-0.8-oauth.txt`) : dix scénarios de transport/polling OAuth et huit scénarios du navigateur. Les tests couvrent le placement réel du code dans la barre haute de Chrome, le clic de copie depuis l'onglet, la disparition de `CustomTabActivity` de la tâche après le signal de succès, pause/reprise et recréation, un résultat retardé d'un ancien onglet, les copies propres à chaque session et les commandes expirées. Le signal de succès est synthétique : cette passe ne soumet aucune autorisation personnelle.
+- Captures et enregistrements des activités dans `output/browser-audit-0.8/`. L'action haute affiche les deux groupes de quatre caractères avec l'icône de copie ; la capture a été inspectée. La vérification contrôle la suppression de l'activité navigateur, au-delà du seul retour de Hamigo au premier plan.
+- Assemblage debug et APK de tests réussis ; lint sans erreur, avec 61 avertissements et une indication. Le rapport de compilation est dans `output/build-0.8-debug.txt`.
+- Le formulaire GitHub authentifié a été lu sans soumettre de code : ses champs `.js-user-code-field` et le script public `user-code-prompt-870b382dfe55fec4.js` établissent les handlers `keyup`/touches physiques et `paste`/`clipboardData`, sans prise en charge spécifique des insertions IME. Un GET authentifié avec `user_code=1234-ABCD` laisse les huit cases vides. Sources publiques et relevé sans jeton dans `output/github-device-input-research/`. Cela explique le comportement rapporté, sans revendiquer une modification du JavaScript GitHub ni un test réel du clavier Samsung.
+- Le code demeure dans le navigateur par défaut avec sa session habituelle. La fermeture est déclenchée dès la réception du jeton, avant la vérification du compte et les Gists. Les validations personnelles antérieures décrites ci-dessous restent distinctes du test de navigateur ; aucun Gist personnel n'est touché par cette passe.
+
+## Vérifications précédentes
+
 Vérification du 4 octobre 2026.
 
 - Banque Exam1 : 2 961 identifiants uniques, textes/réponses comparés à la source, 2 961 PNG valides, aucune image manquante. 11 exclusions documentées ; 2 950 questions dans le jeu courant.

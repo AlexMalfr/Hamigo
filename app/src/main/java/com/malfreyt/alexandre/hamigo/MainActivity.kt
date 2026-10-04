@@ -50,10 +50,13 @@ import java.time.LocalDate
 class MainActivity : ComponentActivity() {
     private lateinit var model: AppModel
     private lateinit var gitHubBrowser: GitHubBrowser
+    private val gitHubTabLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (::gitHubBrowser.isInitialized) gitHubBrowser.onTabResult()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model=ViewModelProvider(this)[AppModel::class.java];model.initialize(this)
-        gitHubBrowser=GitHubBrowser(this,model.githubBrowserState)
+        gitHubBrowser=GitHubBrowser(this,model.githubBrowserState) { gitHubTabLauncher.launch(it) }
         // Remains active while a Custom Tab covers this activity; Compose is paused then.
         lifecycleScope.launch {
             model.githubBrowserCommands.collect { command ->
@@ -70,8 +73,8 @@ class MainActivity : ComponentActivity() {
         setContent { HamigoTheme { HamigoApp(model) } }
     }
     override fun onNewIntent(intent: Intent) {super.onNewIntent(intent);receive(intent)}
-    override fun onResume() {super.onResume();if(::gitHubBrowser.isInitialized)gitHubBrowser.onHostResume();if(::model.isInitialized && model.content!=null) {model.refresh();model.refreshSocial()}}
-    override fun onPause() {if(::gitHubBrowser.isInitialized)gitHubBrowser.onHostPause();stopMorse();super.onPause()}
+    override fun onResume() {super.onResume();if(::model.isInitialized && model.content!=null) {model.refresh();model.refreshSocial()}}
+    override fun onPause() {stopMorse();super.onPause()}
     private fun receive(intent: Intent?) {
         if(intent?.getStringExtra("hamigo_route")=="path") model.route="path"
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
