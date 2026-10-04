@@ -14,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,15 +49,29 @@ import java.time.LocalDate
 
 class MainActivity : ComponentActivity() {
     private lateinit var model: AppModel
+    private lateinit var gitHubBrowser: GitHubBrowser
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model=ViewModelProvider(this)[AppModel::class.java];model.initialize(this)
+        gitHubBrowser=GitHubBrowser(this,model.githubBrowserState)
+        // Remains active while a Custom Tab covers this activity; Compose is paused then.
+        lifecycleScope.launch {
+            model.githubBrowserCommands.collect { command ->
+                if(command!=null && model.takeGitHubBrowserCommand(command)) {
+                    when(command) {
+                        is GitHubBrowserCommand.Open -> runCatching {gitHubBrowser.open(command.session)}
+                            .onFailure {model.message="Impossible d’ouvrir le navigateur. Tu peux saisir le code sur github.com/login/device."}
+                        GitHubBrowserCommand.Close -> gitHubBrowser.close()
+                    }
+                }
+            }
+        }
         receive(intent)
         setContent { HamigoTheme { HamigoApp(model) } }
     }
     override fun onNewIntent(intent: Intent) {super.onNewIntent(intent);receive(intent)}
-    override fun onResume() {super.onResume();if(::model.isInitialized && model.content!=null) {model.refresh();model.refreshSocial()}}
-    override fun onPause() {stopMorse();super.onPause()}
+    override fun onResume() {super.onResume();if(::gitHubBrowser.isInitialized)gitHubBrowser.onHostResume();if(::model.isInitialized && model.content!=null) {model.refresh();model.refreshSocial()}}
+    override fun onPause() {if(::gitHubBrowser.isInitialized)gitHubBrowser.onHostPause();stopMorse();super.onPause()}
     private fun receive(intent: Intent?) {
         if(intent?.getStringExtra("hamigo_route")=="path") model.route="path"
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
@@ -162,7 +177,6 @@ class MainActivity : ComponentActivity() {
             title={Text("Rejoindre cette équipe ?")},text={Text("Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe.")},
             confirmButton={TextButton({model.acceptInvite()},enabled=!model.busy) {Text("Ajouter l’équipier")}},dismissButton={TextButton({model.pendingInvite=null}) {Text("Annuler")}})
     }
-    if(model.oauthSession!=null)GitHubConnectionScreen(model)
 }
 
 @Composable private fun MainDestination(model:AppModel,content:Content) {

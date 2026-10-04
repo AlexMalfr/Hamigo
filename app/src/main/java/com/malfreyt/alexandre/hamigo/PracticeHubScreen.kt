@@ -75,8 +75,8 @@ import kotlin.random.Random
                         Text("$checked/${groupKeys.size}",fontSize=12.sp,color=Muted)
                     }
                     FlowRow(Modifier.padding(start=30.dp),horizontalArrangement=Arrangement.spacedBy(4.dp),verticalArrangement=Arrangement.spacedBy(0.dp)) {
-                        topics.forEach {(topic,questions) ->val key="$section|$topic"
-                            FilterChip(key in selected,{selected=if(key in selected)selected-key else selected+key},label={Text("$topic (${questions.size})",fontSize=11.sp)})
+                        topics.keys.forEach {topic ->val key="$section|$topic"
+                            FilterChip(key in selected,{selected=if(key in selected)selected-key else selected+key},label={Text(topic,fontSize=11.sp)})
                         }
                     }
                 }

@@ -157,14 +157,18 @@ class VisualAuditTest {
         ui.onNodeWithText("Ton historique").assertExists()
         capture("17-moi-historique")
 
-        // A synthetic device session shows the embedded flow without any request to GitHub.
+        // A synthetic session shows the compact return-to-app controls, without opening a browser.
+        navigate("friends")
         ui.runOnIdle {
+            // The preceding ranking fixture was signed in; this capture represents a fresh login.
+            model.sync.disconnect()
             model.oauthSession = DeviceOAuth.Session("visual-audit-only-device", "ABCD-EFGH",
                 "https://github.com/login/device", 900, 5, SystemClock.elapsedRealtime() + 900_000)
             model.oauthStatus = "En attente de ton autorisation GitHub…"
+            model.refresh()
         }
-        ui.onNodeWithText("Ouvrir GitHub ici").assertIsDisplayed()
-        capture("18-oauth-integre-avant-ouverture")
+        ui.onNodeWithContentDescription("Rouvrir l’onglet GitHub").performScrollTo().assertIsDisplayed()
+        capture("18-oauth-code-au-retour")
         ui.runOnIdle { model.oauthSession = null; model.oauthStatus = null }
 
         navigate("resources")

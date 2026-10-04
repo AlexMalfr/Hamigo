@@ -11,6 +11,7 @@ import com.malfreyt.alexandre.hamigo.platform.GitHubSync
 import com.malfreyt.alexandre.hamigo.platform.ShareProgress
 import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
@@ -79,6 +80,12 @@ class AppModel : ViewModel() {
     var showWelcome by mutableStateOf(false)
     var oauthSession by mutableStateOf<DeviceOAuth.Session?>(null)
     var oauthStatus by mutableStateOf<String?>(null)
+    internal val githubBrowserCommands = MutableStateFlow<GitHubBrowserCommand?>(null)
+    internal val githubBrowserState = GitHubBrowserState()
+    internal val githubTabOpen get() = githubBrowserState.open
+    internal fun takeGitHubBrowserCommand(command: GitHubBrowserCommand) =
+        githubBrowserCommands.compareAndSet(command, null)
+    fun openGitHubBrowser() { oauthSession?.let { githubBrowserCommands.value = GitHubBrowserCommand.Open(it) } }
     var pendingInvite by mutableStateOf<String?>(null)
     fun initialize(ctx: Context) {
         if (::progress.isInitialized) return
@@ -206,11 +213,14 @@ class AppModel : ViewModel() {
     fun removeFriend(friend: Friend) { synchronized(Progress.CLOUD_LOCK) { loadFriends();friends=friends.filterNot {it.gist==friend.gist && it.progress.name==friend.progress.name}; saveFriends() } }
     fun startGitHubConnection() = task {
         try {
+            route="friends"
             oauthStatus="Préparation de la connexion…"
             val device=DeviceOAuth.start(GitHubApp.CLIENT_ID); oauthSession=device
+            openGitHubBrowser()
             val token=DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID,device) {notice ->oauthStatus=notice}
             // Receiving the token completes the browser part; a slow Gist must not keep it open.
             oauthSession=null;oauthStatus="GitHub a autorisé Hamigo. Vérification du compte…"
+            githubBrowserCommands.value=GitHubBrowserCommand.Close
             var user:GitHubIdentity?=null
             for(attempt in 0..2) {
                 try {user=sync.connect(token);break} catch(e:GitHubNetworkException) {
@@ -228,7 +238,7 @@ class AppModel : ViewModel() {
                 message="Compte ${user!!.login} connecté. La sauvegarde sera réessayée : ${e.message}"
             }
             refresh()
-        } finally { oauthSession=null;oauthStatus=null }
+        } finally { oauthSession=null;oauthStatus=null;githubBrowserCommands.value=GitHubBrowserCommand.Close }
     }
     fun disconnectGitHub() { sync.disconnect(); ProgressSyncScheduler.cancel(context); refresh() }
     fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }

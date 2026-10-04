@@ -1,6 +1,7 @@
 package com.malfreyt.alexandre.hamigo
 
 import java.math.BigDecimal
+import java.math.MathContext
 import java.math.RoundingMode
 import java.util.Locale
 import kotlin.math.abs
@@ -22,7 +23,11 @@ fun formatMeasuredNumber(value: Double, tolerance: Double): String {
 
 fun toleranceLabel(tolerance: Double, unit: String): String {
     val accepted = tolerance.takeIf { it.isFinite() && it >= 0.0 } ?: .01
-    val amount = formatMeasuredNumber(accepted, accepted.takeIf { it > 0.0 } ?: .01)
+    // A displayed limit is a promise. Truncate it rather than widening the accepted error,
+    // while keeping three useful digits for relative tolerances generated from a calculation.
+    val limit = BigDecimal.valueOf(accepted).round(MathContext(3, RoundingMode.DOWN)).stripTrailingZeros()
+    val exponent = limit.precision() - limit.scale() - 1
+    val amount = (if (exponent in -5..8) limit.toPlainString() else limit.toString()).replace('.', ',')
     return "Précision acceptée : ± $amount${if (unit.isBlank()) "" else " $unit"}."
 }
 

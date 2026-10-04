@@ -82,6 +82,8 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
             Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
                 model.refreshSocial(manual = true)
             }
+        } else if (model.oauthSession != null) {
+            GitHubDeviceCode(model)
         } else {
             Text("Connecte ton compte pour sauvegarder tes leçons, ton XP et tes révisions, et partager ta progression avec ton équipe.",
                 color = Muted, fontSize = 13.sp, lineHeight = 19.sp)
