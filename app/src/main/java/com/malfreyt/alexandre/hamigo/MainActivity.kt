@@ -8,6 +8,8 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
+import androidx.activity.BackEventCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +18,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,6 +29,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -33,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDate
@@ -71,6 +80,9 @@ class MainActivity : ComponentActivity() {
     val tick=model.revision
     val context=LocalContext.current
     var quit by remember {mutableStateOf(false)}
+    var backProgress by remember {mutableFloatStateOf(0f)}
+    var backWidth by remember {mutableFloatStateOf(0f)}
+    var backEdge by remember {mutableIntStateOf(BackEventCompat.EDGE_LEFT)}
     val snackbar=remember {SnackbarHostState()}
     LaunchedEffect(model.message) {model.message?.let {snackbar.showSnackbar(it);model.message=null}}
     if(content==null) {
@@ -82,8 +94,12 @@ class MainActivity : ComponentActivity() {
         };return
     }
     val p=model.progress
-    BackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route=="settings") {
-        when { model.session!=null -> quit=true; model.lesson!=null ->model.lesson=null;model.resource!=null->model.resource=null;else->model.route="profile" }
+    PredictiveBackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route=="settings") {events ->
+        try {
+            events.collect {event ->backProgress=event.progress;backEdge=event.swipeEdge}
+            when {model.session!=null->quit=true;model.lesson!=null->model.lesson=null;model.resource!=null->model.resource=null;else->model.route="profile"}
+        } catch(_:CancellationException) { /* A cancelled gesture keeps the current screen and its input. */ }
+        finally {backProgress=0f}
     }
     Scaffold(containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
         if(model.session==null && model.lesson==null && model.resource==null && model.route!="settings") {
@@ -98,20 +114,30 @@ class MainActivity : ComponentActivity() {
         }
     }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding)) {
+            if(backProgress>0f) {
+                when {
+                    model.resource!=null->ResourceLibraryScreen(model,content)
+                    model.route=="settings"->ProfileScreen(model,content)
+                    else->MainDestination(model,content)
+                }
+            }
+            Box(Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat()}.graphicsLayer {
+                translationX=backWidth*.18f*backProgress*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
+                scaleX=1f-.05f*backProgress;scaleY=1f-.05f*backProgress
+                shape=RoundedCornerShape((24*backProgress).dp);clip=backProgress>0f
+                shadowElevation=12.dp.toPx()*backProgress
+            }.background(Cream)) {
             when {
                 model.session!=null -> QuizScreen(model)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)
                 model.resource!=null -> ReferenceDetailScreen(model,model.resource!!)
-                model.route=="path" -> PathScreen(model,content)
-                model.route=="practice" -> PracticeHubScreen(model,content)
-                model.route=="resources" -> ResourceLibraryScreen(model,content)
-                model.route=="friends" -> FriendsScreen(model)
                 model.route=="settings" -> SettingsScreen(model)
-                else -> ProfileScreen(model,content)
+                else -> MainDestination(model,content)
+            }
             }
         }
     }
-    if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text("Tes réponses et ton XP sont déjà sauvegardés. Tu pourras reprendre cette leçon depuis le parcours.")},
+    if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text(if(model.session?.exam==true)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},
         confirmButton={TextButton({quit=false;model.leaveSession()}){Text("Quitter la séance")}},dismissButton={TextButton({quit=false}){Text("Continuer")}})
     if(model.showWelcome) {
         var name by remember {mutableStateOf("")}
@@ -136,15 +162,16 @@ class MainActivity : ComponentActivity() {
             title={Text("Rejoindre cette équipe ?")},text={Text("Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe.")},
             confirmButton={TextButton({model.acceptInvite()},enabled=!model.busy) {Text("Ajouter l’équipier")}},dismissButton={TextButton({model.pendingInvite=null}) {Text("Annuler")}})
     }
-    model.oauthSession?.let {device ->
-        val clipboard=LocalClipboardManager.current
-        AlertDialog(onDismissRequest={model.cancelTask()},title={Text("Connexion à GitHub")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            Text("Entre ce code dans la page GitHub qui s’ouvre :")
-            Text(device.userCode,fontSize=30.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
-            TextButton({clipboard.setText(AnnotatedString(device.userCode));model.message="Code copié."}) {Text("Copier le code")}
-            Text("Autorise Hamigo à utiliser les Gists de ton compte. L’app attend ta validation ici.",fontSize=13.sp)
-            LinearProgressIndicator(Modifier.fillMaxWidth())
-        }},confirmButton={TextButton({clipboard.setText(AnnotatedString(device.userCode));openLink(context,device.verificationUri)}) {Text("Ouvrir GitHub")}},dismissButton={TextButton({model.cancelTask()}) {Text("Annuler")}})
+    if(model.oauthSession!=null)GitHubConnectionScreen(model)
+}
+
+@Composable private fun MainDestination(model:AppModel,content:Content) {
+    when(model.route) {
+        "path"->PathScreen(model,content)
+        "practice"->PracticeHubScreen(model,content)
+        "resources"->ResourceLibraryScreen(model,content)
+        "friends"->FriendsScreen(model)
+        else->ProfileScreen(model,content)
     }
 }
 
@@ -223,8 +250,8 @@ class MainActivity : ComponentActivity() {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             PageHeader(lesson.title,lesson.summary){model.lesson=null}
             Row(verticalAlignment=Alignment.CenterVertically) {Pico(Modifier.size(64.dp),mood=MascotMood.THINKING,pose=MascotPose.POINT);Spacer(Modifier.width(12.dp));Text("D'abord le déclic.\nEnsuite, à toi de jouer.",fontWeight=FontWeight.Bold,color=Teal)}
-            lesson.body.forEach { Text(it,fontSize=16.sp,lineHeight=24.sp) }
-            if(lesson.formula.isNotBlank()) Panel(color=Mist){Eyebrow("À RETENIR");Text(lesson.formula,fontSize=21.sp,fontWeight=FontWeight.Bold)}
+            lesson.body.forEach { MorseAwareText(it,fontSize=16.sp,lineHeight=24.sp) }
+            if(lesson.formula.isNotBlank()) Panel(color=Mist){Eyebrow("À RETENIR");MorseAwareText(lesson.formula,fontSize=21.sp,fontWeight=FontWeight.Bold)}
             Text("Cours original Hamigo, adapté des ressources F6KGL. Les références sont dans les réglages.",fontSize=12.sp,color=Muted)
         }
         Action("À toi de jouer · ${lesson.questions.size} à ${lesson.questions.size+2} défis",Modifier.padding(16.dp)) {model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)}
@@ -234,15 +261,27 @@ class MainActivity : ComponentActivity() {
 @Composable fun ProfileScreen(model:AppModel,content:Content) {
     val p=model.displayedProgress ?: model.progress
     val context=LocalContext.current
+    val today=LocalDate.now()
+    val earliest=p.activeDays.mapNotNull {runCatching{LocalDate.parse(it)}.getOrNull()}.filter{!it.isAfter(today)}.minOrNull() ?: today
+    val weeks=maxOf(4,(java.time.temporal.ChronoUnit.DAYS.between(earliest,today)/7).toInt()+1)
+    val history=rememberPagerState(pageCount={weeks})
+    val scope=rememberCoroutineScope()
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {Column(Modifier.weight(1f)){BigTitle(p.name,"Un peu chaque jour, beaucoup à l'arrivée.")};IconButton({model.route="settings"}){Icon(Icons.Rounded.Settings,"Réglages")}}}
         item {Panel(color=Mist){Row(verticalAlignment=Alignment.CenterVertically){Pico(Modifier.size(80.dp),mood=if(p.streak>0)MascotMood.CELEBRATE else MascotMood.HAPPY,pose=if(p.streak>0)MascotPose.JUMP else MascotPose.WAVE);Column(Modifier.weight(1f)){Text("Niveau ${1+p.xp/250}",fontSize=24.sp,fontWeight=FontWeight.ExtraBold);Text("${p.xp} XP · 🔥 ${p.streak} jours",color=Teal,fontWeight=FontWeight.Bold)}};LinearProgressIndicator(progress={(p.xp%250)/250f},modifier=Modifier.fillMaxWidth(),color=Teal,trackColor=Color.White);Text("${250-p.xp%250} XP avant le prochain niveau",fontSize=12.sp,color=Muted)}}
         item {
             Panel {
-                Text("Cette semaine",fontSize=20.sp,fontWeight=FontWeight.Bold)
-                Row(Modifier.fillMaxWidth().height(100.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.Bottom) {
-                    val days=(6L downTo 0L).map{LocalDate.now().minusDays(it)}
+                Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                    Text(if(history.currentPage==0)"Cette semaine" else "Ton historique",fontSize=20.sp,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f))
+                    IconButton({scope.launch{history.animateScrollToPage(history.currentPage+1)}},enabled=history.currentPage<weeks-1) {Icon(Icons.Rounded.History,"Voir la semaine précédente")}
+                    IconButton({scope.launch{history.animateScrollToPage(history.currentPage-1)}},enabled=history.currentPage>0) {Icon(Icons.Rounded.Update,"Voir la semaine suivante")}
+                }
+                HorizontalPager(history,Modifier.fillMaxWidth()) {week ->
+                    val days=(6L downTo 0L).map{today.minusDays(week*7L+it)}
                     val maximum=days.maxOf{p.dayXp(it)}.coerceAtLeast(p.dailyGoal)
+                    Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                    Text("${days.first().format(java.time.format.DateTimeFormatter.ofPattern("d MMM",java.util.Locale.FRENCH))} – ${days.last().format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy",java.util.Locale.FRENCH))}",fontSize=12.sp,color=Muted)
+                    Row(Modifier.fillMaxWidth().height(156.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.Bottom) {
                     days.forEach {day->Column(Modifier.weight(1f).fillMaxHeight(),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)) {
                         Text("${p.dayXp(day)}",fontSize=10.sp,color=Muted)
                         Box(Modifier.fillMaxWidth().weight(1f),contentAlignment=Alignment.BottomCenter) {
@@ -250,11 +289,14 @@ class MainActivity : ComponentActivity() {
                         }
                         Text(day.dayOfWeek.getDisplayName(java.time.format.TextStyle.NARROW,java.util.Locale.FRENCH),fontSize=11.sp)
                     }}
+                    }
+                    Text("${days.sumOf {p.dayXp(it)}} XP en 7 jours · objectif ${p.dailyGoal} XP/jour",fontSize=12.sp,color=Muted)
+                    }
                 }
-                Text("${p.weeklyXp} XP en 7 jours · objectif ${p.dailyGoal} XP/jour",fontSize=12.sp,color=Muted)
+                Text("Glisse vers la gauche pour remonter les semaines.",fontSize=11.sp,color=Muted)
             }
         }
-        item {Panel {Text("Ton signal se renforce",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("${p.completed.size} / ${content.lessons.size} leçons terminées\n${p.reviews.values.count{it.repetitions>=3}} notions consolidées\n${p.totalAnswers} réponses · ${if(p.totalAnswers==0)0 else p.totalCorrect*100/p.totalAnswers}% de réussite",fontSize=14.sp,lineHeight=22.sp);Action("Partager ma progression"){NativeShare.progressImage(context,p.snapshot())}}}
+        item {Panel {Text("Ton signal se renforce",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("${p.completed.size} / ${content.lessons.size} leçons terminées\n${p.reviews.values.count{it.repetitions>=3}} notions consolidées\n${p.totalAnswers} réponses · ${if(p.totalAnswers==0)0 else p.totalCorrect*100/p.totalAnswers}% de réussite",fontSize=14.sp,lineHeight=22.sp);Action("Partager mon bilan"){NativeShare.progressImage(context,p.snapshot())}}}
         item {Panel {Text("La mémoire aime les retrouvailles",fontSize=18.sp,fontWeight=FontWeight.Bold);Text("Les bonnes réponses reviennent après 1 jour, puis 6 jours, puis plus loin selon ta facilité. Les erreurs reviennent après 10 minutes. Les flashcards te laissent choisir leur difficulté.",fontSize=14.sp,color=Muted,lineHeight=22.sp)}}
     }
 }

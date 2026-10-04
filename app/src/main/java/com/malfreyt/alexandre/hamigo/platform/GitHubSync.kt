@@ -11,20 +11,23 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.Instant
 import java.util.UUID
 
-class SocialException(message: String, val httpStatus: Int? = null) : IOException(message)
+open class SocialException(message: String, val httpStatus: Int? = null, cause: Throwable? = null) : IOException(message, cause)
+class GitHubNetworkException(message: String, cause: IOException) : SocialException(message, cause = cause)
+
+interface GitHubGateway {
+    suspend fun api(method: String, path: String, token: String? = null, body: String? = null): String
+    suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String): String
+}
 data class GitHubIdentity(val login: String)
 data class GistSnapshot(val id: String, val url: String, val progress: ShareProgress)
 data class SyncReport(val social: GistSnapshot, val restored: Boolean, val lastSyncedAt: String)
 
 /** Opt-in snapshot publishing. A secret Gist is unlisted, and readable by anyone with its link. */
-class GitHubSync(context: Context) {
+class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHttp) {
     private val appContext = context.applicationContext
     private val prefs = appContext.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
     val tokens = SecureTokenStore(context)
@@ -66,7 +69,7 @@ class GitHubSync(context: Context) {
             var restored = false
             var existing: JSONObject? = null
             for (candidate in candidates) {
-                val gist = JSONObject(GitHubHttp.api("GET", "/gists/${candidate.getString("id")}", token))
+                val gist = JSONObject(gateway.api("GET", "/gists/${candidate.getString("id")}", token))
                 if (!matchesOwn(gist, owner, BACKUP_FILE_NAME)) continue
                 if (existing == null) existing = gist
                 for (json in backupContents(gist, owner)) {
@@ -85,8 +88,8 @@ class GitHubSync(context: Context) {
                     .put("hamigo-device-$device.json", JSONObject().put("content", snapshot)))
             val response = if (existing == null) {
                 body.put("public", false)
-                GitHubHttp.api("POST", "/gists", token, body.toString())
-            } else GitHubHttp.api("PATCH", "/gists/${existing.getString("id")}", token, body.toString())
+                gateway.api("POST", "/gists", token, body.toString())
+            } else gateway.api("PATCH", "/gists/${existing.getString("id")}", token, body.toString())
             val saved = JSONObject(response)
             val backupId = saved.getString("id")
             require(ID_PATTERN.matches(backupId))
@@ -121,7 +124,7 @@ class GitHubSync(context: Context) {
         prefs.getString("ownGistId", null)?.let { saved ->
             if (ID_PATTERN.matches(saved)) {
                 try {
-                    val candidate = JSONObject(GitHubHttp.api("GET", "/gists/$saved", token))
+                    val candidate = JSONObject(gateway.api("GET", "/gists/$saved", token))
                     if (matchesOwn(candidate, owner, FILE_NAME)) existing = candidate
                 } catch (e: SocialException) { if (e.httpStatus != 404) throw e }
             }
@@ -134,10 +137,10 @@ class GitHubSync(context: Context) {
         val current = existing
         ensureConnected(token)
         val response = if (current != null) {
-            GitHubHttp.api("PATCH", "/gists/${current.getString("id")}", token, body.toString())
+            gateway.api("PATCH", "/gists/${current.getString("id")}", token, body.toString())
         } else {
             body.put("public", false)
-            GitHubHttp.api("POST", "/gists", token, body.toString())
+            gateway.api("POST", "/gists", token, body.toString())
         }
         val result = JSONObject(response)
         ensureConnected(token)
@@ -153,7 +156,7 @@ class GitHubSync(context: Context) {
     /** A supplied URL is never requested; only a validated ID reaches the fixed GitHub API host. */
     suspend fun read(gistUrlOrId: String): ShareProgress {
         val id = gistId(gistUrlOrId)
-        val gist = JSONObject(GitHubHttp.api("GET", "/gists/$id", tokens.get()))
+        val gist = JSONObject(gateway.api("GET", "/gists/$id", tokens.get()))
         val file = gist.optJSONObject("files")?.optJSONObject(FILE_NAME)
             ?: throw SocialException("Ce lien ne contient pas de progression Hamigo.")
         if (file.optBoolean("truncated", false)) throw SocialException("Le fichier de progression est trop volumineux.")
@@ -164,7 +167,7 @@ class GitHubSync(context: Context) {
     }
 
     private suspend fun identity(token: String): GitHubIdentity {
-        val user = JSONObject(GitHubHttp.api("GET", "/user", token))
+        val user = JSONObject(gateway.api("GET", "/user", token))
         val login = user.optString("login")
         if (login.isBlank()) throw SocialException("Impossible de reconnaître le compte GitHub.")
         return GitHubIdentity(login)
@@ -184,7 +187,7 @@ class GitHubSync(context: Context) {
     private suspend fun findExisting(token: String, owner: String, fileName: String): List<JSONObject> {
         val matches = mutableListOf<JSONObject>()
         for (page in 1..10) {
-            val list = JSONArray(GitHubHttp.api("GET", "/gists?per_page=100&page=$page", token))
+            val list = JSONArray(gateway.api("GET", "/gists?per_page=100&page=$page", token))
             for (index in 0 until list.length()) {
                 val gist = list.getJSONObject(index)
                 if (matchesOwn(gist, owner, fileName)) matches += gist
@@ -201,7 +204,7 @@ class GitHubSync(context: Context) {
         return names.map { name ->
             val file = files.getJSONObject(name)
             val content = if (file.optBoolean("truncated", false)) {
-                GitHubHttp.rawBackup(file.getString("raw_url"), owner, gist.getString("id"), name)
+                gateway.rawBackup(file.getString("raw_url"), owner, gist.getString("id"), name)
             } else file.getString("content")
             try { CloudProgress.validate(content) } catch (e: Exception) {
                 throw SocialException("Une sauvegarde GitHub est invalide. Tes données locales sont conservées : ${e.message}")
@@ -239,86 +242,4 @@ class GitHubSync(context: Context) {
             return id.lowercase(java.util.Locale.ROOT)
         }
     }
-}
-
-/** Fixed GitHub hosts, finite timeouts, bounded responses, and no credential-bearing redirects. */
-internal object GitHubHttp {
-    suspend fun api(method: String, path: String, token: String? = null, body: String? = null): String =
-        request("https://api.github.com$path", method, token, body, "application/json")
-
-    suspend fun oauth(path: String, form: String): JSONObject = JSONObject(
-        request("https://github.com$path", "POST", null, form, "application/x-www-form-urlencoded")
-    )
-
-    /** Large authenticated-owner backups may be truncated in API JSON. Raw reads carry no credential. */
-    suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String): String {
-        val uri = Uri.parse(rawUrl)
-        val parts = uri.pathSegments
-        require(uri.scheme == "https" && uri.host == "gist.githubusercontent.com" && uri.userInfo == null &&
-            uri.port == -1 && uri.query == null && uri.fragment == null && parts.size == 5 &&
-            parts[0].equals(owner, true) && parts[1].equals(gist, true) && parts[2] == "raw" &&
-            Regex("[a-fA-F0-9]{40,64}").matches(parts[3]) && parts[4] == fileName) { "Adresse de sauvegarde GitHub inattendue." }
-        return request("https://gist.githubusercontent.com/$owner/$gist/raw/${parts[3]}/$fileName", "GET", null, null,
-            "application/json", 8 * 1024 * 1024)
-    }
-
-    private suspend fun request(url: String, method: String, token: String?, body: String?, contentType: String,
-        maxResponseBytes: Int = 20 * 1024 * 1024): String =
-        withContext(Dispatchers.IO) {
-            currentCoroutineContext().ensureActive()
-            val connection = URL(url).openConnection() as HttpURLConnection
-            try {
-                connection.connectTimeout = 15_000
-                connection.readTimeout = 15_000
-                connection.instanceFollowRedirects = false
-                connection.requestMethod = method
-                connection.setRequestProperty("Accept", if (token != null || url.contains("api.github.com"))
-                    "application/vnd.github+json" else "application/json")
-                connection.setRequestProperty("X-GitHub-Api-Version", "2026-03-10")
-                connection.setRequestProperty("User-Agent", "Hamigo-Android")
-                token?.let { connection.setRequestProperty("Authorization", "Bearer $it") }
-                body?.let {
-                    connection.doOutput = true
-                    connection.setRequestProperty("Content-Type", "$contentType; charset=utf-8")
-                    val bytes = it.toByteArray(Charsets.UTF_8)
-                    connection.setFixedLengthStreamingMode(bytes.size)
-                    connection.outputStream.use { output -> output.write(bytes) }
-                }
-                val status = connection.responseCode
-                if (status !in 200..299) {
-                    val message = when (status) {
-                        401 -> "Le jeton GitHub est invalide ou a expiré. Reconnecte ton compte."
-                        403 -> if (connection.getHeaderField("X-RateLimit-Remaining") == "0")
-                            "La limite GitHub est atteinte. Réessaie plus tard."
-                        else "GitHub refuse l'accès. Vérifie l'autorisation Gists en écriture de ton jeton."
-                        404 -> "Gist introuvable. Vérifie le lien ou crée une nouvelle connexion."
-                        422 -> "GitHub n'a pas accepté la progression. Réessaie plus tard."
-                        429 -> "Trop de demandes GitHub. Réessaie plus tard."
-                        in 500..599 -> "GitHub est momentanément indisponible. Tes révisions restent enregistrées."
-                        else -> "La connexion GitHub a échoué (HTTP $status)."
-                    }
-                    throw SocialException(message, status)
-                }
-                val bytes = ByteArrayOutputStream()
-                connection.inputStream.use { input ->
-                    val buffer = ByteArray(8192)
-                    while (true) {
-                        currentCoroutineContext().ensureActive()
-                        val count = input.read(buffer)
-                        if (count < 0) break
-                        if (bytes.size() + count > maxResponseBytes)
-                            throw SocialException("La réponse GitHub est trop volumineuse.")
-                        bytes.write(buffer, 0, count)
-                    }
-                }
-                currentCoroutineContext().ensureActive()
-                bytes.toString("UTF-8")
-            } catch (e: SocialException) {
-                throw e
-            } catch (_: IOException) {
-                throw SocialException("Connexion impossible. Vérifie ton réseau ; tes révisions sont conservées sur l'appareil.")
-            } finally {
-                connection.disconnect()
-            }
-        }
 }

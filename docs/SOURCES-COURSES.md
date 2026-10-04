@@ -1,6 +1,6 @@
 # Sources pédagogiques et vérifications
 
-Contenu préparé le 3 octobre 2026 pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **17 catégories et 364 entrées**. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application; ils ne recopient pas les paragraphes du cours.
+Contenu préparé le 3 octobre 2026 et références complétées le 4 octobre pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **18 catégories et 390 entrées**. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application; ils ne recopient pas les paragraphes du cours. Les ajouts, sources de la carte UIT et lacunes sont détaillés dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
 
 ## Approfondissements du parcours
 

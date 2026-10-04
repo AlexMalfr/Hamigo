@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.os.SystemClock
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
@@ -92,7 +93,7 @@ class VisualAuditTest {
             capture("$label-top")
             val lastText = when (route) {
                 "path" -> "Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous."
-                "practice" -> "Lancer mon mix"
+                "practice" -> "Ouvrir le labo · 12 questions"
                 "resources" -> model.content!!.references.last().title
                 "friends" -> "Actualiser l’équipe"
                 "profile" -> "La mémoire aime les retrouvailles"
@@ -149,6 +150,29 @@ class VisualAuditTest {
         scrollTo("Données sauvegardées et fréquence")
         ui.onNodeWithText("Données sauvegardées et fréquence").performClick()
         capture("16-synchronisation-details")
+
+        navigate("profile")
+        scrollTo("Cette semaine")
+        ui.onNodeWithContentDescription("Voir la semaine précédente").performClick()
+        ui.onNodeWithText("Ton historique").assertExists()
+        capture("17-moi-historique")
+
+        // A synthetic device session shows the embedded flow without any request to GitHub.
+        ui.runOnIdle {
+            model.oauthSession = DeviceOAuth.Session("visual-audit-only-device", "ABCD-EFGH",
+                "https://github.com/login/device", 900, 5, SystemClock.elapsedRealtime() + 900_000)
+            model.oauthStatus = "En attente de ton autorisation GitHub…"
+        }
+        ui.onNodeWithText("Ouvrir GitHub ici").assertIsDisplayed()
+        capture("18-oauth-integre-avant-ouverture")
+        ui.runOnIdle { model.oauthSession = null; model.oauthStatus = null }
+
+        navigate("resources")
+        scrollTo("Les petits mémos")
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextReplacement("Morse")
+        capture("19-memo-recherche-compacte")
+        ui.onNodeWithContentDescription("Fermer la recherche des mémos").performClick()
     }
 
     @Test fun practiceConfigurationExpandedAndCustomCount() {
@@ -159,8 +183,9 @@ class VisualAuditTest {
         capture("21-mix-themes-reglementation")
         scrollTo("Technique")
         capture("22-mix-themes-technique")
-        scrollTo("Nombre libre")
-        ui.onNodeWithText("Nombre libre").performClick()
+        scrollTo("Choisir les thèmes", substring = true)
+        ui.onNodeWithText("Choisir les thèmes", substring = true).performClick()
+        ui.onNodeWithContentDescription("Choisir un nombre personnalisé").performScrollTo().performClick()
         capture("23-mix-nombre-libre-dialog")
         ui.onNodeWithText("Annuler").performClick()
     }
@@ -171,17 +196,18 @@ class VisualAuditTest {
             ui.runOnIdle { model.resource = category }
             capture("ref-${index.toString().padStart(2, '0')}-${category.id}-top")
             if (category.rows.isNotEmpty()) {
-                scrollTo(category.rows.last().term)
+                val lastTerm = category.rows.last().term
+                scrollTo(if (category.id == "morse") MorseReference.characterName(lastTerm) else lastTerm)
                 capture("ref-${index.toString().padStart(2, '0')}-${category.id}-lower")
             }
         }
         val tools = listOf(
-            Triple("resistors", "Les anneaux en vrai", "resistance"),
-            Triple("resistors", "Résistances ensemble", "serie-parallele"),
-            Triple("morse", "Le traducteur de Pico", "morse"),
-            Triple("decibels", "La réglette des décibels", "decibels"),
-            Triple("formulas", "Le trio U, R, I", "ohm"),
-            Triple("formulas", "Une fréquence, une onde", "longueur-onde")
+            Triple("resistors", "Lire et composer une résistance", "resistance"),
+            Triple("resistors", "Série et parallèle", "serie-parallele"),
+            Triple("morse", "Texte ↔ Morse, avec le son", "morse"),
+            Triple("decibels", "Rapport ↔ gain ou atténuation", "decibels"),
+            Triple("formulas", "Deux valeurs, la troisième se révèle", "ohm"),
+            Triple("formulas", "Fréquence ↔ longueur d’onde", "longueur-onde")
         )
         for ((categoryId, label, name) in tools) {
             navigate("resources")
@@ -205,9 +231,26 @@ class VisualAuditTest {
                 scrollTo("Morse → texte")
                 ui.onNodeWithText("Morse → texte").performClick()
                 ui.onNodeWithText("SOS").assertExists()
+                ui.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.EditableText)).assertCountEquals(0)
                 capture("outil-morse-inverse")
             }
         }
+
+        navigate("resources")
+        ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "resistors" } }
+        capture("ref-resistance-guide-debutant")
+        ui.onNodeWithContentDescription("Filtrer cette fiche").performClick()
+        ui.onNode(hasSetTextAction()).performTextReplacement("rouge")
+        capture("ref-resistance-filtre-compact")
+        ui.onNodeWithContentDescription("Fermer le filtre de la fiche").performClick()
+        scrollTo("5 anneaux")
+        ui.onNodeWithText("Code des résistances").assertIsDisplayed()
+        ui.onNodeWithText("Réviser avec les flashcards").assertIsDisplayed()
+        capture("ref-resistance-en-tete-sticky")
+
+        navigate("resources")
+        ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "itu-regions" } }
+        capture("ref-carte-trois-regions-uit")
     }
 
     @Test fun everyQuestionInteractionAndCorrection() {
@@ -218,6 +261,13 @@ class VisualAuditTest {
         for ((kind, question) in examples.toSortedMap()) {
             ui.runOnIdle { model.startQuestions("Les défis de Pico", listOf(question)) }
             capture("question-$kind-01-instruction")
+            if (kind == "number") {
+                ui.onNodeWithContentDescription("Ouvrir la calculatrice").performClick()
+                ui.onNode(hasSetTextAction() and hasText("Calcul")).performTextReplacement("10*log(2)")
+                ui.onNode(hasSetTextAction() and hasText("Calcul")).performImeAction()
+                capture("question-calculatrice-flottante")
+                ui.onNodeWithContentDescription("Fermer la calculatrice").performClick()
+            }
             if (kind == "flash") {
                 ui.onNodeWithText("Retourner la carte").performClick()
                 capture("question-$kind-02-retournee")
@@ -230,8 +280,30 @@ class VisualAuditTest {
         }
         model.content!!.activeExam.firstOrNull { it.image != null }?.let { illustrated ->
             ui.runOnIdle { model.startQuestions("Exam1 illustré", listOf(illustrated), exam = true) }
+            capture("question-exam1-introduction-reglementation")
+            ui.runOnIdle { model.beginExamPart() }
+            ui.waitUntil(15_000) { exists("Toucher pour agrandir") }
             capture("question-exam1-illustration")
+            ui.onNodeWithText("Toucher pour agrandir").performClick()
+            capture("question-exam1-originale")
+            ui.onNodeWithContentDescription("Illustration originale : pincer pour zoomer").performTouchInput {
+                pinch(start0 = Offset(width * .45f, height * .45f), end0 = Offset(width * .25f, height * .25f),
+                    start1 = Offset(width * .55f, height * .55f), end1 = Offset(width * .75f, height * .75f))
+            }
+            capture("question-exam1-pinch-zoom")
+            check(InstrumentationRegistry.getInstrumentation().uiAutomation.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_BACK))
+            ui.waitUntil(5_000) { ui.onAllNodesWithContentDescription("Illustration originale : pincer pour zoomer").fetchSemanticsNodes().isEmpty() }
         }
+
+        val examQuestions = examFixtureQuestions()
+        ui.runOnIdle {
+            model.startQuestions("Examen blanc", examQuestions, exam = true)
+            model.session!!.apply { examPart = 1; index = 20; examIntroPending = true }
+            model.revision++
+        }
+        capture("question-exam1-introduction-technique")
+        ui.runOnIdle { model.beginExamPart() }
+        capture("question-exam1-technique-x-sur-y")
     }
 
     @Test fun resultsCommunicatePassAndFailure() {
@@ -250,17 +322,37 @@ class VisualAuditTest {
         ui.runOnIdle { model.session = passed; model.revision++ }
         ui.onNodeWithText("Leçon validée !").assertIsDisplayed()
         capture("resultat-lecon-validee")
-        val exam = Session("Examen blanc", MutableList(40) { questions[it % questions.size] }, exam = true).apply {
+        val exam = Session("Examen blanc", examFixtureQuestions().toMutableList(), exam = true).apply {
             index = 40; regulationScore = 9; techniqueScore = 17; unanswered = 2
+            correct = 26; firstCorrect = 26; gain = 90; elapsedMillis = 2_234_000
+            this.questions.forEachIndexed { i, q ->
+                val omitted = i in 18..19
+                val good = if (i < 20) i < 9 else i < 37
+                val answer = if (good) q.answer else (q.answer + 1) % q.choices.size.coerceAtLeast(1)
+                responses[i] = SessionResponse(good, omitted, if (omitted) "" else q.choices.getOrNull(answer).orEmpty(), answer)
+                if (!good) missed[q.id] = q
+            }
         }
         ui.runOnIdle { model.session = exam; model.revision++ }
         capture("resultat-examen-seuil-non-atteint")
+        scrollTo("Partager mes résultats")
+        capture("resultat-examen-cta-compacts")
+        scrollTo("Récap ⬇️")
+        capture("resultat-examen-recap-et-illustration")
+        scrollTo("QUESTION 10")
+        capture("resultat-examen-reponse-erronee")
+        scrollTo("QUESTION 19")
+        capture("resultat-examen-sans-reponse")
     }
 
     @Test fun sharePostersQrAndEveryReminderContext() {
         val own = model.progress.snapshot()
         NativeShare.renderProgressImage(context, own).copyTo(File(folder, "poster-personnel.png"), overwrite = true)
         NativeShare.renderTeamImage(context, own, demoFriends().map { it.progress }).copyTo(File(folder, "poster-equipe.png"), overwrite = true)
+        NativeShare.renderResultsImage(context, ShareResults(own.name, "Examen blanc", 26, 40, 2_234_000, 2, 90, 9, 17))
+            .copyTo(File(folder, "poster-resultats-examen.png"), overwrite = true)
+        NativeShare.renderResultsImage(context, ShareResults(own.name, "Mix radio · 40 questions", 33, 40, 1_420_000, 1, 106))
+            .copyTo(File(folder, "poster-resultats-mix.png"), overwrite = true)
         val link = FriendInvite.link("abcde0123456789")
         NativeShare.renderInviteImage(context, link).copyTo(File(folder, "poster-invitation-qr.png"), overwrite = true)
         val states = mapOf(
@@ -301,6 +393,10 @@ class VisualAuditTest {
     private fun demoFriends(): List<Friend> = listOf("Camille" to 165, "F4Léo" to 102, "Nora" to 54).mapIndexed { index, (name, weekly) ->
         Friend(ShareProgress(name, 960 - index * 230, 12 - index * 3, 18 - index * 4, weekly,
             dailyXp = (13L downTo 0L).map { ago -> DailyPoint(today.minusDays(ago).toString(), (weekly / 7 + (ago % 3) * 3).toInt()) }), "")
+    }
+
+    private fun examFixtureQuestions(): List<Question> = listOf("regulation", "technique").flatMap { section ->
+        model.content!!.activeExam.filter { it.section == section }.sortedBy { if (it.image != null) 0 else 1 }.take(20)
     }
 
     private fun scrollTo(text: String, substring: Boolean = false) {

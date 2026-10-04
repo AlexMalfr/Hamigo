@@ -2,6 +2,7 @@ package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
@@ -19,9 +20,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +74,12 @@ object ResourceMath {
 }
 
 object MorseReference {
+    fun characterName(value: String): String = when (value) {
+        "." -> "Point final"; "," -> "Virgule"; "?" -> "Point d’interrogation"; "/" -> "Barre oblique"
+        "=" -> "Égal"; "+" -> "Plus"; "-" -> "Tiret"; "(" -> "Parenthèse ouvrante"; ")" -> "Parenthèse fermante"
+        ":" -> "Deux-points"; "@" -> "Arobase"; "'" -> "Apostrophe"
+        else -> value
+    }
     val alphabet: Map<Char, String> = linkedMapOf(
         'A' to ".-", 'B' to "-...", 'C' to "-.-.", 'D' to "-..", 'E' to ".", 'F' to "..-.",
         'G' to "--.", 'H' to "....", 'I' to "..", 'J' to ".---", 'K' to "-.-", 'L' to ".-..",
@@ -144,19 +154,7 @@ private val toleranceOptions = listOf("Brun" to 1.0, "Rouge" to 2.0, "Vert" to .
 
 /** Dots and dashes share a centre line and real 1:3 lengths, unlike font punctuation. */
 @Composable fun ReferenceMorseSymbols(code: String, modifier: Modifier = Modifier, large: Boolean = true) {
-    val unit = if (large) 9.dp else 6.dp
-    val cleaned = code.filter { it == '.' || it == '-' }
-    val width = cleaned.sumOf { if (it == '.') 2 else 4 } * unit.value
-    Canvas(modifier.widthIn(min = 24.dp).width(width.dp).height(if (large) 32.dp else 24.dp)
-        .semantics { contentDescription = cleaned.map { if (it == '.') "point" else "trait" }.joinToString(", ") }) {
-        val u = unit.toPx()
-        var cursor = 0f
-        cleaned.forEach { symbol ->
-            if (symbol == '.') drawCircle(Teal, u / 2, Offset(cursor + u / 2, size.height / 2))
-            else drawLine(Teal, Offset(cursor + u / 2, size.height / 2), Offset(cursor + 2.5f * u, size.height / 2), u, StrokeCap.Round)
-            cursor += if (symbol == '.') 2 * u else 4 * u
-        }
-    }
+    MorseVisual(code, modifier, compact = !large)
 }
 
 private data class ReferenceTool(val id: String, val title: String, val subtitle: String)
@@ -169,24 +167,25 @@ private fun categoryTools(category: String): List<ReferenceTool> = when (categor
     else -> emptyList()
 }
 
+fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNotEmpty()
+
 @Composable fun ResourceInteractiveTools(category: String) {
     val tools = remember(category) { categoryTools(category) }
     if (tools.isEmpty()) return
     var opened by remember(category) { mutableStateOf<String?>(null) }
-    Panel(color = Mist) {
-        Eyebrow("À toi de manipuler")
+    Surface(Modifier.fillMaxWidth().padding(vertical = 12.dp),color=Mist,shape=RoundedCornerShape(22.dp)) {
+    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("À toi de manipuler", fontSize = 12.sp, color = Teal, fontWeight = FontWeight.Bold)
         tools.forEach { tool ->
-            Surface(onClick = { opened = if (opened == tool.id) null else tool.id }, color = Color.White, shape = RoundedCornerShape(14.dp)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp).heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
+            Surface(color = Color.White, shape = RoundedCornerShape(14.dp)) {
+                Column {
+                Row(Modifier.fillMaxWidth().clickable { opened = if (opened == tool.id) null else tool.id }
+                    .padding(horizontal = 12.dp, vertical = 6.dp).heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Science, null, tint = Teal, modifier = Modifier.size(22.dp))
-                    Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
-                        Text(tool.title, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Text(tool.subtitle, color = Muted, fontSize = 11.sp)
-                    }
+                    Text(tool.subtitle, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(horizontal = 10.dp))
                     Icon(if (opened == tool.id) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, "Afficher ou réduire l’outil")
                 }
-            }
-            if (opened == tool.id) {
+                if (opened == tool.id) Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (tool.id) {
                     "resistor" -> ResistorCalculator()
                     "morse" -> MorseTranslator()
@@ -195,8 +194,11 @@ private fun categoryTools(category: String): List<ReferenceTool> = when (categor
                     "wavelength" -> WavelengthCalculator()
                     "networks" -> ResistanceNetworkCalculator()
                 }
+                }
+                }
             }
         }
+    }
     }
 }
 
@@ -300,43 +302,68 @@ private fun categoryTools(category: String): List<ReferenceTool> = when (categor
     var mode by remember { mutableIntStateOf(0) }
     var text by remember { mutableStateOf("CQ HAMIGO") }
     var code by remember { mutableStateOf("... --- ...") }
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
     val translation = if (mode == 0) MorseReference.encode(text) else MorseReference.decode(code)
     val audioCode = if (mode == 0) translation.output else code
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ToolChoices(listOf("Texte → Morse", "Morse → texte"), mode) { mode = it; stopMorse() }
-        OutlinedTextField(if (mode == 0) text else code, { if (mode == 0) text = it.take(100) else code = it.take(240) },
-            label = { Text(if (mode == 0) "Ton message" else "Points, traits et espaces") }, modifier = Modifier.fillMaxWidth(), minLines = 2, maxLines = 4)
-        if (mode == 1) {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                listOf(".", "-", " ", " / ").forEach { symbol ->
-                    OutlinedButton({ code = (code + symbol).take(240) }, Modifier.weight(1f), contentPadding = PaddingValues(4.dp)) {
-                        Text(when (symbol) { "." -> "●"; "-" -> "━"; " " -> "Lettre"; else -> "Mot" }, fontSize = 12.sp)
-                    }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(if (mode == 0) "Ton message" else "Compose les signaux", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            IconButton({
+                val pasted = clipboard.getText()?.text.orEmpty()
+                if (mode == 0) text = pasted.take(100)
+                else if (pasted.isBlank() || isMorseNotation(pasted)) code = normalizedMorse(pasted).take(240)
+                else android.widget.Toast.makeText(context, "Colle uniquement des signaux Morse et leurs séparations.", android.widget.Toast.LENGTH_SHORT).show()
+                stopMorse()
+            }, Modifier.size(36.dp)) { Icon(Icons.Rounded.ContentPaste, "Coller le message", Modifier.size(19.dp)) }
+            IconButton({ text = ""; code = ""; stopMorse() }, Modifier.size(36.dp)) {
+                Icon(Icons.Rounded.DeleteSweep, "Tout effacer", Modifier.size(21.dp))
+            }
+        }
+        if (mode == 0) {
+            OutlinedTextField(text, { text = it.take(100) }, modifier = Modifier.fillMaxWidth(), minLines = 2, maxLines = 4,
+                placeholder = { Text("Écris ton message") })
+        } else {
+            Surface(color = Mist.copy(alpha = .55f), shape = RoundedCornerShape(12.dp)) {
+                Box(Modifier.fillMaxWidth().heightIn(min = 65.dp).padding(10.dp)) {
+                    if (code.isBlank()) Text("Utilise les boutons ci-dessous.", fontSize = 13.sp, color = Muted)
+                    else MorseVisual(code, compact = true)
                 }
             }
-        }
-        Surface(color = Color.White, shape = RoundedCornerShape(14.dp)) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (mode == 0 && translation.output.isNotBlank()) {
-                    translation.output.split(" / ").forEach { word ->
-                        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            word.split(' ').forEach { signals ->
-                                if (signals == "?") Text("?", color = Coral, fontWeight = FontWeight.Bold)
-                                else ReferenceMorseSymbols(signals)
-                            }
-                        }
-                    }
-                } else Text(translation.output.ifBlank { "Le résultat apparaît ici." }, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Teal)
-                if (mode == 0) Text(translation.output, color = Muted, fontSize = 12.sp)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                OutlinedButton({ code = (code + ".").take(240) }, Modifier.weight(1f), contentPadding = PaddingValues(4.dp)) { MorseVisual(".", compact = true) }
+                OutlinedButton({ code = (code + "-").take(240) }, Modifier.weight(1f), contentPadding = PaddingValues(4.dp)) { MorseVisual("-", compact = true) }
+                OutlinedButton({ if (code.isNotBlank() && !code.endsWith(' ')) code = (code + " ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) { Text("Lettre", fontSize = 12.sp) }
+                OutlinedButton({ if (code.trim().isNotBlank() && !code.trim().endsWith('/')) code = (code.trimEnd() + " / ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) {
+                    MorseVisual("/", compact = true); Text("Mot", fontSize = 12.sp)
+                }
+                IconButton({ code = code.dropLast(1); stopMorse() }, Modifier.size(40.dp), enabled = code.isNotEmpty()) { Icon(Icons.Rounded.Backspace, "Effacer le dernier signal", Modifier.size(19.dp)) }
             }
         }
-        if (translation.unsupported.isNotEmpty()) Text("Non reconnus : ${translation.unsupported.joinToString(" · ")}. Corrige-les avant d’écouter.", color = Color(0xFF9B423B), fontSize = 12.sp)
+        Surface(color = Mist.copy(alpha = .55f), shape = RoundedCornerShape(12.dp)) {
+            Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Traduction", color = Muted, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                    IconButton({ clipboard.setText(AnnotatedString(translation.output)) }, Modifier.size(32.dp), enabled = translation.output.isNotBlank()) {
+                        Icon(Icons.Rounded.ContentCopy, "Copier la traduction", Modifier.size(17.dp))
+                    }
+                }
+                if (mode == 0 && translation.output.isNotBlank()) MorseVisual(translation.output, compact = true)
+                else Text(translation.output.ifBlank { "Le résultat apparaît ici." }, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Teal)
+            }
+        }
+        if (translation.unsupported.isNotEmpty()) Text(
+            if (mode == 0) "Ce message contient des caractères non reconnus. Retire-les pour écouter." else "Une séquence ne correspond pas à un caractère connu. Vérifie les séparations de lettres.",
+            color = Color(0xFF9B423B), fontSize = 12.sp)
         if (audioCode.length > 240) InputHint("Raccourcis ton message pour pouvoir l’écouter en entier.")
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button({ playMorse(audioCode) }, Modifier.weight(1f), enabled = audioCode.isNotBlank() && audioCode.length <= 240 && translation.unsupported.isEmpty()) { Icon(Icons.Rounded.VolumeUp, null); Spacer(Modifier.width(6.dp)); Text("Écouter") }
-            OutlinedButton({ stopMorse() }, Modifier.weight(1f)) { Icon(Icons.Rounded.Stop, null); Spacer(Modifier.width(6.dp)); Text("Arrêter") }
+            Button({ playMorse(audioCode) }, Modifier.weight(1f), enabled = audioCode.isNotBlank() && audioCode.length <= 240 && translation.unsupported.isEmpty()) {
+                Icon(Icons.Rounded.VolumeUp, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Écouter", fontSize = 12.sp)
+            }
+            OutlinedButton({ stopMorse() }, Modifier.weight(1f)) { Icon(Icons.Rounded.Stop, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Arrêter", fontSize = 12.sp) }
         }
-        InputHint("Un espace sépare les lettres ; / sépare les mots. Point = 1 unité, trait = 3 ; silences : 1, 3, 7 unités. Les accents sont translittérés.")
+        InputHint("« Lettre » sépare deux caractères ; le séparateur oblique sépare les mots. Point = 1 unité, trait = 3 ; silences : 1, 3 et 7 unités. Les accents sont translittérés.")
         DisposableEffect(Unit) { onDispose { stopMorse() } }
     }
 }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "language": "fr-FR",
-  "verifiedAt": "2026-10-03",
+  "verifiedAt": "2026-10-04",
   "categories": [
     {
       "id": "nato",
@@ -1107,7 +1107,7 @@
     {
       "id": "callsigns",
       "title": "Indicatifs et préfixes",
-      "subtitle": "France, territoires et activité mobile",
+      "subtitle": "Préfixes français, repères internationaux et activité mobile",
       "rows": [
         {
           "term": "F",
@@ -1191,6 +1191,97 @@
           "term": "Voyage radio",
           "description": "Respecter les conditions du pays visité",
           "extra": "Vérifier réciprocité, préfixe et bandes autorisées."
+        },
+        {
+          "term": "FY",
+          "description": "Guyane française"
+        },
+        {
+          "term": "DL",
+          "description": "Allemagne",
+          "extra": "Exemple de préfixe amateur dans la série internationale DA à DR."
+        },
+        {
+          "term": "ON",
+          "description": "Belgique"
+        },
+        {
+          "term": "HB",
+          "description": "Suisse"
+        },
+        {
+          "term": "I",
+          "description": "Italie"
+        },
+        {
+          "term": "EA",
+          "description": "Espagne"
+        },
+        {
+          "term": "G · M · 2",
+          "description": "Royaume-Uni",
+          "extra": "Repères de séries internationales : les préfixes amateurs exacts distinguent aussi les nations et territoires."
+        },
+        {
+          "term": "EI",
+          "description": "Irlande"
+        },
+        {
+          "term": "PA",
+          "description": "Pays-Bas"
+        },
+        {
+          "term": "CT",
+          "description": "Portugal"
+        },
+        {
+          "term": "LX",
+          "description": "Luxembourg"
+        },
+        {
+          "term": "OE",
+          "description": "Autriche"
+        },
+        {
+          "term": "LA",
+          "description": "Norvège"
+        },
+        {
+          "term": "SM",
+          "description": "Suède"
+        },
+        {
+          "term": "OH",
+          "description": "Finlande"
+        },
+        {
+          "term": "K · N · W",
+          "description": "États-Unis",
+          "extra": "Les préfixes de territoires ou îles demandent une localisation plus précise."
+        },
+        {
+          "term": "VE · VA",
+          "description": "Canada"
+        },
+        {
+          "term": "JA",
+          "description": "Japon"
+        },
+        {
+          "term": "VK",
+          "description": "Australie"
+        },
+        {
+          "term": "ZL",
+          "description": "Nouvelle-Zélande"
+        },
+        {
+          "term": "CN",
+          "description": "Maroc"
+        },
+        {
+          "term": "3A",
+          "description": "Monaco"
         }
       ],
       "flashcards": true
@@ -1640,6 +1731,34 @@
         }
       ],
       "flashcards": true
+    },
+    {
+      "id": "itu-regions",
+      "title": "Les 3 régions UIT",
+      "subtitle": "La géographie des attributions de fréquences",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Région 1",
+          "description": "Europe, Afrique et une partie de l’Asie",
+          "extra": "Inclut la France métropolitaine. Les frontières exactes sont celles de la carte UIT."
+        },
+        {
+          "term": "Région 2",
+          "description": "Les Amériques",
+          "extra": "Inclut notamment la Guyane, les Antilles françaises et Saint-Pierre-et-Miquelon."
+        },
+        {
+          "term": "Région 3",
+          "description": "Une partie de l’Asie et l’Océanie",
+          "extra": "Inclut notamment la Nouvelle-Calédonie, la Polynésie française et Wallis-et-Futuna."
+        },
+        {
+          "term": "Régions UIT et zones de concours",
+          "description": "Ce sont deux découpages différents",
+          "extra": "Les trois régions servent aux attributions de fréquences. Les zones UIT ou CQ utilisées dans les concours ne remplacent pas ces régions."
+        }
+      ]
     }
   ],
   "sources": [
@@ -1679,6 +1798,18 @@
     {
       "title": "INRS — sécurité des opérations électriques",
       "url": "https://www.inrs.fr/risques/electriques/operations-installations.html"
+    },
+    {
+      "title": "ANFR — Les indicatifs et préfixes français",
+      "url": "https://www.anfr.fr/gerer/radioamateurs/les-indicatifs"
+    },
+    {
+      "title": "UIT — Séries internationales d’indicatifs, appendice 42",
+      "url": "https://www.itu.int/gladapp/Allocation/CallSigns"
+    },
+    {
+      "title": "UIT — Carte officielle des régions de radiocommunication",
+      "url": "https://www.itu.int/ITU-R/information/docs/emergency-regions.jpg"
     }
   ]
 }

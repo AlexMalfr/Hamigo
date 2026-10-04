@@ -3,8 +3,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <queries>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
     <application android:allowBackup="false" android:label="Hamigo" android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher" android:theme="@style/Theme.Hamigo" android:supportsRtl="true">
+        android:roundIcon="@mipmap/ic_launcher" android:theme="@style/Theme.Hamigo" android:supportsRtl="true" android:enableOnBackInvokedCallback="true">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

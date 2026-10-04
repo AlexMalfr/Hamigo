@@ -30,6 +30,65 @@ import kotlin.math.pow
 
 /** Share cards are drawn locally, with the same Pico artwork as the app and notifications. */
 object NativeShare {
+    fun resultsImage(context:Context,results:ShareResults) {
+        shareFile(context,renderResultsImage(context,results),"image/png","Mes résultats Hamigo",
+            "${cleanName(results.name)} : ${results.correct}/${results.total} sur ${results.title}, avec Hamigo 📻")
+    }
+
+    fun renderResultsImage(context:Context,results:ShareResults):File=posterFile(context,"hamigo-resultats-") {card ->
+        card.brand("MES RÉSULTATS")
+        PicoRenderer.draw(card.canvas,RectF(800f,54f,1030f,284f),
+            if(results.successful)MascotMood.CELEBRATE else MascotMood.DETERMINED,
+            if(results.successful)MascotPose.JUMP else MascotPose.POINT)
+        card.text("Une nouvelle étape",64f,215f,57f,Ink)
+        card.fittedText(cleanName(results.name),64f,274f,37f,Teal,716f)
+        card.fittedText(results.title,64f,317f,27f,Muted,950f,heavy=false)
+        val total=results.total.coerceAtLeast(1)
+        val correct=results.correct.coerceIn(0,total)
+        val minutes=results.elapsedMillis.coerceAtLeast(0)/60_000
+        val seconds=results.elapsedMillis.coerceAtLeast(0)/1000%60
+        card.stat(RectF(64f,350f,532f,467f),"$correct / ${results.total.coerceAtLeast(0)}","bonnes réponses",Mint,48f)
+        card.stat(RectF(548f,350f,1016f,467f),"${minutes}m ${seconds}s","temps de réflexion",GoldLight,48f)
+        card.stat(RectF(64f,483f,532f,600f),"+ ${format(results.gainedXp)}","XP gagnés",Mist,48f)
+        card.stat(RectF(548f,483f,1016f,600f),format(results.unanswered),"sans réponse",Peach,48f)
+        card.panel(RectF(64f,629f,1016f,1180f))
+        if(results.exam) {
+            card.text("Deux épreuves, deux repères",96f,691f,36f,Ink)
+            card.text("Objectif : au moins 10 / 20 dans chacune",96f,732f,24f,Teal,heavy=false)
+            val plot=RectF(194f,798f,953f,1070f)
+            listOf(0,5,10,15,20).forEach {score ->
+                val y=plot.bottom-plot.height()*score/20f
+                card.rounded(RectF(plot.left,y-1,plot.right,y+1),Mist,0f)
+                card.text(score.toString(),plot.left-20f,y+8f,21f,Muted,heavy=false,align=Paint.Align.RIGHT)
+            }
+            listOf("Réglementation" to results.regulationScore!!,"Technique" to results.techniqueScore!!).forEachIndexed {index,entry ->
+                val x=plot.left+plot.width()*(index+.5f)/2f
+                val value=entry.second.coerceIn(0,20)
+                val height=plot.height()*value/20f
+                card.rounded(RectF(x-75f,plot.bottom-height,x+75f,plot.bottom),if(index==0)Teal else Coral,14f)
+                card.text("$value / 20",x,plot.bottom-height-18f,29f,Ink,align=Paint.Align.CENTER)
+                card.text(entry.first,x,1122f,25f,Ink,align=Paint.Align.CENTER)
+            }
+        } else {
+            card.text("Mon signal se précise",96f,695f,38f,Ink)
+            val percentage=100*correct/total
+            card.text("$percentage %",540f,854f,92f,Teal,align=Paint.Align.CENTER)
+            val unanswered=results.unanswered.coerceIn(0,total-correct)
+            val wrong=total-correct-unanswered
+            var x=111f
+            listOf(correct to Teal,wrong to Coral,unanswered to GoldLight).forEach {entry ->
+                val end=x+858f*entry.first/total
+                if(entry.first>0)card.rounded(RectF(x,919f,end,974f),entry.second,8f)
+                x=end
+            }
+            card.text("$correct justes · $wrong à consolider",540f,1050f,29f,Ink,align=Paint.Align.CENTER)
+            card.text("$unanswered sans réponse",540f,1098f,24f,Muted,heavy=false,align=Paint.Align.CENTER)
+        }
+        card.text(if(results.successful)"Le signal passe. On garde le cap !" else "Chaque essai prépare la prochaine réussite.",
+            540f,1250f,29f,Ink,align=Paint.Align.CENTER)
+        card.footer()
+    }
+
     fun progressImage(context: Context, progress: ShareProgress) {
         shareFile(context, renderProgressImage(context, progress), "image/png", "Ma progression Hamigo",
             "${progress.name} : ${progress.xp} XP, ${progress.streak} jours de série sur Hamigo 📻")

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.lifecycle.ViewModelProvider
 import org.junit.Before
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,6 +91,40 @@ class ApplicationSmokeTest {
         quitQuiz()
         awaitText("HAMIGO")
         ui.onNodeWithText("Parcours").assertIsDisplayed()
+    }
+
+    @Test
+    fun examCanBeReviewedBeforeFinalizationAndTheRecapKeepsTheChosenAnswer() {
+        val model=ViewModelProvider(ui.activity)[AppModel::class.java]
+        ui.runOnIdle {
+            model.startQuestions("Examen blanc témoin",List(40) {index->Question("exam-ui-$index","Question témoin ${index+1}",
+                listOf("La bonne réponse","Autre réponse"),0,"Une explication à lire.",section=if(index<20)"regulation" else "technique")},exam=true)
+        }
+        ui.onNodeWithText("Commencer la réglementation").assertIsDisplayed().performClick()
+        repeat(20) {index->
+            awaitText("Question témoin ${index+1}")
+            ui.onNodeWithText("La bonne réponse").performScrollTo().performClick()
+            ui.onNodeWithText(if(index<19)"Enregistrer et continuer" else "Enregistrer et relire").performClick()
+        }
+        awaitText("Relire réglementation")
+        ui.onNodeWithText("1").performClick()
+        awaitText("Question témoin 1")
+        ui.onNodeWithText("Autre réponse").performScrollTo().performClick()
+        ui.onNodeWithText("Enregistrer et continuer").performClick()
+        ui.onNodeWithText("Relire").performClick()
+        ui.runOnIdle {assertEquals(1,model.session!!.responses[0]!!.choiceIndex)}
+        ui.onNodeWithText("Finaliser la réglementation").performScrollTo().performClick()
+        ui.onNodeWithText("Finaliser").performClick()
+        ui.onNodeWithText("Commencer la technique").assertIsDisplayed().performClick()
+        ui.runOnIdle {
+            repeat(20) {model.answer(true,display="La bonne réponse",choiceIndex=0)}
+            model.finishExamPart()
+        }
+        ui.onNodeWithText("19 / 20").assertIsDisplayed()
+        ui.onNodeWithText("Partager mes résultats").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Récap ⬇️").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Autre réponse").performScrollTo().assertIsDisplayed()
+        ui.onAllNodesWithText("Réponse : La bonne réponse").onFirst().performScrollTo().assertIsDisplayed()
     }
 
     private fun pair(left: String, right: String) {

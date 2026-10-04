@@ -26,14 +26,28 @@ class Session(val title: String, val questions: MutableList<Question>, val lesso
     var regulationScore = 0
     var techniqueScore = 0
     var unanswered = 0
+    val responses = linkedMapOf<Int, SessionResponse>()
+    var examPart = 0
+    var examIntroPending = exam
+    var examReviewing = false
+    val finalizedExamParts = linkedSetOf<Int>()
+    var elapsedMillis = 0L
+    val examPartStart get() = if(examPart == 0) 0 else 20
+    val examPartEnd get() = minOf(if(examPart == 0) 20 else 40, questions.size)
+    val examPartLabel get() = if(examPart == 0) "Réglementation" else "Technique"
+    val examMinutes get() = if(examPart == 0) 15 else 30
     val missed = linkedMapOf<String, Question>()
     val unresolved = linkedSetOf<String>()
     val firstCount = questions.size
     val lessonPassed get() = LearningRules.lessonPassed(firstCorrect,firstCount) && unresolved.isEmpty()
-    val done get() = index >= questions.size
+    val done get() = index >= questions.size && !examReviewing
     val current get() = questions.getOrNull(index)
-    val examTimeRemaining: Long get() = ((if (index < 20) 15 else 30) * 60_000L - (System.currentTimeMillis() - started)).coerceAtLeast(0)
+    val examTimeRemaining: Long get() = if(examIntroPending) examMinutes * 60_000L else
+        (examMinutes * 60_000L - (System.currentTimeMillis() - started)).coerceAtLeast(0)
 }
+
+data class SessionResponse(val correct: Boolean, val omitted: Boolean = false,
+    val display: String = "", val choiceIndex: Int = -1, val quality: Int = if(correct) 4 else 1)
 
 class AppModel : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -64,6 +78,7 @@ class AppModel : ViewModel() {
     var incoming by mutableStateOf<String?>(null)
     var showWelcome by mutableStateOf(false)
     var oauthSession by mutableStateOf<DeviceOAuth.Session?>(null)
+    var oauthStatus by mutableStateOf<String?>(null)
     var pendingInvite by mutableStateOf<String?>(null)
     fun initialize(ctx: Context) {
         if (::progress.isInitialized) return
@@ -86,9 +101,17 @@ class AppModel : ViewModel() {
         require(questions.isNotEmpty())
         lesson=null; resource=null; session=Session(title, questions.toMutableList(), lessonId, exam)
     }
-    fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false) {
+    fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false,
+               display: String = "", choiceIndex: Int = -1) {
         val s=session ?: return; val q=s.current ?: return
         if (s.feedback != null) return
+        if(s.exam && (s.examIntroPending || s.examReviewing || s.examPart in s.finalizedExamParts)) return
+        s.responses[s.index]=SessionResponse(correct,omitted,display,choiceIndex,quality)
+        if(s.exam) {
+            // A draft can be changed freely; XP and spaced repetition are recorded once on finalisation.
+            if(s.index+1 < s.examPartEnd) s.index++ else s.examReviewing=true
+            revision++; return
+        }
         if (!omitted) s.gain += progress.answer(q.id, correct, quality)
         if (correct) {
             if(s.index<s.firstCount) s.firstCorrect++
@@ -97,15 +120,14 @@ class AppModel : ViewModel() {
         } else { s.missed[q.id]=q; s.unresolved.add(q.id); if(omitted) s.unanswered++ }
         s.feedback=correct; revision++
         ProgressSyncScheduler.enqueue(context)
-        if(s.exam) next()
     }
     fun next() {
         val s=session ?: return
         val q=s.current
         if (!s.exam && s.feedback == false && q != null && s.questions.count { it.id == q.id } < 3) s.questions.add(q)
         s.index++; s.feedback=null
-        if(s.exam && s.index==20) s.started=System.currentTimeMillis()
         if(s.done) {
+            s.elapsedMillis=System.currentTimeMillis()-s.started
             if(s.lessonId != null && s.lessonPassed) { s.gain += progress.complete(s.lessonId) }
             refreshSocial()
         }
@@ -113,9 +135,49 @@ class AppModel : ViewModel() {
     }
     fun timeoutExamPart() {
         val s=session ?: return
-        if(!s.exam) return
-        val end=if(s.index<20) 20 else 40
-        while(s.index < end && !s.done) answer(false, omitted=true)
+        if(!s.exam || s.examIntroPending || s.done) return
+        finishExamPart()
+    }
+    fun beginExamPart() {
+        val s=session ?: return
+        if(!s.exam || !s.examIntroPending) return
+        s.examIntroPending=false; s.examReviewing=false; s.index=s.examPartStart
+        s.started=System.currentTimeMillis(); revision++
+    }
+    fun revisitExamQuestion(index:Int) {
+        val s=session ?: return
+        if(!s.exam || s.examIntroPending || s.examPart in s.finalizedExamParts || index !in s.examPartStart until s.examPartEnd) return
+        s.index=index; s.examReviewing=false; s.feedback=null; revision++
+    }
+    fun reviewExamPart() {
+        val s=session ?: return
+        if(!s.exam || s.examIntroPending || s.done) return
+        s.examReviewing=true; revision++
+    }
+    fun finishExamPart() {
+        val s=session ?: return
+        if(!s.exam || s.examIntroPending || !s.finalizedExamParts.add(s.examPart)) return
+        s.elapsedMillis+=(System.currentTimeMillis()-s.started).coerceIn(0L,s.examMinutes*60_000L)
+        for(index in s.examPartStart until s.examPartEnd) {
+            val q=s.questions[index]
+            val response=s.responses[index] ?: SessionResponse(false,omitted=true)
+            s.responses[index]=response
+            if(!response.omitted) s.gain+=progress.answer(q.id,response.correct,response.quality)
+            if(response.correct) {
+                s.correct++; s.firstCorrect++
+                if(s.examPart==0) s.regulationScore++ else s.techniqueScore++
+            } else {
+                s.missed[q.id]=q; s.unresolved.add(q.id)
+                if(response.omitted) s.unanswered++
+            }
+        }
+        s.feedback=null; s.examReviewing=false
+        if(s.examPart==0 && s.questions.size>20) {
+            s.examPart=1; s.index=20; s.examIntroPending=true
+        } else {
+            s.index=s.questions.size; s.examIntroPending=false; refreshSocial()
+        }
+        ProgressSyncScheduler.enqueue(context); revision++
     }
     fun refresh() {
         if(::progress.isInitialized) {
@@ -144,11 +206,29 @@ class AppModel : ViewModel() {
     fun removeFriend(friend: Friend) { synchronized(Progress.CLOUD_LOCK) { loadFriends();friends=friends.filterNot {it.gist==friend.gist && it.progress.name==friend.progress.name}; saveFriends() } }
     fun startGitHubConnection() = task {
         try {
+            oauthStatus="Préparation de la connexion…"
             val device=DeviceOAuth.start(GitHubApp.CLIENT_ID); oauthSession=device
-            val token=DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID,device)
-            val user=sync.connect(token); sync.synchronize(progress)
-            ProgressSyncScheduler.schedule(context); message="Bienvenue ${user.login} ! Ton voyage est synchronisé."
-        } finally { oauthSession=null }
+            val token=DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID,device) {notice ->oauthStatus=notice}
+            // Receiving the token completes the browser part; a slow Gist must not keep it open.
+            oauthSession=null;oauthStatus="GitHub a autorisé Hamigo. Vérification du compte…"
+            var user:GitHubIdentity?=null
+            for(attempt in 0..2) {
+                try {user=sync.connect(token);break} catch(e:GitHubNetworkException) {
+                    if(attempt==2)throw e
+                    delay((attempt+1)*1500L)
+                }
+            }
+            oauthStatus="Compte connecté. Première sauvegarde…"
+            ProgressSyncScheduler.schedule(context)
+            try {
+                sync.synchronize(progress)
+                message="Bienvenue ${user!!.login} ! Ton voyage est synchronisé."
+            } catch(e:SocialException) {
+                ProgressSyncScheduler.enqueue(context,0)
+                message="Compte ${user!!.login} connecté. La sauvegarde sera réessayée : ${e.message}"
+            }
+            refresh()
+        } finally { oauthSession=null;oauthStatus=null }
     }
     fun disconnectGitHub() { sync.disconnect(); ProgressSyncScheduler.cancel(context); refresh() }
     fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }

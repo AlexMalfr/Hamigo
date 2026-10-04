@@ -58,7 +58,7 @@ const additions = {
     'On apprend le Morse comme un rythme, pas seulement comme un dessin. Un point vaut une unité, un trait trois; à l’intérieur d’une lettre, la pause vaut une unité. Entre deux lettres, laisse trois unités, et entre deux mots sept. Le chapitre dédié entraîne ensuite toutes les lettres, les chiffres, l’écoute et la composition.',
     N('Entre deux lettres Morse, la pause dure combien d’unités ?',3,'unités','La pause entre lettres vaut trois durées de point.',0),
     N('Entre deux mots Morse, combien d’unités de silence ?',7,'unités','La pause entre mots vaut sept durées de point.',0),
-    {...Q('Écoute le signal et choisis la lettre.','A',['N','E','T'],'A se compose d’un point puis d’un trait : .-.'),kind:'morseListen',bands:['.-']},
+    {...Q('Écoute le signal et choisis la lettre.','A',['N','E','T'],'Pour A, compose un point puis un trait : .-'),kind:'morseListen',bands:['.-']},
     {kind:'morseEncode',prompt:'Compose la lettre N avec les boutons point et trait.',choices:[],answer:0,bands:['-.'],explanation:'N = trait puis point : ━•. Les lettres A et N sont inversées.'}
   ],
   'c02-l04': [
@@ -526,7 +526,7 @@ chapter('c15','Le Morse, de A à Z','Un vrai atelier : tout l’alphabet, chiffr
   ],'',[
     listen('Z',['Z','G','Q','X']),compose('Q'),listen('7',['7','8','2','0']),compose('9'),
     Q('Quel caractère correspond à •••• ?','H',['S','I','5'],'H possède quatre points; S en a trois et 5 en a cinq.'),
-    Q('Quel caractère correspond à ━•━━ ?','Y',['C','K','X'],'Y = -.--.'),
+    Q('Quel caractère correspond à ━•━━ ?','Y',['C','K','X'],'Y = ━•━━'),
     M('Relie sans confondre lettres et chiffres.',[['O','━━━'],['0','━━━━━'],['S','•••'],['5','•••••']],'La longueur du caractère distingue O de 0 et S de 5.'),
     compose('CQ DE'),listen('73',['73','37','72','83'],'Écoute le groupe de chiffres.'),
     N('Un point vaut 60 ms. Pause standard entre deux mots ?',420,'ms','7 × 60 = 420 ms.',0)
@@ -886,6 +886,19 @@ chapter('c21','Le labo des bons réflexes','Écouter, mesurer, diagnostiquer et 
     Q('Quel signe indique un apprentissage transférable ?','Résoudre une situation nouvelle avec la même règle',['Reconnaître seulement l’emplacement du bouton','Finir sans lire les unités','Répéter un nombre appris'],'Le transfert utilise le principe dans un autre contexte.')
   ])
 ]);
+
+// Name punctuation characters rather than drawing their literal period or slash as Morse E/a word gap.
+// Apply after answer shuffling so the existing question IDs and answer indices remain stable.
+const punctuationNames={'.':'Point final',',':'Virgule','?':'Point d’interrogation','/':'Barre oblique','=':'Égal','@':'Arobase'};
+const punctuationLesson=newChapters.find(c=>c.id==='c15').lessons.find(l=>l.id==='c15-l10');
+for(const question of punctuationLesson.questions) {
+  for(const [character,name] of Object.entries(punctuationNames)) {
+    question.prompt=question.prompt.replace('le caractère '+character+' en Morse.',
+      character==='/'?'la barre oblique en Morse.':'le signe « '+name.toLowerCase()+' » en Morse.');
+  }
+  if(question.kind!=='morseEncode') question.choices=(question.choices||[]).map(choice=>punctuationNames[choice]||choice);
+  for(const pair of question.pairs||[]) pair.left=punctuationNames[pair.left]||pair.left;
+}
 
 // Keep the original IDs; insert deeper chapters beside their prerequisite concepts.
 const byId=new Map([...data.chapters,...newChapters].map(c=>[c.id,c]));

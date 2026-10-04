@@ -973,7 +973,7 @@
                 "N"
               ],
               "answer": 2,
-              "explanation": "A se compose d’un point puis d’un trait : .-.",
+              "explanation": "Pour A, compose un point puis un trait : .-",
               "bands": [
                 ".-"
               ],
@@ -3405,10 +3405,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à ••━━•• ?",
               "choices": [
-                ".",
-                "=",
-                "?",
-                "/"
+                "Point final",
+                "Égal",
+                "Point d’interrogation",
+                "Barre oblique"
               ],
               "answer": 2,
               "explanation": "? correspond à ••━━••.",
@@ -3420,10 +3420,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                "=",
-                "?",
-                "/",
-                "."
+                "Égal",
+                "Point d’interrogation",
+                "Barre oblique",
+                "Point final"
               ],
               "answer": 1,
               "explanation": "? correspond à ••━━••.",
@@ -3436,7 +3436,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère ? en Morse.",
+              "prompt": "Compose le signe « point d’interrogation » en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3451,10 +3451,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à ━••━• ?",
               "choices": [
-                "?",
-                ".",
-                "=",
-                "/"
+                "Point d’interrogation",
+                "Point final",
+                "Égal",
+                "Barre oblique"
               ],
               "answer": 3,
               "explanation": "/ correspond à ━••━•.",
@@ -3466,10 +3466,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                ".",
-                "=",
-                "/",
-                "?"
+                "Point final",
+                "Égal",
+                "Barre oblique",
+                "Point d’interrogation"
               ],
               "answer": 2,
               "explanation": "/ correspond à ━••━•.",
@@ -3482,7 +3482,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère / en Morse.",
+              "prompt": "Compose la barre oblique en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3497,10 +3497,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à •━•━•━ ?",
               "choices": [
-                ".",
-                "?",
-                "/",
-                "="
+                "Point final",
+                "Point d’interrogation",
+                "Barre oblique",
+                "Égal"
               ],
               "answer": 0,
               "explanation": ". correspond à •━•━•━.",
@@ -3512,10 +3512,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                "?",
-                "/",
-                "=",
-                "."
+                "Point d’interrogation",
+                "Barre oblique",
+                "Égal",
+                "Point final"
               ],
               "answer": 3,
               "explanation": ". correspond à •━•━•━.",
@@ -3528,7 +3528,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère . en Morse.",
+              "prompt": "Compose le signe « point final » en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3543,10 +3543,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à ━•••━ ?",
               "choices": [
-                "/",
-                ".",
-                "=",
-                "?"
+                "Barre oblique",
+                "Point final",
+                "Égal",
+                "Point d’interrogation"
               ],
               "answer": 2,
               "explanation": "= correspond à ━•••━.",
@@ -3558,10 +3558,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                ".",
-                "=",
-                "?",
-                "/"
+                "Point final",
+                "Égal",
+                "Point d’interrogation",
+                "Barre oblique"
               ],
               "answer": 1,
               "explanation": "= correspond à ━•••━.",
@@ -3574,7 +3574,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère = en Morse.",
+              "prompt": "Compose le signe « égal » en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3589,10 +3589,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à ━━••━━ ?",
               "choices": [
-                "?",
-                "/",
-                ".",
-                ","
+                "Point d’interrogation",
+                "Barre oblique",
+                "Point final",
+                "Virgule"
               ],
               "answer": 3,
               "explanation": ", correspond à ━━••━━.",
@@ -3604,10 +3604,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                "/",
-                ".",
-                ",",
-                "?"
+                "Barre oblique",
+                "Point final",
+                "Virgule",
+                "Point d’interrogation"
               ],
               "answer": 2,
               "explanation": ", correspond à ━━••━━.",
@@ -3620,7 +3620,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère , en Morse.",
+              "prompt": "Compose le signe « virgule » en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3635,10 +3635,10 @@
               "kind": "choice",
               "prompt": "Quel caractère correspond à •━━•━• ?",
               "choices": [
-                "@",
-                "?",
-                "/",
-                "."
+                "Arobase",
+                "Point d’interrogation",
+                "Barre oblique",
+                "Point final"
               ],
               "answer": 0,
               "explanation": "@ correspond à •━━•━•.",
@@ -3650,10 +3650,10 @@
               "kind": "morseListen",
               "prompt": "Écoute le rythme puis choisis le caractère.",
               "choices": [
-                "?",
-                "/",
-                ".",
-                "@"
+                "Point d’interrogation",
+                "Barre oblique",
+                "Point final",
+                "Arobase"
               ],
               "answer": 3,
               "explanation": "@ correspond à •━━•━•.",
@@ -3666,7 +3666,7 @@
             },
             {
               "kind": "morseEncode",
-              "prompt": "Compose le caractère @ en Morse.",
+              "prompt": "Compose le signe « arobase » en Morse.",
               "choices": [],
               "answer": 0,
               "bands": [
@@ -3684,23 +3684,23 @@
               "answer": 0,
               "pairs": [
                 {
-                  "left": "?",
+                  "left": "Point d’interrogation",
                   "right": "••━━••"
                 },
                 {
-                  "left": "/",
+                  "left": "Barre oblique",
                   "right": "━••━•"
                 },
                 {
-                  "left": ".",
+                  "left": "Point final",
                   "right": "•━•━•━"
                 },
                 {
-                  "left": "=",
+                  "left": "Égal",
                   "right": "━•••━"
                 },
                 {
-                  "left": ",",
+                  "left": "Virgule",
                   "right": "━━••━━"
                 }
               ],
@@ -4242,7 +4242,7 @@
                 "K"
               ],
               "answer": 1,
-              "explanation": "Y = -.--.",
+              "explanation": "Y = ━•━━",
               "id": "c15-l14-q06",
               "section": "technique",
               "topic": "Morse"

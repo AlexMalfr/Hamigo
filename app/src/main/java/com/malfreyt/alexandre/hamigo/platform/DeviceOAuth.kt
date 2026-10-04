@@ -32,17 +32,30 @@ object DeviceOAuth {
     }
 
     /** Cancellable polling observes GitHub's interval and slow_down; caller stores the result via connect(). */
-    suspend fun awaitToken(clientId: String, session: Session): String {
+    suspend fun awaitToken(clientId: String, session: Session, onNetworkWait: (String?) -> Unit = {}): String =
+        awaitTokenWith(clientId,session,GitHubHttp::oauth,{delay(it)},SystemClock::elapsedRealtime,onNetworkWait)
+
+    internal suspend fun awaitTokenWith(clientId:String,session:Session,
+        exchange:suspend (String,String)->org.json.JSONObject, wait:suspend (Long)->Unit,
+        elapsed:()->Long,onNetworkWait:(String?)->Unit={}):String {
         validateClient(clientId)
         var interval = session.interval
-        while (SystemClock.elapsedRealtime() < session.expiresAtElapsed) {
+        var interrupted = 0
+        while (elapsed() < session.expiresAtElapsed) {
             currentCoroutineContext().ensureActive()
-            delay(interval * 1000L)
-            if (SystemClock.elapsedRealtime() >= session.expiresAtElapsed) break
-            val reply = GitHubHttp.oauth("/login/oauth/access_token", form(
+            wait(maxOf(interval,if(interrupted==0)0 else minOf(30,interrupted*5)) * 1000L)
+            if (elapsed() >= session.expiresAtElapsed) break
+            val reply = try {exchange("/login/oauth/access_token", form(
                 "client_id" to clientId.trim(), "device_code" to session.deviceCode,
                 "grant_type" to "urn:ietf:params:oauth:grant-type:device_code"
-            ))
+            ))} catch(e:SocialException) {
+                if(e is GitHubNetworkException || e.httpStatus==429 || e.httpStatus in 500..599) {
+                    interrupted++;onNetworkWait("Connexion interrompue : l’attente continue. Tu peux terminer l’autorisation GitHub.")
+                    continue
+                }
+                throw e
+            }
+            interrupted=0;onNetworkWait(null)
             val token = reply.optString("access_token")
             if (token.isNotBlank()) {
                 if ("gist" !in reply.optString("scope").split(',', ' ').filter { it.isNotBlank() })

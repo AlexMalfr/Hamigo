@@ -64,6 +64,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
                     fontWeight = FontWeight.ExtraBold, fontSize = 19.sp, color = Ink)
             }
         }
+        model.oauthStatus?.let {Text(it,color=Muted,fontSize=12.sp,lineHeight=17.sp)}
         if (connected) {
             Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
             if (lastError != null) {
@@ -142,7 +143,7 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 if (invitation == null) Text("Connecte GitHub ci-dessus pour créer ton lien d’invitation.", fontSize = 12.sp, color = Muted)
-                Action("Partager ma progression") {
+                Action("Partager le classement") {
                     NativeShare.teamImage(context, own, model.friends.map { it.progress })
                 }
                 Text("Une image de votre équipe, avec vos graphiques de progression.", fontSize = 11.sp, color = Muted)
@@ -332,9 +333,11 @@ fun SettingsScreen(model: AppModel) {
                 val lessonCount = model.content?.lessons?.size ?: 0
                 Text("Hamigo ${BuildConfig.VERSION_NAME}\n$lessonCount leçons · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",
                     fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
-                TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") }, contentPadding = PaddingValues(0.dp)) { Text("Cours F6KGL · CC BY-NC-SA 4.0", fontSize = 12.sp) }
-                TextButton({ openLink(context, "https://exam1.r-e-f.org/") }, contentPadding = PaddingValues(0.dp)) { Text("Questions communautaires Exam1 · REF", fontSize = 12.sp) }
-                TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") }, contentPadding = PaddingValues(0.dp)) { Text("Certificat · informations ANFR", fontSize = 12.sp) }
+                Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp)) {
+                    TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
+                    TextButton({ openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
+                    TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
+                }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
         }
