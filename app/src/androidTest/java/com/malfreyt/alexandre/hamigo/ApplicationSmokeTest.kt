@@ -1,6 +1,7 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.ui.test.*
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.lifecycle.ViewModelProvider
@@ -31,8 +32,8 @@ class ApplicationSmokeTest {
     @Test
     fun memoFlashcardCanBeFlippedRatedAndLeftForTheProfile() {
         ui.onNodeWithText("Mémo").performClick()
-        awaitText("Les petits mémos")
-        ui.onNodeWithText("Alphabet international").performScrollTo().performClick()
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+        ui.onNodeWithTag("memo-row-nato").performScrollTo().performClick()
         ui.onNodeWithText("Réviser avec les flashcards").performScrollTo().performClick()
 
         awaitText("Retourner la carte")
@@ -44,10 +45,12 @@ class ApplicationSmokeTest {
         awaitText("Retourner la carte")
 
         quitQuiz()
-        awaitText("Les petits mémos")
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
         ui.onNodeWithText("Moi").performClick()
-        ui.onNodeWithText("Cette semaine").performScrollTo().assertIsDisplayed()
         ui.onNodeWithContentDescription("Réglages").assertExists()
+        ui.onNode(hasScrollAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange))
+            .performScrollToNode(hasText("Cette semaine"))
+        ui.onNodeWithText("Cette semaine").assertIsDisplayed()
     }
 
     @Test

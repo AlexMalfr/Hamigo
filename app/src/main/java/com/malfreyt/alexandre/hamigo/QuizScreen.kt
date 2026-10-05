@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -32,6 +33,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalView
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -55,6 +58,7 @@ import kotlin.random.Random
     var matches by remember(key){mutableStateOf(emptyMap<Int,Int>())}
     var left by remember(key){mutableStateOf<Int?>(null)}
     var flipped by rememberSaveable(key){mutableStateOf(false)}
+    var revealed by rememberSaveable(key){mutableStateOf(false)}
     var frequency by rememberSaveable(key){mutableFloatStateOf(144f)}
     var selectedMany by remember(key){mutableStateOf(emptySet<Int>())}
     var morse by rememberSaveable(key){mutableStateOf("")}
@@ -65,6 +69,8 @@ import kotlin.random.Random
     var quit by remember{mutableStateOf(false)}
     var enlarged by remember{mutableStateOf(false)}
     var calculatorOpen by rememberSaveable {mutableStateOf(false)}
+    var calculatorAnchor by remember {mutableStateOf<Rect?>(null)}
+    val view=LocalView.current
     val feedback=s.feedback
     LaunchedEffect(key){scroll.scrollTo(0);focus.clearFocus()}
     LaunchedEffect(key,feedback) {
@@ -123,20 +129,12 @@ import kotlin.random.Random
                 when{feedback==true->MascotMood.CELEBRATE;feedback==false->MascotMood.THINKING;s.index%5==3->MascotMood.GOOFY;q.kind in listOf("morseListen","binary","number")->MascotMood.DETERMINED;else->MascotMood.HAPPY},
                 when{feedback==true->MascotPose.JUMP;feedback==false->MascotPose.HUG;s.index%5==3->MascotPose.DANCE;else->MascotPose.POINT},
                 when{feedback==true->listOf("Ton signal passe cinq sur cinq !","Pico sort sa danse de victoire.","Bien joué, on garde le rythme !")[s.index%3];feedback==false->"On prend le temps de comprendre, puis on réessaie.";else->listOf("Pico est avec toi. À toi de jouer !","Un défi à la fois, on capte les bons réflexes.","Branche tes neurones, la radio attend !")[s.index%3]})
-            if(q.image==null && q.kind!="cloze")MorseAwareText(if(q.kind=="flash" && q.topic=="morse")MorseReference.characterName(q.prompt) else q.prompt,fontSize=21.sp,lineHeight=28.sp,fontWeight=FontWeight.ExtraBold)
+            if(q.image==null && q.kind!in listOf("cloze","flash"))MorseAwareText(q.prompt,fontSize=21.sp,lineHeight=28.sp,fontWeight=FontWeight.ExtraBold)
             if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
             if(q.kind=="resistor") Resistor(q.bands)
             when(q.kind) {
                 "flash" -> {
-                    Surface(onClick={flipped=true},color=if(flipped)Mist else Color.White,shape=RoundedCornerShape(24.dp),modifier=Modifier.fillMaxWidth().heightIn(min=200.dp)) {
-                        Box(Modifier.padding(18.dp),contentAlignment=Alignment.Center) {
-                            Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(12.dp)) {
-                                Icon(if(flipped)Icons.Rounded.CheckCircle else Icons.Rounded.TouchApp,null,tint=Teal,modifier=Modifier.size(32.dp))
-                                MorseAwareText(if(flipped)q.choices.firstOrNull().orEmpty() else "Retrouve la réponse dans ta tête, puis retourne la carte.",fontSize=20.sp,lineHeight=28.sp,fontWeight=FontWeight.Bold)
-                                if(flipped && q.explanation.isNotBlank())MorseAwareText(q.explanation,fontSize=13.sp,color=Muted)
-                            }
-                        }
-                    }
+                    FlippingFlashcard(q,flipped){flipped=!flipped;revealed=true}
                 }
                 "number" -> {
                     OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth(),enabled=feedback==null)
@@ -228,12 +226,13 @@ import kotlin.random.Random
         Surface(modifier=Modifier.onSizeChanged {footerHeight=it.height},color=Cream,shadowElevation=5.dp) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
                 if(q.kind=="flash") {
-                    if(!flipped)Action("Retourner la carte"){flipped=true}
+                    if(!revealed)Action("Retourner la carte"){flipped=true;revealed=true}
                     else {
                         Text("Comment était le rappel ?",fontWeight=FontWeight.Bold,fontSize=13.sp)
                         Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                             listOf(2 to "À revoir",3 to "Difficile",4 to "Bien",5 to "Facile").forEach{(quality,label)->
-                                OutlinedButton({model.answer(quality>=3,quality);model.next()},modifier=Modifier.weight(1f),contentPadding=PaddingValues(horizontal=4.dp,vertical=12.dp)){Text(label,fontSize=11.sp)}
+                                val colors=listOf(Color(0xFFFADEDE),Color(0xFFFFE8C6),Color(0xFFDDEEDD),Color(0xFFDDEAFB))
+                                Button({model.answer(quality>=3,quality);model.next()},modifier=Modifier.weight(1f).heightIn(min=56.dp),colors=ButtonDefaults.buttonColors(containerColor=colors[quality-2],contentColor=Ink),shape=RoundedCornerShape(12.dp),contentPadding=PaddingValues(horizontal=4.dp,vertical=16.dp)){Text(label,fontSize=11.sp,fontWeight=FontWeight.Bold)}
                             }
                         }
                     }
@@ -250,11 +249,11 @@ import kotlin.random.Random
             }
         }
     }
-    if(q.kind!="flash" && feedback==null)FloatingActionButton({focus.clearFocus();calculatorOpen=true},modifier=Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp),containerColor=Teal,contentColor=Color.White) {
+    if(q.kind!="flash" && feedback==null)FloatingActionButton({focus.clearFocus();calculatorOpen=true},modifier=Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp).onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
         Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",modifier=Modifier.size(28.dp))
     }
     }
-    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null)
+    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor)
     if(quit)AlertDialog(onDismissRequest={quit=false},title={Text("Faire une pause ?")},text={Text(if(s.exam)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},confirmButton={TextButton({model.leaveSession();quit=false}){Text("Quitter")}},dismissButton={TextButton({quit=false}){Text("Revenir au défi")}})
     if(enlarged && artwork!=null)FullscreenExamIllustration(artwork.original){enlarged=false}
 }

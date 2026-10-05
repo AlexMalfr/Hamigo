@@ -306,9 +306,9 @@ class PredictiveBackInstrumentedTest {
         ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
         ui.onNodeWithTag("memo-row-nato").assertIsDisplayed()
 
-        val profileTarget = navigationIconBounds("profile")
         ui.runOnIdle { model.route = "settings" }
         startAndProgress(.45f, BackEventCompat.EDGE_RIGHT)
+        val profileTarget = ui.onNodeWithContentDescription("Réglages").fetchSemanticsNode().boundsInRoot
         completeAndInspectAnimation(
             "settings-commit", profileTarget,
             assertPending = { assertEquals("settings", model.route) },
@@ -384,8 +384,12 @@ class PredictiveBackInstrumentedTest {
         ui.onNodeWithText("Choix B").performScrollTo().performClick()
         ui.onNodeWithText("Enregistrer et continuer").assertIsEnabled()
         val original = model.session!!
+        val fixedPage = foregroundBounds()
 
         startAndProgress(.5f)
+        ui.onNodeWithTag("back-destination-resources").assertDoesNotExist()
+        assertEquals("A session needing confirmation must not move with predictive Back.",fixedPage,foregroundBounds())
+        ui.onNodeWithTag("back-foreground",useUnmergedTree=true).assertIsDisplayed()
         ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
         ui.waitForIdle()
         ui.runOnIdle {
@@ -409,6 +413,37 @@ class PredictiveBackInstrumentedTest {
             assertEquals("Choix A", original.responses.getValue(0).display)
             assertTrue(original.finalizedExamParts.isEmpty())
         }
+    }
+
+    @Test fun flashcardsFlipBothWaysAndKeepRatingButtonsUntilOneRatingAdvances() {
+        val cards=listOf(
+            Question("flip-one","Question recto",listOf("Réponse verso"),0,"Explication verso",kind="flash"),
+            Question("flip-two","Deuxième recto",listOf("Deuxième verso"),0,"",kind="flash"),
+        )
+        ui.runOnIdle { model.startQuestions("Cartes",cards) }
+        ui.onNodeWithText("Question recto").assertIsDisplayed()
+        ui.onNodeWithText("Réponse verso").assertDoesNotExist()
+        ui.onNodeWithText("À revoir").assertDoesNotExist()
+        ui.onNodeWithText("Retourner la carte").performClick()
+        ui.onNodeWithText("Réponse verso").assertIsDisplayed()
+        ui.onNodeWithText("Question recto").assertDoesNotExist()
+        capture("flashcard-answer")
+        ui.mainClock.autoAdvance=false
+        try {
+            ui.onNodeWithTag("flashcard").performClick()
+            ui.mainClock.advanceTimeBy(96)
+            capture("flashcard-flip-middle")
+            ui.mainClock.advanceTimeBy(320)
+        } finally { ui.mainClock.autoAdvance=true }
+        ui.onNodeWithText("Question recto").assertIsDisplayed()
+        ui.onNodeWithText("Réponse verso").assertDoesNotExist()
+        listOf("À revoir","Difficile","Bien","Facile").forEach { ui.onNodeWithText(it).assertIsDisplayed() }
+        ui.runOnIdle { assertEquals(0,model.session!!.index);assertTrue(model.session!!.responses.isEmpty()) }
+        capture("flashcard-question-after-reveal")
+        ui.onNodeWithText("Bien").performClick()
+        ui.runOnIdle { assertEquals(1,model.session!!.index);assertEquals(1,model.session!!.responses.size) }
+        ui.onNodeWithText("Deuxième recto").assertIsDisplayed()
+        ui.onNodeWithText("À revoir").assertDoesNotExist()
     }
 
     private fun startAndProgress(progress: Float, edge: Int = BackEventCompat.EDGE_LEFT) {

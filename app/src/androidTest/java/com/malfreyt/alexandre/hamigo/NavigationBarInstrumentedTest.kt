@@ -164,6 +164,17 @@ class NavigationBarInstrumentedTest {
         assertCutoutShowsBackdrop(circle.center.x, circle.center.y+ringOffset)
         val shadowPixel = pixels[(circle.center.x+ringOffset-rootBounds.left).toInt(), (circle.center.y-rootBounds.top).toInt()]
         assertTrue("The concave edge must cast a soft visible shadow inside the hole.", shadowPixel.blue < backdrop.blue-.01f)
+        val circleHalo=pixels[(circle.center.x-rootBounds.left).toInt(),
+            (circle.top-with(ui.density){3.dp.toPx()}-rootBounds.top).toInt()]
+        assertTrue("The raised circle needs its own visible halo above the navigation body.",circleHalo.blue<backdrop.blue-.08f)
+        // An extra radial shadow used to be cut at bodyTop, leaving two grey rectangular lips.
+        val lipProbe=with(ui.density) {34.dp.toPx()}
+        listOf(circle.center.x-lipProbe,circle.center.x+lipProbe).forEach {x ->
+            val above=pixels[(x-rootBounds.left).toInt(),(bodyTop-rootBounds.top).toInt()-1]
+            val below=pixels[(x-rootBounds.left).toInt(),(bodyTop-rootBounds.top).toInt()+1]
+            assertTrue("The notch shadow must remain continuous across the bar's top, without a rectangular cut.",
+                kotlin.math.abs(above.blue-below.blue)<.04f)
+        }
         capture(root, "navbar-real-cutout")
         val topOfCircle = circle.top + with(ui.density) { 6.dp.toPx() }
         assertTrue("The regression click must hit the protruding part of the circle.", topOfCircle < bodyTop)

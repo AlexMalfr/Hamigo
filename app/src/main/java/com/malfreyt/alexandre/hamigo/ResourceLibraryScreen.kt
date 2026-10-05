@@ -71,14 +71,16 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
 
 @Composable private fun MemoCalculatorLayout(content: @Composable () -> Unit) {
     var calculator by remember { mutableStateOf(false) }
+    var anchor by remember { mutableStateOf<Rect?>(null) }
+    val view = androidx.compose.ui.platform.LocalView.current
     val overlap = LocalNavigationContentOverlap.current
     Box(Modifier.fillMaxSize().imePadding()) {
         content()
-        FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap), containerColor = Teal, contentColor = Color.White) {
+        FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap).onGloballyPositioned { anchor = it.screenBounds(view) }, containerColor = Teal, contentColor = Color.White) {
             Icon(Icons.Rounded.Calculate, "Ouvrir la calculatrice", Modifier.size(28.dp))
         }
     }
-    FloatingCalculator(calculator, { calculator = false })
+    FloatingCalculator(calculator, { calculator = false }, anchorBounds = anchor)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -141,7 +143,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     MemoCalculatorLayout {
         LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + overlap), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
-                Column(Modifier.fillMaxWidth().background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
+                Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("Mémo", Modifier.weight(1f).testTag("memo-library-title"), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                         IconButton({ state.searching = !state.searching; if (!state.searching) state.search = "" }) {
@@ -160,21 +162,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                             returnTarget.fullRowHeight = it.size.height
                         }
                     }, color = Color.White, shape = RoundedCornerShape(18.dp)) {
-                        Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                            val icon = when (category.id) {
-                                "morse", "morse-rhythm" -> Icons.Rounded.GraphicEq
-                                "resistors", "formulas", "decibels", "units" -> Icons.Rounded.Science
-                                "bands", "propagation", "antennas" -> Icons.Rounded.SettingsInputAntenna
-                                "itu-regions", "callsigns" -> Icons.Rounded.Public
-                                else -> Icons.Rounded.Style
-                            }
-                            Box(Modifier.size(40.dp).background(Mist, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = Teal) }
-                            Column(Modifier.weight(1f).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                Text(category.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                                Text("${category.rows.count { it.kind != "flashcard-only" }} repères" + (if (category.flashcards) " · flashcards" else "") + (if (hasReferenceTools(category.id)) " · outils" else ""), fontSize = 11.sp, color = Muted)
-                            }
-                            Icon(Icons.Rounded.ChevronRight, null, tint = Muted, modifier = Modifier.size(20.dp))
-                        }
+                        MemoMorphRow(category)
                     }
                 }
             }
@@ -186,6 +174,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable fun ReferenceDetailScreen(model: AppModel, cat: RefCategory) {
+    val listState=remember(cat.id) { LazyListState() }
     var search by remember(cat.id) { mutableStateOf("") }
     var searching by remember(cat.id) { mutableStateOf(false) }
     var region by remember(cat.id) { mutableStateOf("1") }
@@ -196,11 +185,11 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }.groupBy { it.group }
     }
     MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.fillMaxSize(), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
-                Column(Modifier.fillMaxWidth().background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton({ model.resource = null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, "Retour aux mémos") }
+                        IconButton({ model.resource=null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, "Retour aux mémos") }
                         Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                             Text(cat.title, fontSize = 21.sp, lineHeight = 25.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                             if (cat.subtitle.isNotBlank()) Text(cat.subtitle, fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
@@ -318,5 +307,24 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         if (source.isNotBlank() && source != courseUrl) TextButton({ openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
         TextButton({ openLink(context, courseUrl) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Consulter le cours complet F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
+    }
+}
+
+
+@Composable internal fun MemoMorphRow(category: RefCategory, modifier: Modifier = Modifier, titleSize: androidx.compose.ui.unit.TextUnit = 16.sp) {
+    Row(modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        val icon = when (category.id) {
+            "morse", "morse-rhythm" -> Icons.Rounded.GraphicEq
+            "resistors", "formulas", "decibels", "units" -> Icons.Rounded.Science
+            "bands", "propagation", "antennas" -> Icons.Rounded.SettingsInputAntenna
+            "itu-regions", "callsigns" -> Icons.Rounded.Public
+            else -> Icons.Rounded.Style
+        }
+        Box(Modifier.size(40.dp).background(Mist, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) { Icon(icon, null, tint = Teal) }
+        Column(Modifier.weight(1f).padding(horizontal = 12.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(category.title, fontSize = titleSize, fontWeight = FontWeight.Bold)
+            Text("${category.rows.count { it.kind != "flashcard-only" }} repères" + (if (category.flashcards) " · flashcards" else "") + (if (hasReferenceTools(category.id)) " · outils" else ""), fontSize = 11.sp, color = Muted)
+        }
+        Icon(Icons.Rounded.ChevronRight, null, tint = Muted, modifier = Modifier.size(20.dp))
     }
 }

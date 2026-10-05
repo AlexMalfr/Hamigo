@@ -69,3 +69,16 @@ Moi ajoute un calendrier mensuel au-dessus du graphique, avec navigation dans to
 Le graphique hebdomadaire montre l'objectif journalier par une ligne orange pointillée. Le Bilan d'apprentissage présente les statistiques dans quatre tuiles et Mieux retenir adopte l'ampoule et le fond jaune des astuces Mémo. Partager mon bilan rejoint la carte niveau/XP, et tous les boutons de partage d'image portent une icône de partage.
 
 L'en-tête de Parcours reste fixe au scroll ; son bloc série/XP mène à Moi avec une petite flèche. Dans Équipe et les réglages, la dernière synchronisation est le sous-titre de Synchronisation automatique, et le bouton des données/fréquence est resserré.
+
+## Animations de retour et flashcards — 5 octobre 2026, 0.21
+
+- Le retour prédictif d’une fiche Mémo anime les dimensions réelles de son cadre, ses arrondis et le passage du contenu détaillé à la ligne exacte de la bibliothèque. Les glyphes ne sont plus écrasés verticalement ; le titre rejoint sa taille dans la liste. La recherche et le scroll sont conservés lors d’une annulation ; un retour validé retrouve sa ligne même hors écran.
+- Les paramètres se rangent vers le bouton Réglages en haut à droite de Moi, aussi via leur flèche de retour. Les séances nécessitant une confirmation utilisent un retour classique sans déplacer la page pendant le geste.
+- La calculatrice se réduit vers les coordonnées réelles de son bouton sur Mémo et dans les questions. Fond, taille et position évoluent ensemble ; le calcul et le mode DEG/RAD restent disponibles après réouverture. Le clavier et les barres système restent pris en compte.
+- Les flashcards montrent la question au recto et la réponse avec son explication au verso, avec ombre et rotation horizontale en perspective. Les deux faces restent consultables librement. Après la première révélation, les boutons À revoir, Difficile, Bien et Facile restent disponibles côté question aussi, avec une hauteur accrue et des fonds rouge, orange, vert et bleu.
+
+- Le raccord d’ombre de la navbar suit désormais exclusivement son contour arrondi. La seconde ombre radiale découpée au bord supérieur créait deux coupures rectangulaires autour de Parcours ; elle est supprimée, avec contrôle de continuité par pixels.
+
+- La carte de compte GitHub sur Équipe utilise 8 dp de marge verticale au lieu de 16, 4 dp entre ses rangées au lieu de 12 et un avatar de 36 dp. Ses contrôles dépliés n’ajoutent plus une seconde carte avec un second jeu de marges. Les contrôles communs dans les paramètres sont également resserrés.
+- Une ombre apparaît progressivement sous les en-têtes fixes de Parcours, de la bibliothèque Mémo et des fiches une fois leur marge supérieure dépassée ; elle disparaît au retour en haut. L’ombre n’affecte ni les dimensions ni la position du contenu.
+- Les en-têtes et leur ombre couvrent toute la largeur du viewport, marges latérales comprises. La portée de 10 dp et la densité utilisent les mêmes paramètres que le contour de la navbar. Le cercle Parcours a son propre halo visible sur toute sa circonférence, dessiné avant son découpage circulaire.

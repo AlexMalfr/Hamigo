@@ -200,9 +200,14 @@ class VisualAuditTest {
         navigate("friends")
         scrollTo("Connecté · AlexMalfr")
         ui.onNodeWithContentDescription("Afficher les réglages de synchronisation").performClick()
+        capture("16-synchronisation-compacte")
         scrollTo("Données sauvegardées et fréquence")
         ui.onNodeWithText("Données sauvegardées et fréquence").performClick()
         capture("16-synchronisation-details")
+
+        navigate("settings")
+        scrollTo("Connecté · AlexMalfr")
+        capture("16-parametres-synchronisation")
 
         navigate("profile")
         scrollTo("Cette semaine")

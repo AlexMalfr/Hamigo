@@ -13,6 +13,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -42,6 +44,7 @@ private val French = Locale.FRENCH
 fun ProfileScreen(model: AppModel, content: Content) {
     val p = model.displayedProgress ?: model.progress
     val context = LocalContext.current
+    val backAnchors = LocalBackMotionAnchors.current
     val today = LocalDate.now()
     val earliest = p.activeDays.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }
         .filter { !it.isAfter(today) }.minOrNull() ?: today
@@ -56,7 +59,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.size(56.dp))
                 Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
-                IconButton({ model.route = "settings" }) { Icon(Icons.Rounded.Settings, "Réglages") }
+                IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
             }
         }
         item(key = "profile-level") {

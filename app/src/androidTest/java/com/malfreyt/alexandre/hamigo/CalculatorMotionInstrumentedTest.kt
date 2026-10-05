@@ -9,12 +9,22 @@ import android.view.WindowInsets
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
@@ -43,12 +53,14 @@ class CalculatorMotionInstrumentedTest {
         val harness = Harness(initialOpen)
         ui.setContent {
             HamigoTheme {
+                var anchor by remember { mutableStateOf<Rect?>(null) }
+                val view=LocalView.current
                 Box(Modifier.fillMaxSize()) {
-                    Button({ harness.open = true }) { Text("Ouvrir") }
+                    Button({ harness.open = true },Modifier.align(Alignment.BottomEnd).padding(24.dp).size(56.dp).testTag("calculator-origin").onGloballyPositioned { anchor=it.screenBounds(view) }) { Text("Ouvrir") }
                     FloatingCalculator(harness.open, onDismiss = {
                         harness.dismissCount++
                         harness.open = false
-                    }, onInsertResult = { harness.inserted += it })
+                    }, onInsertResult = { harness.inserted += it }, anchorBounds=anchor)
                 }
             }
         }
@@ -88,6 +100,9 @@ class CalculatorMotionInstrumentedTest {
             ui.onNodeWithTag("calculator-result").assertTextEquals("20")
             val closingMiddle = surface().fetchSemanticsNode().boundsInRoot
             assertTrue("The content must shrink visibly during its exit.", closingMiddle.width < opened.width)
+            val origin=ui.onNodeWithTag("calculator-origin",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+            assertTrue("Closing should travel towards the actual opening button.",
+                (closingMiddle.center-origin.center).getDistance() < (opened.center-origin.center).getDistance()*.8f)
             capture("calculator-closing-middle")
             ui.mainClock.advanceTimeBy(160)
             surface().assertDoesNotExist()

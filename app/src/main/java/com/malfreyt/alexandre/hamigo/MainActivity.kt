@@ -63,6 +63,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import org.json.JSONObject
 import kotlin.math.min
 
@@ -198,6 +201,7 @@ private data class BackScreenSnapshot(
     var windowBounds by remember {mutableStateOf(Rect.Zero)}
     var contentBounds by remember {mutableStateOf(Rect.Zero)}
     val navigationBounds=remember {mutableMapOf<String,Rect>()}
+    val backAnchors=remember {BackMotionAnchors()}
     val backAnimationScope=rememberCoroutineScope()
     val density=LocalDensity.current
     val layoutDirection=LocalLayoutDirection.current
@@ -247,7 +251,8 @@ private data class BackScreenSnapshot(
     LaunchedEffect(model.route,model.session,model.lesson,model.resource) {
         if(backSource?.isCurrent(model)==false) resetBackMotion()
     }
-    PredictiveBackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path") {events ->
+    BackHandler(enabled=model.session!=null) { quit=true }
+    PredictiveBackHandler(enabled=model.session==null && (model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
         resetBackMotion()
         val generation=backGeneration
         val source=BackScreenSnapshot(model.route,model.session,model.lesson,model.resource)
@@ -269,53 +274,43 @@ private data class BackScreenSnapshot(
             }
             if(generation==backGeneration && source.isCurrent(model)) {
                 backSettling=true
-                if(source.session!=null) {
-                    // A confirmation keeps the session on screen instead of pretending it was left.
-                    val releasedProgress=backProgress
-                    backMotion=backAnimationScope.launch {
-                        animate(releasedProgress,0f,animationSpec=tween(150,easing=FastOutSlowInEasing)) {value,_ ->
-                            if(generation==backGeneration) backProgress=value
-                        }
-                        if(generation==backGeneration) {
-                            val stillCurrent=source.isCurrent(model)
-                            resetBackMotion()
-                            if(stillCurrent) quit=true
-                        }
+                backMotion=backAnimationScope.launch {
+                    // Reveal and measure this exact fiche in an independent library preview.
+                    // The foreground remains at its released size and position while it lays out.
+                    val measuredTarget=when {
+                        memoTarget!=null -> memoTarget.reveal()
+                        source.route=="settings" -> withTimeoutOrNull(400) { snapshotFlow {backAnchors.settings}.filterNotNull().first() }
+                            ?: Rect(contentBounds.right-with(density){64.dp.toPx()},contentBounds.top+with(density){16.dp.toPx()},contentBounds.right-with(density){16.dp.toPx()},contentBounds.top+with(density){64.dp.toPx()})
+                        else -> dockBounds(source.dockRoute)
                     }
-                } else {
-                    backMotion=backAnimationScope.launch {
-                        // Reveal and measure this exact fiche in an independent library preview.
-                        // The foreground remains at its released size and position while it lays out.
-                        val measuredTarget=if(memoTarget!=null)memoTarget.reveal() else dockBounds(source.dockRoute)
-                        if(generation!=backGeneration) return@launch
-                        if(!source.isCurrent(model)) {resetBackMotion();return@launch}
-                        // A delayed layout may omit the visual docking, but must never prevent Back.
-                        // Fade in place rather than inventing a different row or changing saved scroll.
-                        val target=measuredTarget ?: Rect(
-                            contentBounds.center.x-backWidth*.45f,contentBounds.center.y-backHeight*.45f,
-                            contentBounds.center.x+backWidth*.45f,contentBounds.center.y+backHeight*.45f,
-                        )
-                        backDockCenter=target.center-contentBounds.topLeft
-                        if(memoTarget!=null) {
-                            backDockScaleX=(target.width/backWidth.coerceAtLeast(1f)).coerceIn(.01f,1f)
-                            backDockScaleY=(target.height/backHeight.coerceAtLeast(1f)).coerceIn(.01f,1f)
-                        } else {
-                            val scale=(min(target.width/backWidth.coerceAtLeast(1f),target.height/backHeight.coerceAtLeast(1f))*.8f).coerceIn(.01f,.2f)
-                            backDockScaleX=scale
-                            backDockScaleY=scale
+                    if(generation!=backGeneration) return@launch
+                    if(!source.isCurrent(model)) {resetBackMotion();return@launch}
+                    // A delayed layout may omit the visual docking, but must never prevent Back.
+                    // Fade in place rather than inventing a different row or changing saved scroll.
+                    val target=measuredTarget ?: Rect(
+                        contentBounds.center.x-backWidth*.45f,contentBounds.center.y-backHeight*.45f,
+                        contentBounds.center.x+backWidth*.45f,contentBounds.center.y+backHeight*.45f,
+                    )
+                    backDockCenter=target.center-contentBounds.topLeft
+                    if(memoTarget!=null) {
+                        backDockScaleX=(target.width/backWidth.coerceAtLeast(1f)).coerceIn(.01f,1f)
+                        backDockScaleY=(target.height/backHeight.coerceAtLeast(1f)).coerceIn(.01f,1f)
+                    } else {
+                        val scale=(min(target.width/backWidth.coerceAtLeast(1f),target.height/backHeight.coerceAtLeast(1f))*.8f).coerceIn(.01f,.2f)
+                        backDockScaleX=scale
+                        backDockScaleY=scale
+                    }
+                    backDockProgress=0f
+                    backDocking=true
+                    animate(0f,1f,animationSpec=tween(220,easing=FastOutSlowInEasing)) {value,_ ->
+                        if(generation==backGeneration) backDockProgress=value
+                    }
+                    if(generation==backGeneration) {
+                        if(source.isCurrent(model)) {
+                            if(measuredTarget!=null) memoTarget?.commitPosition()
+                            source.navigate(model)
                         }
-                        backDockProgress=0f
-                        backDocking=true
-                        animate(0f,1f,animationSpec=tween(220,easing=FastOutSlowInEasing)) {value,_ ->
-                            if(generation==backGeneration) backDockProgress=value
-                        }
-                        if(generation==backGeneration) {
-                            if(source.isCurrent(model)) {
-                                if(measuredTarget!=null) memoTarget?.commitPosition()
-                                source.navigate(model)
-                            }
-                            resetBackMotion()
-                        }
+                        resetBackMotion()
                     }
                 }
             } else if(generation==backGeneration) {
@@ -345,7 +340,8 @@ private data class BackScreenSnapshot(
         }
     }) { padding ->
         val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
-        CompositionLocalProvider(LocalNavigationContentOverlap provides if(raisedBarVisible)HamigoNavigationContentOverlap else 0.dp) {
+        CompositionLocalProvider(LocalNavigationContentOverlap provides if(raisedBarVisible)HamigoNavigationContentOverlap else 0.dp, LocalBackMotionAnchors provides backAnchors,
+            LocalAnimatedBack provides { (context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed() }) {
         Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)
             .onGloballyPositioned {contentBounds=it.boundsInWindow()}
             .pointerInput(backSettling) {
@@ -372,7 +368,21 @@ private data class BackScreenSnapshot(
                     }
                 }
             }
-            Box(Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat();backHeight=it.height.toFloat()}.graphicsLayer {
+            val memoMorph=backDocking && backMemoTarget!=null && backSource?.resource!=null
+            val movement=backProgress*(2f-backProgress)
+            val followX=backWidth*.34f*movement*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
+            val followY=backDragY.coerceIn(-with(density){24.dp.toPx()},with(density){24.dp.toPx()})*movement
+            val followScale=1f-.07f*movement
+            val dock=if(backDocking)backDockProgress else 0f
+            val morphWidth=backWidth*(followScale+(backDockScaleX-followScale)*dock)
+            val morphHeight=backHeight*(followScale+(backDockScaleY-followScale)*dock)
+            val morphCenter=Offset(backWidth/2f+followX+(backDockCenter.x-backWidth/2f-followX)*dock,
+                backHeight/2f+followY+(backDockCenter.y-backHeight/2f-followY)*dock)
+            // Remeasure the frame into the row instead of stretching every glyph in the page.
+            val frameModifier=if(memoMorph)Modifier.offset { androidx.compose.ui.unit.IntOffset((morphCenter.x-morphWidth/2).toInt(),(morphCenter.y-morphHeight/2).toInt()) }
+                .size(with(density){morphWidth.toDp()},with(density){morphHeight.toDp()})
+                .graphicsLayer { shape=RoundedCornerShape((28f+(18f-28f)*dock).dp);clip=true;shadowElevation=12.dp.toPx()*(1f-dock) }
+            else Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat();backHeight=it.height.toFloat()}.graphicsLayer {
                 val movement=backProgress*(2f-backProgress)
                 val followX=backWidth*.34f*movement*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
                 val followY=backDragY.coerceIn(-24.dp.toPx(),24.dp.toPx())*movement
@@ -385,7 +395,10 @@ private data class BackScreenSnapshot(
                 alpha=1f-((dock-.72f)/.28f).coerceIn(0f,1f)
                 shape=RoundedCornerShape((28*movement).dp);clip=backGestureActive
                 shadowElevation=16.dp.toPx()*movement
-            }.background(Cream).testTag("back-foreground")) {
+            }
+            Box(frameModifier.background(if(memoMorph)Color.White else Cream).testTag("back-foreground")) {
+            Box(if(memoMorph)Modifier.wrapContentSize(Alignment.TopStart,unbounded=true)
+                .requiredSize(with(density){backWidth.toDp()},with(density){backHeight.toDp()}).graphicsLayer {alpha=(1f-dock/.65f).coerceIn(0f,1f)} else Modifier.fillMaxSize()) {
             when {
                 model.session!=null -> QuizScreen(model)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)
@@ -393,6 +406,8 @@ private data class BackScreenSnapshot(
                 model.route=="settings" -> SettingsScreen(model)
                 else -> MainDestination(model,content)
             }
+            }
+            if(memoMorph)MemoMorphRow(backSource!!.resource!!,Modifier.fillMaxWidth().graphicsLayer { alpha=((dock-.18f)/.5f).coerceIn(0f,1f) },titleSize=(21f-5f*dock).sp)
             }
         }
         }
@@ -458,9 +473,10 @@ private data class BackScreenSnapshot(
     var expanded by remember {mutableStateOf(content.chapters.indexOfFirst { c->c.lessons.any {it.id !in completed} }.coerceAtLeast(0))}
     val next=content.nextLesson(completed)
     val due=p.due(content)
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    val listState=androidx.compose.foundation.lazy.rememberLazyListState()
+    LazyColumn(Modifier.fillMaxSize(),state=listState,contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {
-            Row(Modifier.fillMaxWidth().background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().stickyHeaderShadow(listState).background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}
                 Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Mist.copy(alpha=.6f))
                     .clickable(role=Role.Button) {model.route="profile"}

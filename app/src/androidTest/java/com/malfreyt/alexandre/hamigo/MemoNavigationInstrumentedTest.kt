@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
+import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -65,6 +67,27 @@ class MemoNavigationInstrumentedTest {
         ui.onNodeWithText(model.content!!.references.first {it.id=="resistors"}.title).assertIsDisplayed()
         ui.onNodeWithText("Réviser avec les flashcards").assertIsDisplayed()
         ui.onNodeWithText("Ordre aléatoire").assertIsDisplayed()
+    }
+
+    @Test fun stickyHeaderOnlyCastsItsShadowAfterDetachingFromTheTop() {
+        fun belowHeaderReds(): List<Float> {
+            val header=ui.onNodeWithTag("memo-library-header",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+            val root=ui.onRoot().fetchSemanticsNode().boundsInRoot
+            val pixels=ui.onRoot().captureToImage().toPixelMap()
+            val y=(header.bottom-root.top).toInt()+1
+            return listOf(1,(header.left-root.left+with(ui.density){4.dp.toPx()}).toInt(),pixels.width-2)
+                .map { pixels[it,y].red }
+        }
+        val initial=belowHeaderReds()
+        initial.forEach { assertEquals(Cream.red,it,.02f) }
+        ui.onNodeWithTag("memo-library-list").performScrollToNode(hasTestTag("memo-row-radio-regulations"))
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+        val pinned=belowHeaderReds()
+        pinned.forEach { assertTrue("The pinned header needs a visible shadow right through both side gutters.",it<Cream.red-.10f) }
+        assertEquals("The shadow must have the same density at the left edge.",pinned[1],pinned[0],.02f)
+        assertEquals("The shadow must have the same density at the right edge.",pinned[1],pinned[2],.02f)
+        ui.onNodeWithTag("memo-library-list").performScrollToIndex(0)
+        belowHeaderReds().forEachIndexed { i,red -> assertEquals("Returning to the top should remove the header shadow.",initial[i],red,.02f) }
     }
 
     @Test fun morseInputUsesOnlySignalButtonsAndClearRemovesItsTranslation() {

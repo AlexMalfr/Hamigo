@@ -48,6 +48,13 @@ private fun syncDate(value: String?): String = value?.let {
 } ?: "pas encore effectuée"
 
 /** The same account controls are available from the team and preferences. */
+@Composable private fun SyncPanel(modifier: Modifier = Modifier, controlsOnly: Boolean = false, content: @Composable ColumnScope.() -> Unit) {
+    if(controlsOnly)Column(modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(2.dp),content=content)
+    else Surface(modifier.fillMaxWidth(),shape=RoundedCornerShape(20.dp),color=Mist) {
+        Column(Modifier.padding(horizontal=12.dp,vertical=8.dp),verticalArrangement=Arrangement.spacedBy(4.dp),content=content)
+    }
+}
+
 @Composable
 fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnly: Boolean = false) {
     val connected = remember(model.revision) { runCatching { model.sync.tokens.get() != null }.getOrDefault(false) }
@@ -57,9 +64,9 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
     val lastError = remember(model.revision) { model.sync.lastSyncError }
     val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
     var details by remember { mutableStateOf(false) }
-    Panel(modifier, color = Mist) {
+    SyncPanel(modifier, controlsOnly) {
         if (!controlsOnly || !connected) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            if(connected) GitHubAvatar(identity,login ?: model.progress.name,Modifier.size(44.dp))
+            if(connected) GitHubAvatar(identity,login ?: model.progress.name,Modifier.size(36.dp))
             else Icon(Icons.Rounded.CloudSync, null, tint = Teal, modifier = Modifier.size(32.dp))
             Column(Modifier.weight(1f)) {
                 Eyebrow("SYNCHRONISATION GITHUB")
@@ -79,7 +86,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
                     Text("Synchronisation automatique", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
                 }
-                Switch(automatic, { model.setAutoSync(it) }, enabled = !model.busy)
+                Switch(automatic, { model.setAutoSync(it) }, modifier=Modifier.height(40.dp), enabled = !model.busy)
             }
             if (!controlsOnly) Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
                 model.refreshSocial(manual = true)
@@ -102,7 +109,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
             Text("Le compte GitHub est facultatif. Ton apprentissage reste enregistré sur ce téléphone.",
                 color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
         }
-        TextButton({ details = !details }, modifier = Modifier.height(36.dp), contentPadding = PaddingValues(0.dp)) {
+        TextButton({ details = !details }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(0.dp)) {
             Icon(if (details) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null)
             Spacer(Modifier.width(6.dp))
             Text("Données sauvegardées et fréquence", fontSize = 12.sp)
@@ -139,13 +146,13 @@ fun FriendsScreen(model: AppModel) {
         item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
         item {
             if (!connected) GitHubConnection(model)
-            else Panel(color = Mist) {
+            else SyncPanel {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    GitHubAvatar(model.sync.accountIdentity, accountLogin ?: own.name, Modifier.size(44.dp))
+                    GitHubAvatar(model.sync.accountIdentity, accountLogin ?: own.name, Modifier.size(36.dp))
                     Column(Modifier.weight(1f)) {
                         Text("Connecté · ${accountLogin ?: "GitHub"}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
-                    IconButton({ syncExpanded = !syncExpanded }) {
+                    IconButton({ syncExpanded = !syncExpanded },Modifier.size(36.dp)) {
                         Icon(if (syncExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
                             if (syncExpanded) "Masquer les réglages de synchronisation" else "Afficher les réglages de synchronisation", tint = Teal)
                     }
@@ -154,7 +161,7 @@ fun FriendsScreen(model: AppModel) {
                     Text(if (lastSyncError != null) "Synchronisation à vérifier" else "Sauvegarde et équipe GitHub",
                         color = if (lastSyncError != null) MaterialTheme.colorScheme.error else Muted,
                         fontSize = 11.sp, modifier = Modifier.weight(1f))
-                    TextButton({ model.refreshSocial(manual = true) }, enabled = !model.busy,
+                    TextButton({ model.refreshSocial(manual = true) }, enabled = !model.busy,modifier=Modifier.height(32.dp),
                         contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) {
                         Icon(Icons.Rounded.Refresh, null, Modifier.size(17.dp))
                         Spacer(Modifier.width(4.dp))
@@ -385,6 +392,7 @@ private fun FriendRequestsPanel(model: AppModel) {
 @Composable
 fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
+    val animatedBack = LocalAnimatedBack.current
     val p = model.displayedProgress ?: model.progress
     var name by remember { mutableStateOf(p.name) }
     var hour by remember { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
@@ -417,7 +425,7 @@ fun SettingsScreen(model: AppModel) {
         if (uri != null) model.task { model.incoming = withContext(Dispatchers.IO) { readImport(context.contentResolver, uri) } }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PageHeader("À ta fréquence", "Tes préférences et ton compte.") { model.route = "profile" } }
+        item { PageHeader("À ta fréquence", "Tes préférences et ton compte.") { if(animatedBack!=null)animatedBack() else model.route = "profile" } }
         item {
             Panel {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {

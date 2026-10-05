@@ -4,6 +4,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,24 +14,33 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Backspace
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Calculate
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 
 /** A floating calculator that leaves the question and its current answer intact beneath it. */
 @Composable
-fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null) {
+fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null) {
     var expression by rememberSaveable { mutableStateOf("") }
     var result by rememberSaveable { mutableStateOf<Double?>(null) }
     var previousAnswer by rememberSaveable { mutableDoubleStateOf(0.0) }
@@ -81,15 +92,31 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
         }
     }
     if (!rendered) return
-    Dialog(onDismissRequest = ::requestDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(Modifier.padding(horizontal = 14.dp).widthIn(max = 430.dp).fillMaxWidth().graphicsLayer {
+    Dialog(onDismissRequest = ::requestDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        val view = LocalView.current
+        val calculatorFocus=LocalFocusManager.current
+        val keyboard=LocalSoftwareKeyboardController.current
+        DisposableEffect(view) { (view.parent as? DialogWindowProvider)?.window?.let { window ->
+            window.setDimAmount(0f)
+        }; onDispose {} }
+        var panelBounds by remember { mutableStateOf(Rect.Zero) }
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.32f*visibility.value)).pointerInput(Unit) { detectTapGestures { requestDismiss() } }.imePadding().safeDrawingPadding(),contentAlignment=Alignment.Center) {
+        Box(Modifier.padding(horizontal=14.dp).widthIn(max=430.dp).fillMaxWidth()
+            .onGloballyPositioned { panelBounds=it.screenBounds(view) }) {
+        Surface(modifier=Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures {} }.graphicsLayer {
             val fraction = visibility.value
-            alpha = fraction
-            scaleX = .94f + .06f * fraction
-            scaleY = .94f + .06f * fraction
-            translationY = 16.dp.toPx() * (1f - fraction)
+            val target = anchorBounds ?: Rect(panelBounds.center+Offset(0f,panelBounds.height*.5f), androidx.compose.ui.geometry.Size(56.dp.toPx(),56.dp.toPx()))
+            val targetScaleX=(target.width/panelBounds.width.coerceAtLeast(1f)).coerceIn(.01f,1f)
+            val targetScaleY=(target.height/panelBounds.height.coerceAtLeast(1f)).coerceIn(.01f,1f)
+            scaleX = targetScaleX+(1f-targetScaleX)*fraction
+            scaleY = targetScaleY+(1f-targetScaleY)*fraction
+            translationX = (target.center.x-panelBounds.center.x)*(1f-fraction)
+            translationY = (target.center.y-panelBounds.center.y)*(1f-fraction)
+            alpha = (fraction/.12f).coerceIn(0f,1f)
+            shape=RoundedCornerShape((24f+80f*(1f-fraction)).dp);clip=true
         }.testTag("calculator-surface"), shape = RoundedCornerShape(24.dp), color = Cream, shadowElevation = 8.dp) {
-            Column(Modifier.padding(14.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            Box {
+            Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.padding(14.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("Calculatrice", Modifier.weight(1f), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = Ink)
                     TextButton({ degrees = !degrees; result = null; error = null }, contentPadding = PaddingValues(horizontal = 8.dp)) {
@@ -99,7 +126,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                 }
                 OutlinedTextField(expression, { change(it) }, modifier = Modifier.fillMaxWidth().testTag("calculator-expression"), label = { Text("Calcul") },
                     singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { calculate() }))
+                    keyboardActions = KeyboardActions(onDone = { calculate();calculatorFocus.clearFocus();keyboard?.hide() }))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f).testTag("calculator-result"), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
                     TextButton({ change(expression + "Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
@@ -119,7 +146,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         labels.forEach { label ->
                             val accent = label == "="
-                            Surface(onClick = { press(label) }, modifier = Modifier.weight(1f).height(42.dp),
+                            Surface(onClick = { calculatorFocus.clearFocus();keyboard?.hide();press(label) }, modifier = Modifier.weight(1f).height(42.dp),
                                 shape = RoundedCornerShape(10.dp), color = if (accent) Teal else if (rowIndex < 3) Mist else Color.White,
                                 tonalElevation = if (accent) 0.dp else 1.dp) {
                                 Box(contentAlignment = Alignment.Center) {
@@ -144,6 +171,12 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     }
                 }
             }
+            Box(Modifier.matchParentSize().graphicsLayer { alpha=((.4f-visibility.value)/.25f).coerceIn(0f,1f) }.background(Teal),contentAlignment=Alignment.Center) {
+                Icon(Icons.Rounded.Calculate,null,Modifier.size(42.dp),tint=Color.White)
+            }
+            }
+        }
+        }
         }
     }
 }

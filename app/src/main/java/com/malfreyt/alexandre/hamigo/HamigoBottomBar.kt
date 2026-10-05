@@ -41,13 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -67,6 +64,8 @@ internal val HamigoNavigationOverhang = 18.dp
 internal val HamigoNavigationCutoutDepth = 72.dp
 internal val HamigoNavigationContentOverlap = HamigoNavigationCutoutDepth - HamigoNavigationOverhang
 internal val LocalNavigationContentOverlap = staticCompositionLocalOf { 0.dp }
+internal const val HamigoEdgeShadowLayers = 10
+internal const val HamigoEdgeShadowAlpha = .020f
 
 private data class BottomDestination(val route: String, val label: String, val icon: ImageVector)
 
@@ -102,7 +101,6 @@ fun HamigoBottomBar(
                 val rightInset = navigationInsets.getRight(density, layoutDirection).toFloat()
                 val center = Offset((size.width + leftInset - rightInset) / 2f, 34.dp.toPx())
                 val radius = 38.dp.toPx()
-                val body = Path().apply { addRect(Rect(0f, bodyTop, size.width, size.height)) }
                 val circleBounds = Rect(center.x-radius, center.y-radius, center.x+radius, center.y+radius)
                 val lip = 8.dp.toPx()
                 val silhouette = Path().apply {
@@ -120,25 +118,11 @@ fun HamigoBottomBar(
                 }
                 // The same soft edge follows the straight top and the notch. Translucent strokes
                 // preserve the real content through the cutout; the white fill covers their inner half.
-                for (spread in 10 downTo 1) {
-                    drawPath(silhouette, Color.Black.copy(alpha = .020f), style = Stroke(spread * 2.dp.toPx()))
+                for (spread in HamigoEdgeShadowLayers downTo 1) {
+                    drawPath(silhouette, Color.Black.copy(alpha = HamigoEdgeShadowAlpha), style = Stroke(spread * 2.dp.toPx()))
                 }
                 // Paint only the bar itself: the hole reveals the actual scrolling screen below.
                 drawPath(silhouette, Color.White)
-                // A translucent inset shadow follows the concave edge without filling the hole.
-                clipPath(body) {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            0f to Color.Transparent,
-                            .87f to Color.Transparent,
-                            1f to Color.Black.copy(alpha = .18f),
-                            center = center,
-                            radius = radius,
-                        ),
-                        radius = radius,
-                        center = center,
-                    )
-                }
             }
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
     ) {
@@ -174,8 +158,14 @@ fun HamigoBottomBar(
                     ) {
                         Box(
                             (if (central) {
-                                Modifier.size(64.dp).shadow(9.dp, CircleShape, clip = false,
-                                    ambientColor = Color.Black.copy(alpha = .16f), spotColor = Color.Black.copy(alpha = .22f))
+                                Modifier.size(64.dp).drawBehind {
+                                    // Draw the halo before clipping the button: it stays visible around
+                                    // the whole circle, including the part above the navigation body.
+                                    for (spread in HamigoEdgeShadowLayers downTo 1) {
+                                        drawCircle(Color.Black.copy(alpha = HamigoEdgeShadowAlpha),
+                                            radius = size.minDimension / 2f + spread.dp.toPx())
+                                    }
+                                }
                                     .clip(CircleShape).background(fillColor)
                             } else {
                                 Modifier.width(56.dp).height(40.dp).clip(RoundedCornerShape(18.dp)).background(fillColor)
