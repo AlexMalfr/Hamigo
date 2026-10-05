@@ -120,6 +120,7 @@ fun HamigoBottomBar(route: String, onDestination: (String) -> Unit, modifier: Mo
                         Spacer(Modifier.height(6.dp))
                         Text(
                             destination.label,
+                            modifier = Modifier.height(14.dp + labelGrowth),
                             color = if (selected) Teal else Muted,
                             fontSize = 11.sp,
                             lineHeight = 14.sp,
