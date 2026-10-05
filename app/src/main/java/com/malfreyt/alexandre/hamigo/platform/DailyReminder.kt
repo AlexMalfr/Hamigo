@@ -12,6 +12,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
+import android.os.SystemClock
+import android.widget.Toast
 import com.malfreyt.alexandre.hamigo.Progress
 import com.malfreyt.alexandre.hamigo.R
 import java.time.LocalDate
@@ -22,7 +24,13 @@ import java.time.ZonedDateTime
 object DailyReminder {
     const val CHANNEL_ID = "daily_practice"
     const val ACTION_REMIND = "com.malfreyt.alexandre.hamigo.REMIND"
+    const val ACTION_SNOOZE = "com.malfreyt.alexandre.hamigo.SNOOZE"
+    const val ACTION_SNOOZED_REMIND = "com.malfreyt.alexandre.hamigo.SNOOZED_REMIND"
+    const val SNOOZE_MINUTES = 30
     private const val REQUEST_CODE = 2701
+    private const val SNOOZE_REQUEST_CODE = 2702
+    internal const val SNOOZE_AT = "reminderSnoozeAt"
+    internal const val SNOOZE_DAY = "reminderSnoozeDay"
 
     fun configure(context: Context, enabled: Boolean, hour: Int = 20, minute: Int = 0) {
         require(hour in 0..23 && minute in 0..59)
@@ -58,7 +66,11 @@ object DailyReminder {
         )
         manager.cancel(pending)
         val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("reminderEnabled", false)) return
+        if (!prefs.getBoolean("reminderEnabled", false)) {
+            cancelSnooze(context)
+            context.getSystemService(NotificationManager::class.java).cancel(REQUEST_CODE)
+            return
+        }
         // setAndAllowWhileIdle is inexact and needs no SCHEDULE_EXACT_ALARM permission.
         manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
             nextTriggerMillis(ZonedDateTime.now(), prefs.getInt("reminderHour", 20).coerceIn(0, 23),
@@ -73,6 +85,68 @@ object DailyReminder {
     }
 
     fun showTest(context: Context): Boolean = notify(context)
+
+    private fun snoozedIntent(context: Context) = PendingIntent.getBroadcast(context, SNOOZE_REQUEST_CODE,
+        Intent(context, ReminderReceiver::class.java).setAction(ACTION_SNOOZED_REMIND),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+    internal fun cancelSnooze(context: Context) {
+        context.getSystemService(AlarmManager::class.java).cancel(snoozedIntent(context))
+        context.getSharedPreferences("hamigo", Context.MODE_PRIVATE).edit().remove(SNOOZE_AT).remove(SNOOZE_DAY).apply()
+    }
+
+    internal fun snooze(context: Context, notificationDay: String): Boolean {
+        val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
+        val current = ReminderContent.build(Progress(context.applicationContext))
+        context.getSystemService(NotificationManager::class.java).cancel(REQUEST_CODE)
+        val toast = when {
+            !prefs.getBoolean("reminderEnabled", false) -> "Les rappels sont désactivés."
+            notificationDay != current.date.toString() -> "Ce rappel a expiré."
+            current.context == ReminderContext.GOAL_REACHED -> "Objectif atteint : pas besoin d’un autre rappel !"
+            else -> null
+        }
+        if (toast != null) {
+            cancelSnooze(context)
+            Toast.makeText(context, toast, Toast.LENGTH_SHORT).show()
+            return false
+        }
+        val delay = SNOOZE_MINUTES * 60_000L
+        // This local, temporary choice is intentionally absent from the cloud backup.
+        prefs.edit().putLong(SNOOZE_AT, System.currentTimeMillis()+delay).putString(SNOOZE_DAY, notificationDay).apply()
+        context.getSystemService(AlarmManager::class.java).setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime()+delay, snoozedIntent(context))
+        Toast.makeText(context, "Rappel reporté de $SNOOZE_MINUTES minutes.", Toast.LENGTH_SHORT).show()
+        return true
+    }
+
+    /** Recreate after reboot, including a 23:50 postponement that falls after midnight. */
+    internal fun restoreSnooze(context: Context) {
+        val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
+        val at = prefs.getLong(SNOOZE_AT, 0L)
+        if (at == 0L) return
+        if (!prefs.getBoolean("reminderEnabled", false) || System.currentTimeMillis()-at>6*60*60_000L ||
+            ReminderContent.build(Progress(context.applicationContext)).context == ReminderContext.GOAL_REACHED) {
+            cancelSnooze(context); return
+        }
+        context.getSystemService(AlarmManager::class.java).setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            SystemClock.elapsedRealtime()+(at-System.currentTimeMillis()).coerceAtLeast(1000L), snoozedIntent(context))
+    }
+
+    internal fun deliverSnooze(context: Context): Boolean {
+        val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
+        val at = prefs.getLong(SNOOZE_AT, 0L)
+        if (at == 0L || at > System.currentTimeMillis()+1000L) return false
+        val shouldNotify = prefs.getBoolean("reminderEnabled", false) &&
+            System.currentTimeMillis()-at<=6*60*60_000L &&
+            ReminderContent.build(Progress(context.applicationContext)).context != ReminderContext.GOAL_REACHED
+        cancelSnooze(context)
+        return shouldNotify && notify(context)
+    }
+
+    internal fun progressChanged(context: Context) {
+        val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
+        if (prefs.contains(SNOOZE_AT) && Progress(context.applicationContext).let { it.todayXp >= it.dailyGoal }) cancelSnooze(context)
+    }
 
     internal fun notify(context: Context, message: String? = null): Boolean {
         val content = ReminderContent.build(Progress(context.applicationContext), LocalDate.now())
@@ -93,6 +167,9 @@ object DailyReminder {
         launch.putExtra("hamigo_route", "path")
         val content = PendingIntent.getActivity(context, REQUEST_CODE, launch,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val later = PendingIntent.getBroadcast(context, REQUEST_CODE,
+            Intent(context, ReminderReceiver::class.java).setAction(ACTION_SNOOZE).putExtra("day", reminder.date.toString()),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_radio)
             .setLargeIcon(ReminderArtwork.avatar(reminder))
@@ -104,6 +181,7 @@ object DailyReminder {
                 .setBigContentTitle(reminder.title)
                 .setSummaryText(reminder.message))
             .setContentIntent(content)
+            .addAction(Notification.Action.Builder(null, "Me rappeler plus tard", later).build())
             .setAutoCancel(true)
             .setColor(reminder.accent)
             .setCategory(Notification.CATEGORY_REMINDER)
@@ -119,11 +197,19 @@ class ReminderReceiver : BroadcastReceiver() {
         when (intent.action) {
             DailyReminder.ACTION_REMIND -> {
                 DailyReminder.schedule(context)
+                // A daily reminder replaces an older postponed reminder rather than doubling it.
+                DailyReminder.cancelSnooze(context)
                 if (context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
                         .getBoolean("reminderEnabled", false)) DailyReminder.notify(context)
             }
+            DailyReminder.ACTION_SNOOZE -> DailyReminder.snooze(context, intent.getStringExtra("day").orEmpty())
+            DailyReminder.ACTION_SNOOZED_REMIND -> DailyReminder.deliverSnooze(context)
             Intent.ACTION_BOOT_COMPLETED, Intent.ACTION_TIME_CHANGED,
-            Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED -> DailyReminder.schedule(context)
+            Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                DailyReminder.schedule(context)
+                DailyReminder.restoreSnooze(context)
+                HomeWidgets.refresh(context)
+            }
         }
     }
 }

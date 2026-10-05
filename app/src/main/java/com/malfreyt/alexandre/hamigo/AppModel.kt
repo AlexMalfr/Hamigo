@@ -134,6 +134,7 @@ class AppModel internal constructor(
         progress.prefs.registerOnSharedPreferenceChangeListener(preferenceListener)
         context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(preferenceListener)
         DailyReminder.schedule(context)
+        HomeWidgets.progressChanged(context)
         showWelcome = !progress.prefs.getBoolean("welcomed", false)
         scope.launch {
             runCatching { withContext(Dispatchers.IO) { Content(context) } }

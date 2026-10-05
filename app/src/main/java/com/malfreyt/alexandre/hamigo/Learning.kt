@@ -172,13 +172,19 @@ class Progress(private val context: Context) {
             val day = LocalDate.now().toString(); days.put(day, days.optInt(day) + gain)
         }
     }
-    private fun save() { root.put("schema", 2); prefs.edit().putString("progress", root.toString()).apply() }
+    private fun save() {
+        root.put("schema", 2); prefs.edit().putString("progress", root.toString()).apply()
+        com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
+        DailyReminder.progressChanged(context)
+    }
     fun reload() = synchronized(CLOUD_LOCK) {
         root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
     }
     fun setDailyGoal(goal:Int) {
         require(goal in 1..1000)
         prefs.edit().putInt("dailyGoal",goal).putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
+        com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
+        DailyReminder.progressChanged(context)
         ProgressSyncScheduler.enqueue(context)
     }
     fun cloudExport():String = synchronized(CLOUD_LOCK) {

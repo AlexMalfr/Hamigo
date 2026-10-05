@@ -131,7 +131,7 @@ class VisualAuditTest {
         capture("41-moi-entete-fixe")
         ui.onNodeWithContentDescription("Réglages").performClick()
         ui.runOnIdle { check(model.route=="settings") }
-        ui.onNodeWithText("Réglages").assertIsDisplayed()
+        ui.onNodeWithText("À ta fréquence").assertIsDisplayed()
     }
 
     @Test fun monthlyCalendarKeepsItsHistoryAndDailyGoalVisible() {

@@ -82,3 +82,17 @@ L'en-tête de Parcours reste fixe au scroll ; son bloc série/XP mène à Moi av
 - La carte de compte GitHub sur Équipe utilise 8 dp de marge verticale au lieu de 16, 4 dp entre ses rangées au lieu de 12 et un avatar de 36 dp. Ses contrôles dépliés n’ajoutent plus une seconde carte avec un second jeu de marges. Les contrôles communs dans les paramètres sont également resserrés.
 - Une ombre apparaît progressivement sous les en-têtes fixes de Parcours, de la bibliothèque Mémo et des fiches une fois leur marge supérieure dépassée ; elle disparaît au retour en haut. L’ombre n’affecte ni les dimensions ni la position du contenu.
 - Les en-têtes et leur ombre couvrent toute la largeur du viewport, marges latérales comprises. La portée de 10 dp et la densité utilisent les mêmes paramètres que le contour de la navbar. Le cercle Parcours a son propre halo visible sur toute sa circonférence, dessiné avant son découpage circulaire.
+
+### Révision de la 0.21 : en-tête Moi
+
+La photo, le titre, le sous-titre et le bouton Paramètres restent fixes pendant le défilement de Moi. L’ombre pleine largeur apparaît lorsqu’ils se détachent, avec les mêmes paramètres que les autres en-têtes. Cette révision a été construite séparément des widgets, livrée sous le numéro 0.21 demandé et installée sans effacer les données.
+
+## Widgets et report des rappels — 5 octobre 2026, 0.23
+
+- Trois widgets dans le sélecteur du launcher : **Série** (Pico, compteur et cercles de la semaine), **Objectif du jour** (XP, reste à gagner et jauge circulaire) et **Cette semaine** (XP, jours actifs et histogramme avec objectif pointillé). Chaque widget ouvre Parcours au toucher.
+- Tous sont redimensionnables horizontalement et verticalement. Les formats compacts gardent l’essentiel sans tronquer les valeurs ; les formats étroits/hauts et larges affichent davantage de visuels. Android 12+ utilise quatre seuils de layouts responsive ; Android 8–11 utilise la taille transmise par le launcher. Textes et boutons restent des vues natives accessibles, avec descriptions des données dessinées.
+- Mise à jour locale après réponses, fin de leçon, changement d’objectif, import ou fusion GitHub, avec regroupement des écritures et rendu hors du thread des questions. Le launcher demande aussi des mises à jour toutes les 30 minutes ; une alarme recalcule les widgets au changement de jour. Les redémarrages et changements de fuseau/horaire relancent leur mise à jour. Aucune connexion réseau ni chargement de la banque de questions n’est nécessaire au rendu.
+- L’action **Me rappeler plus tard** ferme la notification et affiche « Rappel reporté de 30 minutes. ». Un seul report est programmé, sans décaler l’horaire quotidien. Le contenu est recalculé à la livraison ; le report peut traverser minuit et est restauré après redémarrage.
+- Atteindre l’objectif ou désactiver les rappels annule le report. Une notification d’un ancien jour ne crée pas de nouveau report, et un report expiré depuis plus de six heures est abandonné. L’alarme reste inexacte et Android peut retarder la livraison selon ses contraintes d’énergie. Le report est local à l’appareil et n’est pas exporté dans la sauvegarde GitHub.
+
+Références de plateforme : [layouts responsive des widgets](https://developer.android.com/develop/ui/views/appwidgets/layouts), [mise à jour des widgets](https://developer.android.com/develop/ui/views/appwidgets/advanced).

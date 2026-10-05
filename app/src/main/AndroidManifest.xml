@@ -51,6 +51,18 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".platform.GitHubCodeReceiver" android:exported="false" />
+        <receiver android:name=".platform.StreakWidgetProvider" android:exported="false" android:label="@string/widget_streak_name">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_streak" />
+        </receiver>
+        <receiver android:name=".platform.GoalWidgetProvider" android:exported="false" android:label="@string/widget_goal_name">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_goal" />
+        </receiver>
+        <receiver android:name=".platform.WeekWidgetProvider" android:exported="false" android:label="@string/widget_week_name">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_week" />
+        </receiver>
         <provider android:name=".ShareFileProvider" android:authorities="${applicationId}.files"
             android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_streak_name">Hamigo · Série</string>
+    <string name="widget_goal_name">Hamigo · Objectif du jour</string>
+    <string name="widget_week_name">Hamigo · Cette semaine</string>
+    <string name="widget_streak_description">Ta série de révisions et Pico, pour garder le rythme.</string>
+    <string name="widget_goal_description">Les XP du jour et la progression vers ton objectif.</string>
+    <string name="widget_week_description">Les sept jours de la semaine et ton objectif quotidien.</string>
+    <string name="widget_preview_streak_title">HAMIGO · SÉRIE</string>
+    <string name="widget_preview_streak_metric">0 jour</string>
+    <string name="widget_preview_streak_status">Une petite leçon pour commencer</string>
+    <string name="widget_preview_goal_title">HAMIGO · OBJECTIF DU JOUR</string>
+    <string name="widget_preview_goal_metric">12 / 30 XP</string>
+    <string name="widget_preview_goal_status">Encore 18 XP aujourd’hui</string>
+    <string name="widget_preview_week_title">HAMIGO · CETTE SEMAINE</string>
+    <string name="widget_preview_week_metric">126 XP</string>
+    <string name="widget_preview_week_status">5 jours actifs · objectif 30 XP/j</string>
+    <string name="widget_review">Réviser →</string>
+    <string name="widget_preview_week_chart">Exemple de progression sur 7 jours</string>
+</resources>

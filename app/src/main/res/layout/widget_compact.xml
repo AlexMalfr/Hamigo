@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="12dp" android:background="@drawable/widget_streak_background">
+    <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:text="@string/widget_preview_streak_title" android:textSize="11sp" android:textStyle="bold" android:textColor="#087F82" android:maxLines="1" android:ellipsize="end" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/widget_metric" android:layout_width="0dp" android:layout_weight="1" android:layout_height="36dp"
+            android:text="@string/widget_preview_streak_metric" android:textSize="24sp" android:textStyle="bold" android:textColor="#073D40" android:gravity="center_vertical"
+            android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMinTextSize="12sp" android:autoSizeMaxTextSize="24sp" android:autoSizeStepGranularity="1sp" />
+        <ImageView android:id="@+id/widget_mascot" android:layout_width="36dp" android:layout_height="36dp" android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" android:importantForAccessibility="no" />
+    </LinearLayout>
+    <TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"
+        android:text="@string/widget_preview_streak_status" android:textSize="12sp" android:textColor="#45676A" android:maxLines="2" android:ellipsize="end" android:gravity="center_vertical" />
+    <ProgressBar android:id="@+id/widget_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="5dp"
+        android:progressTint="#087F82" android:progressBackgroundTint="#FFFFFF" android:max="100" android:progress="0" />
+    <TextView android:id="@+id/widget_review" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="5dp" android:text="@string/widget_review" android:textSize="12sp" android:textStyle="bold" android:textColor="#087F82" />
+</LinearLayout>
