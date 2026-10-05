@@ -84,6 +84,13 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
             }
         } else if (model.oauthSession != null) {
             GitHubDeviceCode(model)
+        } else if (model.authSession != null) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton({ model.openGitHubBrowser() }, contentPadding = PaddingValues(0.dp)) {
+                    Icon(Icons.Rounded.OpenInBrowser, null); Spacer(Modifier.width(6.dp)); Text("Rouvrir GitHub")
+                }
+                TextButton({ model.cancelTask() }, contentPadding = PaddingValues(0.dp)) { Text("Annuler") }
+            }
         } else {
             Text("Connecte ton compte pour sauvegarder tes leçons, ton XP et tes révisions, et partager ta progression avec ton équipe.",
                 color = Muted, fontSize = 13.sp, lineHeight = 19.sp)

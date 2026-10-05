@@ -15,6 +15,17 @@ val commitCount = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
 val revision = git("rev-parse", "--short=8", "HEAD").ifEmpty { "local" }
 val dirty = git("status", "--porcelain").isNotEmpty()
 
+// Native GitHub OAuth uses PKCE. GitHub still requires this app-wide identifier at exchange;
+// it is extractible from the APK, never a user token, and is kept out of version control.
+val oauthFile = rootProject.file(".tools/oauth.properties")
+val oauthProperties = Properties().apply {
+    if (oauthFile.exists()) oauthFile.inputStream().use { load(it) }
+}
+val gitHubClientSecret = oauthProperties.getProperty("githubClientSecret", "").trim()
+require(gitHubClientSecret.isEmpty() || gitHubClientSecret.matches(Regex("[A-Za-z0-9_\\-]{32,128}"))) {
+    "Invalid GitHub application credential in .tools/oauth.properties."
+}
+
 // Optional fresh output directory when Windows/OneDrive locks an earlier generated package.
 providers.gradleProperty("hamigoBuildRoot").orNull?.let { buildRoot ->
     layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("$buildRoot/app"))
@@ -30,6 +41,7 @@ android {
         versionCode = commitCount
         versionName = "0.$commitCount+$revision" + if (dirty) "-dev" else ""
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GITHUB_CLIENT_SECRET", "\"$gitHubClientSecret\"")
     }
     buildFeatures { compose = true; buildConfig = true }
     val signingFile = rootProject.file(".tools/signing.properties")

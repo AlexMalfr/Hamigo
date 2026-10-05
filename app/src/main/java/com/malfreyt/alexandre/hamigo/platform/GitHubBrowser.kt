@@ -19,6 +19,8 @@ import android.os.PersistableBundle
 import android.os.SystemClock
 import android.widget.Toast
 import android.widget.RemoteViews
+import androidx.browser.auth.AuthTabColorSchemeParams
+import androidx.browser.auth.AuthTabIntent
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.malfreyt.alexandre.hamigo.MainActivity
@@ -26,6 +28,7 @@ import com.malfreyt.alexandre.hamigo.R
 
 internal sealed interface GitHubBrowserCommand {
     class Open(val session: DeviceOAuth.Session) : GitHubBrowserCommand
+    class OpenAuthorization(val url: String) : GitHubBrowserCommand
     data object Close : GitHubBrowserCommand
 }
 
@@ -37,6 +40,7 @@ internal class GitHubBrowserState {
 
 /** Uses the default browser's ordinary cookie jar, never an ephemeral or embedded WebView. */
 internal class GitHubBrowser(private val activity: Activity, private val state: GitHubBrowserState,
+    private val launchAuthorization: ((AuthTabIntent, Uri) -> Unit)? = null,
     private val launch: (Intent) -> Unit) {
 
     fun open(session: DeviceOAuth.Session) {
@@ -46,6 +50,25 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
         state.launchesAwaitingResult++
         state.open = true
         try { launch(intent) }
+        catch (e: Exception) {
+            state.launchesAwaitingResult--
+            state.open = previouslyOpen
+            throw e
+        }
+    }
+
+    /** Auth Tab captures the HTTPS callback; older browsers use the same intent as a Custom Tab. */
+    fun openAuthorization(url: String) {
+        val uri = Uri.parse(url)
+        require(uri.scheme == "https" && uri.host == "github.com" &&
+            uri.path == "/login/oauth/authorize" && uri.port == -1 &&
+            uri.userInfo == null && uri.fragment == null)
+        val launcher = checkNotNull(launchAuthorization)
+        val tab = authorizationTabFor(activity)
+        val previouslyOpen = state.open
+        state.launchesAwaitingResult++
+        state.open = true
+        try { launcher(tab, uri) }
         catch (e: Exception) {
             state.launchesAwaitingResult--
             state.open = previouslyOpen
@@ -90,15 +113,29 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
                     setContentDescription(R.id.github_copy_code, "Copier le code GitHub ${session.userCode}")
                 }, intArrayOf(R.id.github_device_code, R.id.github_copy_code), copy)
                 .build()
-            // A generic web URL finds the browser rather than a GitHub deep-link handler.
-            val browser = context.packageManager.resolveActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/"))
-                    .addCategory(Intent.CATEGORY_BROWSABLE), PackageManager.MATCH_DEFAULT_ONLY)
-                ?.activityInfo?.packageName?.takeUnless { it == "android" }
-            tab.intent.setPackage(browser)
+            tab.intent.setPackage(defaultBrowser(context))
             tab.intent.data = Uri.parse(session.verificationUri)
             return tab.intent
         }
+
+        internal fun authorizationTabFor(context: Context): AuthTabIntent = AuthTabIntent.Builder()
+            .setEphemeralBrowsingEnabled(false)
+            .setColorScheme(CustomTabsIntent.COLOR_SCHEME_LIGHT)
+            .setDefaultColorSchemeParams(AuthTabColorSchemeParams.Builder()
+                .setToolbarColor(0xFFE1F2EF.toInt()).build())
+            .build().apply {
+                intent.setPackage(defaultBrowser(context))
+                // These settings also apply when the user's browser falls back to a Custom Tab.
+                intent.putExtra(CustomTabsIntent.EXTRA_CLOSE_BUTTON_POSITION, CustomTabsIntent.CLOSE_BUTTON_POSITION_START)
+                intent.putExtra(CustomTabsIntent.EXTRA_SHARE_STATE, CustomTabsIntent.SHARE_STATE_OFF)
+                intent.putExtra(CustomTabsIntent.EXTRA_TITLE_VISIBILITY_STATE, CustomTabsIntent.SHOW_PAGE_TITLE)
+            }
+
+        /** Generic HTTPS resolution avoids choosing an installed GitHub deep-link handler. */
+        private fun defaultBrowser(context: Context): String? = context.packageManager.resolveActivity(
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/"))
+                .addCategory(Intent.CATEGORY_BROWSABLE), PackageManager.MATCH_DEFAULT_ONLY)
+            ?.activityInfo?.packageName?.takeUnless { it == "android" }
 
         internal fun returnIntent(context: Context) = Intent(context, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

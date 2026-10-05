@@ -50,7 +50,9 @@ class Session(val title: String, val questions: MutableList<Question>, val lesso
 data class SessionResponse(val correct: Boolean, val omitted: Boolean = false,
     val display: String = "", val choiceIndex: Int = -1, val quality: Int = if(correct) 4 else 1)
 
-class AppModel : ViewModel() {
+class AppModel internal constructor(
+    private val authorizationClient: GitHubAuthorizationClient = DefaultGitHubAuthorizationClient
+) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var context: Context
     lateinit var progress: Progress
@@ -79,18 +81,49 @@ class AppModel : ViewModel() {
     var incoming by mutableStateOf<String?>(null)
     var showWelcome by mutableStateOf(false)
     var oauthSession by mutableStateOf<DeviceOAuth.Session?>(null)
+    internal var authSession by mutableStateOf<GitHubPkce.Session?>(null)
+        private set
+    private lateinit var pendingAuthorization: PendingGitHubAuthorization
+    private var authorizationCode: CompletableDeferred<String>? = null
     var oauthStatus by mutableStateOf<String?>(null)
     internal val githubBrowserCommands = MutableStateFlow<GitHubBrowserCommand?>(null)
     internal val githubBrowserState = GitHubBrowserState()
     internal val githubTabOpen get() = githubBrowserState.open
     internal fun takeGitHubBrowserCommand(command: GitHubBrowserCommand) =
         githubBrowserCommands.compareAndSet(command, null)
-    fun openGitHubBrowser() { oauthSession?.let { githubBrowserCommands.value = GitHubBrowserCommand.Open(it) } }
+    fun openGitHubBrowser() {
+        authSession?.let {
+            githubBrowserCommands.value = GitHubBrowserCommand.OpenAuthorization(GitHubPkce.authorizationUrl(GitHubApp.CLIENT_ID, it))
+            return
+        }
+        oauthSession?.let { githubBrowserCommands.value = GitHubBrowserCommand.Open(it) }
+    }
+    internal fun receiveGitHubAuthorization(url: String) {
+        val active = authSession ?: return
+        // An unsolicited or old callback must never complete or cancel the current connection.
+        if (!GitHubPkce.matchesState(url, active)) {
+            message = "Ce retour GitHub ne correspond pas à la connexion en cours."
+            return
+        }
+        val result = runCatching { GitHubPkce.codeFromCallback(url, active) }
+        result.onSuccess { authorizationCode?.complete(it) }
+            .onFailure { authorizationCode?.completeExceptionally(it) }
+    }
+    internal fun githubBrowserFailed(notice: String) {
+        if (authSession != null) authorizationCode?.completeExceptionally(SocialException(notice))
+        else message = notice
+    }
     var pendingInvite by mutableStateOf<String?>(null)
     fun initialize(ctx: Context) {
         if (::progress.isInitialized) return
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
+        pendingAuthorization = PendingGitHubAuthorization(context)
+        val savedAuthorization = pendingAuthorization.restore()
+        if (savedAuthorization != null && authorizationClient.enabled) {
+            githubBrowserState.open = true
+            connectGitHub(savedAuthorization)
+        } else pendingAuthorization.clear()
         displayedProgress=progress
         progress.prefs.registerOnSharedPreferenceChangeListener(preferenceListener)
         context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).registerOnSharedPreferenceChangeListener(preferenceListener)
@@ -211,13 +244,31 @@ class AppModel : ViewModel() {
         }
     }
     fun removeFriend(friend: Friend) { synchronized(Progress.CLOUD_LOCK) { loadFriends();friends=friends.filterNot {it.gist==friend.gist && it.progress.name==friend.progress.name}; saveFriends() } }
-    fun startGitHubConnection() = task {
+    fun startGitHubConnection() = connectGitHub()
+    private fun connectGitHub(savedAuthorization: GitHubPkce.Session? = null) = task {
         try {
             route="friends"
             oauthStatus="Préparation de la connexion…"
-            val device=DeviceOAuth.start(GitHubApp.CLIENT_ID); oauthSession=device
-            openGitHubBrowser()
-            val token=DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID,device) {notice ->oauthStatus=notice}
+            val token = if (authorizationClient.enabled) {
+                val authorization = savedAuthorization ?: GitHubPkce.start()
+                authorizationCode = CompletableDeferred()
+                authSession = authorization
+                pendingAuthorization.save(authorization)
+                oauthStatus = "Autorise Hamigo dans ton navigateur habituel."
+                if (savedAuthorization == null) openGitHubBrowser()
+                val remaining = (authorization.expiresAtMillis - System.currentTimeMillis()).coerceAtLeast(1L)
+                val code = try { withTimeout(remaining) { authorizationCode!!.await() } }
+                    catch (_: TimeoutCancellationException) { throw SocialException("La connexion GitHub a expiré. Relance-la.") }
+                // Consume once before exchanging: a replayed App Link cannot launch another request.
+                authorizationCode = null; authSession = null; pendingAuthorization.clear()
+                oauthStatus = "GitHub a autorisé Hamigo. Vérification du compte…"
+                githubBrowserCommands.value = GitHubBrowserCommand.Close
+                authorizationClient.exchange(authorization, code)
+            } else {
+                val device = DeviceOAuth.start(GitHubApp.CLIENT_ID); oauthSession = device
+                openGitHubBrowser()
+                DeviceOAuth.awaitToken(GitHubApp.CLIENT_ID, device) { notice -> oauthStatus = notice }
+            }
             // Receiving the token completes the browser part; a slow Gist must not keep it open.
             oauthSession=null;oauthStatus="GitHub a autorisé Hamigo. Vérification du compte…"
             githubBrowserCommands.value=GitHubBrowserCommand.Close
@@ -238,7 +289,11 @@ class AppModel : ViewModel() {
                 message="Compte ${user!!.login} connecté. La sauvegarde sera réessayée : ${e.message}"
             }
             refresh()
-        } finally { oauthSession=null;oauthStatus=null;githubBrowserCommands.value=GitHubBrowserCommand.Close }
+        } finally {
+            oauthSession = null; authSession = null; authorizationCode = null
+            pendingAuthorization.clear(); oauthStatus = null
+            githubBrowserCommands.value = GitHubBrowserCommand.Close
+        }
     }
     fun disconnectGitHub() { sync.disconnect(); ProgressSyncScheduler.cancel(context); refresh() }
     fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }

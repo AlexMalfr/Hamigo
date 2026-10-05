@@ -13,6 +13,7 @@ import androidx.activity.BackEventCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.browser.auth.AuthTabIntent
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.*
@@ -53,10 +54,27 @@ class MainActivity : ComponentActivity() {
     private val gitHubTabLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (::gitHubBrowser.isInitialized) gitHubBrowser.onTabResult()
     }
+    private val gitHubAuthTabLauncher = AuthTabIntent.registerActivityResultLauncher(this) { result ->
+        if (::gitHubBrowser.isInitialized) gitHubBrowser.onTabResult()
+        if (::model.isInitialized) {
+            when (result.resultCode) {
+                AuthTabIntent.RESULT_OK -> result.resultUri?.toString()?.let { model.receiveGitHubAuthorization(it) }
+                AuthTabIntent.RESULT_VERIFICATION_FAILED, AuthTabIntent.RESULT_VERIFICATION_TIMED_OUT ->
+                    if (model.authSession != null && !model.githubTabOpen)
+                        model.message = "Le navigateur n’a pas pu vérifier le retour vers Hamigo. Tu peux rouvrir l’onglet GitHub pour réessayer."
+                // A Custom Tab fallback can report cancellation after an App Link already returned.
+                // Keep the pending authorization available; AppModel validates and consumes it once.
+            }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         model=ViewModelProvider(this)[AppModel::class.java];model.initialize(this)
-        gitHubBrowser=GitHubBrowser(this,model.githubBrowserState) { gitHubTabLauncher.launch(it) }
+        gitHubBrowser=GitHubBrowser(this,model.githubBrowserState,
+            launchAuthorization={ tab, uri ->
+                val callback = Uri.parse(GitHubPkce.CALLBACK)
+                tab.launch(gitHubAuthTabLauncher, uri, callback.host!!, callback.path!!)
+            }) { gitHubTabLauncher.launch(it) }
         // Remains active while a Custom Tab covers this activity; Compose is paused then.
         lifecycleScope.launch {
             model.githubBrowserCommands.collect { command ->
@@ -64,6 +82,8 @@ class MainActivity : ComponentActivity() {
                     when(command) {
                         is GitHubBrowserCommand.Open -> runCatching {gitHubBrowser.open(command.session)}
                             .onFailure {model.message="Impossible d’ouvrir le navigateur. Tu peux saisir le code sur github.com/login/device."}
+                        is GitHubBrowserCommand.OpenAuthorization -> runCatching {gitHubBrowser.openAuthorization(command.url)}
+                            .onFailure {model.githubBrowserFailed("Impossible d’ouvrir le navigateur pour connecter GitHub. Réessaie depuis Hamigo.")}
                         GitHubBrowserCommand.Close -> gitHubBrowser.close()
                     }
                 }
@@ -76,6 +96,16 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {super.onResume();if(::model.isInitialized && model.content!=null) {model.refresh();model.refreshSocial()}}
     override fun onPause() {stopMorse();super.onPause()}
     private fun receive(intent: Intent?) {
+        val callback = intent?.dataString
+        if (intent?.action == Intent.ACTION_VIEW && callback != null && GitHubPkce.isCallback(callback)) {
+            try { model.receiveGitHubAuthorization(callback) }
+            finally {
+                // Activity recreation must not replay or retain an authorization code in Intent.data.
+                intent.data = null
+                if (this.intent?.dataString?.let(GitHubPkce::isCallback) == true) this.intent.data = null
+            }
+            return
+        }
         if(intent?.getStringExtra("hamigo_route")=="path") model.route="path"
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
         @Suppress("DEPRECATION")
@@ -175,7 +205,7 @@ class MainActivity : ComponentActivity() {
             confirmButton={TextButton({model.restore(json);model.incoming=null}){Text("Restaurer")}},
             dismissButton={TextButton({model.incoming=null}){Text("Annuler")}})
     }
-    if(!model.showWelcome && model.oauthSession==null) model.pendingInvite?.let {
+    if(!model.showWelcome && model.oauthSession==null && model.authSession==null) model.pendingInvite?.let {
         AlertDialog(onDismissRequest={model.pendingInvite=null},icon={Pico(Modifier.size(80.dp),mood=MascotMood.GOOFY,pose=MascotPose.WAVE)},
             title={Text("Rejoindre cette équipe ?")},text={Text("Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe.")},
             confirmButton={TextButton({model.acceptInvite()},enabled=!model.busy) {Text("Ajouter l’équipier")}},dismissButton={TextButton({model.pendingInvite=null}) {Text("Annuler")}})
