@@ -120,6 +120,20 @@ class VisualAuditTest {
         capture("36-moi-entete-partage")
     }
 
+    @Test fun profileHeaderStaysPinnedWithAvatarTitleAndSettingsWhileItsShadowSpansTheScreen() {
+        navigate("profile")
+        val header=ui.onNodeWithTag("profile-header",useUnmergedTree=true)
+        val top=header.fetchSemanticsNode().boundsInRoot.top
+        ui.onNodeWithTag("profile-list").performScrollToNode(hasText("Mieux retenir"))
+        header.assertIsDisplayed()
+        check(header.fetchSemanticsNode().boundsInRoot.top<=top+1f)
+        ui.onNodeWithContentDescription("Réglages").assertIsDisplayed()
+        capture("41-moi-entete-fixe")
+        ui.onNodeWithContentDescription("Réglages").performClick()
+        ui.runOnIdle { check(model.route=="settings") }
+        ui.onNodeWithText("Réglages").assertIsDisplayed()
+    }
+
     @Test fun monthlyCalendarKeepsItsHistoryAndDailyGoalVisible() {
         navigate("profile")
         scrollTo("Calendrier d’activité")

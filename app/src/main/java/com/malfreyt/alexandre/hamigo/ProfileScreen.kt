@@ -1,9 +1,11 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +42,7 @@ import kotlin.math.sqrt
 private val GoalOrange = Color(0xFFD97827)
 private val French = Locale.FRENCH
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProfileScreen(model: AppModel, content: Content) {
     val p = model.displayedProgress ?: model.progress
@@ -50,13 +53,14 @@ fun ProfileScreen(model: AppModel, content: Content) {
         .filter { !it.isAfter(today) }.minOrNull() ?: today
     val weeks = maxOf(4, (ChronoUnit.DAYS.between(earliest, today) / 7).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
+    val listState = rememberLazyListState()
     LazyColumn(
-        Modifier.fillMaxSize(),
+        Modifier.fillMaxSize().testTag("profile-list"), state = listState,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp + LocalNavigationContentOverlap.current),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item(key = "profile-header") {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        stickyHeader(key = "profile-header") {
+            Row(Modifier.fillMaxWidth().testTag("profile-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.size(56.dp))
                 Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
                 IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
