@@ -38,9 +38,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.Dispatchers
@@ -127,6 +129,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/** The raised circle overlays the screen; only the normal bar body reserves content space. */
+internal fun hamigoContentPadding(padding: PaddingValues, layoutDirection: LayoutDirection, raisedBarVisible: Boolean): PaddingValues = PaddingValues(
+    start=padding.calculateStartPadding(layoutDirection),
+    top=padding.calculateTopPadding(),
+    end=padding.calculateEndPadding(layoutDirection),
+    bottom=(padding.calculateBottomPadding() - if(raisedBarVisible) HamigoNavigationOverhang else 0.dp).coerceAtLeast(0.dp),
+)
+
 @Composable fun HamigoApp(model: AppModel) {
     val content=model.content
     val tick=model.revision
@@ -181,8 +191,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    val raisedBarVisible=model.session==null && model.lesson==null && model.resource==null && model.route!="settings"
+    val layoutDirection=LocalLayoutDirection.current
     Scaffold(containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
-        if(model.session==null && model.lesson==null && model.resource==null && model.route!="settings") {
+        if(raisedBarVisible) {
             HamigoBottomBar(model.route,onDestination={destination ->
                 backRebound?.cancel()
                 backGestureActive=false
@@ -191,7 +203,8 @@ class MainActivity : ComponentActivity() {
             })
         }
     }) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
+        val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
+        Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)) {
             if(backGestureActive) {
                 when {
                     model.resource!=null->ResourceLibraryScreen(model,content)

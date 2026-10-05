@@ -1,5 +1,12 @@
 # Validation de Hamigo
 
+## Surplomb et effets d'appui de la navbar — 5 octobre 2026
+
+- Le défaut signalé sur le Samsung est visible dans `output/navigation-audit/phone-navbar-overlap.png` et `phone-navbar-hover.png` : bande beige masquant le contenu et indication rectangulaire sur toute la cible. Le surplomb est maintenant transparent hors couronne centrale ; le contenu s'étend jusqu'au corps blanc et les indications sont découpées dans les icônes. Les cibles latérales commencent au corps ; le haut du cercle reste cliquable.
+- **Huit tests Android ciblés réussis** sur Pixel 9a API 36, dont les six scénarios de retour et deux tests de navbar. Le nouveau cas utilise un fond contrasté, mesure la limite du contenu, contrôle les pixels du surplomb et du corps blanc, puis maintient un appui long pour vérifier l'absence d'indication rectangulaire avant de relâcher sur le haut du cercle. Rapport : `output/android-tests-navigation-overlap.txt`.
+- Les deux tests de navbar passent également avec une police à **80 % et 130 %**, puis l'émulateur est rétabli à 100 %. Rapports : `output/android-tests-navigation-overlap-font-0.8.txt` et `output/android-tests-navigation-overlap-font-1.3.txt`.
+- Assemblage debug et tests réussi ; lint sans erreur, avec 67 avertissements et une indication. Rapport : `output/build-navigation-overlap-debug.txt`.
+
 ## Navigation principale et retour prédictif — 5 octobre 2026
 
 - **Sept tests Android ciblés réussis** sur Pixel 9a API 36 : ordre Défis/Mémo/Parcours/Équipe/Moi, cercle central au-dessus des icônes voisines, cibles tactiles et sélection ; retour standard des quatre pages vers Parcours ; aperçu, annulation et validation depuis les deux bords ; nouveau geste pendant le rebond ; conservation du filtre/scroll des fiches et des réponses d'examen ; hiérarchie réglages/Moi et leçons/Parcours. Rapport : `output/android-tests-navigation-final.txt`.
