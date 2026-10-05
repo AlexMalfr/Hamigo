@@ -1,7 +1,6 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,6 +36,7 @@ import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,10 +44,14 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -59,6 +63,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 internal val HamigoNavigationOverhang = 18.dp
+internal val HamigoNavigationCutoutDepth = 72.dp
+internal val HamigoNavigationContentOverlap = HamigoNavigationCutoutDepth - HamigoNavigationOverhang
+internal val LocalNavigationContentOverlap = staticCompositionLocalOf { 0.dp }
 
 private data class BottomDestination(val route: String, val label: String, val icon: ImageVector)
 
@@ -80,23 +87,41 @@ fun HamigoBottomBar(
 ) {
     // Reserve the raised part rather than offsetting it outside Scaffold's measured bottom bar.
     // Only the labels grow with text size; the icons, notch and touch targets stay predictable.
-    val labelGrowth = ((LocalDensity.current.fontScale.coerceAtLeast(1f) - 1f) * 14f).dp
+    val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
+    val navigationInsets = WindowInsets.navigationBars
+    val labelGrowth = ((density.fontScale.coerceAtLeast(1f) - 1f) * 14f).dp
     Box(
         modifier
             .fillMaxWidth()
             .drawBehind {
-                // The raised zone is transparent, so scrolling content stays visible beneath it.
-                // Draw through the inset padding as well to keep the system navigation area white.
                 val bodyTop = HamigoNavigationOverhang.toPx()
-                drawRect(Color.White, topLeft = Offset(0f, bodyTop), size = Size(size.width, (size.height - bodyTop).coerceAtLeast(0f)))
+                val leftInset = navigationInsets.getLeft(density, layoutDirection).toFloat()
+                val rightInset = navigationInsets.getRight(density, layoutDirection).toFloat()
+                val center = Offset((size.width + leftInset - rightInset) / 2f, 34.dp.toPx())
+                val radius = 38.dp.toPx()
+                val body = Path().apply { addRect(Rect(0f, bodyTop, size.width, size.height)) }
+                val hole = Path().apply { addOval(Rect(center.x-radius, center.y-radius, center.x+radius, center.y+radius)) }
+                // Paint only the bar itself: the hole reveals the actual scrolling screen below.
+                drawPath(Path.combine(PathOperation.Difference, body, hole), Color.White)
+                // A translucent inset shadow follows the concave edge without filling the hole.
+                clipPath(body) {
+                    drawCircle(
+                        brush = Brush.radialGradient(
+                            0f to Color.Transparent,
+                            .87f to Color.Transparent,
+                            1f to Color.Black.copy(alpha = .18f),
+                            center = center,
+                            radius = radius,
+                        ),
+                        radius = radius,
+                        center = center,
+                    )
+                }
             }
             .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)),
     ) {
         Box(Modifier.fillMaxWidth().height(94.dp + labelGrowth)) {
-            Canvas(Modifier.fillMaxSize()) {
-                // Keep the requested 6 dp negative space local to the 64 dp central circle.
-                drawCircle(Cream, radius = 38.dp.toPx(), center = Offset(size.width / 2f, 34.dp.toPx()))
-            }
             Row(Modifier.fillMaxSize().selectableGroup(), verticalAlignment = Alignment.Bottom) {
                 bottomDestinations.forEach { destination ->
                     val selected = route == destination.route

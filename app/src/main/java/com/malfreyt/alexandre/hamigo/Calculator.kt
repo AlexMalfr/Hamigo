@@ -1,5 +1,8 @@
 package com.malfreyt.alexandre.hamigo
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +18,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -30,6 +35,28 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
     var previousAnswer by rememberSaveable { mutableDoubleStateOf(0.0) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
     var degrees by rememberSaveable { mutableStateOf(true) }
+    val visibility = remember { Animatable(0f) }
+    var rendered by remember { mutableStateOf(false) }
+    var dismissalRequested by remember { mutableStateOf(false) }
+    val currentOpen by rememberUpdatedState(isOpen)
+    val currentDismiss by rememberUpdatedState(onDismiss)
+    val currentInsert by rememberUpdatedState(onInsertResult)
+    LaunchedEffect(isOpen) {
+        if (isOpen) {
+            rendered = true
+            dismissalRequested = false
+        }
+        val target = if (isOpen) 1f else 0f
+        if (visibility.value != target) visibility.animateTo(target, tween(200, easing = FastOutSlowInEasing))
+        // This effect is cancelled on a quick reopen, so an old exit cannot remove the new dialog.
+        if (!isOpen) rendered = false
+    }
+    fun requestDismiss() {
+        if (currentOpen && !dismissalRequested) {
+            dismissalRequested = true
+            currentDismiss()
+        }
+    }
     fun calculate(): Double? {
         return runCatching {
             CalculatorEngine.evaluate(expression, if (degrees) CalculatorAngleMode.DEGREES else CalculatorAngleMode.RADIANS, previousAnswer)
@@ -53,22 +80,28 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
             else -> change(expression + label)
         }
     }
-    if (!isOpen) return
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(Modifier.padding(horizontal = 14.dp).widthIn(max = 430.dp).fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = Cream, shadowElevation = 8.dp) {
+    if (!rendered) return
+    Dialog(onDismissRequest = ::requestDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        Surface(Modifier.padding(horizontal = 14.dp).widthIn(max = 430.dp).fillMaxWidth().graphicsLayer {
+            val fraction = visibility.value
+            alpha = fraction
+            scaleX = .94f + .06f * fraction
+            scaleY = .94f + .06f * fraction
+            translationY = 16.dp.toPx() * (1f - fraction)
+        }.testTag("calculator-surface"), shape = RoundedCornerShape(24.dp), color = Cream, shadowElevation = 8.dp) {
             Column(Modifier.padding(14.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("Calculatrice", Modifier.weight(1f), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = Ink)
                     TextButton({ degrees = !degrees; result = null; error = null }, contentPadding = PaddingValues(horizontal = 8.dp)) {
                         Text(if (degrees) "DEG" else "RAD", fontWeight = FontWeight.Bold)
                     }
-                    IconButton(onDismiss, modifier = Modifier.size(40.dp)) { Icon(Icons.Rounded.Close, "Fermer la calculatrice") }
+                    IconButton(::requestDismiss, modifier = Modifier.size(40.dp), enabled = isOpen && !dismissalRequested) { Icon(Icons.Rounded.Close, "Fermer la calculatrice") }
                 }
-                OutlinedTextField(expression, { change(it) }, modifier = Modifier.fillMaxWidth(), label = { Text("Calcul") },
+                OutlinedTextField(expression, { change(it) }, modifier = Modifier.fillMaxWidth().testTag("calculator-expression"), label = { Text("Calcul") },
                     singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { calculate() }))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
+                    Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f).testTag("calculator-result"), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
                     TextButton({ change(expression + "Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
                     TextButton({ change(expression + "%") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("%") }
                 }
@@ -99,7 +132,14 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                 }
                 Text("Angles en ${if (degrees) "degrés" else "radians"} · log = base 10 · EXP = ×10ⁿ", fontSize = 10.sp, color = Muted)
                 if (onInsertResult != null) {
-                    Button({ (result ?: calculate())?.let { onInsertResult(it); onDismiss() } }, enabled = expression.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
+                    Button({
+                        if (currentOpen && !dismissalRequested) (result ?: calculate())?.let { value ->
+                            // Lock before the callback: two taps in the same frame still insert only once.
+                            dismissalRequested = true
+                            currentInsert?.invoke(value)
+                            currentDismiss()
+                        }
+                    }, enabled = isOpen && !dismissalRequested && expression.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
                         Text("Utiliser dans ma réponse")
                     }
                 }

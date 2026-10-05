@@ -143,7 +143,7 @@ internal fun hamigoContentPadding(padding: PaddingValues, layoutDirection: Layou
     start=padding.calculateStartPadding(layoutDirection),
     top=padding.calculateTopPadding(),
     end=padding.calculateEndPadding(layoutDirection),
-    bottom=(padding.calculateBottomPadding() - if(raisedBarVisible) HamigoNavigationOverhang else 0.dp).coerceAtLeast(0.dp),
+    bottom=(padding.calculateBottomPadding() - if(raisedBarVisible) HamigoNavigationCutoutDepth else 0.dp).coerceAtLeast(0.dp),
 )
 
 /** A completed gesture may finish visually before its unchanged screen is removed. */
@@ -186,7 +186,9 @@ private data class BackScreenSnapshot(
     var backSettling by remember {mutableStateOf(false)}
     var backDockProgress by remember {mutableFloatStateOf(0f)}
     var backDockCenter by remember {mutableStateOf(Offset.Zero)}
-    var backDockScale by remember {mutableFloatStateOf(.05f)}
+    var backDockScaleX by remember {mutableFloatStateOf(.05f)}
+    var backDockScaleY by remember {mutableFloatStateOf(.05f)}
+    var backMemoTarget by remember {mutableStateOf<MemoReturnTarget?>(null)}
     var backSource by remember {mutableStateOf<BackScreenSnapshot?>(null)}
     var backMotion by remember {mutableStateOf<Job?>(null)}
     var backGeneration by remember {mutableIntStateOf(0)}
@@ -210,6 +212,7 @@ private data class BackScreenSnapshot(
         backProgress=0f
         backDockProgress=0f
         backSource=null
+        backMemoTarget=null
     }
     fun dockBounds(route:String):Rect {
         if(raisedBarVisible) navigationBounds[route]?.let {return it}
@@ -245,6 +248,8 @@ private data class BackScreenSnapshot(
         resetBackMotion()
         val generation=backGeneration
         val source=BackScreenSnapshot(model.route,model.session,model.lesson,model.resource)
+        val memoTarget=source.resource?.let {MemoReturnTarget(it.id)}
+        backMemoTarget=memoTarget
         backSource=source
         backGestureActive=true
         backProgress=0f
@@ -275,17 +280,37 @@ private data class BackScreenSnapshot(
                         }
                     }
                 } else {
-                    val target=dockBounds(source.dockRoute)
-                    backDockCenter=target.center-contentBounds.topLeft
-                    backDockScale=(min(target.width/backWidth.coerceAtLeast(1f),target.height/backHeight.coerceAtLeast(1f))*.8f).coerceIn(.01f,.2f)
-                    backDockProgress=0f
-                    backDocking=true
                     backMotion=backAnimationScope.launch {
+                        // Reveal and measure this exact fiche in an independent library preview.
+                        // The foreground remains at its released size and position while it lays out.
+                        val measuredTarget=if(memoTarget!=null)memoTarget.reveal() else dockBounds(source.dockRoute)
+                        if(generation!=backGeneration) return@launch
+                        if(!source.isCurrent(model)) {resetBackMotion();return@launch}
+                        // A delayed layout may omit the visual docking, but must never prevent Back.
+                        // Fade in place rather than inventing a different row or changing saved scroll.
+                        val target=measuredTarget ?: Rect(
+                            contentBounds.center.x-backWidth*.45f,contentBounds.center.y-backHeight*.45f,
+                            contentBounds.center.x+backWidth*.45f,contentBounds.center.y+backHeight*.45f,
+                        )
+                        backDockCenter=target.center-contentBounds.topLeft
+                        if(memoTarget!=null) {
+                            backDockScaleX=(target.width/backWidth.coerceAtLeast(1f)).coerceIn(.01f,1f)
+                            backDockScaleY=(target.height/backHeight.coerceAtLeast(1f)).coerceIn(.01f,1f)
+                        } else {
+                            val scale=(min(target.width/backWidth.coerceAtLeast(1f),target.height/backHeight.coerceAtLeast(1f))*.8f).coerceIn(.01f,.2f)
+                            backDockScaleX=scale
+                            backDockScaleY=scale
+                        }
+                        backDockProgress=0f
+                        backDocking=true
                         animate(0f,1f,animationSpec=tween(220,easing=FastOutSlowInEasing)) {value,_ ->
                             if(generation==backGeneration) backDockProgress=value
                         }
                         if(generation==backGeneration) {
-                            if(source.isCurrent(model)) source.navigate(model)
+                            if(source.isCurrent(model)) {
+                                if(measuredTarget!=null) memoTarget?.commitPosition()
+                                source.navigate(model)
+                            }
                             resetBackMotion()
                         }
                     }
@@ -317,6 +342,7 @@ private data class BackScreenSnapshot(
         }
     }) { padding ->
         val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
+        CompositionLocalProvider(LocalNavigationContentOverlap provides if(raisedBarVisible)HamigoNavigationContentOverlap else 0.dp) {
         Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)
             .onGloballyPositioned {contentBounds=it.boundsInWindow()}
             .pointerInput(backSettling) {
@@ -327,7 +353,16 @@ private data class BackScreenSnapshot(
             if(backGestureActive) {
                 Box(Modifier.fillMaxSize().testTag("back-destination-${backSource?.dockRoute ?: model.route}")) {
                     when {
-                        model.resource!=null->ResourceLibraryScreen(model,content)
+                        model.resource!=null->{
+                            // Match the future library viewport without changing the departing fiche.
+                            val growth=((density.fontScale.coerceAtLeast(1f)-1f)*14f).dp
+                            val libraryBarBody=(94.dp+growth-HamigoNavigationCutoutDepth).coerceAtLeast(0.dp)
+                            CompositionLocalProvider(LocalNavigationContentOverlap provides HamigoNavigationContentOverlap) {
+                                Box(Modifier.fillMaxSize().padding(bottom=libraryBarBody)) {
+                                    ResourceLibraryScreen(model,content,backMemoTarget)
+                                }
+                            }
+                        }
                         model.route=="settings"->ProfileScreen(model,content)
                         model.session!=null || model.lesson!=null->MainDestination(model,content)
                         else->PathScreen(model,content)
@@ -342,7 +377,8 @@ private data class BackScreenSnapshot(
                 translationX=followX+(backDockCenter.x-backWidth/2f-followX)*dock
                 translationY=followY+(backDockCenter.y-backHeight/2f-followY)*dock
                 val followScale=1f-.07f*movement
-                scaleX=followScale+(backDockScale-followScale)*dock;scaleY=scaleX
+                scaleX=followScale+(backDockScaleX-followScale)*dock
+                scaleY=followScale+(backDockScaleY-followScale)*dock
                 alpha=1f-((dock-.72f)/.28f).coerceIn(0f,1f)
                 shape=RoundedCornerShape((28*movement).dp);clip=backGestureActive
                 shadowElevation=16.dp.toPx()*movement
@@ -355,6 +391,7 @@ private data class BackScreenSnapshot(
                 else -> MainDestination(model,content)
             }
             }
+        }
         }
     }
     if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text(if(model.session?.exam==true)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},
@@ -405,7 +442,7 @@ private data class BackScreenSnapshot(
     var expanded by remember {mutableStateOf(content.chapters.indexOfFirst { c->c.lessons.any {it.id !in completed} }.coerceAtLeast(0))}
     val next=content.nextLesson(completed)
     val due=p.due(content)
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                 Column {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold)}
@@ -485,7 +522,7 @@ private data class BackScreenSnapshot(
     val weeks=maxOf(4,(java.time.temporal.ChronoUnit.DAYS.between(earliest,today)/7).toInt()+1)
     val history=rememberPagerState(pageCount={weeks})
     val scope=rememberCoroutineScope()
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {Column(Modifier.weight(1f)){BigTitle(p.name,"Un peu chaque jour, beaucoup à l'arrivée.")};IconButton({model.route="settings"}){Icon(Icons.Rounded.Settings,"Réglages")}}}
         item {Panel(color=Mist){Row(verticalAlignment=Alignment.CenterVertically){Pico(Modifier.size(80.dp),mood=if(p.streak>0)MascotMood.CELEBRATE else MascotMood.HAPPY,pose=if(p.streak>0)MascotPose.JUMP else MascotPose.WAVE);Column(Modifier.weight(1f)){Text("Niveau ${1+p.xp/250}",fontSize=24.sp,fontWeight=FontWeight.ExtraBold);Text("${p.xp} XP · 🔥 ${p.streak} jours",color=Teal,fontWeight=FontWeight.Bold)}};LinearProgressIndicator(progress={(p.xp%250)/250f},modifier=Modifier.fillMaxWidth(),color=Teal,trackColor=Color.White);Text("${250-p.xp%250} XP avant le prochain niveau",fontSize=12.sp,color=Muted)}}
         item {

@@ -15,29 +15,66 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.WeakHashMap
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.math.roundToInt
 
 private const val courseUrl = "http://f6kgl.free.fr/COURS.html"
-private class MemoLibraryState {
-    val list = LazyListState()
+private class MemoLibraryState(val list: LazyListState = LazyListState()) {
     var search by mutableStateOf("")
     var searching by mutableStateOf(false)
+    fun previewCopy() = MemoLibraryState(LazyListState(list.firstVisibleItemIndex, list.firstVisibleItemScrollOffset)).also {
+        it.search = search
+        it.searching = searching
+    }
 }
 private object MemoNavigation {
     private val states = WeakHashMap<AppModel, MemoLibraryState>()
     fun state(model: AppModel) = states.getOrPut(model) { MemoLibraryState() }
 }
 
+/** The preview has its own list state; only a completed return adopts its revealed row position. */
+internal class MemoReturnTarget(val categoryId: String) {
+    private val attached = CompletableDeferred<Unit>()
+    private var revealAction: (suspend () -> Rect?)? = null
+    private var commitAction: (() -> Unit)? = null
+    internal var rowBounds by mutableStateOf<Rect?>(null)
+    internal var fullRowHeight by mutableIntStateOf(0)
+    internal fun attach(reveal: suspend () -> Rect?, commit: () -> Unit) {
+        revealAction = reveal
+        commitAction = commit
+        attached.complete(Unit)
+    }
+    suspend fun reveal(): Rect? = withTimeoutOrNull(1500) {
+        attached.await()
+        revealAction?.invoke()
+    }
+    fun commitPosition() { commitAction?.invoke() }
+}
+
+private fun matchesMemo(category: RefCategory, search: String) = category.title.contains(search, true) ||
+    category.group.contains(search, true) || category.rows.any {
+        it.term.contains(search, true) || it.description.contains(search, true) || it.extra.contains(search, true)
+    }
+
 @Composable private fun MemoCalculatorLayout(content: @Composable () -> Unit) {
     var calculator by remember { mutableStateOf(false) }
+    val overlap = LocalNavigationContentOverlap.current
     Box(Modifier.fillMaxSize().imePadding()) {
         content()
-        FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(18.dp), containerColor = Teal, contentColor = Color.White) {
+        FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap), containerColor = Teal, contentColor = Color.White) {
             Icon(Icons.Rounded.Calculate, "Ouvrir la calculatrice", Modifier.size(28.dp))
         }
     }
@@ -45,19 +82,66 @@ private object MemoNavigation {
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-@Composable fun ResourceLibraryScreen(model: AppModel, content: Content) {
-    val state = remember(model) { MemoNavigation.state(model) }
-    val categories = remember(content, state.search) {
-        content.references.filter { category ->
-            category.title.contains(state.search, true) || category.group.contains(state.search, true) || category.rows.any {
-                it.term.contains(state.search, true) || it.description.contains(state.search, true) || it.extra.contains(state.search, true)
+@Composable internal fun ResourceLibraryScreen(model: AppModel, content: Content, returnTarget: MemoReturnTarget? = null) {
+    val savedState = remember(model) { MemoNavigation.state(model) }
+    val state = remember(model, returnTarget) {
+        if (returnTarget == null) savedState else savedState.previewCopy().also { preview ->
+            // A directly opened fiche may not belong to the saved filter; never target another row.
+            content.references.firstOrNull { it.id == returnTarget.categoryId }?.let { category ->
+                if (!matchesMemo(category, preview.search)) preview.search = ""
             }
-        }.groupBy { it.group.ifBlank { "Repères radio" } }
+        }
+    }
+    val density = LocalDensity.current
+    val overlap = LocalNavigationContentOverlap.current
+    var viewportBounds by remember { mutableStateOf<Rect?>(null) }
+    var headerBounds by remember { mutableStateOf<Rect?>(null) }
+    val categories = remember(content, state.search) {
+        content.references.filter { matchesMemo(it, state.search) }.groupBy { it.group.ifBlank { "Repères radio" } }
+    }
+    DisposableEffect(returnTarget, state, categories, overlap) {
+        returnTarget?.let { target ->
+            var index = 1 // Sticky header, then one heading per family and its actual filtered rows.
+            var targetIndex = -1
+            categories.values.forEach { fiches ->
+                index++
+                fiches.forEach { category ->
+                    if (category.id == target.categoryId) targetIndex = index
+                    index++
+                }
+            }
+            fun visibleTarget(): Rect? {
+                val row = target.rowBounds ?: return null
+                val viewport = viewportBounds ?: return null
+                val header = headerBounds ?: return null
+                val bottomClearance = with(density) { (84.dp + overlap).toPx() }
+                val stillLaidOut = state.list.layoutInfo.visibleItemsInfo.any { it.key == target.categoryId }
+                return row.takeIf {
+                    stillLaidOut && row.height >= target.fullRowHeight - 1f && row.top >= header.bottom - 1f &&
+                        row.bottom <= viewport.bottom - bottomClearance + 1f
+                }
+            }
+            target.attach(reveal = {
+                if (targetIndex < 0) null else {
+                    snapshotFlow { headerBounds?.takeIf { viewportBounds != null } }.filterNotNull().first()
+                    visibleTarget() ?: run {
+                        val headerHeight = requireNotNull(headerBounds).height
+                        state.list.scrollToItem(targetIndex, -(headerHeight + with(density) { 8.dp.toPx() }).roundToInt())
+                        snapshotFlow { visibleTarget() }.filterNotNull().first()
+                    }
+                }
+            }, commit = {
+                savedState.search = state.search
+                savedState.searching = state.searching
+                savedState.list.requestScrollToItem(state.list.firstVisibleItemIndex, state.list.firstVisibleItemScrollOffset)
+            })
+        }
+        onDispose {}
     }
     MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize(), state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + overlap), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
-                Column(Modifier.fillMaxWidth().background(Cream).padding(bottom = 10.dp)) {
+                Column(Modifier.fillMaxWidth().background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("Mémo", Modifier.weight(1f).testTag("memo-library-title"), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                         IconButton({ state.searching = !state.searching; if (!state.searching) state.search = "" }) {
@@ -70,7 +154,12 @@ private object MemoNavigation {
             categories.forEach { (group, fiches) ->
                 item(key = "group-$group") { Text(group, Modifier.padding(top = 10.dp, bottom = 2.dp), color = Teal, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold) }
                 items(fiches, key = { it.id }) { category ->
-                    Surface(onClick = { model.resource = category }, color = Color.White, shape = RoundedCornerShape(18.dp)) {
+                    Surface(onClick = { if (returnTarget == null) model.resource = category }, modifier = Modifier.testTag("memo-row-${category.id}").onGloballyPositioned {
+                        if (returnTarget?.categoryId == category.id) {
+                            returnTarget.rowBounds = it.boundsInWindow()
+                            returnTarget.fullRowHeight = it.size.height
+                        }
+                    }, color = Color.White, shape = RoundedCornerShape(18.dp)) {
                         Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                             val icon = when (category.id) {
                                 "morse", "morse-rhythm" -> Icons.Rounded.GraphicEq
@@ -107,7 +196,7 @@ private object MemoNavigation {
         }.groupBy { it.group }
     }
     MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
                 Column(Modifier.fillMaxWidth().background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

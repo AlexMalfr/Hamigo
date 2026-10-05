@@ -11,6 +11,9 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.ViewModelProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.malfreyt.alexandre.hamigo.platform.DailyReminder
@@ -170,7 +173,15 @@ class PredictiveBackInstrumentedTest {
     }
 
     @Test fun cancellingTheMemoGestureKeepsItsFilterAndScrollWhileCompletingItOpensTheLibrary() {
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextInput("a")
+        ui.onNode(verticalScroll).performScrollToNode(hasTestTag("memo-row-transmission-lines"))
+        val libraryBefore = scrollPosition()
+        assertTrue("The library must actually be scrolled before opening the fiche.", libraryBefore > 0f)
+        ui.onNodeWithTag("memo-row-nato").assertDoesNotExist()
+        // Restored/deep-linked details can point at a row outside the library's saved viewport.
         ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "nato" } }
+        val fiche = model.resource!!
         ui.onNodeWithContentDescription("Filtrer cette fiche").performClick()
         ui.onNode(hasSetTextAction()).performTextInput("a")
         ui.onNode(verticalScroll).performScrollToNode(hasText("Yankee"))
@@ -179,6 +190,8 @@ class PredictiveBackInstrumentedTest {
         assertTrue("The fiche must actually be scrolled before the gesture.", before > 0f)
 
         startAndProgress(.6f)
+        assertEquals("A preview must preserve the library's saved viewport.", libraryBefore, libraryScrollPosition(), .001f)
+        ui.onNodeWithTag("memo-row-nato").assertDoesNotExist()
         ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
         ui.waitForIdle()
         ui.runOnIdle { assertEquals("nato", model.resource?.id) }
@@ -186,11 +199,73 @@ class PredictiveBackInstrumentedTest {
         ui.onNodeWithText("Yankee").assertIsDisplayed()
         assertEquals(before, scrollPosition(), .001f)
 
-        startAndProgress(.85f)
-        ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
-        ui.waitUntil(5000) { model.resource == null }
+        startAndProgress(.45f)
+        assertEquals("Cancellation must preserve the next preview's original viewport.", libraryBefore, libraryScrollPosition(), .001f)
+        completeAndInspectAnimation(
+            "memo-offscreen-row-commit",
+            assertPending = { assertSame("Finding the offscreen row must keep the fiche alive.", fiche, model.resource) },
+            assertCompleted = { assertNull(model.resource); assertEquals("resources", model.route) },
+            flattenIntoRow = true,
+            targetAfterPreparation = { memoRowBounds("nato") },
+        )
         ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+        ui.onNodeWithTag("memo-row-nato").assertIsDisplayed()
+        ui.onNode(hasSetTextAction()).assertTextContains("a")
         ui.onNodeWithContentDescription("Retour aux mémos").assertDoesNotExist()
+    }
+
+    @Test fun directlyOpenedFicheExcludedByTheSavedFilterKeepsItOnCancelAndRevealsItsOwnRowOnCommit() {
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextInput("Morse")
+        ui.onNodeWithTag("memo-row-nato").assertDoesNotExist()
+        // Compare the saved viewport with the same keyboard/inset geometry after returning.
+        ui.runOnIdle {
+            WindowInsetsControllerCompat(ui.activity.window, ui.activity.window.decorView)
+                .hide(WindowInsetsCompat.Type.ime())
+        }
+        ui.waitUntil(5000) {
+            ViewCompat.getRootWindowInsets(ui.activity.window.decorView)
+                ?.isVisible(WindowInsetsCompat.Type.ime()) == false
+        }
+        ui.waitForIdle()
+        ui.onNode(verticalScroll).performScrollToNode(hasTestTag("memo-row-radio-regulations"))
+        ui.onNodeWithTag("memo-row-radio-regulations").assertIsDisplayed()
+        val libraryBefore = libraryScrollPosition()
+        val fiche = model.content!!.references.first { it.id == "nato" }
+        ui.runOnIdle { model.resource = fiche }
+
+        startAndProgress(.6f)
+        ui.mainClock.autoAdvance = false
+        try {
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
+            ui.mainClock.advanceTimeBy(240)
+            ui.runOnIdle {
+                assertSame("Cancelling a return must keep the directly opened fiche alive.", fiche, model.resource)
+            }
+            ui.onNodeWithTag("memo-library-list", useUnmergedTree = true).assertDoesNotExist()
+        } finally {
+            ui.mainClock.autoAdvance = true
+        }
+        // Inspect the original library, rather than the independent unfiltered preview.
+        ui.onNodeWithContentDescription("Retour aux mémos").performClick()
+        ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+        ui.onNodeWithTag("memo-row-radio-regulations").assertIsDisplayed()
+        assertEquals("Cancelling must preserve the saved filtered scroll.", libraryBefore, libraryScrollPosition(), .001f)
+        ui.onNodeWithTag("memo-row-nato").assertDoesNotExist()
+
+        ui.runOnIdle { model.resource = fiche }
+        startAndProgress(.45f)
+        completeAndInspectAnimation(
+            "memo-excluded-filter-row-commit",
+            assertPending = { assertSame("The exact fiche must remain open while its row is revealed.", fiche, model.resource) },
+            assertCompleted = { assertNull(model.resource); assertEquals("resources", model.route) },
+            flattenIntoRow = true,
+            targetAfterPreparation = { memoRowBounds("nato") },
+        )
+        ui.onNodeWithTag("memo-row-nato").assertIsDisplayed()
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+        assertEquals("", ui.onNode(hasSetTextAction()).fetchSemanticsNode().config[SemanticsProperties.EditableText].text)
+        navigationTab("Mémo").assertIsSelected()
     }
 
     @Test fun completingTheMemoGestureShrinksThePageIntoItsOwnTabBeforeNavigationAndKeepsTheFilter() {
@@ -216,17 +291,20 @@ class PredictiveBackInstrumentedTest {
         }
     }
 
-    @Test fun completingDetailGesturesKeepsTheirContentUntilThePageReachesItsParentTab() {
-        val memoTarget = navigationIconBounds("resources")
-        ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "nato" } }
+    @Test fun completingDetailGesturesKeepsTheirContentUntilThePageReachesItsParentDestination() {
+        ui.onNode(verticalScroll).performScrollToNode(hasTestTag("memo-row-nato"))
+        ui.onNodeWithTag("memo-row-nato").performClick()
         val fiche = model.resource!!
         startAndProgress(.45f)
+        val memoTarget = memoRowBounds("nato")
         completeAndInspectAnimation(
             "memo-detail-commit", memoTarget,
-            assertPending = { assertSame("The fiche must stay alive while its page shrinks.", fiche, model.resource) },
+            assertPending = { assertSame("The fiche must stay alive while its page flattens into its own row.", fiche, model.resource) },
             assertCompleted = { assertNull(model.resource); assertEquals("resources", model.route) },
+            flattenIntoRow = true,
         )
         ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+        ui.onNodeWithTag("memo-row-nato").assertIsDisplayed()
 
         val profileTarget = navigationIconBounds("profile")
         ui.runOnIdle { model.route = "settings" }
@@ -349,11 +427,16 @@ class PredictiveBackInstrumentedTest {
     private fun foregroundBounds(): Rect =
         ui.onNodeWithTag("back-foreground", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
 
+    private fun memoRowBounds(id: String): Rect =
+        ui.onNodeWithTag("memo-row-$id", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+
     private fun completeAndInspectAnimation(
         name: String,
-        target: Rect,
+        target: Rect? = null,
         assertPending: () -> Unit,
         assertCompleted: () -> Unit,
+        flattenIntoRow: Boolean = false,
+        targetAfterPreparation: (() -> Rect)? = null,
     ) {
         val released = foregroundBounds()
         ui.mainClock.autoAdvance = false
@@ -366,16 +449,28 @@ class PredictiveBackInstrumentedTest {
             ui.mainClock.advanceTimeBy(112)
             ui.runOnIdle { assertPending() }
             val middle = foregroundBounds()
-            assertTrue("The released page must visibly shrink before disappearing.", middle.width < released.width * .8f)
-            assertTrue("The page height must shrink along with its width.", middle.height < released.height * .8f)
+            val destination = targetAfterPreparation?.invoke() ?: requireNotNull(target)
+            if (flattenIntoRow) {
+                assertTrue(
+                    "The fiche must flatten vertically into its row while retaining most of its width.",
+                    middle.width / released.width > middle.height / released.height + .3f,
+                )
+            } else {
+                assertTrue("The released page must visibly shrink before disappearing.", middle.width < released.width * .8f)
+            }
+            assertTrue("The released page must visibly lose height before disappearing.", middle.height < released.height * .8f)
             assertTrue(
-                "The page must travel toward its own tab, rather than merely fade in place.",
-                distanceToTarget(middle, target) < distanceToTarget(released, target) * .8,
+                "The page must travel toward its parent destination, rather than merely fade in place.",
+                distanceToTarget(middle, destination) < distanceToTarget(released, destination) * .8,
             )
             capture("$name-middle")
 
-            ui.mainClock.advanceTimeBy(160)
+            // An offscreen row needs one or two layout frames before the same return animation starts.
+            ui.mainClock.advanceTimeBy(if (targetAfterPreparation == null) 160 else 192)
             ui.runOnIdle { assertCompleted() }
+            // Keep the navigation deadline assertion above, then render the adopted list position.
+            repeat(2) { ui.mainClock.advanceTimeByFrame() }
+            ui.waitForIdle()
             capture("$name-finished")
         } finally {
             ui.mainClock.autoAdvance = true
@@ -396,6 +491,8 @@ class PredictiveBackInstrumentedTest {
         }
     }
     private fun scrollPosition(): Float = ui.onNode(verticalScroll).fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
+    private fun libraryScrollPosition(): Float = ui.onNodeWithTag("memo-library-list", useUnmergedTree = true)
+        .fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
     private fun restore(edit: SharedPreferences.Editor, key: String, value: Any?) {
         when (value) {
             is String -> edit.putString(key, value)

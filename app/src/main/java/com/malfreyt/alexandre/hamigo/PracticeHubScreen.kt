@@ -32,7 +32,7 @@ import kotlin.random.Random
     var custom by remember {mutableStateOf("100")}
     var customSelected by remember {mutableStateOf(false)}
     val available=remember(index,selected) {index.available(selected)}
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {BigTitle("À toi de jouer","Trois façons de renforcer ton signal.")}
         item {Panel(color=Color(0xFFFFE8E0)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.School,null,tint=Coral);Spacer(Modifier.width(8.dp));Eyebrow("EXAMEN BLANC",Color(0xFFAC493B))}

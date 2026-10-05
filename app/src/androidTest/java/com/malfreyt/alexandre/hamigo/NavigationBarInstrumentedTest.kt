@@ -1,5 +1,6 @@
 package com.malfreyt.alexandre.hamigo
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
@@ -23,6 +25,8 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -107,8 +111,9 @@ class NavigationBarInstrumentedTest {
         val circle = ui.onNodeWithTag("navigation-icon-path", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         val overhang = with(ui.density) { HamigoNavigationOverhang.toPx() }
         val bodyTop = bar.top + overhang
-        assertEquals("The content must continue under the circle's overhang, up to the white body.", bodyTop, content.bottom, 1f)
-        assertEquals("Only the body and system navigation inset reserve content space.", bar.height - overhang, rootBounds.bottom - content.bottom, 1f)
+        val cutoutDepth = with(ui.density) { HamigoNavigationCutoutDepth.toPx() }
+        assertEquals("Real content must continue behind the entire cutout, including below the white body's top.", bar.top + cutoutDepth, content.bottom, 1f)
+        assertEquals("The reserved area must start below the transparent hole.", bar.height - cutoutDepth, rootBounds.bottom - content.bottom, 1f)
         assertTrue("The centre circle should extend above the white body.", circle.top < bodyTop)
 
         var pixels = root.captureToImage().toPixelMap()
@@ -126,6 +131,21 @@ class NavigationBarInstrumentedTest {
             assertPixel(backdrop, x, bar.top + overhang / 2f, "The overhang must reveal the content behind it")
             assertPixel(Color.White, x, bodyTop + belowBody, "The navigation body should still be white")
         }
+        fun assertCutoutShowsBackdrop(x: Float, y: Float) {
+            val actual = pixels[(x-rootBounds.left).toInt(), (y-rootBounds.top).toInt()]
+            // The inset shadow may darken the real colour, but must never replace it with Cream.
+            assertTrue("The hole must reveal the coloured screen through its translucent shadow.",
+                actual.red > backdrop.red*.65f && actual.red <= backdrop.red+.03f &&
+                actual.green > backdrop.green*.65f && actual.green <= backdrop.green+.03f &&
+                actual.blue > backdrop.blue*.65f && actual.blue <= backdrop.blue+.03f)
+        }
+        val ringOffset = with(ui.density) { 36.dp.toPx() }
+        assertCutoutShowsBackdrop(circle.center.x-ringOffset, circle.center.y)
+        assertCutoutShowsBackdrop(circle.center.x+ringOffset, circle.center.y)
+        assertCutoutShowsBackdrop(circle.center.x, circle.center.y+ringOffset)
+        val shadowPixel = pixels[(circle.center.x+ringOffset-rootBounds.left).toInt(), (circle.center.y-rootBounds.top).toInt()]
+        assertTrue("The concave edge must cast a soft visible shadow inside the hole.", shadowPixel.blue < backdrop.blue-.01f)
+        capture(root, "navbar-real-cutout")
         val topOfCircle = circle.top + with(ui.density) { 6.dp.toPx() }
         assertTrue("The regression click must hit the protruding part of the circle.", topOfCircle < bodyTop)
         assertPixel(Coral, circle.center.x, topOfCircle, "The visible raised circle must still be drawn")
@@ -145,6 +165,10 @@ class NavigationBarInstrumentedTest {
             }
             assertPixel(backdrop, centreTarget.right - belowBody, bar.top + belowBody, "The centre tab ripple must stay inside the circular icon")
             assertPixel(Color.White, circle.center.x, centreTarget.bottom - belowBody, "The centre tab ripple must not fill its rectangular touch target")
+            assertCutoutShowsBackdrop(circle.center.x-ringOffset, circle.center.y)
+            assertCutoutShowsBackdrop(circle.center.x+ringOffset, circle.center.y)
+            assertCutoutShowsBackdrop(circle.center.x, circle.center.y+ringOffset)
+            capture(root, "navbar-real-cutout-held")
         } finally {
             root.performTouchInput { up() }
             ui.mainClock.autoAdvance = true
@@ -156,4 +180,12 @@ class NavigationBarInstrumentedTest {
     private fun tab(label: String) = ui.onNode(
         hasText(label) and hasClickAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)
     )
+
+    private fun capture(node: SemanticsNodeInteraction, name: String) {
+        val directory = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "navigation-audit").apply { mkdirs() }
+        val bitmap = node.captureToImage().asAndroidBitmap()
+        try {
+            File(directory, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        } finally { bitmap.recycle() }
+    }
 }

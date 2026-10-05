@@ -12,6 +12,10 @@ fun git(vararg args: String): String = runCatching {
     check(process.waitFor() == 0) { output }; output
 }.getOrDefault("")
 val commitCount = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
+// Explicitly requested revisions of an existing release keep its number; normal builds follow Git.
+val versionCommit = providers.gradleProperty("hamigoVersionCommit").orNull?.let {
+    it.toInt().also { value -> require(value > 0) { "hamigoVersionCommit must be positive." } }
+} ?: commitCount
 val revision = git("rev-parse", "--short=8", "HEAD").ifEmpty { "local" }
 val dirty = git("status", "--porcelain").isNotEmpty()
 
@@ -38,8 +42,8 @@ android {
         applicationId = "com.malfreyt.alexandre.hamigo"
         minSdk = 26
         targetSdk = 36
-        versionCode = commitCount
-        versionName = "0.$commitCount+$revision" + if (dirty) "-dev" else ""
+        versionCode = versionCommit
+        versionName = "0.$versionCommit+$revision" + if (dirty) "-dev" else ""
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GITHUB_CLIENT_SECRET", "\"$gitHubClientSecret\"")
     }

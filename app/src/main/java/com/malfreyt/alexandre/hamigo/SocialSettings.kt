@@ -129,7 +129,7 @@ fun FriendsScreen(model: AppModel) {
     var receivedLink by remember { mutableStateOf("") }
     var inviteError by remember { mutableStateOf<String?>(null) }
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
         item { GitHubConnection(model) }
         item {
