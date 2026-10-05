@@ -13,6 +13,9 @@ import androidx.activity.BackEventCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
 import androidx.browser.auth.AuthTabIntent
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
@@ -131,6 +135,10 @@ class MainActivity : ComponentActivity() {
     var backProgress by remember {mutableFloatStateOf(0f)}
     var backWidth by remember {mutableFloatStateOf(0f)}
     var backEdge by remember {mutableIntStateOf(BackEventCompat.EDGE_LEFT)}
+    var backDragY by remember {mutableFloatStateOf(0f)}
+    var backGestureActive by remember {mutableStateOf(false)}
+    var backRebound by remember {mutableStateOf<Job?>(null)}
+    val backAnimationScope=rememberCoroutineScope()
     val snackbar=remember {SnackbarHostState()}
     LaunchedEffect(model.message) {model.message?.let {snackbar.showSnackbar(it);model.message=null}}
     if(content==null) {
@@ -142,38 +150,63 @@ class MainActivity : ComponentActivity() {
         };return
     }
     val p=model.progress
-    PredictiveBackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route=="settings") {events ->
+    PredictiveBackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path") {events ->
+        backRebound?.cancel()
+        backGestureActive=true
+        backProgress=0f
+        backDragY=0f
+        var firstTouchY:Float?=null
         try {
-            events.collect {event ->backProgress=event.progress;backEdge=event.swipeEdge}
-            when {model.session!=null->quit=true;model.lesson!=null->model.lesson=null;model.resource!=null->model.resource=null;else->model.route="profile"}
-        } catch(_:CancellationException) { /* A cancelled gesture keeps the current screen and its input. */ }
-        finally {backProgress=0f}
+            events.collect {event ->
+                if(firstTouchY==null) firstTouchY=event.touchY
+                backProgress=event.progress.coerceIn(0f,1f)
+                backEdge=event.swipeEdge
+                backDragY=(event.touchY-firstTouchY!!)*.12f
+            }
+            backGestureActive=false
+            backProgress=0f
+            when {
+                model.session!=null->quit=true
+                model.lesson!=null->model.lesson=null
+                model.resource!=null->model.resource=null
+                model.route=="settings"->model.route="profile"
+                else->model.route="path"
+            }
+        } catch(_:CancellationException) {
+            // Separate scope lets a cancelled gesture settle without changing navigation or input.
+            val releasedProgress=backProgress
+            backRebound=backAnimationScope.launch {
+                animate(releasedProgress,0f,animationSpec=tween(180,easing=FastOutSlowInEasing)) {value,_ ->backProgress=value}
+                backGestureActive=false
+            }
+        }
     }
     Scaffold(containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
         if(model.session==null && model.lesson==null && model.resource==null && model.route!="settings") {
-            NavigationBar(containerColor=Color.White,tonalElevation=0.dp) {
-                listOf(Triple("path","Parcours",Icons.Rounded.Route),Triple("practice","Défis",Icons.Rounded.Bolt),
-                    Triple("resources","Mémo",Icons.Rounded.MenuBook),Triple("friends","Équipe",Icons.Rounded.Groups),
-                    Triple("profile","Moi",Icons.Rounded.Person)).forEach { (id,label,icon)->
-                    NavigationBarItem(selected=model.route==id,onClick={model.route=id},icon={Icon(icon,label)},label={Text(label,fontSize=11.sp)},
-                        colors=NavigationBarItemDefaults.colors(indicatorColor=Mist,selectedIconColor=Teal,selectedTextColor=Teal))
-                }
-            }
+            HamigoBottomBar(model.route,onDestination={destination ->
+                backRebound?.cancel()
+                backGestureActive=false
+                backProgress=0f
+                model.route=destination
+            })
         }
     }) { padding ->
         Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
-            if(backProgress>0f) {
+            if(backGestureActive) {
                 when {
                     model.resource!=null->ResourceLibraryScreen(model,content)
                     model.route=="settings"->ProfileScreen(model,content)
-                    else->MainDestination(model,content)
+                    model.session!=null || model.lesson!=null->MainDestination(model,content)
+                    else->PathScreen(model,content)
                 }
             }
             Box(Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat()}.graphicsLayer {
-                translationX=backWidth*.18f*backProgress*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
-                scaleX=1f-.05f*backProgress;scaleY=1f-.05f*backProgress
-                shape=RoundedCornerShape((24*backProgress).dp);clip=backProgress>0f
-                shadowElevation=12.dp.toPx()*backProgress
+                val movement=backProgress*(2f-backProgress)
+                translationX=backWidth*.34f*movement*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
+                translationY=backDragY.coerceIn(-24.dp.toPx(),24.dp.toPx())*movement
+                scaleX=1f-.07f*movement;scaleY=1f-.07f*movement
+                shape=RoundedCornerShape((28*movement).dp);clip=backGestureActive
+                shadowElevation=16.dp.toPx()*movement
             }.background(Cream)) {
             when {
                 model.session!=null -> QuizScreen(model)

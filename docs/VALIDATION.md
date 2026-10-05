@@ -1,5 +1,13 @@
 # Validation de Hamigo
 
+## Navigation principale et retour prédictif — 5 octobre 2026
+
+- **Sept tests Android ciblés réussis** sur Pixel 9a API 36 : ordre Défis/Mémo/Parcours/Équipe/Moi, cercle central au-dessus des icônes voisines, cibles tactiles et sélection ; retour standard des quatre pages vers Parcours ; aperçu, annulation et validation depuis les deux bords ; nouveau geste pendant le rebond ; conservation du filtre/scroll des fiches et des réponses d'examen ; hiérarchie réglages/Moi et leçons/Parcours. Rapport : `output/android-tests-navigation-final.txt`.
+- Le test de navbar passe aussi avec une police à **130 %** ; l'émulateur est ensuite rétabli à 100 %. Le premier test comparait les zones tactiles de même hauteur pour mesurer le relief visuel : cette assertion de fixture est remplacée par la mesure des boîtes d'icônes. Les cinq cas de retour de cette première passe étaient déjà réussis. L'échec initial est conservé dans `output/android-tests-navigation.txt`.
+- Le contrôle par un vrai `KEYCODE_BACK` avec le clavier ouvert ferme d'abord l'IME, conserve la recherche « Morse » et l'onglet Mémo ; le second retour ouvre Parcours. Preuves : `output/navigation-audit/ime-back.json` et les relevés XML associés.
+- **Douze captures** des quatre pages et des gestes depuis les deux bords montrent Parcours sous la page déplacée, avec coins arrondis et barre de navigation fixe. Le déplacement est lu dans `graphicsLayer` ; la page de fond est introduite une fois par geste. La découpe laisse 6 dp autour du bouton central de 64 dp. Captures dans `output/navigation-audit/predictive/`, plus `navbar-path.png`.
+- Assemblage debug et APK de tests réussis ; **lint sans erreur**, avec 67 avertissements et une indication. Aucun domaine d'apprentissage, sauvegarde ou transport OAuth n'est modifié par cette passe.
+
 ## Activation et validation OAuth PKCE — 5 octobre 2026
 
 - Après l'autorisation explicite de l'utilisateur et sa vérification 2FA dans le portail GitHub, le secret de l'application OAuth Hamigo existante a été généré et enregistré uniquement dans `.tools/oauth.properties`, ignoré de Git. Aucun jeton personnel n'a été créé. La valeur n'est pas incluse dans les rapports.

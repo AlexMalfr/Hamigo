@@ -2,9 +2,11 @@ package com.malfreyt.alexandre.hamigo
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.BackEventCompat
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +21,7 @@ import org.junit.Test
 import org.junit.rules.ExternalResource
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import java.io.File
 
 /** Dispatches the real Activity callbacks consumed by Compose's PredictiveBackHandler. */
 @RunWith(AndroidJUnit4::class)
@@ -56,6 +59,114 @@ class PredictiveBackInstrumentedTest {
         ui.runOnIdle { model.showWelcome = false; model.route = "resources" }
     }
 
+    @Test fun ordinaryBackReturnsEverySecondaryMainDestinationToParcours() {
+        listOf("practice", "resources", "friends", "profile").forEach { route ->
+            ui.runOnIdle { model.route = route }
+            ui.waitForIdle()
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+            ui.waitForIdle()
+            ui.runOnIdle {
+                assertEquals("Back from $route should return to the main learning page.", "path", model.route)
+                assertFalse("Back between tabs must keep Hamigo open.", ui.activity.isFinishing)
+            }
+            ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+            navigationTab("Parcours").assertIsSelected()
+        }
+    }
+
+    @Test fun predictiveBackFromBothEdgesCancelsOrReturnsEveryMainDestinationToParcours() {
+        val destinations = listOf(
+            "practice" to "Défis", "resources" to "Mémo", "friends" to "Équipe", "profile" to "Moi"
+        )
+        listOf(BackEventCompat.EDGE_LEFT, BackEventCompat.EDGE_RIGHT).forEach { edge ->
+            destinations.forEach { (route, label) ->
+                ui.runOnIdle { model.route = route }
+                ui.waitForIdle()
+                capture("$route-before")
+                startAndProgress(.45f, edge)
+                capture("$route-back-${if (edge == BackEventCompat.EDGE_LEFT) "left" else "right"}")
+                // The destination is genuinely visible before release; cancellation preserves the source tab.
+                ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+                ui.runOnIdle {
+                    assertEquals(route, model.route)
+                    ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled()
+                }
+                ui.waitForIdle()
+                ui.runOnIdle { assertEquals("Cancelling from $route on edge $edge", route, model.route) }
+                navigationTab(label).assertIsSelected()
+                ui.onNodeWithText("HAMIGO").assertDoesNotExist()
+
+                startAndProgress(.85f, edge)
+                ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+                ui.waitForIdle()
+                ui.runOnIdle {
+                    assertEquals("Completing from $route on edge $edge", "path", model.route)
+                    assertFalse(ui.activity.isFinishing)
+                }
+                ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+                navigationTab("Parcours").assertIsSelected()
+            }
+        }
+    }
+
+    @Test fun startingAnotherGestureDuringCancellationKeepsItsPreviewAndTheMemoFilter() {
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextInput("Morse")
+        startAndProgress(.6f)
+
+        ui.mainClock.autoAdvance = false
+        try {
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
+            ui.mainClock.advanceTimeBy(32)
+            ui.runOnIdle { assertEquals("resources", model.route) }
+            ui.runOnIdle {
+                ui.activity.onBackPressedDispatcher.dispatchOnBackStarted(BackEventCompat(0f, 200f, 0f, BackEventCompat.EDGE_LEFT))
+            }
+            ui.runOnIdle {
+                ui.activity.onBackPressedDispatcher.dispatchOnBackProgressed(BackEventCompat(100f, 200f, .45f, BackEventCompat.EDGE_LEFT))
+            }
+            // Longer than the old rebound: it must not erase the newly started gesture's preview.
+            ui.mainClock.advanceTimeBy(240)
+            ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            ui.runOnIdle {
+                assertEquals("resources", model.route)
+                ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled()
+            }
+            ui.mainClock.advanceTimeBy(240)
+            ui.onNodeWithText("HAMIGO").assertDoesNotExist()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            navigationTab("Mémo").assertIsSelected()
+        } finally {
+            ui.mainClock.autoAdvance = true
+        }
+    }
+
+    @Test fun backFromSettingsAndLessonStillVisitsTheirParentBeforeParcours() {
+        ui.runOnIdle { model.route = "settings" }
+        startAndProgress(.7f, BackEventCompat.EDGE_RIGHT)
+        ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+        ui.waitForIdle()
+        ui.runOnIdle { assertEquals("profile", model.route) }
+        navigationTab("Moi").assertIsSelected()
+
+        ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+        ui.waitForIdle()
+        ui.runOnIdle {
+            assertEquals("path", model.route)
+            model.startLesson(model.content!!.lessons.first())
+        }
+        startAndProgress(.7f)
+        ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+        ui.waitForIdle()
+        ui.runOnIdle {
+            assertNull(model.lesson)
+            assertEquals("path", model.route)
+            assertFalse(ui.activity.isFinishing)
+        }
+        navigationTab("Parcours").assertIsSelected()
+    }
+
     @Test fun cancellingTheMemoGestureKeepsItsFilterAndScrollWhileCompletingItOpensTheLibrary() {
         ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "nato" } }
         ui.onNodeWithContentDescription("Filtrer cette fiche").performClick()
@@ -76,7 +187,7 @@ class PredictiveBackInstrumentedTest {
         startAndProgress(.85f)
         ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
         ui.waitUntil(5000) { model.resource == null }
-        ui.onNodeWithText("Les petits mémos").assertIsDisplayed()
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
         ui.onNodeWithContentDescription("Retour aux mémos").assertDoesNotExist()
     }
 
@@ -122,10 +233,23 @@ class PredictiveBackInstrumentedTest {
         }
     }
 
-    private fun startAndProgress(progress: Float) {
-        ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackStarted(BackEventCompat(0f, 200f, 0f, BackEventCompat.EDGE_LEFT)) }
-        ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackProgressed(BackEventCompat(120f, 200f, progress, BackEventCompat.EDGE_LEFT)) }
+    private fun startAndProgress(progress: Float, edge: Int = BackEventCompat.EDGE_LEFT) {
+        val start = if (edge == BackEventCompat.EDGE_LEFT) 0f else ui.activity.resources.displayMetrics.widthPixels.toFloat()
+        val direction = if (edge == BackEventCompat.EDGE_LEFT) 1f else -1f
+        ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackStarted(BackEventCompat(start, 200f, 0f, edge)) }
+        ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackProgressed(BackEventCompat(start + direction * 120f, 200f, progress, edge)) }
         ui.waitForIdle()
+    }
+    private fun navigationTab(label: String) = ui.onNode(
+        hasText(label) and SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)
+    )
+    private fun capture(name: String) {
+        val directory = requireNotNull(context.getExternalFilesDir("navigation-audit"))
+        check(directory.isDirectory || directory.mkdirs())
+        val bitmap = ui.onRoot().captureToImage().asAndroidBitmap()
+        File(directory, "$name.png").outputStream().use { stream ->
+            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream))
+        }
     }
     private fun scrollPosition(): Float = ui.onNode(verticalScroll).fetchSemanticsNode().config[SemanticsProperties.VerticalScrollAxisRange].value()
     private fun restore(edit: SharedPreferences.Editor, key: String, value: Any?) {

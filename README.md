@@ -18,7 +18,9 @@ Ton compagnon pour préparer le **certificat d’opérateur des services d’ama
 
 Les mauvaises réponses reviennent après dix minutes, puis les bonnes réponses s'espacent. Relire prématurément une carte déjà acquise n'allonge pas artificiellement son intervalle. Une question rapporte 3 XP si elle est réussie, 1 XP en cas d'erreur, au plus une attribution par question et par jour ; une première validation de leçon ajoute 6 XP. Une leçon exige **au moins 80 % de bonnes réponses au premier essai et aucune erreur restante** : corriger ensuite une séance entièrement ratée ne suffit pas à valider la leçon.
 
-Moi permet de parcourir l'historique des XP par tranches de sept jours avec un glissement horizontal ou les boutons. Le retour prédictif anime l'écran et laisse la navigation inchangée si le geste est annulé. Les illustrations Exam1 utilisent un aperçu dérivé plus lisible ; toucher l'image ouvre l'original en plein écran avec zoom et déplacement.
+La barre de navigation suit l'ordre **Défis · Mémo · Parcours · Équipe · Moi**. Parcours est la page principale : son bouton rond central dépasse de la barre, avec un fond distinct et une encoche qui laisse 6 dp d'espace autour du cercle. Retour depuis les quatre autres pages principales ramène à Parcours ; les fiches, leçons et réglages conservent leur retour vers leur page parente.
+
+Moi permet de parcourir l'historique des XP par tranches de sept jours avec un glissement horizontal ou les boutons. Le retour prédictif déplace davantage l'écran dès le début du geste, avec un léger suivi vertical ; annuler le geste anime son retour en place et conserve la navigation et les entrées. Les illustrations Exam1 utilisent un aperçu dérivé plus lisible ; toucher l'image ouvre l'original en plein écran avec zoom et déplacement.
 
 ## Jouer ensemble
 
