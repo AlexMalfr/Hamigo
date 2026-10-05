@@ -49,7 +49,7 @@ private fun syncDate(value: String?): String = value?.let {
 
 /** The same account controls are available from the team and preferences. */
 @Composable
-fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
+fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnly: Boolean = false) {
     val connected = remember(model.revision) { runCatching { model.sync.tokens.get() != null }.getOrDefault(false) }
     val login = remember(model.revision) { model.sync.accountLogin }
     val identity = remember(model.revision) { model.sync.accountIdentity }
@@ -58,7 +58,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
     val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
     var details by remember { mutableStateOf(false) }
     Panel(modifier, color = Mist) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (!controlsOnly || !connected) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if(connected) GitHubAvatar(identity,login ?: model.progress.name,Modifier.size(44.dp))
             else Icon(Icons.Rounded.CloudSync, null, tint = Teal, modifier = Modifier.size(32.dp))
             Column(Modifier.weight(1f)) {
@@ -69,7 +69,6 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
         }
         model.oauthStatus?.let {Text(it,color=Muted,fontSize=12.sp,lineHeight=17.sp)}
         if (connected) {
-            Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
             if (lastError != null) {
                 Surface(color = Color(0xFFFFE8E0), shape = RoundedCornerShape(12.dp)) {
                     Text(lastError, Modifier.padding(10.dp), color = Ink, fontSize = 12.sp, lineHeight = 17.sp)
@@ -78,11 +77,11 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Synchronisation automatique", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text("Tes révisions suivent ton compte.", color = Muted, fontSize = 12.sp)
+                    Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
                 }
                 Switch(automatic, { model.setAutoSync(it) }, enabled = !model.busy)
             }
-            Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
+            if (!controlsOnly) Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
                 model.refreshSocial(manual = true)
             }
         } else if (model.oauthSession != null) {
@@ -103,7 +102,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
             Text("Le compte GitHub est facultatif. Ton apprentissage reste enregistré sur ce téléphone.",
                 color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
         }
-        TextButton({ details = !details }, contentPadding = PaddingValues(0.dp)) {
+        TextButton({ details = !details }, modifier = Modifier.height(36.dp), contentPadding = PaddingValues(0.dp)) {
             Icon(if (details) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null)
             Spacer(Modifier.width(6.dp))
             Text("Données sauvegardées et fréquence", fontSize = 12.sp)
@@ -127,6 +126,10 @@ fun FriendsScreen(model: AppModel) {
     val context = LocalContext.current
     val own = remember(model.revision) { model.progress.snapshot() }
     val invitation = remember(model.revision) { model.sync.savedGistUrl?.let { FriendInvite.link(it) } }
+    val connected = remember(model.revision) { model.sync.tokens.hasToken() }
+    val accountLogin = remember(model.revision) { model.sync.accountLogin }
+    val lastSyncError = remember(model.revision) { model.sync.lastSyncError }
+    var syncExpanded by remember { mutableStateOf(false) }
     var showQr by remember { mutableStateOf(false) }
     var addOpen by remember { mutableStateOf(false) }
     var receivedLink by remember { mutableStateOf("") }
@@ -134,15 +137,40 @@ fun FriendsScreen(model: AppModel) {
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
-        item { GitHubConnection(model) }
-        if(model.friendRequests.isNotEmpty() || model.outgoingRequests.isNotEmpty()) item { FriendRequestsPanel(model) }
+        item {
+            if (!connected) GitHubConnection(model)
+            else Panel(color = Mist) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    GitHubAvatar(model.sync.accountIdentity, accountLogin ?: own.name, Modifier.size(44.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Connecté · ${accountLogin ?: "GitHub"}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
+                    IconButton({ syncExpanded = !syncExpanded }) {
+                        Icon(if (syncExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                            if (syncExpanded) "Masquer les réglages de synchronisation" else "Afficher les réglages de synchronisation", tint = Teal)
+                    }
+                }
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (lastSyncError != null) "Synchronisation à vérifier" else "Sauvegarde et équipe GitHub",
+                        color = if (lastSyncError != null) MaterialTheme.colorScheme.error else Muted,
+                        fontSize = 11.sp, modifier = Modifier.weight(1f))
+                    TextButton({ model.refreshSocial(manual = true) }, enabled = !model.busy,
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) {
+                        Icon(Icons.Rounded.Refresh, null, Modifier.size(17.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text(if (model.busy) "Actualisation…" else "Actualiser l’équipe", fontSize = 12.sp)
+                    }
+                }
+                if (syncExpanded) GitHubConnection(model, controlsOnly = true)
+            }
+        }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Pico(Modifier.size(64.dp), mood = MascotMood.HAPPY)
+                    Pico(Modifier.size(44.dp), mood = MascotMood.HAPPY)
                     Column(Modifier.weight(1f)) {
-                        Text("Ton équipe radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("Un lien ou un QR suffit pour vous retrouver.", color = Muted, fontSize = 12.sp)
+                        Text("Invitations", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Retrouvez-vous par lien ou QR code.", color = Muted, fontSize = 12.sp)
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -156,21 +184,18 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 if (invitation == null) Text("Connecte GitHub ci-dessus pour créer ton lien d’invitation.", fontSize = 12.sp, color = Muted)
-                Action("Partager le classement") {
-                    NativeShare.teamImage(context, own, model.friends.map { it.progress })
-                }
-                Text("Une image de votre équipe, avec vos graphiques de progression.", fontSize = 11.sp, color = Muted)
             }
         }
+        if(model.friendRequests.isNotEmpty() || model.outgoingRequests.isNotEmpty()) item { FriendRequestsPanel(model) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Le sprint des 7 jours", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                    Text("Classement hebdomadaire", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
                     Icon(Icons.Rounded.Leaderboard, null, tint = Teal)
                 }
                 ranking.forEachIndexed { index, profile ->
                     val isOwn = profile === own
-                    Row(Modifier.fillMaxWidth().background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 10.dp),
+                    Row(Modifier.fillMaxWidth().background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text("${index + 1}", fontSize = 19.sp, fontWeight = FontWeight.ExtraBold,
                             color = if (index == 0) Coral else Teal, modifier = Modifier.width(22.dp))
@@ -184,6 +209,17 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 if (model.friends.isEmpty()) Text("Invite un équipier pour suivre vos progrès et vous encourager.", fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
+                OutlinedButton({ NativeShare.teamImage(context, own, model.friends.map { it.progress }) },
+                    Modifier.fillMaxWidth().heightIn(min = 44.dp)) {
+                    Icon(Icons.Rounded.Share, null, Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp)); Text("Partager le classement")
+                }
+            }
+        }
+        if (model.friends.isNotEmpty()) item {
+            Row(Modifier.fillMaxWidth().padding(top = 6.dp, start = 4.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Tes équipiers", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                Text(model.friends.size.toString(), color = Teal, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
         items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
@@ -248,7 +284,7 @@ fun FriendsScreen(model: AppModel) {
                 confirmButton={TextButton({confirmRequest=false;model.sendFriendRequest(friend)},enabled=!model.busy) {Text("Envoyer")}},
                 dismissButton={TextButton({confirmRequest=false}){Text("Annuler")}})
         }
-        item {
+        if (!connected) item {
             OutlinedButton({ model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
                 Icon(Icons.Rounded.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
                 Text(if (model.busy) "Actualisation…" else "Actualiser l’équipe")
@@ -265,7 +301,7 @@ fun FriendsScreen(model: AppModel) {
                     Icon(Icons.Rounded.Link, null); Spacer(Modifier.width(8.dp)); Text("Partager le lien")
                 }
                 OutlinedButton({ NativeShare.inviteImage(context, invitation) }, Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.QrCode2, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
+                    Icon(Icons.Rounded.Share, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
                 }
             }
         }, confirmButton = { TextButton({ showQr = false }) { Text("Fermer") } })
@@ -300,27 +336,32 @@ private fun FriendRequestsPanel(model: AppModel) {
                 Text("Demandes reçues",fontSize=18.sp,fontWeight=FontWeight.ExtraBold,modifier=Modifier.weight(1f))
                 Badge { Text(model.friendRequests.size.toString()) }
             }
-            Text("À toi de choisir qui rejoint ton équipe.",fontSize=12.sp,color=Muted)
             val requests=if(allIncoming) model.friendRequests else model.friendRequests.take(5)
             requests.forEach { request -> key(request.decisionKey) {
-                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                    GitHubAvatar(request.author,request.profile.name,Modifier.size(40.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(request.profile.name,fontWeight=FontWeight.Bold,fontSize=15.sp)
-                        Text("@${request.author.login}",fontSize=12.sp,color=Muted)
+                Surface(color = Color.White.copy(alpha = .6f), shape = RoundedCornerShape(14.dp)) {
+                    Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
+                            GitHubAvatar(request.author,request.profile.name,Modifier.size(40.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(request.profile.name,fontWeight=FontWeight.Bold,fontSize=15.sp)
+                                Text("@${request.author.login}",fontSize=12.sp,color=Muted)
+                            }
+                        }
+                        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                            Button({model.acceptFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy,
+                                contentPadding=PaddingValues(horizontal=14.dp,vertical=6.dp)) { Text("Accepter") }
+                            TextButton({model.ignoreFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy) { Text("Ignorer") }
+                        }
                     }
-                }
-                Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                    Button({model.acceptFriendRequest(request)},enabled=!model.busy,
-                        contentPadding=PaddingValues(horizontal=14.dp,vertical=6.dp)) { Text("Accepter") }
-                    TextButton({model.ignoreFriendRequest(request)},enabled=!model.busy) { Text("Ignorer") }
                 }
             } }
             if(!allIncoming && model.friendRequests.size>5) TextButton({allIncoming=true}) { Text("Voir les autres demandes") }
         }
         if(model.outgoingRequests.isNotEmpty()) Panel {
             TextButton({outgoingOpen=!outgoingOpen},Modifier.fillMaxWidth(),contentPadding=PaddingValues(0.dp)) {
-                Text("Demandes envoyées · ${model.outgoingRequests.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold)
+                Icon(Icons.Rounded.Send,null,modifier=Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Demandes envoyées · ${model.outgoingRequests.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold,fontSize=16.sp)
                 Icon(if(outgoingOpen) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null)
             }
             if(outgoingOpen) model.outgoingRequests.sortedByDescending { it.updatedAt }.take(10).forEach { outgoing ->

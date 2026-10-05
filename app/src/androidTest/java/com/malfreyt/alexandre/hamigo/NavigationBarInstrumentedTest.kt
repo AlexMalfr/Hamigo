@@ -144,8 +144,11 @@ class NavigationBarInstrumentedTest {
         val belowBody = with(ui.density) { 4.dp.toPx() }
         // Sampling both sides catches a full-width beige or white strip behind the raised button.
         listOf(rootBounds.left + edge, rootBounds.right - edge).forEach { x ->
-            assertPixel(backdrop, x, bar.top + overhang / 2f, "The overhang must reveal the content behind it")
+            assertPixel(backdrop, x, bar.top + with(ui.density) { 2.dp.toPx() }, "The overhang must reveal the content behind it")
             assertPixel(Color.White, x, bodyTop + belowBody, "The navigation body should still be white")
+            val shadow=pixels[(x-rootBounds.left).toInt(), (bodyTop-with(ui.density) {3.dp.toPx()}-rootBounds.top).toInt()]
+            assertTrue("The straight top edge needs a soft shadow without an opaque strip.",
+                shadow.blue < backdrop.blue-.01f && shadow.blue > backdrop.blue*.7f)
         }
         fun assertCutoutShowsBackdrop(x: Float, y: Float) {
             val actual = pixels[(x-rootBounds.left).toInt(), (y-rootBounds.top).toInt()]
@@ -164,7 +167,7 @@ class NavigationBarInstrumentedTest {
         capture(root, "navbar-real-cutout")
         val topOfCircle = circle.top + with(ui.density) { 6.dp.toPx() }
         assertTrue("The regression click must hit the protruding part of the circle.", topOfCircle < bodyTop)
-        assertPixel(Coral, circle.center.x, topOfCircle, "The visible raised circle must still be drawn")
+        assertPixel(Teal, circle.center.x, topOfCircle, "The unselected raised circle must be turquoise")
         val centreTarget = tab("Parcours").fetchSemanticsNode().boundsInRoot
         // Freeze automatic time advancement so the press stays down while its ripple is captured.
         ui.mainClock.autoAdvance = false
@@ -176,7 +179,7 @@ class NavigationBarInstrumentedTest {
             ui.mainClock.advanceTimeBy(650)
             pixels = root.captureToImage().toPixelMap()
             listOf(rootBounds.left + edge, rootBounds.right - edge).forEach { x ->
-                assertPixel(backdrop, x, bar.top + overhang / 2f, "A held press must not tint the content beside the circle")
+                assertPixel(backdrop, x, bar.top + with(ui.density) { 2.dp.toPx() }, "A held press must not tint the content beside the circle")
                 assertPixel(Color.White, x, bodyTop + belowBody, "A held press must not tint the whole navigation body")
             }
             assertPixel(backdrop, centreTarget.right - belowBody, bar.top + belowBody, "The centre tab ripple must stay inside the circular icon")

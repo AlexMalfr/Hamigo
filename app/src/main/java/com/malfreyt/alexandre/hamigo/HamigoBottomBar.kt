@@ -47,8 +47,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -103,9 +103,28 @@ fun HamigoBottomBar(
                 val center = Offset((size.width + leftInset - rightInset) / 2f, 34.dp.toPx())
                 val radius = 38.dp.toPx()
                 val body = Path().apply { addRect(Rect(0f, bodyTop, size.width, size.height)) }
-                val hole = Path().apply { addOval(Rect(center.x-radius, center.y-radius, center.x+radius, center.y+radius)) }
+                val circleBounds = Rect(center.x-radius, center.y-radius, center.x+radius, center.y+radius)
+                val lip = 8.dp.toPx()
+                val silhouette = Path().apply {
+                    moveTo(0f, bodyTop)
+                    lineTo(center.x-radius-lip, bodyTop)
+                    cubicTo(center.x-radius-3.dp.toPx(), bodyTop,
+                        center.x-radius, center.y-10.dp.toPx(), center.x-radius, center.y)
+                    arcTo(circleBounds, 180f, -180f, false)
+                    cubicTo(center.x+radius, center.y-10.dp.toPx(),
+                        center.x+radius+3.dp.toPx(), bodyTop, center.x+radius+lip, bodyTop)
+                    lineTo(size.width, bodyTop)
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
+                }
+                // The same soft edge follows the straight top and the notch. Translucent strokes
+                // preserve the real content through the cutout; the white fill covers their inner half.
+                for (spread in 10 downTo 1) {
+                    drawPath(silhouette, Color.Black.copy(alpha = .020f), style = Stroke(spread * 2.dp.toPx()))
+                }
                 // Paint only the bar itself: the hole reveals the actual scrolling screen below.
-                drawPath(Path.combine(PathOperation.Difference, body, hole), Color.White)
+                drawPath(silhouette, Color.White)
                 // A translucent inset shadow follows the concave edge without filling the hole.
                 clipPath(body) {
                     drawCircle(
@@ -130,11 +149,11 @@ fun HamigoBottomBar(
                     val central = destination.route == "path"
                     val interactionSource = remember(destination.route) { MutableInteractionSource() }
                     val iconColor by animateColorAsState(
-                        if (central && selected) Color.White else if (central) Ink else if (selected) Teal else Muted,
+                        if (central && selected) Ink else if (central) Color.White else if (selected) Teal else Muted,
                         label = "${destination.route} icon",
                     )
                     val fillColor by animateColorAsState(
-                        if (central) { if (selected) Teal else Coral } else { if (selected) Mist else Color.Transparent },
+                        if (central) { if (selected) Coral else Teal } else { if (selected) Mist else Color.Transparent },
                         label = "${destination.route} background",
                     )
                     Column(
@@ -155,7 +174,9 @@ fun HamigoBottomBar(
                     ) {
                         Box(
                             (if (central) {
-                                Modifier.size(64.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(fillColor)
+                                Modifier.size(64.dp).shadow(9.dp, CircleShape, clip = false,
+                                    ambientColor = Color.Black.copy(alpha = .16f), spotColor = Color.Black.copy(alpha = .22f))
+                                    .clip(CircleShape).background(fillColor)
                             } else {
                                 Modifier.width(56.dp).height(40.dp).clip(RoundedCornerShape(18.dp)).background(fillColor)
                             }).onGloballyPositioned { onDestinationBounds(destination.route, it.boundsInWindow()) }

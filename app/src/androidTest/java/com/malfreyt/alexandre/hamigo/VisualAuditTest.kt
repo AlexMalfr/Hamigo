@@ -87,6 +87,57 @@ class VisualAuditTest {
         ui.waitForIdle()
     }
 
+    @Test fun profileDistinguishesAnEmptyWeekFromEarlierProgress() {
+        ui.runOnIdle {
+            val progress=JSONObject(model.progress.prefs.getString("progress","{}")!!)
+            val daily=progress.getJSONObject("dailyXp")
+            (0L..6L).forEach { daily.remove(today.minusDays(it).toString()) }
+            model.progress.prefs.edit().putString("progress",progress.toString()).commit()
+            model.progress.reload();model.refresh()
+        }
+        navigate("profile")
+        scrollTo("Pas de progressions cette semaine.")
+        ui.onNodeWithText("Pas de progressions cette semaine.").assertIsDisplayed()
+        capture("33-moi-semaine-vide")
+        ui.onNodeWithContentDescription("Voir la semaine précédente").performClick()
+        ui.onNodeWithText("Ton historique").assertIsDisplayed()
+        ui.onNodeWithText("Pas de progressions cette semaine.").assertIsNotDisplayed()
+        capture("34-moi-historique-actif")
+    }
+
+    @Test fun pathHeaderRemainsVisibleAndItsStatsOpenProfile() {
+        navigate("path")
+        val shortcut=ui.onNode(hasContentDescription("Voir ma progression :",substring=true))
+        shortcut.assertIsDisplayed()
+        val initialTop=shortcut.fetchSemanticsNode().boundsInRoot.top
+        scrollTo("Parcours libre :",substring=true)
+        shortcut.assertIsDisplayed()
+        check(shortcut.fetchSemanticsNode().boundsInRoot.top<=initialTop+1f)
+        capture("35-parcours-entete-fixe")
+        shortcut.performClick()
+        ui.runOnIdle {check(model.route=="profile")}
+        ui.onNodeWithText("Partager mon bilan").assertIsDisplayed()
+        capture("36-moi-entete-partage")
+    }
+
+    @Test fun monthlyCalendarKeepsItsHistoryAndDailyGoalVisible() {
+        navigate("profile")
+        scrollTo("Calendrier d’activité")
+        ui.onNode(hasContentDescription("aujourd’hui",substring=true)).assertIsDisplayed()
+        ui.onNodeWithContentDescription("Voir le mois suivant").assertIsNotEnabled()
+        capture("37-moi-calendrier-mensuel")
+        ui.onNodeWithContentDescription("Voir le mois précédent").performClick()
+        ui.onNodeWithContentDescription("Voir le mois suivant").assertIsEnabled()
+        capture("38-moi-calendrier-historique")
+        ui.onNodeWithContentDescription("Voir le mois suivant").performClick()
+        ui.onNode(hasContentDescription("aujourd’hui",substring=true)).assertIsDisplayed()
+        scrollTo("Cette semaine")
+        ui.onNodeWithContentDescription("Objectif journalier : 30 XP").assertIsDisplayed()
+        capture("39-moi-objectif-graphique")
+        scrollTo("Bilan d’apprentissage")
+        capture("40-moi-bilan-astuce")
+    }
+
     @Test fun allMainPagesAndSocialDialogs() {
         for ((route, label) in listOf("path" to "01-parcours", "practice" to "02-defis", "resources" to "03-memo", "friends" to "04-equipe", "profile" to "05-moi", "settings" to "06-reglages")) {
             navigate(route)
@@ -95,8 +146,8 @@ class VisualAuditTest {
                 "path" -> "Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous."
                 "practice" -> "Ouvrir le labo · 12 questions"
                 "resources" -> model.content!!.references.last().title
-                "friends" -> "Actualiser l’équipe"
-                "profile" -> "La mémoire aime les retrouvailles"
+                "friends" -> "Classement hebdomadaire"
+                "profile" -> "Mieux retenir"
                 else -> "Sources & version"
             }
             if (exists(lastText)) scrollTo(lastText)
@@ -142,11 +193,13 @@ class VisualAuditTest {
         ui.onNodeWithText("Inviter").performScrollTo().performClick()
         capture("13-invitation-qr-dialog")
         ui.onNodeWithText("Fermer").performClick()
-        scrollTo("Le sprint des 7 jours")
+        scrollTo("Classement hebdomadaire")
         capture("14-equipe-classement")
-        scrollTo("Actualiser l’équipe")
+        ui.onAllNodes(verticalScroll).onFirst().performScrollToNode(hasContentDescription("Options de Nora"))
         capture("15-equipe-equipiers")
         navigate("friends")
+        scrollTo("Connecté · AlexMalfr")
+        ui.onNodeWithContentDescription("Afficher les réglages de synchronisation").performClick()
         scrollTo("Données sauvegardées et fréquence")
         ui.onNodeWithText("Données sauvegardées et fréquence").performClick()
         capture("16-synchronisation-details")
@@ -497,7 +550,8 @@ class VisualAuditTest {
 
     private fun demoFriends(): List<Friend> = listOf("Camille" to 165, "F4Léo" to 102, "Nora" to 54).mapIndexed { index, (name, weekly) ->
         Friend(ShareProgress(name, 960 - index * 230, 12 - index * 3, 18 - index * 4, weekly,
-            dailyXp = (13L downTo 0L).map { ago -> DailyPoint(today.minusDays(ago).toString(), (weekly / 7 + (ago % 3) * 3).toInt()) }), "")
+            dailyXp = (13L downTo 0L).map { ago -> DailyPoint(today.minusDays(ago).toString(), (weekly / 7 + (ago % 3) * 3).toInt()) }),
+            "https://gist.github.com/${(index+1).toString(16).padStart(32,'0')}")
     }
 
     private fun examFixtureQuestions(): List<Question> = listOf("regulation", "technique").flatMap { section ->

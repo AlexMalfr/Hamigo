@@ -53,3 +53,19 @@ Les photos GitHub s'affichent en cercle à côté des équipiers et sur Moi, Éq
 Ouvrir une invitation connecté permet d'ajouter l'ami et de demander l'ajout en retour, ou d'ajouter seulement. Une demande est un commentaire GitHub sur le Gist social du destinataire, publié uniquement sur une action explicite. Celui-ci voit une pastille avec le nombre de demandes sur l'onglet Équipe et une section Accepter/Ignorer. L'acceptation sauvegarde la relation et la décision, puis publie un accusé que l'expéditeur peut lire. Un ami déjà présent dispose aussi de cette action dans son menu.
 
 Les auteurs et propriétaires sont vérifiés par l'API GitHub. Les UUID et états persistants évitent les doublons après interruption ; les demandes importées ne repartent jamais seules. Les demandes expirent après trente jours. Les commentaires sont accessibles aux personnes possédant le lien du Gist ; ce mécanisme repose sur les actualisations de Hamigo, sans notification push ni serveur dédié. Voir [SOCIAL.md](SOCIAL.md) et [VALIDATION.md](VALIDATION.md).
+
+## Navigation, Équipe et graphique vide — 5 octobre 2026
+
+Le bouton Parcours est orange lorsqu'il est sélectionné et turquoise autrement. Son ombre est élargie, celle du bord supérieur suit la découpe avec un contraste renforcé. Les deux raccords de la découpe sont arrondis ; le contenu reste visible derrière le vrai espace transparent et la hauteur de la barre ne change pas.
+
+Équipe présente un compte compact avec actualisation et réglages dépliables, puis Invitations, Demandes reçues/envoyées, Classement hebdomadaire avec partage, et Tes équipiers. Les détails de synchronisation dépliés évitent de répéter le compte et le bouton d'actualisation. Les demandes, photos et menus amis sont conservés.
+
+Moi affiche « Pas de progressions cette semaine. » en gris au centre du graphique pour chaque tranche de sept jours sans XP, y compris dans l'historique.
+
+## Calendrier et bilan personnel
+
+Moi ajoute un calendrier mensuel au-dessus du graphique, avec navigation dans tout l'historique. Les cercles se remplissent depuis le centre proportionnellement aux XP rapportés à l'objectif actuel ; aujourd'hui est cerclé d'orange et les dates futures restent discrètes. L'app ne prétend pas conserver les anciens objectifs, qui ne sont pas historisés.
+
+Le graphique hebdomadaire montre l'objectif journalier par une ligne orange pointillée. Le Bilan d'apprentissage présente les statistiques dans quatre tuiles et Mieux retenir adopte l'ampoule et le fond jaune des astuces Mémo. Partager mon bilan rejoint la carte niveau/XP, et tous les boutons de partage d'image portent une icône de partage.
+
+L'en-tête de Parcours reste fixe au scroll ; son bloc série/XP mène à Moi avec une petite flèche. Dans Équipe et les réglages, la dernière synchronisation est le sous-titre de Synchronisation automatique, et le bouton des données/fréquence est resserré.

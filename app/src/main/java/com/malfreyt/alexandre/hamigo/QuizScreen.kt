@@ -341,7 +341,11 @@ fun solution(q:Question):String=when(q.kind){
                     if(showRecap)NativeShare.resultsImage(context,ShareResults(model.progress.name,s.title,s.firstCorrect,s.firstCount,s.elapsedMillis,s.unanswered,s.gain,
                         if(s.exam)s.regulationScore else null,if(s.exam)s.techniqueScore else null))
                     else NativeShare.progressImage(context,model.progress.snapshot())
-                },Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)) {Text(if(showRecap)"Partager mes résultats" else "Partager mon parcours")}
+                },Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)) {
+                    Icon(Icons.Rounded.Share,null,Modifier.size(18.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(if(showRecap)"Partager mes résultats" else "Partager mon parcours")
+                }
             }
         }
         if(showRecap) {

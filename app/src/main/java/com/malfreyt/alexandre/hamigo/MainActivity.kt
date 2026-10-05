@@ -23,8 +23,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +31,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
@@ -49,6 +48,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -61,7 +64,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.time.LocalDate
 import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
@@ -449,6 +451,7 @@ private data class BackScreenSnapshot(
     BigTitle(title,subtitle)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable fun PathScreen(model:AppModel, content:Content) {
     val p=model.displayedProgress ?: model.progress
     val completed=p.completed
@@ -456,10 +459,17 @@ private data class BackScreenSnapshot(
     val next=content.nextLesson(completed)
     val due=p.due(content)
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        item {
-            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                Column {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold)}
-                Column(horizontalAlignment=Alignment.End) {Text("🔥 ${p.streak} jours",fontWeight=FontWeight.Bold,color=Color(0xFFB44D30));Text("⚡ ${p.xp} XP",fontSize=13.sp,color=Teal)}
+        stickyHeader {
+            Row(Modifier.fillMaxWidth().background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}
+                Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Mist.copy(alpha=.6f))
+                    .clickable(role=Role.Button) {model.route="profile"}
+                    .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${p.streak} jours de série, ${p.xp} XP"}
+                    .padding(horizontal=10.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,
+                    horizontalArrangement=Arrangement.spacedBy(5.dp)) {
+                    Column(horizontalAlignment=Alignment.End) {Text("🔥 ${p.streak} jours",fontWeight=FontWeight.Bold,color=Color(0xFFB44D30));Text("⚡ ${p.xp} XP",fontSize=13.sp,color=Teal)}
+                    Icon(Icons.Rounded.ChevronRight,null,Modifier.size(17.dp),tint=Muted)
+                }
             }
         }
         item {
@@ -524,48 +534,5 @@ private data class BackScreenSnapshot(
             Text("Cours original Hamigo, adapté des ressources F6KGL. Les références sont dans les réglages.",fontSize=12.sp,color=Muted)
         }
         Action("À toi de jouer · ${lesson.questions.size} à ${lesson.questions.size+2} défis",Modifier.padding(16.dp)) {model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)}
-    }
-}
-
-@Composable fun ProfileScreen(model:AppModel,content:Content) {
-    val p=model.displayedProgress ?: model.progress
-    val context=LocalContext.current
-    val today=LocalDate.now()
-    val earliest=p.activeDays.mapNotNull {runCatching{LocalDate.parse(it)}.getOrNull()}.filter{!it.isAfter(today)}.minOrNull() ?: today
-    val weeks=maxOf(4,(java.time.temporal.ChronoUnit.DAYS.between(earliest,today)/7).toInt()+1)
-    val history=rememberPagerState(pageCount={weeks})
-    val scope=rememberCoroutineScope()
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        item {Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {GitHubAvatar(model.sync.accountIdentity,p.name,Modifier.size(56.dp));Column(Modifier.weight(1f)){BigTitle(p.name,"Un peu chaque jour, beaucoup à l'arrivée.")};IconButton({model.route="settings"}){Icon(Icons.Rounded.Settings,"Réglages")}}}
-        item {Panel(color=Mist){Row(verticalAlignment=Alignment.CenterVertically){Pico(Modifier.size(80.dp),mood=if(p.streak>0)MascotMood.CELEBRATE else MascotMood.HAPPY,pose=if(p.streak>0)MascotPose.JUMP else MascotPose.WAVE);Column(Modifier.weight(1f)){Text("Niveau ${1+p.xp/250}",fontSize=24.sp,fontWeight=FontWeight.ExtraBold);Text("${p.xp} XP · 🔥 ${p.streak} jours",color=Teal,fontWeight=FontWeight.Bold)}};LinearProgressIndicator(progress={(p.xp%250)/250f},modifier=Modifier.fillMaxWidth(),color=Teal,trackColor=Color.White);Text("${250-p.xp%250} XP avant le prochain niveau",fontSize=12.sp,color=Muted)}}
-        item {
-            Panel {
-                Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-                    Text(if(history.currentPage==0)"Cette semaine" else "Ton historique",fontSize=20.sp,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f))
-                    IconButton({scope.launch{history.animateScrollToPage(history.currentPage+1)}},enabled=history.currentPage<weeks-1) {Icon(Icons.Rounded.History,"Voir la semaine précédente")}
-                    IconButton({scope.launch{history.animateScrollToPage(history.currentPage-1)}},enabled=history.currentPage>0) {Icon(Icons.Rounded.Update,"Voir la semaine suivante")}
-                }
-                HorizontalPager(history,Modifier.fillMaxWidth(),reverseLayout=true) {week ->
-                    val days=(6L downTo 0L).map{today.minusDays(week*7L+it)}
-                    val maximum=days.maxOf{p.dayXp(it)}.coerceAtLeast(p.dailyGoal)
-                    Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    Text("${days.first().format(java.time.format.DateTimeFormatter.ofPattern("d MMM",java.util.Locale.FRENCH))} – ${days.last().format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy",java.util.Locale.FRENCH))}",fontSize=12.sp,color=Muted)
-                    Row(Modifier.fillMaxWidth().height(156.dp),horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.Bottom) {
-                    days.forEach {day->Column(Modifier.weight(1f).fillMaxHeight(),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(3.dp)) {
-                        Text("${p.dayXp(day)}",fontSize=10.sp,color=Muted)
-                        Box(Modifier.fillMaxWidth().weight(1f),contentAlignment=Alignment.BottomCenter) {
-                            Box(Modifier.fillMaxWidth().fillMaxHeight(p.dayXp(day).toFloat()/maximum).background(if(day==LocalDate.now())Coral else Teal,RoundedCornerShape(5.dp)))
-                        }
-                        Text(day.dayOfWeek.getDisplayName(java.time.format.TextStyle.NARROW,java.util.Locale.FRENCH),fontSize=11.sp)
-                    }}
-                    }
-                    Text("${days.sumOf {p.dayXp(it)}} XP en 7 jours · objectif ${p.dailyGoal} XP/jour",fontSize=12.sp,color=Muted)
-                    }
-                }
-                Text("Glisse vers la droite pour remonter les semaines.",fontSize=11.sp,color=Muted)
-            }
-        }
-        item {Panel {Text("Ton signal se renforce",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("${p.completed.size} / ${content.lessons.size} leçons terminées\n${p.reviews.values.count{it.repetitions>=3}} notions consolidées\n${p.totalAnswers} réponses · ${if(p.totalAnswers==0)0 else p.totalCorrect*100/p.totalAnswers}% de réussite",fontSize=14.sp,lineHeight=22.sp);Action("Partager mon bilan"){NativeShare.progressImage(context,p.snapshot())}}}
-        item {Panel {Text("La mémoire aime les retrouvailles",fontSize=18.sp,fontWeight=FontWeight.Bold);Text("Les bonnes réponses reviennent après 1 jour, puis 6 jours, puis plus loin selon ta facilité. Les erreurs reviennent après 10 minutes. Les flashcards te laissent choisir leur difficulté.",fontSize=14.sp,color=Muted,lineHeight=22.sp)}}
     }
 }
