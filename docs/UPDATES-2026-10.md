@@ -45,3 +45,11 @@ Les marges, espacements, titres et cartes ont été resserrés dans l'ensemble d
 La sauvegarde GitHub et l'export manuel incluent désormais les amis. La reconnexion sur une installation vide restaure l'équipe. Les relations se fusionnent par identifiant de Gist ; les suppressions horodatées empêchent les anciennes sauvegardes de réintroduire un ami retiré. Une actualisation de ses statistiques ne vaut pas nouvel ajout. Les anciens exports sans relations restent compatibles et préservent les amis locaux.
 
 Les réglages permettent d'ouvrir ses Gists social et de sauvegarde dans les options manuelles repliées. Le menu d'un équipier permet d'ouvrir son Gist social ou de le retirer. Les URLs sont validées et reconstruites sur le domaine Gist ; afficher les liens ne provoque aucune découverte réseau. Le [schéma social et les règles de conflit](SOCIAL.md) détaillent le stockage, les invitations HTTPS/QR et leur caractère à sens unique.
+
+## Photos GitHub et demandes réciproques — 5 octobre 2026
+
+Les photos GitHub s'affichent en cercle à côté des équipiers et sur Moi, Équipe et les réglages pour le compte connecté. Le menu d'un ami ouvre son profil GitHub et son Gist social. Le retrait apparaît en rouge et ouvre une confirmation avec annulation.
+
+Ouvrir une invitation connecté permet d'ajouter l'ami et de demander l'ajout en retour, ou d'ajouter seulement. Une demande est un commentaire GitHub sur le Gist social du destinataire, publié uniquement sur une action explicite. Celui-ci voit une pastille avec le nombre de demandes sur l'onglet Équipe et une section Accepter/Ignorer. L'acceptation sauvegarde la relation et la décision, puis publie un accusé que l'expéditeur peut lire. Un ami déjà présent dispose aussi de cette action dans son menu.
+
+Les auteurs et propriétaires sont vérifiés par l'API GitHub. Les UUID et états persistants évitent les doublons après interruption ; les demandes importées ne repartent jamais seules. Les demandes expirent après trente jours. Les commentaires sont accessibles aux personnes possédant le lien du Gist ; ce mécanisme repose sur les actualisations de Hamigo, sans notification push ni serveur dédié. Voir [SOCIAL.md](SOCIAL.md) et [VALIDATION.md](VALIDATION.md).

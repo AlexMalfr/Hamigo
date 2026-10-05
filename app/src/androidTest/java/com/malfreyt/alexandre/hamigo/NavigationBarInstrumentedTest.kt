@@ -38,6 +38,22 @@ import org.junit.runner.RunWith
 class NavigationBarInstrumentedTest {
     @get:Rule val ui = createComposeRule()
 
+    @Test fun pendingRequestBadgeAppearsAndClearsWithoutChangingTheBarBounds() {
+        var count by mutableStateOf(0)
+        ui.setContent { HamigoTheme {
+            Box(Modifier.fillMaxSize()) {
+                HamigoBottomBar("path",{},Modifier.align(Alignment.BottomCenter).testTag("badge-test-bar"),friendRequestCount=count)
+            }
+        } }
+        val before=ui.onNodeWithTag("badge-test-bar").fetchSemanticsNode().boundsInRoot
+        ui.onNodeWithTag("friend-request-badge",useUnmergedTree=true).assertDoesNotExist()
+        ui.runOnIdle {count=2}
+        ui.onNodeWithContentDescription("2 demandes d’amis en attente",useUnmergedTree=true).assertIsDisplayed()
+        assertEquals(before,ui.onNodeWithTag("badge-test-bar").fetchSemanticsNode().boundsInRoot)
+        ui.runOnIdle {count=0}
+        ui.onNodeWithTag("friend-request-badge",useUnmergedTree=true).assertDoesNotExist()
+    }
+
     @Test fun destinationsHaveTheRequestedOrderAndEveryTapUpdatesTheirSelectedState() {
         var route by mutableStateOf("path")
         ui.setContent {

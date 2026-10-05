@@ -23,6 +23,10 @@ object CloudProgress {
                 val id = GitHubSync.gistId(entry.getString("gist"))
                 val record = JSONObject().put("modifiedAt", entry.optLong("modifiedAt", 1L).coerceAtLeast(1L))
                     .put("deleted", false).put("progress", JSONObject(ShareProgress.fromJson(entry.getJSONObject("progress").toString()).toJson()))
+                entry.optJSONObject("githubIdentity")?.let { identity ->
+                    record.put("githubIdentity", GitHubIdentity.fromJson(identity).toJson())
+                        .put("githubIdentityCheckedAt",entry.optLong("githubIdentityCheckedAt",0L).coerceAtLeast(0L))
+                }
                 result.put(id, result.optJSONObject(id)?.let { chooseFriend(it, record) } ?: record)
             }
         }
@@ -39,7 +43,10 @@ object CloudProgress {
     fun activeFriends(records: JSONObject): JSONArray = JSONArray(records.keys().asSequence().sorted().mapNotNull { id ->
         val record = records.getJSONObject(id)
         if (record.getBoolean("deleted")) null else JSONObject().put("gist", "https://gist.github.com/$id")
-            .put("modifiedAt", record.getLong("modifiedAt")).put("progress", copy(record.getJSONObject("progress")))
+            .put("modifiedAt", record.getLong("modifiedAt")).put("progress", copy(record.getJSONObject("progress"))).also { entry ->
+                record.optJSONObject("githubIdentity")?.let { entry.put("githubIdentity",copy(it))
+                    .put("githubIdentityCheckedAt",record.optLong("githubIdentityCheckedAt")) }
+            }
     }.toList())
 
     fun friendTombstones(records: JSONObject): JSONObject = JSONObject().also { result ->
@@ -70,6 +77,11 @@ object CloudProgress {
                 else -> right
             }
             result.put("progress", copy(cache))
+            val identities=listOf(a,b).filter { it.optJSONObject("githubIdentity")!=null }
+            identities.maxWithOrNull(compareBy<JSONObject> { it.optLong("githubIdentityCheckedAt") }.thenBy { canonical(it.getJSONObject("githubIdentity")) })?.let {
+                result.put("githubIdentity",copy(it.getJSONObject("githubIdentity")))
+                    .put("githubIdentityCheckedAt",it.optLong("githubIdentityCheckedAt"))
+            }
         }
         return result
     }
@@ -97,15 +109,21 @@ object CloudProgress {
         records.keys().forEach { id ->
             require(friendId.matches(id)) { "Identifiant d'équipier invalide." }
             val record = records.getJSONObject(id)
-            require(record.keys().asSequence().all { it in setOf("modifiedAt", "deleted", "progress") }) { "Relation de sauvegarde invalide." }
+            require(record.keys().asSequence().all { it in setOf("modifiedAt", "deleted", "progress", "githubIdentity", "githubIdentityCheckedAt") }) { "Relation de sauvegarde invalide." }
             val modified = record.opt("modifiedAt")
             require(modified is Number && modified.toDouble().isFinite() && modified.toDouble() % 1.0 == 0.0 && modified.toDouble() in 1.0..9_007_199_254_740_991.0) { "Date de relation invalide." }
             require(record.opt("deleted") is Boolean) { "État de relation invalide." }
             if (record.getBoolean("deleted")) {
                 require(!record.has("progress")) { "Une relation supprimée ne doit pas contenir de profil." }
+                require(!record.has("githubIdentity") && !record.has("githubIdentityCheckedAt"))
             } else {
                 active++
                 record.put("progress", JSONObject(ShareProgress.fromJson(record.getJSONObject("progress").toString()).toJson()))
+                if(record.has("githubIdentity")) record.put("githubIdentity", GitHubIdentity.fromJson(record.getJSONObject("githubIdentity")).toJson())
+                if(record.has("githubIdentityCheckedAt")) {
+                    val checked=record.opt("githubIdentityCheckedAt")
+                    require(record.has("githubIdentity") && checked is Number && checked.toDouble().isFinite() && checked.toDouble()%1.0==0.0 && checked.toDouble() in 0.0..9_007_199_254_740_991.0)
+                }
             }
         }
         require(active <= MAX_FRIENDS) { "La sauvegarde dépasse la limite de trente équipiers." }
@@ -208,6 +226,8 @@ object CloudProgress {
             .put("progress", state)
         if (local.has("friends") || remote.has("friends")) result.put("friends", mergeFriends(
             local.optJSONObject("friends") ?: JSONObject(), remote.optJSONObject("friends") ?: JSONObject()))
+        if (local.has("socialInbox") || remote.has("socialInbox")) result.put("socialInbox", FriendInboxState.merge(
+            local.optJSONObject("socialInbox") ?: FriendInboxState.empty(), remote.optJSONObject("socialInbox") ?: FriendInboxState.empty()))
         return result.toString()
     }
 
@@ -223,6 +243,7 @@ object CloudProgress {
             require(wrapper.opt("friends") is JSONObject) { "Liste d'équipiers invalide." }
             checkFriends(wrapper.getJSONObject("friends"))
         }
+        if(wrapper.has("socialInbox")) FriendInboxState.validate(wrapper.getJSONObject("socialInbox"))
         val state = wrapper.getJSONObject("progress")
         checkCollectionTypes(state)
         checkCounters(state)

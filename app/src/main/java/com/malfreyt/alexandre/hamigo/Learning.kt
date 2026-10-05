@@ -8,6 +8,7 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import com.malfreyt.alexandre.hamigo.platform.CloudProgress
+import com.malfreyt.alexandre.hamigo.platform.FriendInboxState
 import com.malfreyt.alexandre.hamigo.platform.DailyPoint
 import com.malfreyt.alexandre.hamigo.platform.DailyReminder
 import com.malfreyt.alexandre.hamigo.platform.ProgressSyncScheduler
@@ -188,7 +189,41 @@ class Progress(private val context: Context) {
             .put("preferences",JSONObject().put("dailyGoal",dailyGoal)
                 .put("reminderEnabled",prefs.getBoolean("reminderEnabled",false))
                 .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0)))
-            .put("progress",root).put("friends",friendRecords()).toString()
+            .put("progress",root).put("friends",cloudFriendRecords()).put("socialInbox",socialInboxState()).toString()
+    }
+    /** Keep verified avatar metadata local: older clients reject unknown relationship fields. */
+    private fun cloudFriendRecords(): JSONObject = friendRecords().also { records ->
+        records.keys().forEach { id -> records.getJSONObject(id).remove("githubIdentity");records.getJSONObject(id).remove("githubIdentityCheckedAt") }
+    }
+    fun socialInboxState(): JSONObject = synchronized(CLOUD_LOCK) {
+        runCatching { FriendInboxState.prune(JSONObject(prefs.getString("socialInbox","{}") ?: "{}")) }.getOrElse { FriendInboxState.empty() }
+    }
+    fun saveSocialInboxState(state:JSONObject) = synchronized(CLOUD_LOCK) {
+        check(prefs.edit().putString("socialInbox",FriendInboxState.prune(state).toString()).commit()) {
+            "La demande n’a pas pu être sauvegardée sur l’appareil."
+        }
+    }
+    /** Atomic acceptance: the decision and the active relationship survive together. */
+    fun saveSocialAcceptance(records:JSONObject,state:JSONObject) = synchronized(CLOUD_LOCK) {
+        val active=CloudProgress.activeFriends(records)
+        val deleted=CloudProgress.friendTombstones(records)
+        val checked=FriendInboxState.prune(state)
+        check(prefs.edit().putString("friends",active.toString()).putString("friendTombstones",deleted.toString())
+            .putString("socialInbox",checked.toString()).commit()) { "L’acceptation n’a pas pu être sauvegardée sur l’appareil." }
+    }
+    private fun retainLocalFriendIdentities(records:JSONObject):JSONObject {
+        val cached=friendRecords()
+        return JSONObject(records.toString()).also { restored ->
+            restored.keys().forEach { id ->
+                val record=restored.getJSONObject(id)
+                record.remove("githubIdentity");record.remove("githubIdentityCheckedAt")
+                val previous=cached.optJSONObject(id)
+                if(!record.getBoolean("deleted") && previous?.optBoolean("deleted")==false) {
+                    previous.optJSONObject("githubIdentity")?.let { record.put("githubIdentity",it)
+                        .put("githubIdentityCheckedAt",previous.optLong("githubIdentityCheckedAt")) }
+                }
+            }
+        }
     }
     fun friendRecords(): JSONObject = synchronized(CLOUD_LOCK) {
         val active = runCatching { JSONArray(prefs.getString("friends", "[]") ?: "[]") }.getOrDefault(JSONArray())
@@ -215,9 +250,10 @@ class Progress(private val context: Context) {
                 .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
         }
         candidate.optJSONObject("friends")?.let { records ->
-            editor.putString("friends",CloudProgress.activeFriends(records).toString())
+            editor.putString("friends",CloudProgress.activeFriends(retainLocalFriendIdentities(records)).toString())
                 .putString("friendTombstones",CloudProgress.friendTombstones(records).toString())
         }
+        candidate.optJSONObject("socialInbox")?.let { editor.putString("socialInbox",it.toString()) }
         editor.apply(); save()
         if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
         before != cloudExport()
@@ -240,7 +276,8 @@ class Progress(private val context: Context) {
             root = state; name = candidate.optString("name", name)
             // An old export has no relationships: preserve the local team in that case.
             // An explicit new-format import replaces both active relationships and deletions.
-            candidate.optJSONObject("friends")?.let { saveFriendRecords(it) }
+            candidate.optJSONObject("friends")?.let { saveFriendRecords(retainLocalFriendIdentities(it)) }
+            candidate.optJSONObject("socialInbox")?.let { saveSocialInboxState(it) }
             candidate.optJSONObject("preferences")?.let {settings ->
                 prefs.edit().putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal))
                     .putInt("reminderHour",settings.optInt("reminderHour",20)).putInt("reminderMinute",settings.optInt("reminderMinute",0))

@@ -231,6 +231,70 @@ class VisualAuditTest {
         // No link is clicked: the audit never opens a browser or sends a request to GitHub.
     }
 
+    @Test fun githubAvatarsAndFriendRemovalRequireConfirmation() {
+        // Login-only identities deliberately exercise the offline fallback without CDN requests.
+        model.sync.tokens.store("visual-audit-only-not-a-real-token")
+        check(context.getSharedPreferences("hamigo_social",Context.MODE_PRIVATE).edit()
+            .putString("ownerLogin","AlexMalfr").remove("ownerId").commit())
+        val friend=demoFriends().first().copy(gist="https://gist.github.com/fedcba9876543210fedcba9876543210",
+            githubIdentity=GitHubIdentity("camille-radio"))
+        ui.runOnIdle { model.addFriend(friend);model.refresh() }
+        navigate("profile")
+        ui.onNodeWithContentDescription("Photo GitHub de Alex").assertIsDisplayed()
+        capture("26-moi-avatar-github")
+        navigate("settings")
+        ui.onNodeWithContentDescription("Photo GitHub de Alex").assertIsDisplayed()
+        capture("27-reglages-avatar-github")
+        navigate("friends")
+        ui.onNodeWithContentDescription("Photo GitHub de AlexMalfr").assertIsDisplayed()
+        capture("28-equipe-avatar-github")
+        ui.onAllNodes(verticalScroll).onFirst().performScrollToNode(hasContentDescription("Options de Camille"))
+        ui.onNodeWithContentDescription("Options de Camille").performClick()
+        ui.onNodeWithText("Ouvrir le profil GitHub").assertIsDisplayed()
+        capture("29-equipe-profil-menu")
+        ui.onNodeWithText("Retirer cet équipier").performClick()
+        ui.onNodeWithText("Retirer Camille ?").assertIsDisplayed()
+        check(model.friends.size==1)
+        capture("30-equipe-retrait-confirmation")
+        ui.onNodeWithText("Annuler").performClick()
+        check(model.friends.size==1)
+        ui.onNodeWithContentDescription("Options de Camille").performClick()
+        ui.onNodeWithText("Retirer cet équipier").performClick()
+        ui.onNodeWithText("Retirer").performClick()
+        ui.runOnIdle {
+            check(model.friends.isEmpty())
+            check(model.progress.friendRecords().getJSONObject(GitHubSync.gistId(friend.gist)).getBoolean("deleted"))
+        }
+    }
+
+    @Test fun reciprocalRequestsShowTheirBadgeAndExplicitInvitationChoice() {
+        model.sync.tokens.store("visual-audit-only-not-a-real-token")
+        check(context.getSharedPreferences("hamigo_social",Context.MODE_PRIVATE).edit()
+            .putString("ownerLogin","AlexMalfr").putString("ownGistId","aaaaaaaaaaaaaaaaaaaa")
+            .remove("ownerId").commit())
+        val own="aaaaaaaaaaaaaaaaaaaa"
+        val created=java.time.Instant.now().toString()
+        // Display-only fixtures: no action invokes the transport, login-only avatars stay offline.
+        val requests=listOf("Camille" to "bbbbbbbbbbbbbbbbbbbb","Nora" to "cccccccccccccccccccc").mapIndexed { index,pair ->
+            FriendRequest(java.util.UUID.randomUUID().toString(),pair.second,own,created,
+                GitHubIdentity(if(index==0) "camille-radio" else "nora-radio"),
+                ShareProgress(pair.first,30,1,1),index.toLong()+1)
+        }
+        navigate("friends")
+        ui.runOnIdle { model.friendRequests=requests }
+        ui.onNodeWithContentDescription("2 demandes d’amis en attente",useUnmergedTree=true).assertExists()
+        scrollTo("Demandes reçues")
+        capture("31-equipe-demandes-badge")
+        ui.onAllNodesWithText("Accepter").assertCountEquals(2)
+        ui.runOnIdle { model.friendRequests=emptyList() }
+        ui.onNodeWithTag("friend-request-badge",useUnmergedTree=true).assertDoesNotExist()
+        ui.runOnIdle { model.pendingInvite="bbbbbbbbbbbbbbbbbbbb" }
+        ui.onNodeWithText("Ajouter et envoyer la demande").assertIsDisplayed()
+        ui.onNodeWithText("Ajouter seulement").assertIsDisplayed()
+        capture("32-invitation-ajout-reciproque")
+        ui.onNodeWithText("Annuler").performClick()
+    }
+
     @Test fun everyReferenceCategoryAndInteractiveTool() {
         for ((index, category) in model.content!!.references.withIndex()) {
             navigate("resources")

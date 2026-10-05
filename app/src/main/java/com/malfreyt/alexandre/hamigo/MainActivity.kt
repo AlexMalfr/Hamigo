@@ -48,6 +48,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -338,7 +339,7 @@ private data class BackScreenSnapshot(
             HamigoBottomBar(model.route,onDestination={destination ->
                 resetBackMotion()
                 model.route=destination
-            },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds})
+            },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds},friendRequestCount=model.friendRequests.size)
         }
     }) { padding ->
         val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
@@ -415,9 +416,21 @@ private data class BackScreenSnapshot(
             dismissButton={TextButton({model.incoming=null}){Text("Annuler")}})
     }
     if(!model.showWelcome && model.oauthSession==null && model.authSession==null) model.pendingInvite?.let {
-        AlertDialog(onDismissRequest={model.pendingInvite=null},icon={Pico(Modifier.size(80.dp),mood=MascotMood.GOOFY,pose=MascotPose.WAVE)},
-            title={Text("Rejoindre cette équipe ?")},text={Text("Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe.")},
-            confirmButton={TextButton({model.acceptInvite()},enabled=!model.busy) {Text("Ajouter l’équipier")}},dismissButton={TextButton({model.pendingInvite=null}) {Text("Annuler")}})
+        val canRequest=model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null
+        AlertDialog(onDismissRequest={model.pendingInvite=null},icon={Pico(Modifier.size(64.dp),mood=MascotMood.GOOFY,pose=MascotPose.WAVE)},
+            title={Text("Rejoindre cette équipe ?")},text={Text(if(canRequest)
+                "Ajoute cet équipier et envoie-lui une demande pour qu’il puisse aussi t’ajouter. La demande sera visible dans les commentaires de son Gist social."
+                else "Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe. Connecte GitHub pour demander l’ajout en retour.")},
+            confirmButton={Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(8.dp),horizontalAlignment=Alignment.CenterHorizontally) {
+                Button(onClick={model.acceptInvite(sendReciprocal=canRequest)},enabled=!model.busy,
+                    modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(15.dp),
+                    colors=ButtonDefaults.buttonColors(containerColor=Teal,contentColor=Color.White)) {
+                    Text(if(canRequest) "Ajouter et envoyer la demande" else "Ajouter l’équipier",textAlign=TextAlign.Center,fontWeight=FontWeight.Bold)
+                }
+                if(canRequest) OutlinedButton(onClick={model.acceptInvite()},enabled=!model.busy,
+                    modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(15.dp)) {Text("Ajouter seulement")}
+                TextButton({model.pendingInvite=null}) {Text("Annuler")}
+            }})
     }
 }
 
@@ -523,7 +536,7 @@ private data class BackScreenSnapshot(
     val history=rememberPagerState(pageCount={weeks})
     val scope=rememberCoroutineScope()
     LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        item {Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {Column(Modifier.weight(1f)){BigTitle(p.name,"Un peu chaque jour, beaucoup à l'arrivée.")};IconButton({model.route="settings"}){Icon(Icons.Rounded.Settings,"Réglages")}}}
+        item {Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {GitHubAvatar(model.sync.accountIdentity,p.name,Modifier.size(56.dp));Column(Modifier.weight(1f)){BigTitle(p.name,"Un peu chaque jour, beaucoup à l'arrivée.")};IconButton({model.route="settings"}){Icon(Icons.Rounded.Settings,"Réglages")}}}
         item {Panel(color=Mist){Row(verticalAlignment=Alignment.CenterVertically){Pico(Modifier.size(80.dp),mood=if(p.streak>0)MascotMood.CELEBRATE else MascotMood.HAPPY,pose=if(p.streak>0)MascotPose.JUMP else MascotPose.WAVE);Column(Modifier.weight(1f)){Text("Niveau ${1+p.xp/250}",fontSize=24.sp,fontWeight=FontWeight.ExtraBold);Text("${p.xp} XP · 🔥 ${p.streak} jours",color=Teal,fontWeight=FontWeight.Bold)}};LinearProgressIndicator(progress={(p.xp%250)/250f},modifier=Modifier.fillMaxWidth(),color=Teal,trackColor=Color.White);Text("${250-p.xp%250} XP avant le prochain niveau",fontSize=12.sp,color=Muted)}}
         item {
             Panel {

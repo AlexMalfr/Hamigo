@@ -93,7 +93,39 @@ Un écouteur des préférences rafraîchit les valeurs affichées lorsqu'un trav
 
 `FriendInvite.link` produit `https://alexmalfr.github.io/hamigo/?invite=<identifiant-du-Gist-social>`. Ce lien peut circuler dans Discord et les autres messageries qui reconnaissent HTTPS. Android App Links ouvre Hamigo ; la page statique GitHub Pages propose aussi un bouton vers `hamigo://join?invite=...`. Si l'application est absente, elle invite à demander l'APK à l'ami : les releases restent dans le dépôt privé. Le fichier `/.well-known/assetlinks.json` lie le domaine au package Android et au certificat de signature. Aucun serveur applicatif n'est nécessaire.
 
-L'identifiant dans le lien est bien celui du Gist social : l'URL complète n'y figure pas, mais on peut la reconstruire à partir de cet identifiant. Il n'est ni chiffré ni secret. L'app valide l'invitation, lit le résumé, puis demande confirmation avant d'enregistrer l'ami. La relation est à sens unique : ajouter quelqu'un permet de lire sa progression, sans modifier sa liste d'amis ni lui envoyer automatiquement une demande. Pour apparaître mutuellement, chacun doit ouvrir l'invitation de l'autre. Une demande réciproque pourrait utiliser GitHub comme boîte de réception avec validation et polling, mais ce protocole n'est pas implémenté. Le jeton d'un utilisateur ne permet pas de modifier le Gist appartenant à un autre.
+L'identifiant dans le lien est bien celui du Gist social : l'URL complète n'y figure pas, mais on peut la reconstruire à partir de cet identifiant. Il n'est ni chiffré ni secret. L'app valide l'invitation et lit le résumé après confirmation. **Ajouter seulement** crée une relation à sens unique. Avec GitHub connecté et un Gist social créé, **Ajouter et envoyer la demande** ajoute l'ami puis envoie une demande pour établir l'autre sens. Chacun garde la maîtrise de sa liste ; les fichiers de l'autre utilisateur ne sont jamais modifiés.
+
+## Demandes réciproques
+
+Les commentaires des Gists sociaux servent de boîte de réception, via [l'API GitHub des commentaires](https://docs.github.com/en/rest/gists/comments). Aucun troisième Gist ni serveur applicatif n'est nécessaire. Une demande contient un UUID et les identifiants des deux Gists sociaux. GitHub fournit l'identité de l'auteur du commentaire ; Hamigo vérifie que son identifiant numérique est celui du propriétaire du Gist social annoncé. Un nom ou une URL fournis dans le corps ne suffisent pas à établir une identité.
+
+```mermaid
+sequenceDiagram
+    participant A as App de A
+    participant G as Gist social de B
+    participant B as App de B
+    participant S as Sauvegarde de B
+    A->>A: Ouvrir le lien de B et choisir Ajouter et envoyer la demande
+    A->>G: Commentaire signé par le compte A : demande + son Gist social
+    B->>G: Lire les commentaires lors de la synchronisation
+    G-->>B: Demande et auteur GitHub vérifiés
+    B->>B: Afficher une pastille et Accepter / Ignorer
+    B->>S: Accepter : enregistrer A et la décision
+    B->>G: Commentaire signé par B : demande acceptée
+    G-->>A: Lors d'une lecture suivante, afficher Acceptée
+```
+
+Les demandes reçues apparaissent dans Équipe, avec la photo et le compte de leur auteur. Une pastille indique leur nombre sur l'onglet. **Accepter** vérifie de nouveau la source, enregistre localement l'ami et la décision ensemble, puis tente de publier une confirmation sur le propre Gist social du destinataire. Un échec de cette confirmation ne retire pas l'ami ; la confirmation pourra être réessayée lors d'une actualisation. **Ignorer** sauvegarde la décision sans publier de refus. Les demandes envoyées se consultent dans une section repliable ; un envoi échoué propose **Réessayer**. Relire ou importer une sauvegarde n'envoie jamais automatiquement de nouvelles demandes.
+
+Le champ de sauvegarde `socialInbox` conserve les décisions et les états d'envoi, avec des règles de fusion déterministes. Les demandes reçues restent un cache local attaché au compte et au Gist social courant. Les clés de décision incluent destinataire, expéditeur et UUID : copier un UUID public sous un autre compte ne masque pas la demande authentique. Les anciennes demandes d'un expéditeur déjà traitées, ou antérieures à son retrait, ne le réajoutent pas. L'identifiant conservé lors d'une reprise évite de publier deux fois après une réponse réseau perdue.
+
+Le transport expire les demandes après trente jours, lit au plus cent demandes candidates et refuse une boîte atteignant mille commentaires plutôt que de publier sans pouvoir vérifier les doublons. Les décisions et suivis sont bornés et les données de plus de soixante jours sont élaguées. Les autres commentaires et les formats invalides sont ignorés. Les vérifications accompagnent les synchronisations au premier plan et en arrière-plan ; la pastille n'est donc pas une notification push instantanée. Les commentaires sont lisibles avec le lien du Gist social. GitHub peut aussi produire ses notifications habituelles. Le nettoyage des commentaires n'est pas automatisé dans cette version.
+
+## Photos et profils GitHub
+
+Les photos circulaires viennent de l'identité vérifiée par `/user` pour son propre compte et du propriétaire renvoyé par `/gists/<id>` pour les amis. Les URLs de profil sont reconstruites sur `github.com` et les avatars sur `avatars.githubusercontent.com` à partir de l'identifiant numérique, sans réutiliser une URL arbitraire du résumé. Les images utilisent un transport séparé sans jeton, sans redirections, avec limites de téléchargement et de décodage, cache mémoire/disque et initiales de repli. L'identité des amis reste un cache local réenrichi après restauration, pour que les anciennes versions puissent encore lire les relations sauvegardées.
+
+Moi, Équipe et les réglages affichent sa photo. Le menu d'un ami ouvre son profil ou son Gist social ; **Retirer cet équipier**, en rouge, ouvre une confirmation avant de créer la suppression persistante.
 
 Le QR code encode exactement le même lien HTTPS, avec une marge blanche et une correction d'erreur M. L'appareil photo du téléphone suffit pour le lire ; Hamigo ne demande donc pas une permission caméra uniquement pour partager son invitation. Le parseur refuse les hôtes différents, les identifiants invalides, les URL contenant des identifiants de connexion, les fragments et les paramètres ambigus/répétés. L'import de profils via JSON est supprimé. Une sauvegarde JSON complète reste un outil avancé de migration, distinct du partage social.
 

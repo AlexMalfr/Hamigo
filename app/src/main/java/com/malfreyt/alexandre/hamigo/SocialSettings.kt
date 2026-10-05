@@ -52,13 +52,15 @@ private fun syncDate(value: String?): String = value?.let {
 fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier) {
     val connected = remember(model.revision) { runCatching { model.sync.tokens.get() != null }.getOrDefault(false) }
     val login = remember(model.revision) { model.sync.accountLogin }
+    val identity = remember(model.revision) { model.sync.accountIdentity }
     val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
     val lastError = remember(model.revision) { model.sync.lastSyncError }
     val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
     var details by remember { mutableStateOf(false) }
     Panel(modifier, color = Mist) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Icon(Icons.Rounded.CloudSync, null, tint = Teal, modifier = Modifier.size(32.dp))
+            if(connected) GitHubAvatar(identity,login ?: model.progress.name,Modifier.size(44.dp))
+            else Icon(Icons.Rounded.CloudSync, null, tint = Teal, modifier = Modifier.size(32.dp))
             Column(Modifier.weight(1f)) {
                 Eyebrow("SYNCHRONISATION GITHUB")
                 Text(if (connected) "Connecté · ${login ?: "GitHub"}" else "Retrouve ton voyage partout",
@@ -133,6 +135,7 @@ fun FriendsScreen(model: AppModel) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
         item { GitHubConnection(model) }
+        if(model.friendRequests.isNotEmpty() || model.outgoingRequests.isNotEmpty()) item { FriendRequestsPanel(model) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -171,6 +174,8 @@ fun FriendsScreen(model: AppModel) {
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text("${index + 1}", fontSize = 19.sp, fontWeight = FontWeight.ExtraBold,
                             color = if (index == 0) Coral else Teal, modifier = Modifier.width(22.dp))
+                        GitHubAvatar(if(isOwn) model.sync.accountIdentity else model.friends.firstOrNull { it.progress === profile }?.githubIdentity,
+                            profile.name,Modifier.size(36.dp))
                         Column(Modifier.weight(1f)) {
                             Text(profile.name + if (isOwn) " · toi" else "", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                             Text("${profile.streak} jours de série · ${profile.lessons} leçons", fontSize = 11.sp, color = Muted)
@@ -183,9 +188,14 @@ fun FriendsScreen(model: AppModel) {
         }
         items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
             var menuOpen by remember { mutableStateOf(false) }
+            var confirmRemoval by remember { mutableStateOf(false) }
+            var confirmRequest by remember { mutableStateOf(false) }
             val socialGist = remember(friend.gist) { runCatching { GitHubSync.gistPageUrl(friend.gist) }.getOrNull() }
+            val githubProfile = remember(friend.githubIdentity) { friend.githubIdentity?.let { runCatching { it.profileUrl }.getOrNull() } }
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    GitHubAvatar(friend.githubIdentity,friend.progress.name,Modifier.size(44.dp))
+                    Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text(friend.progress.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons", color = Muted, fontSize = 12.sp)
@@ -193,15 +203,28 @@ fun FriendsScreen(model: AppModel) {
                     Box {
                         IconButton({ menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            if(model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null) {
+                                val sent=model.outgoingRequests.firstOrNull { it.request.recipientGistId==runCatching { GitHubSync.gistId(friend.gist) }.getOrNull() }
+                                DropdownMenuItem(
+                                    text={Text(when(sent?.status) {"sent"->"Demande déjà envoyée";"accepted"->"Ajout réciproque confirmé";else->"Demander l’ajout en retour"})},
+                                    leadingIcon={Icon(Icons.Rounded.PersonAdd,null)},
+                                    enabled=!model.busy && sent?.status !in setOf("sent","accepted"),
+                                    onClick={menuOpen=false;confirmRequest=true})
+                            }
+                            if (githubProfile != null) DropdownMenuItem(
+                                text = { Text("Ouvrir le profil GitHub") },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, null) },
+                                onClick = { menuOpen = false; openLink(context, githubProfile) }
+                            )
                             if (socialGist != null) DropdownMenuItem(
                                 text = { Text("Ouvrir le Gist social") },
                                 leadingIcon = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, null) },
                                 onClick = { menuOpen = false; openLink(context, socialGist) }
                             )
                             DropdownMenuItem(
-                                text = { Text("Retirer cet équipier") },
-                                leadingIcon = { Icon(Icons.Rounded.PersonRemove, null) },
-                                onClick = { menuOpen = false; model.removeFriend(friend) }
+                                text = { Text("Retirer cet équipier",color=MaterialTheme.colorScheme.error) },
+                                leadingIcon = { Icon(Icons.Rounded.PersonRemove, null,tint=MaterialTheme.colorScheme.error) },
+                                onClick = { menuOpen = false; confirmRemoval = true }
                             )
                         }
                     }
@@ -213,6 +236,17 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
             }
+            if(confirmRemoval) AlertDialog(onDismissRequest={confirmRemoval=false},
+                title={Text("Retirer ${friend.progress.name} ?")},
+                text={Text("Sa progression n’apparaîtra plus dans ton équipe. Tu pourras l’ajouter à nouveau avec son lien d’invitation.")},
+                confirmButton={TextButton({confirmRemoval=false;model.removeFriend(friend)},
+                    colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)) {Text("Retirer")}},
+                dismissButton={TextButton({confirmRemoval=false}){Text("Annuler")}})
+            if(confirmRequest) AlertDialog(onDismissRequest={confirmRequest=false},
+                title={Text("Demander l’ajout en retour ?")},
+                text={Text("${friend.progress.name} recevra une demande à accepter dans Hamigo. Elle sera publiée sous ton compte GitHub dans les commentaires de son Gist social, lisibles avec son lien.")},
+                confirmButton={TextButton({confirmRequest=false;model.sendFriendRequest(friend)},enabled=!model.busy) {Text("Envoyer")}},
+                dismissButton={TextButton({confirmRequest=false}){Text("Annuler")}})
         }
         item {
             OutlinedButton({ model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
@@ -256,6 +290,58 @@ fun FriendsScreen(model: AppModel) {
 }
 
 @Composable
+private fun FriendRequestsPanel(model: AppModel) {
+    var allIncoming by remember { mutableStateOf(false) }
+    var outgoingOpen by remember { mutableStateOf(false) }
+    Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+        if(model.friendRequests.isNotEmpty()) Panel(color=Color(0xFFFFF4D6)) {
+            Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Rounded.NotificationsActive,null,tint=Teal,modifier=Modifier.size(22.dp))
+                Text("Demandes reçues",fontSize=18.sp,fontWeight=FontWeight.ExtraBold,modifier=Modifier.weight(1f))
+                Badge { Text(model.friendRequests.size.toString()) }
+            }
+            Text("À toi de choisir qui rejoint ton équipe.",fontSize=12.sp,color=Muted)
+            val requests=if(allIncoming) model.friendRequests else model.friendRequests.take(5)
+            requests.forEach { request -> key(request.decisionKey) {
+                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
+                    GitHubAvatar(request.author,request.profile.name,Modifier.size(40.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(request.profile.name,fontWeight=FontWeight.Bold,fontSize=15.sp)
+                        Text("@${request.author.login}",fontSize=12.sp,color=Muted)
+                    }
+                }
+                Row(horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                    Button({model.acceptFriendRequest(request)},enabled=!model.busy,
+                        contentPadding=PaddingValues(horizontal=14.dp,vertical=6.dp)) { Text("Accepter") }
+                    TextButton({model.ignoreFriendRequest(request)},enabled=!model.busy) { Text("Ignorer") }
+                }
+            } }
+            if(!allIncoming && model.friendRequests.size>5) TextButton({allIncoming=true}) { Text("Voir les autres demandes") }
+        }
+        if(model.outgoingRequests.isNotEmpty()) Panel {
+            TextButton({outgoingOpen=!outgoingOpen},Modifier.fillMaxWidth(),contentPadding=PaddingValues(0.dp)) {
+                Text("Demandes envoyées · ${model.outgoingRequests.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold)
+                Icon(if(outgoingOpen) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null)
+            }
+            if(outgoingOpen) model.outgoingRequests.sortedByDescending { it.updatedAt }.take(10).forEach { outgoing ->
+                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                    Column(Modifier.weight(1f)) {
+                        Text(outgoing.recipientName,fontWeight=FontWeight.Bold,fontSize=14.sp)
+                        Text(when(outgoing.status) {
+                            "accepted" -> "Acceptée ✓"
+                            "sent" -> "En attente de sa réponse"
+                            "failed" -> "Envoi à réessayer"
+                            else -> "Envoi non confirmé"
+                        },fontSize=12.sp,color=Muted)
+                    }
+                    if(outgoing.status in setOf("pending","failed")) TextButton({model.retryFriendRequest(outgoing)},enabled=!model.busy) {Text("Réessayer")}
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
     val p = model.displayedProgress ?: model.progress
@@ -293,7 +379,10 @@ fun SettingsScreen(model: AppModel) {
         item { PageHeader("À ta fréquence", "Tes préférences et ton compte.") { model.route = "profile" } }
         item {
             Panel {
-                Text("Ton identité radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
+                    GitHubAvatar(model.sync.accountIdentity,p.name,Modifier.size(44.dp))
+                    Text("Ton identité radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                }
                 OutlinedTextField(name, { name = it.take(40) }, label = { Text("Pseudo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Action("Enregistrer le pseudo", enabled = name.isNotBlank()) {
                     p.name = name.trim(); model.refresh(); model.refreshSocial(); model.message = "Pseudo enregistré."

@@ -27,6 +27,7 @@ class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : Corou
         return try {
             sync.synchronize(progress)
             refreshFriends(progress, sync)
+            FriendInboxCoordinator(applicationContext,progress,sync).refresh()
             Result.success()
         } catch (e: CancellationException) { throw e }
         catch (e: SocialException) {
@@ -38,11 +39,11 @@ class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : Corou
 
     private suspend fun refreshFriends(progress: Progress, sync: GitHubSync) {
         val before = readFriends(progress)
-        val refreshed = linkedMapOf<String, ShareProgress>()
+        val refreshed = linkedMapOf<String, GitHubFriendProfile>()
         for (entry in before) {
             val gist = entry.optString("gist")
             if (gist.isBlank()) continue
-            try { refreshed[gist] = sync.read(gist) }
+            try { refreshed[gist] = sync.readProfile(gist) }
             catch (e: CancellationException) { throw e }
             catch (_: Exception) { /* A temporarily unreachable friend retains its previous card. */ }
         }
@@ -53,9 +54,13 @@ class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : Corou
                 val update = refreshed[entry.optString("gist")]
                 if (update == null) entry else {
                     val previousTime = runCatching { Instant.parse(entry.getJSONObject("progress").getString("updatedAt")) }.getOrNull()
-                    val updateTime = runCatching { Instant.parse(update.updatedAt) }.getOrNull()
-                    if (previousTime != null && updateTime != null && previousTime.isAfter(updateTime)) entry
-                    else JSONObject(entry.toString()).put("progress", JSONObject(update.toJson()))
+                    val updateTime = runCatching { Instant.parse(update.progress.updatedAt) }.getOrNull()
+                    JSONObject(entry.toString()).also { updated ->
+                        if (!(previousTime != null && updateTime != null && previousTime.isAfter(updateTime)))
+                            updated.put("progress", JSONObject(update.progress.toJson()))
+                        update.identity?.let { updated.put("githubIdentity",it.toJson())
+                            .put("githubIdentityCheckedAt",System.currentTimeMillis()) }
+                    }
                 }
             }
             progress.prefs.edit().putString("friends", JSONArray(merged).toString())

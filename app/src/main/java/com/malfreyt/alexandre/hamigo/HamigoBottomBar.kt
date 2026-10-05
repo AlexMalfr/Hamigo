@@ -56,6 +56,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -84,6 +85,7 @@ fun HamigoBottomBar(
     onDestination: (String) -> Unit,
     modifier: Modifier = Modifier,
     onDestinationBounds: (String, Rect) -> Unit = { _, _ -> },
+    friendRequestCount: Int = 0,
 ) {
     // Reserve the raised part rather than offsetting it outside Scaffold's measured bottom bar.
     // Only the labels grow with text size; the icons, notch and touch targets stay predictable.
@@ -162,6 +164,17 @@ fun HamigoBottomBar(
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(destination.icon, contentDescription = null, Modifier.size(if (central) 30.dp else 24.dp), tint = iconColor)
+                            if (destination.route == "friends" && friendRequestCount > 0) {
+                                Box(Modifier.align(Alignment.TopEnd).padding(end = 3.dp, top = 3.dp).size(18.dp)
+                                    .background(Color(0xFFB3261E), CircleShape)
+                                    .testTag("friend-request-badge")
+                                    .semantics { contentDescription = "$friendRequestCount demandes d’amis en attente" },
+                                    contentAlignment = Alignment.Center) {
+                                    Text(if (friendRequestCount > 99) "99+" else friendRequestCount.toString(),
+                                        color = Color.White, fontSize = 9.sp, lineHeight = 10.sp, maxLines = 1,
+                                        fontWeight = FontWeight.Bold)
+                                }
+                            }
                         }
                         Spacer(Modifier.height(6.dp))
                         Text(

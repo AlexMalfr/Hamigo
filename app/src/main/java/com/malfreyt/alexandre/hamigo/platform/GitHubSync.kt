@@ -22,7 +22,6 @@ interface GitHubGateway {
     suspend fun api(method: String, path: String, token: String? = null, body: String? = null): String
     suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String): String
 }
-data class GitHubIdentity(val login: String)
 data class GistSnapshot(val id: String, val url: String, val progress: ShareProgress)
 data class SyncReport(val social: GistSnapshot, val restored: Boolean, val lastSyncedAt: String)
 
@@ -37,6 +36,11 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
     val savedBackupUrl: String? get() = savedGistPage("ownBackupId")
     val lastSyncedAt: String? get() = prefs.getString("lastSyncedAt", null)
     val accountLogin: String? get() = prefs.getString("ownerLogin", null)
+    val accountIdentity: GitHubIdentity? get() = accountLogin?.let { login ->
+        runCatching { GitHubIdentity.fromJson(JSONObject().put("login", login).also {
+            if (prefs.contains("ownerId")) it.put("id", prefs.getLong("ownerId", 0L))
+        }) }.getOrNull()
+    }
     val lastSyncError: String? get() = prefs.getString("lastSyncError", null)
 
     private fun savedGistPage(key: String): String? = prefs.getString(key, null)
@@ -51,7 +55,7 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
         val identity = identity(clean)
         if (prefs.getString("ownerLogin", null) != identity.login) prefs.edit().clear().commit()
         tokens.store(clean)
-        prefs.edit().putString("ownerLogin", identity.login).apply()
+        storeIdentity(identity)
         identity
     }
 
@@ -159,30 +163,39 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
     }
 
     /** A supplied URL is never requested; only a validated ID reaches the fixed GitHub API host. */
-    suspend fun read(gistUrlOrId: String): ShareProgress {
+    suspend fun read(gistUrlOrId: String): ShareProgress = readProfile(gistUrlOrId).progress
+
+    /** Owner identity comes from API metadata, never from the shared JSON payload. */
+    suspend fun readProfile(gistUrlOrId: String): GitHubFriendProfile {
         val id = gistId(gistUrlOrId)
         val gist = JSONObject(gateway.api("GET", "/gists/$id", tokens.get()))
         val file = gist.optJSONObject("files")?.optJSONObject(FILE_NAME)
             ?: throw SocialException("Ce lien ne contient pas de progression Hamigo.")
         if (file.optBoolean("truncated", false)) throw SocialException("Le fichier de progression est trop volumineux.")
         val content = file.optString("content")
-        return try { ShareProgress.fromJson(content) } catch (e: IllegalArgumentException) {
+        return try { GitHubFriendProfile(ShareProgress.fromJson(content), GitHubIdentity.fromApi(gist.optJSONObject("owner"))) } catch (e: IllegalArgumentException) {
             throw SocialException(e.message ?: "Progression Hamigo invalide.")
         }
     }
 
     private suspend fun identity(token: String): GitHubIdentity {
         val user = JSONObject(gateway.api("GET", "/user", token))
-        val login = user.optString("login")
-        if (login.isBlank()) throw SocialException("Impossible de reconnaître le compte GitHub.")
-        return GitHubIdentity(login)
+        return GitHubIdentity.fromApi(user) ?: throw SocialException("Impossible de reconnaître le compte GitHub.")
     }
 
     private suspend fun ensureOwner(token: String): String {
-        val owner = identity(token).login
+        val identity = identity(token)
+        val owner = identity.login
         ensureConnected(token)
         if (prefs.getString("ownerLogin", null) != owner) prefs.edit().clear().putString("ownerLogin", owner).commit()
+        storeIdentity(identity)
         return owner
+    }
+
+    private fun storeIdentity(identity: GitHubIdentity) {
+        prefs.edit().putString("ownerLogin", identity.login).also { editor ->
+            identity.id?.let { editor.putLong("ownerId", it) } ?: editor.remove("ownerId")
+        }.apply()
     }
 
     private fun ensureConnected(token: String) {

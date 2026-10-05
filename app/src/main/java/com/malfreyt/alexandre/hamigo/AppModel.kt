@@ -16,7 +16,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 
-data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L)
+data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L,
+    val githubIdentity: GitHubIdentity? = null, val githubIdentityCheckedAt: Long = 0L)
 class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false) {
     var index = 0
     var correct = 0
@@ -51,7 +52,8 @@ data class SessionResponse(val correct: Boolean, val omitted: Boolean = false,
     val display: String = "", val choiceIndex: Int = -1, val quality: Int = if(correct) 4 else 1)
 
 class AppModel internal constructor(
-    private val authorizationClient: GitHubAuthorizationClient = DefaultGitHubAuthorizationClient
+    private val authorizationClient: GitHubAuthorizationClient = DefaultGitHubAuthorizationClient,
+    private val friendInboxGateway: FriendInboxGateway = FriendInbox()
 ) : ViewModel() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var context: Context
@@ -59,6 +61,7 @@ class AppModel internal constructor(
     var displayedProgress by mutableStateOf<Progress?>(null)
         private set
     lateinit var sync: GitHubSync
+    private lateinit var friendInbox: FriendInboxCoordinator
     var content by mutableStateOf<Content?>(null)
     var error by mutableStateOf<String?>(null)
     var message by mutableStateOf<String?>(null)
@@ -68,12 +71,14 @@ class AppModel internal constructor(
     var session by mutableStateOf<Session?>(null)
     var resource by mutableStateOf<RefCategory?>(null)
     var friends by mutableStateOf<List<Friend>>(emptyList())
+    var friendRequests by mutableStateOf<List<FriendRequest>>(emptyList())
+    var outgoingRequests by mutableStateOf<List<OutgoingFriendRequestState>>(emptyList())
     var busy by mutableStateOf(false)
     private var taskJob: Job? = null
     private var socialJob: Job? = null
     private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key in setOf("progress", "friends", "name", "dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute",
-                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownGistUrl")) {
+        if (key in setOf("progress", "friends", "socialInbox", "friendIncomingCache", "name", "dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute",
+                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownerId", "ownGistUrl")) {
             // Workers can finish while a screen remains open. Reload data without starting another sync.
             scope.launch { refresh() }
         }
@@ -118,6 +123,7 @@ class AppModel internal constructor(
         if (::progress.isInitialized) return
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
+        friendInbox = FriendInboxCoordinator(context,progress,sync,friendInboxGateway)
         pendingAuthorization = PendingGitHubAuthorization(context)
         val savedAuthorization = pendingAuthorization.restore()
         if (savedAuthorization != null && authorizationClient.enabled) {
@@ -131,7 +137,7 @@ class AppModel internal constructor(
         showWelcome = !progress.prefs.getBoolean("welcomed", false)
         scope.launch {
             runCatching { withContext(Dispatchers.IO) { Content(context) } }
-                .onSuccess { content = it; loadFriends(); ProgressSyncScheduler.schedule(context); refreshSocial() }
+                .onSuccess { content = it; loadFriends(); loadFriendRequests(); ProgressSyncScheduler.schedule(context); refreshSocial() }
                 .onFailure { error = "Chargement impossible : ${it.message}" }
         }
     }
@@ -221,7 +227,7 @@ class AppModel internal constructor(
     }
     fun refresh() {
         if(::progress.isInitialized) {
-            progress.reload(); loadFriends()
+            progress.reload(); loadFriends(); loadFriendRequests()
             // Compose also needs a new display value, rather than a mutated cached Progress instance.
             displayedProgress=Progress(context)
         }
@@ -230,12 +236,19 @@ class AppModel internal constructor(
     fun leaveSession() { session=null; lesson=null; refreshSocial() }
     private fun loadFriends() {
         friends = CloudProgress.activeFriends(progress.friendRecords()).objects().map { f ->
-            Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.getString("gist"), f.getLong("modifiedAt")) }
+            Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.getString("gist"), f.getLong("modifiedAt"),
+                GitHubIdentity.fromApi(f.optJSONObject("githubIdentity")),f.optLong("githubIdentityCheckedAt")) }
+    }
+    private fun loadFriendRequests() {
+        if(::friendInbox.isInitialized) { friendRequests=friendInbox.pending();outgoingRequests=friendInbox.outgoing() }
     }
     private fun saveFriends() {
         val deleted = CloudProgress.friendTombstones(progress.friendRecords())
         val active = JSONArray(friends.map { JSONObject().put("progress", JSONObject(it.progress.toJson()))
-            .put("gist",it.gist).put("modifiedAt",it.modifiedAt) })
+            .put("gist",it.gist).put("modifiedAt",it.modifiedAt).also { entry ->
+                it.githubIdentity?.let { identity -> entry.put("githubIdentity", identity.toJson())
+                    .put("githubIdentityCheckedAt",it.githubIdentityCheckedAt) }
+            } })
         progress.saveFriendRecords(CloudProgress.localFriends(active, deleted))
     }
     fun addFriend(friend: Friend) {
@@ -314,16 +327,42 @@ class AppModel internal constructor(
             githubBrowserCommands.value = GitHubBrowserCommand.Close
         }
     }
-    fun disconnectGitHub() { sync.disconnect(); ProgressSyncScheduler.cancel(context); refresh() }
+    fun disconnectGitHub() { taskJob?.cancel();socialJob?.cancel();sync.disconnect(); ProgressSyncScheduler.cancel(context); busy=false;refresh() }
     fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }
-    fun acceptInvite() {
+    fun acceptInvite(sendReciprocal:Boolean=false) {
         val invite=pendingInvite ?: return
         pendingInvite=null
         task {
             if(sync.savedGistUrl?.let { GitHubSync.gistId(it) } == invite) {message="C'est ton propre lien d'invitation.";return@task}
-            val friend=sync.read(invite)
-            addFriend(Friend(friend,"https://gist.github.com/$invite"));route="friends";message="${friend.name} rejoint ton équipe !"
+            val friend=sync.readProfile(invite)
+            addFriend(Friend(friend.progress,"https://gist.github.com/$invite",githubIdentity=friend.identity,
+                githubIdentityCheckedAt=System.currentTimeMillis()));route="friends"
+            if(sendReciprocal) {
+                try {
+                    friendInbox.send(invite,friend.progress.name)
+                    message="${friend.progress.name} ajouté. Ta demande réciproque est envoyée."
+                } catch(e:CancellationException){throw e}
+                catch(_:Exception){message="${friend.progress.name} ajouté. La demande n’a pas pu partir ; tu peux réessayer dans Équipe."}
+            } else message="${friend.progress.name} rejoint ton équipe !"
+            refresh()
         }
+    }
+    fun acceptFriendRequest(request:FriendRequest) = task {
+        friendInbox.accept(request);refresh();message="${request.profile.name} rejoint ton équipe !"
+    }
+    fun ignoreFriendRequest(request:FriendRequest) {
+        if(busy) return
+        runCatching { friendInbox.ignore(request);refresh() }.onFailure { message=it.message }
+    }
+    fun retryFriendRequest(outgoing:OutgoingFriendRequestState) = task {
+        try { friendInbox.retry(outgoing);message="Demande envoyée." }
+        finally {refresh()}
+    }
+    fun sendFriendRequest(friend:Friend) = task {
+        try { friendInbox.send(friend.gist,friend.progress.name);message="Ta demande réciproque est envoyée." }
+        catch(e:CancellationException){throw e}
+        catch(_:Exception){message="La demande n’a pas pu partir ; ton équipier est conservé. Tu peux réessayer dans Équipe."}
+        finally {refresh()}
     }
     fun refreshSocial(manual: Boolean = false) {
         if(busy || socialJob?.isActive==true) return
@@ -335,7 +374,11 @@ class AppModel internal constructor(
                 try { sync.synchronize(progress) } catch(e:CancellationException){throw e} catch(e:Exception){failures++}
             }
             val updates = friends.map { friend ->
-                if(friend.gist.isBlank()) friend else try { Friend(sync.read(friend.gist),friend.gist) } catch(e:CancellationException){throw e} catch(e:Exception){failures++;friend}
+                if(friend.gist.isBlank()) friend else try {
+                    val profile=sync.readProfile(friend.gist)
+                    friend.copy(progress=profile.progress,githubIdentity=profile.identity ?: friend.githubIdentity,
+                        githubIdentityCheckedAt=if(profile.identity!=null) System.currentTimeMillis() else friend.githubIdentityCheckedAt)
+                } catch(e:CancellationException){throw e} catch(e:Exception){failures++;friend}
             }
             val byGist=updates.filter{it.gist.isNotBlank()}.associateBy{it.gist}
             synchronized(Progress.CLOUD_LOCK) {
@@ -344,11 +387,16 @@ class AppModel internal constructor(
                     val updated=byGist[previous.gist]
                     val previousTime=runCatching { Instant.parse(previous.progress.updatedAt) }.getOrNull()
                     val updateTime=updated?.let { runCatching { Instant.parse(it.progress.updatedAt) }.getOrNull() }
-                    if(updated==null || (previousTime!=null && updateTime!=null && previousTime.isAfter(updateTime))) previous
-                    else previous.copy(progress=updated.progress)
+                    if(updated==null) previous
+                    else previous.copy(
+                        progress=if(previousTime!=null && updateTime!=null && previousTime.isAfter(updateTime)) previous.progress else updated.progress,
+                        githubIdentity=updated.githubIdentity,githubIdentityCheckedAt=updated.githubIdentityCheckedAt)
                 }
                 saveFriends()
             }; revision++
+            try { friendInbox.refresh();loadFriendRequests() }
+            catch(e:CancellationException){throw e}
+            catch(_:Exception){failures++}
             if(manual) { busy=false; message=if(failures==0) "Progressions actualisées." else "Connexion indisponible. Les dernières progressions restent consultables." }
         }
     }
