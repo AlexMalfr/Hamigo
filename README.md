@@ -20,7 +20,7 @@ Les mauvaises réponses reviennent après dix minutes, puis les bonnes réponses
 
 La barre de navigation suit l'ordre **Défis · Mémo · Parcours · Équipe · Moi**. Parcours est la page principale : son bouton rond central dépasse de la barre, avec un fond distinct et une encoche qui laisse 6 dp d'espace autour du cercle. Le contenu reste visible derrière le dépassement ; l'effet d'appui reste dans la pastille de chaque icône. Retour depuis les quatre autres pages principales ramène à Parcours ; les fiches, leçons et réglages conservent leur retour vers leur page parente.
 
-Moi permet de parcourir l'historique des XP par tranches de sept jours avec un glissement horizontal ou les boutons. Le retour prédictif déplace davantage l'écran dès le début du geste, avec un léger suivi vertical ; annuler le geste anime son retour en place et conserve la navigation et les entrées. Les illustrations Exam1 utilisent un aperçu dérivé plus lisible ; toucher l'image ouvre l'original en plein écran avec zoom et déplacement.
+Moi permet de parcourir l'historique des XP par tranches de sept jours avec un glissement horizontal ou les boutons. Le retour prédictif déplace davantage l'écran dès le début du geste, avec un léger suivi vertical ; annuler le geste anime son retour en place et conserve la navigation et les entrées. Valider le geste range brièvement la page vers l'icône de sa section avant d'afficher sa destination. Les illustrations Exam1 utilisent un aperçu dérivé plus lisible ; toucher l'image ouvre l'original en plein écran avec zoom et déplacement.
 
 ## Jouer ensemble
 

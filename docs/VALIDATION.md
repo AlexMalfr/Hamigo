@@ -1,5 +1,12 @@
 # Validation de Hamigo
 
+## Transition finale du retour prédictif — 5 octobre 2026
+
+- **Onze tests Android ciblés réussis** : neuf scénarios de retour et les deux régressions de navbar. L'horloge est suspendue après un geste à 45 % ; la page et son modèle restent présents au relâchement et à 112 ms, les dimensions diminuent et son centre se rapproche de l'onglet, puis la navigation se termine. Les deux bords, la fiche Mémo, les réglages et une leçon sont contrôlés. Rapport : `output/android-tests-navigation-dock.txt`.
+- Le nouveau cas d'interruption démarre une fermeture, puis change d'onglet ou lance un autre geste avant sa fin. Après expiration du délai initial, aucun retour tardif n'a lieu ; le filtre « Morse » reste présent et le nouveau geste peut être annulé. La confirmation d'examen et les six anciens cas restent réussis.
+- **Dix captures milieu/fin** dans `output/navigation-audit/dock-final/` montrent la page qui rejoint son onglet ; les cinq images intermédiaires et le retour à la bibliothèque ont été inspectés. Les douze captures des gestes depuis les deux bords sont aussi récupérées dans ce dossier.
+- Assemblage debug et APK de tests réussi ; lint sans erreur, avec 67 avertissements et une indication. Rapport : `output/build-navigation-dock-debug.txt`. Les contrôles de navbar à 80 % et 130 % sont décrits ci-dessous ; sa géométrie reste inchangée dans cette dernière passe.
+
 ## Surplomb et effets d'appui de la navbar — 5 octobre 2026
 
 - Le défaut signalé sur le Samsung est visible dans `output/navigation-audit/phone-navbar-overlap.png` et `phone-navbar-hover.png` : bande beige masquant le contenu et indication rectangulaire sur toute la cible. Le surplomb est maintenant transparent hors couronne centrale ; le contenu s'étend jusqu'au corps blanc et les indications sont découpées dans les icônes. Les cibles latérales commencent au corps ; le haut du cercle reste cliquable.

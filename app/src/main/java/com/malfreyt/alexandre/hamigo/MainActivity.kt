@@ -35,10 +35,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,6 +61,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.time.LocalDate
+import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
     private lateinit var model: AppModel
@@ -137,6 +146,31 @@ internal fun hamigoContentPadding(padding: PaddingValues, layoutDirection: Layou
     bottom=(padding.calculateBottomPadding() - if(raisedBarVisible) HamigoNavigationOverhang else 0.dp).coerceAtLeast(0.dp),
 )
 
+/** A completed gesture may finish visually before its unchanged screen is removed. */
+private data class BackScreenSnapshot(
+    val route: String,
+    val session: Session?,
+    val lesson: Lesson?,
+    val resource: RefCategory?,
+) {
+    val dockRoute get() = when {
+        resource != null -> "resources"
+        lesson != null -> "path"
+        route == "settings" -> "profile"
+        else -> route
+    }
+    fun isCurrent(model: AppModel) = model.route == route && model.session === session &&
+        model.lesson === lesson && model.resource === resource
+    fun navigate(model: AppModel) {
+        when {
+            lesson != null -> model.lesson = null
+            resource != null -> model.resource = null
+            route == "settings" -> model.route = "profile"
+            else -> model.route = "path"
+        }
+    }
+}
+
 @Composable fun HamigoApp(model: AppModel) {
     val content=model.content
     val tick=model.revision
@@ -144,11 +178,55 @@ internal fun hamigoContentPadding(padding: PaddingValues, layoutDirection: Layou
     var quit by remember {mutableStateOf(false)}
     var backProgress by remember {mutableFloatStateOf(0f)}
     var backWidth by remember {mutableFloatStateOf(0f)}
+    var backHeight by remember {mutableFloatStateOf(0f)}
     var backEdge by remember {mutableIntStateOf(BackEventCompat.EDGE_LEFT)}
     var backDragY by remember {mutableFloatStateOf(0f)}
     var backGestureActive by remember {mutableStateOf(false)}
-    var backRebound by remember {mutableStateOf<Job?>(null)}
+    var backDocking by remember {mutableStateOf(false)}
+    var backSettling by remember {mutableStateOf(false)}
+    var backDockProgress by remember {mutableFloatStateOf(0f)}
+    var backDockCenter by remember {mutableStateOf(Offset.Zero)}
+    var backDockScale by remember {mutableFloatStateOf(.05f)}
+    var backSource by remember {mutableStateOf<BackScreenSnapshot?>(null)}
+    var backMotion by remember {mutableStateOf<Job?>(null)}
+    var backGeneration by remember {mutableIntStateOf(0)}
+    var windowBounds by remember {mutableStateOf(Rect.Zero)}
+    var contentBounds by remember {mutableStateOf(Rect.Zero)}
+    val navigationBounds=remember {mutableMapOf<String,Rect>()}
     val backAnimationScope=rememberCoroutineScope()
+    val density=LocalDensity.current
+    val layoutDirection=LocalLayoutDirection.current
+    val navLeft=WindowInsets.navigationBars.getLeft(density,layoutDirection)
+    val navRight=WindowInsets.navigationBars.getRight(density,layoutDirection)
+    val navBottom=WindowInsets.navigationBars.getBottom(density)
+    val raisedBarVisible=model.session==null && model.lesson==null && model.resource==null && model.route!="settings"
+    fun resetBackMotion() {
+        backGeneration++
+        backMotion?.cancel()
+        backMotion=null
+        backGestureActive=false
+        backSettling=false
+        backDocking=false
+        backProgress=0f
+        backDockProgress=0f
+        backSource=null
+    }
+    fun dockBounds(route:String):Rect {
+        if(raisedBarVisible) navigationBounds[route]?.let {return it}
+        // Hidden bars on detail screens use the same current window, insets and font geometry.
+        val routes=listOf("practice","resources","path","friends","profile")
+        val logicalIndex=routes.indexOf(route).takeIf {it>=0} ?: 2
+        val index=if(layoutDirection==LayoutDirection.Rtl)4-logicalIndex else logicalIndex
+        val availableWidth=(windowBounds.width-navLeft-navRight).coerceAtLeast(0f)
+        val centerX=windowBounds.left+navLeft+availableWidth*(index+.5f)/5f
+        val central=route=="path"
+        val growth=((density.fontScale.coerceAtLeast(1f)-1f)*14f).dp
+        val barHeight=with(density){(94.dp+growth).toPx()}
+        val centerY=windowBounds.bottom-navBottom-barHeight+with(density){(if(central)34.dp else 46.dp).toPx()}
+        val width=with(density){(if(central)64.dp else 56.dp).toPx()}
+        val height=with(density){(if(central)64.dp else 40.dp).toPx()}
+        return Rect(centerX-width/2f,centerY-height/2f,centerX+width/2f,centerY+height/2f)
+    }
     val snackbar=remember {SnackbarHostState()}
     LaunchedEffect(model.message) {model.message?.let {snackbar.showSnackbar(it);model.message=null}}
     if(content==null) {
@@ -160,67 +238,115 @@ internal fun hamigoContentPadding(padding: PaddingValues, layoutDirection: Layou
         };return
     }
     val p=model.progress
+    LaunchedEffect(model.route,model.session,model.lesson,model.resource) {
+        if(backSource?.isCurrent(model)==false) resetBackMotion()
+    }
     PredictiveBackHandler(enabled=model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path") {events ->
-        backRebound?.cancel()
+        resetBackMotion()
+        val generation=backGeneration
+        val source=BackScreenSnapshot(model.route,model.session,model.lesson,model.resource)
+        backSource=source
         backGestureActive=true
         backProgress=0f
         backDragY=0f
         var firstTouchY:Float?=null
         try {
             events.collect {event ->
-                if(firstTouchY==null) firstTouchY=event.touchY
-                backProgress=event.progress.coerceIn(0f,1f)
-                backEdge=event.swipeEdge
-                backDragY=(event.touchY-firstTouchY!!)*.12f
+                if(generation==backGeneration) {
+                    if(firstTouchY==null) firstTouchY=event.touchY
+                    backProgress=event.progress.coerceIn(0f,1f)
+                    backEdge=event.swipeEdge
+                    backDragY=(event.touchY-firstTouchY!!)*.12f
+                }
             }
-            backGestureActive=false
-            backProgress=0f
-            when {
-                model.session!=null->quit=true
-                model.lesson!=null->model.lesson=null
-                model.resource!=null->model.resource=null
-                model.route=="settings"->model.route="profile"
-                else->model.route="path"
+            if(generation==backGeneration && source.isCurrent(model)) {
+                backSettling=true
+                if(source.session!=null) {
+                    // A confirmation keeps the session on screen instead of pretending it was left.
+                    val releasedProgress=backProgress
+                    backMotion=backAnimationScope.launch {
+                        animate(releasedProgress,0f,animationSpec=tween(150,easing=FastOutSlowInEasing)) {value,_ ->
+                            if(generation==backGeneration) backProgress=value
+                        }
+                        if(generation==backGeneration) {
+                            val stillCurrent=source.isCurrent(model)
+                            resetBackMotion()
+                            if(stillCurrent) quit=true
+                        }
+                    }
+                } else {
+                    val target=dockBounds(source.dockRoute)
+                    backDockCenter=target.center-contentBounds.topLeft
+                    backDockScale=(min(target.width/backWidth.coerceAtLeast(1f),target.height/backHeight.coerceAtLeast(1f))*.8f).coerceIn(.01f,.2f)
+                    backDockProgress=0f
+                    backDocking=true
+                    backMotion=backAnimationScope.launch {
+                        animate(0f,1f,animationSpec=tween(220,easing=FastOutSlowInEasing)) {value,_ ->
+                            if(generation==backGeneration) backDockProgress=value
+                        }
+                        if(generation==backGeneration) {
+                            if(source.isCurrent(model)) source.navigate(model)
+                            resetBackMotion()
+                        }
+                    }
+                }
+            } else if(generation==backGeneration) {
+                resetBackMotion()
             }
         } catch(_:CancellationException) {
             // Separate scope lets a cancelled gesture settle without changing navigation or input.
-            val releasedProgress=backProgress
-            backRebound=backAnimationScope.launch {
-                animate(releasedProgress,0f,animationSpec=tween(180,easing=FastOutSlowInEasing)) {value,_ ->backProgress=value}
-                backGestureActive=false
+            if(generation==backGeneration && source.isCurrent(model)) {
+                val releasedProgress=backProgress
+                backMotion=backAnimationScope.launch {
+                    animate(releasedProgress,0f,animationSpec=tween(180,easing=FastOutSlowInEasing)) {value,_ ->
+                        if(generation==backGeneration) backProgress=value
+                    }
+                    if(generation==backGeneration) resetBackMotion()
+                }
+            } else if(generation==backGeneration) {
+                resetBackMotion()
             }
         }
     }
-    val raisedBarVisible=model.session==null && model.lesson==null && model.resource==null && model.route!="settings"
-    val layoutDirection=LocalLayoutDirection.current
-    Scaffold(containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
+    Scaffold(modifier=Modifier.onGloballyPositioned {windowBounds=it.boundsInWindow()},containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
         if(raisedBarVisible) {
             HamigoBottomBar(model.route,onDestination={destination ->
-                backRebound?.cancel()
-                backGestureActive=false
-                backProgress=0f
+                resetBackMotion()
                 model.route=destination
-            })
+            },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds})
         }
     }) { padding ->
         val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
-        Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)) {
+        Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)
+            .onGloballyPositioned {contentBounds=it.boundsInWindow()}
+            .pointerInput(backSettling) {
+                if(backSettling) awaitPointerEventScope {
+                    while(true) awaitPointerEvent(PointerEventPass.Initial).changes.forEach {it.consume()}
+                }
+            }) {
             if(backGestureActive) {
-                when {
-                    model.resource!=null->ResourceLibraryScreen(model,content)
-                    model.route=="settings"->ProfileScreen(model,content)
-                    model.session!=null || model.lesson!=null->MainDestination(model,content)
-                    else->PathScreen(model,content)
+                Box(Modifier.fillMaxSize().testTag("back-destination-${backSource?.dockRoute ?: model.route}")) {
+                    when {
+                        model.resource!=null->ResourceLibraryScreen(model,content)
+                        model.route=="settings"->ProfileScreen(model,content)
+                        model.session!=null || model.lesson!=null->MainDestination(model,content)
+                        else->PathScreen(model,content)
+                    }
                 }
             }
-            Box(Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat()}.graphicsLayer {
+            Box(Modifier.fillMaxSize().onSizeChanged {backWidth=it.width.toFloat();backHeight=it.height.toFloat()}.graphicsLayer {
                 val movement=backProgress*(2f-backProgress)
-                translationX=backWidth*.34f*movement*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
-                translationY=backDragY.coerceIn(-24.dp.toPx(),24.dp.toPx())*movement
-                scaleX=1f-.07f*movement;scaleY=1f-.07f*movement
+                val followX=backWidth*.34f*movement*(if(backEdge==BackEventCompat.EDGE_LEFT)1 else -1)
+                val followY=backDragY.coerceIn(-24.dp.toPx(),24.dp.toPx())*movement
+                val dock=if(backDocking)backDockProgress else 0f
+                translationX=followX+(backDockCenter.x-backWidth/2f-followX)*dock
+                translationY=followY+(backDockCenter.y-backHeight/2f-followY)*dock
+                val followScale=1f-.07f*movement
+                scaleX=followScale+(backDockScale-followScale)*dock;scaleY=scaleX
+                alpha=1f-((dock-.72f)/.28f).coerceIn(0f,1f)
                 shape=RoundedCornerShape((28*movement).dp);clip=backGestureActive
                 shadowElevation=16.dp.toPx()*movement
-            }.background(Cream)) {
+            }.background(Cream).testTag("back-foreground")) {
             when {
                 model.session!=null -> QuizScreen(model)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)

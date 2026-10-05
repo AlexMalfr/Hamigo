@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.activity.BackEventCompat
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
@@ -22,6 +23,7 @@ import org.junit.rules.ExternalResource
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import java.io.File
+import kotlin.math.hypot
 
 /** Dispatches the real Activity callbacks consumed by Compose's PredictiveBackHandler. */
 @RunWith(AndroidJUnit4::class)
@@ -191,6 +193,104 @@ class PredictiveBackInstrumentedTest {
         ui.onNodeWithContentDescription("Retour aux mémos").assertDoesNotExist()
     }
 
+    @Test fun completingTheMemoGestureShrinksThePageIntoItsOwnTabBeforeNavigationAndKeepsTheFilter() {
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextInput("Morse")
+        listOf(BackEventCompat.EDGE_LEFT, BackEventCompat.EDGE_RIGHT).forEach { edge ->
+            val target = navigationIconBounds("resources")
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            startAndProgress(.45f, edge)
+            val edgeName = if (edge == BackEventCompat.EDGE_LEFT) "left" else "right"
+            completeAndInspectAnimation(
+                "memo-commit-$edgeName", target,
+                assertPending = {
+                    assertEquals("The source route must survive until the visual return finishes.", "resources", model.route)
+                },
+                assertCompleted = { assertEquals("path", model.route) },
+            )
+            ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+            navigationTab("Parcours").assertIsSelected()
+            navigationTab("Mémo").performClick()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            navigationTab("Mémo").assertIsSelected()
+        }
+    }
+
+    @Test fun completingDetailGesturesKeepsTheirContentUntilThePageReachesItsParentTab() {
+        val memoTarget = navigationIconBounds("resources")
+        ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "nato" } }
+        val fiche = model.resource!!
+        startAndProgress(.45f)
+        completeAndInspectAnimation(
+            "memo-detail-commit", memoTarget,
+            assertPending = { assertSame("The fiche must stay alive while its page shrinks.", fiche, model.resource) },
+            assertCompleted = { assertNull(model.resource); assertEquals("resources", model.route) },
+        )
+        ui.onNodeWithTag("memo-library-title").assertIsDisplayed()
+
+        val profileTarget = navigationIconBounds("profile")
+        ui.runOnIdle { model.route = "settings" }
+        startAndProgress(.45f, BackEventCompat.EDGE_RIGHT)
+        completeAndInspectAnimation(
+            "settings-commit", profileTarget,
+            assertPending = { assertEquals("settings", model.route) },
+            assertCompleted = { assertEquals("profile", model.route) },
+        )
+        navigationTab("Moi").assertIsSelected()
+
+        val pathTarget = navigationIconBounds("path")
+        ui.runOnIdle { model.route = "path"; model.startLesson(model.content!!.lessons.first()) }
+        val lesson = model.lesson!!
+        startAndProgress(.45f)
+        completeAndInspectAnimation(
+            "lesson-commit", pathTarget,
+            assertPending = { assertSame("The lesson must stay alive while its page shrinks.", lesson, model.lesson) },
+            assertCompleted = { assertNull(model.lesson); assertEquals("path", model.route) },
+        )
+        navigationTab("Parcours").assertIsSelected()
+        ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+    }
+
+    @Test fun interruptingTheReturnWithAnotherTabOrGestureNeverCommitsTheOldDestination() {
+        ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
+        ui.onNode(hasSetTextAction()).performTextInput("Morse")
+        startAndProgress(.45f)
+        ui.mainClock.autoAdvance = false
+        try {
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+            ui.mainClock.advanceTimeBy(64)
+            ui.runOnIdle { assertEquals("resources", model.route) }
+            navigationTab("Équipe").performClick()
+            ui.mainClock.advanceTimeBy(336)
+            ui.runOnIdle { assertEquals("The old Back completion must not override a newer tab choice.", "friends", model.route) }
+            navigationTab("Équipe").assertIsSelected()
+            ui.onNodeWithText("HAMIGO").assertDoesNotExist()
+
+            navigationTab("Mémo").performClick()
+            ui.mainClock.advanceTimeByFrame()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            startAndProgress(.45f)
+            ui.mainClock.advanceTimeByFrame()
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+            ui.mainClock.advanceTimeBy(64)
+            ui.runOnIdle { assertEquals("resources", model.route) }
+            startAndProgress(.45f)
+            // Pass the interrupted animation's old deadline while the new gesture is still open.
+            ui.mainClock.advanceTimeBy(336)
+            ui.runOnIdle { assertEquals("A newer gesture must keep the old return from navigating.", "resources", model.route) }
+            ui.onNodeWithText("HAMIGO").assertIsDisplayed()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
+            ui.mainClock.advanceTimeBy(240)
+            ui.runOnIdle { assertEquals("resources", model.route) }
+            navigationTab("Mémo").assertIsSelected()
+            ui.onNodeWithText("HAMIGO").assertDoesNotExist()
+            ui.onNode(hasSetTextAction()).assertTextContains("Morse")
+        } finally {
+            ui.mainClock.autoAdvance = true
+        }
+    }
+
     @Test fun examBackWarnsAboutTheDraftAndDismissalKeepsSavedAndUnsubmittedAnswers() {
         ui.runOnIdle {
             val questions = (0 until 40).map { index ->
@@ -243,6 +343,50 @@ class PredictiveBackInstrumentedTest {
     private fun navigationTab(label: String) = ui.onNode(
         hasText(label) and SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)
     )
+    private fun navigationIconBounds(route: String): Rect =
+        ui.onNodeWithTag("navigation-icon-$route", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+
+    private fun foregroundBounds(): Rect =
+        ui.onNodeWithTag("back-foreground", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+
+    private fun completeAndInspectAnimation(
+        name: String,
+        target: Rect,
+        assertPending: () -> Unit,
+        assertCompleted: () -> Unit,
+    ) {
+        val released = foregroundBounds()
+        ui.mainClock.autoAdvance = false
+        try {
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+            ui.runOnIdle { assertPending() }
+            ui.onNodeWithTag("back-foreground", useUnmergedTree = true).assertExists()
+
+            // Freeze the real Compose animation halfway through the short return, before model commit.
+            ui.mainClock.advanceTimeBy(112)
+            ui.runOnIdle { assertPending() }
+            val middle = foregroundBounds()
+            assertTrue("The released page must visibly shrink before disappearing.", middle.width < released.width * .8f)
+            assertTrue("The page height must shrink along with its width.", middle.height < released.height * .8f)
+            assertTrue(
+                "The page must travel toward its own tab, rather than merely fade in place.",
+                distanceToTarget(middle, target) < distanceToTarget(released, target) * .8,
+            )
+            capture("$name-middle")
+
+            ui.mainClock.advanceTimeBy(160)
+            ui.runOnIdle { assertCompleted() }
+            capture("$name-finished")
+        } finally {
+            ui.mainClock.autoAdvance = true
+        }
+        ui.waitForIdle()
+    }
+
+    private fun distanceToTarget(page: Rect, target: Rect): Double = hypot(
+        (page.center.x - target.center.x).toDouble(), (page.center.y - target.center.y).toDouble(),
+    )
+
     private fun capture(name: String) {
         val directory = requireNotNull(context.getExternalFilesDir("navigation-audit"))
         check(directory.isDirectory || directory.mkdirs())

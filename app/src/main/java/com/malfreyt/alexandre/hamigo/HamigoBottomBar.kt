@@ -43,11 +43,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -69,7 +72,12 @@ private val bottomDestinations = listOf(
 
 /** Parcours stays at the heart of the app, with room for its raised button inside the bar's bounds. */
 @Composable
-fun HamigoBottomBar(route: String, onDestination: (String) -> Unit, modifier: Modifier = Modifier) {
+fun HamigoBottomBar(
+    route: String,
+    onDestination: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    onDestinationBounds: (String, Rect) -> Unit = { _, _ -> },
+) {
     // Reserve the raised part rather than offsetting it outside Scaffold's measured bottom bar.
     // Only the labels grow with text size; the icons, notch and touch targets stay predictable.
     val labelGrowth = ((LocalDensity.current.fontScale.coerceAtLeast(1f) - 1f) * 14f).dp
@@ -123,7 +131,8 @@ fun HamigoBottomBar(route: String, onDestination: (String) -> Unit, modifier: Mo
                                 Modifier.size(64.dp).shadow(3.dp, CircleShape).clip(CircleShape).background(fillColor)
                             } else {
                                 Modifier.width(56.dp).height(40.dp).clip(RoundedCornerShape(18.dp)).background(fillColor)
-                            }).indication(interactionSource, ripple(bounded = false))
+                            }).onGloballyPositioned { onDestinationBounds(destination.route, it.boundsInWindow()) }
+                                .indication(interactionSource, ripple(bounded = false))
                                 .testTag("navigation-icon-${destination.route}"),
                             contentAlignment = Alignment.Center,
                         ) {
