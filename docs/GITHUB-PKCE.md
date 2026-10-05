@@ -1,4 +1,4 @@
-# Connexion native GitHub préparée le 5 octobre 2026
+# Connexion native GitHub configurée le 5 octobre 2026
 
 ## Parcours et configuration
 
@@ -8,9 +8,9 @@ Ce parcours réutilise l'application OAuth Hamigo et son scope `gist`. Le callba
 
 GitHub demande encore un `client_secret` pour l'échange PKCE. Son guide recommande ce flux pour les clients natifs, tout en précisant que le secret distribué dans une application ne peut pas rester confidentiel. Ce paramètre commun n'est pas un jeton utilisateur et ne donne pas seul accès à un compte. Hamigo ne s'en sert pas pour prouver qu'une installation est authentique.
 
-Le build lit `githubClientSecret` dans le fichier local ignoré `.tools/oauth.properties`. Aucune valeur n'est consignée dans les sources, tests, logs ou documents. En son absence, l'APK conserve Device Flow ; le parcours direct ne doit donc pas être annoncé comme activé avant configuration et validation réelle. Les personnes installant un APK configuré utilisent toutes la même application OAuth et ne fournissent aucun secret personnel.
+Le secret commun de l'application OAuth Hamigo a été généré dans le portail GitHub le **5 octobre 2026**, avec l'autorisation de l'utilisateur, puis renseigné dans le fichier local ignoré `.tools/oauth.properties`. Le build lit sa propriété `githubClientSecret` et intègre ce paramètre dans l'APK pour activer le parcours direct. Le secret reste hors des fichiers versionnés et des rapports. Les personnes installant cet APK utilisent toutes la même application OAuth et ne fournissent aucun secret personnel.
 
-La génération de cette credential dans le portail GitHub reste à effectuer par le propriétaire. Le modèle de fichier est prêt ; seul le secret de l'application doit être collé après `githubClientSecret=`, jamais un jeton personnel GitHub.
+Une compilation dépourvue de cette configuration locale conserve Device Flow. Il s'agit bien du secret de l'application OAuth, jamais d'un jeton personnel GitHub. Le parcours direct avec ce paramètre intégré a été validé sur le téléphone avec le compte déjà autorisé ; les observations et limites figurent ci-dessous.
 
 ## Protection de la transaction
 
@@ -29,6 +29,12 @@ Une annulation rapportée par le navigateur ne détruit pas immédiatement la tr
 ## Validation
 
 Les **65 tests JVM et 42 tests Android locaux passent**, avec identifiants fictifs et serveurs de transport locaux. Ils ne constituent pas une autorisation personnelle réussie auprès de GitHub. Le retour d'un App Link depuis un vrai Custom Tab a reproduit une seconde instance avec `singleTop` ; `singleTask` retrouve le même ViewModel et retire le navigateur de la pile. La fermeture est attendue jusqu'à sa destruction effective, après la reprise de l'app. Une reprise à froid et une recréation effacent le code de l'intent. Les preuves et limites figurent dans [VALIDATION.md](VALIDATION.md).
+
+Le **5 octobre 2026**, l'APK release signé **0.10+4a37256b** a été installé sur le Samsung SM-S938B. Après déconnexion locale du compte puis lancement du parcours direct, Hamigo a repris la même `MainActivity` et affiché successivement « GitHub a autorisé Hamigo. Vérification du compte… », puis « Connecté · AlexMalfr » avec une synchronisation terminée. Le navigateur observé était un **Custom Tab** : son activité terminée ne figurait plus dans l'historique de la tâche. Le relevé final confirme une seule `MainActivity`, aucun onglet navigateur dans la tâche et Hamigo au premier plan.
+
+Les **386 XP et trois leçons** étaient conservés. Après arrêt forcé et relancement, le compte restait connecté et une nouvelle synchronisation était affichée ; le domaine Android App Links était toujours vérifié. Le rapport local `output/pkce-validation/phone-live-stack.json` consigne la pile et la persistance observées, sans code OAuth ni jeton.
+
+Le compte avait déjà autorisé Hamigo. La connexion réelle, l'échange PKCE, le retour, la fermeture du Custom Tab, la synchronisation et la persistance sont donc validés pour ce cas. Cette passe n'a pas montré de nouveau consentement, de saisie de mot de passe ou de double authentification ; elle ne valide pas ces écrans pour un nouvel utilisateur ni le canal de retour d'un Auth Tab natif distinct du Custom Tab observé.
 
 ## Sources
 
