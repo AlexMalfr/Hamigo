@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -59,9 +61,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 internal val HamigoNavigationOverhang = 18.dp
-internal val HamigoNavigationCutoutDepth = 72.dp
+internal val HamigoNavigationCutoutDepth = 69.dp
 internal val HamigoNavigationContentOverlap = HamigoNavigationCutoutDepth - HamigoNavigationOverhang
 internal val LocalNavigationContentOverlap = staticCompositionLocalOf { 0.dp }
 internal const val HamigoEdgeShadowLayers = 10
@@ -100,17 +104,22 @@ fun HamigoBottomBar(
                 val leftInset = navigationInsets.getLeft(density, layoutDirection).toFloat()
                 val rightInset = navigationInsets.getRight(density, layoutDirection).toFloat()
                 val center = Offset((size.width + leftInset - rightInset) / 2f, 34.dp.toPx())
-                val radius = 38.dp.toPx()
+                val radius = 35.dp.toPx()
                 val circleBounds = Rect(center.x-radius, center.y-radius, center.x+radius, center.y+radius)
-                val lip = 8.dp.toPx()
+                // Tangent circles round the shoulders and join the notch without a kink.
+                val shoulderRadius = 9.dp.toPx()
+                val shoulderY = bodyTop + shoulderRadius
+                val dy = shoulderY - center.y
+                val shoulderX = sqrt((radius+shoulderRadius)*(radius+shoulderRadius)-dy*dy)
+                val tangentAngle = Math.toDegrees(atan2(-dy,shoulderX).toDouble()).toFloat()
                 val silhouette = Path().apply {
                     moveTo(0f, bodyTop)
-                    lineTo(center.x-radius-lip, bodyTop)
-                    cubicTo(center.x-radius-3.dp.toPx(), bodyTop,
-                        center.x-radius, center.y-10.dp.toPx(), center.x-radius, center.y)
-                    arcTo(circleBounds, 180f, -180f, false)
-                    cubicTo(center.x+radius, center.y-10.dp.toPx(),
-                        center.x+radius+3.dp.toPx(), bodyTop, center.x+radius+lip, bodyTop)
+                    lineTo(center.x-shoulderX, bodyTop)
+                    arcTo(Rect(center.x-shoulderX-shoulderRadius,shoulderY-shoulderRadius,
+                        center.x-shoulderX+shoulderRadius,shoulderY+shoulderRadius),-90f,90f+tangentAngle,false)
+                    arcTo(circleBounds,180f+tangentAngle,-180f-2f*tangentAngle,false)
+                    arcTo(Rect(center.x+shoulderX-shoulderRadius,shoulderY-shoulderRadius,
+                        center.x+shoulderX+shoulderRadius,shoulderY+shoulderRadius),180f-tangentAngle,90f+tangentAngle,false)
                     lineTo(size.width, bodyTop)
                     lineTo(size.width, size.height)
                     lineTo(0f, size.height)
@@ -159,12 +168,14 @@ fun HamigoBottomBar(
                         Box(
                             (if (central) {
                                 Modifier.size(64.dp).drawBehind {
-                                    // Draw the halo before clipping the button: it stays visible around
-                                    // the whole circle, including the part above the navigation body.
-                                    for (spread in HamigoEdgeShadowLayers downTo 1) {
-                                        drawCircle(Color.Black.copy(alpha = HamigoEdgeShadowAlpha),
-                                            radius = size.minDimension / 2f + spread.dp.toPx())
-                                    }
+                                    val buttonRadius=size.minDimension/2f
+                                    val haloRadius=buttonRadius+14.dp.toPx()
+                                    drawCircle(Brush.radialGradient(
+                                        0f to Color.Black.copy(alpha=.10f),
+                                        buttonRadius/haloRadius to Color.Black.copy(alpha=.10f),
+                                        (buttonRadius+5.dp.toPx())/haloRadius to Color.Black.copy(alpha=.055f),
+                                        1f to Color.Transparent,
+                                        center=center,radius=haloRadius),radius=haloRadius)
                                 }
                                     .clip(CircleShape).background(fillColor)
                             } else {
@@ -190,7 +201,8 @@ fun HamigoBottomBar(
                         Spacer(Modifier.height(6.dp))
                         Text(
                             destination.label,
-                            modifier = Modifier.height(14.dp + labelGrowth),
+                            modifier = Modifier.height(14.dp + labelGrowth).offset(y=if(central)4.dp else 0.dp)
+                                .testTag("navigation-label-${destination.route}"),
                             color = if (selected) Teal else Muted,
                             fontSize = 11.sp,
                             lineHeight = 14.sp,

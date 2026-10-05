@@ -474,7 +474,7 @@ private data class BackScreenSnapshot(
     val next=content.nextLesson(completed)
     val due=p.due(content)
     val listState=androidx.compose.foundation.lazy.rememberLazyListState()
-    LazyColumn(Modifier.fillMaxSize(),state=listState,contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("path-list"),state=listState,contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {
             Row(Modifier.fillMaxWidth().stickyHeaderShadow(listState).background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}

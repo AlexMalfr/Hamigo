@@ -1,23 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical" android:padding="14dp" android:background="@drawable/widget_week_background">
-    <TextView android:id="@id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:text="@string/widget_preview_week_title" android:textSize="11sp" android:textStyle="bold" android:textColor="#087F82" android:maxLines="1" android:ellipsize="end" />
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-        <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical">
-            <TextView android:id="@id/widget_metric" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="@string/widget_preview_week_metric" android:textSize="25sp" android:textStyle="bold" android:textColor="#073D40" android:maxLines="1" android:ellipsize="end"
-                android:autoSizeTextType="uniform" android:autoSizeMinTextSize="18sp" android:autoSizeMaxTextSize="25sp" android:autoSizeStepGranularity="1sp" />
-            <TextView android:id="@id/widget_status" android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:text="@string/widget_preview_week_status" android:textSize="12sp" android:textColor="#45676A" android:maxLines="2" android:ellipsize="end" />
-        </LinearLayout>
-        <ImageView android:id="@+id/widget_mascot" android:layout_width="58dp" android:layout_height="58dp" android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" android:importantForAccessibility="no" />
-    </LinearLayout>
-    <ImageView android:id="@+id/widget_art" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginVertical="3dp"
-        android:src="@drawable/widget_week_chart" android:scaleType="fitCenter" android:importantForAccessibility="yes" android:contentDescription="@string/widget_preview_week_chart" />
-    <ProgressBar android:id="@id/widget_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="5dp" android:visibility="gone"
-        android:progressTint="#087F82" android:progressBackgroundTint="#FFFFFF" android:max="100" android:progress="40" />
-    <TextView android:id="@id/widget_review" android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:layout_marginTop="5dp" android:text="@string/widget_review" android:textSize="12sp" android:textStyle="bold" android:textColor="#087F82" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="16dp" android:background="@drawable/widget_week_background" android:clipToPadding="false">
+<LinearLayout android:layout_width="match_parent" android:layout_height="18dp" android:orientation="horizontal" android:gravity="center_vertical">
+<TextView android:id="@+id/widget_title" android:layout_width="0dp" android:layout_weight="1" android:layout_height="18dp" android:text="@string/widget_preview_week_title" android:textSize="12sp" android:textColor="#D7EBE8" android:autoSizeMinTextSize="9sp" android:includeFontPadding="false" android:gravity="center_vertical" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMaxTextSize="12sp" android:autoSizeStepGranularity="1sp" android:textStyle="bold" />
+<TextView android:id="@+id/widget_badge" android:layout_width="wrap_content" android:layout_height="22dp" android:text="@string/widget_preview_badge" android:textSize="11sp" android:textColor="#D7EBE8" android:autoSizeMinTextSize="9sp" android:includeFontPadding="false" android:gravity="center_vertical" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMaxTextSize="11sp" android:autoSizeStepGranularity="1sp" android:background="@drawable/widget_chip_background" android:paddingHorizontal="8dp" android:visibility="gone" />
+</LinearLayout>
+<LinearLayout android:layout_width="match_parent" android:layout_height="38dp" android:orientation="horizontal" android:gravity="center_vertical">
+<TextView android:id="@+id/widget_metric" android:layout_width="0dp" android:layout_weight="1" android:layout_height="38dp" android:text="@string/widget_preview_week_metric" android:textSize="32sp" android:textStyle="bold" android:textColor="#FFFFFF" android:autoSizeMinTextSize="11sp" android:includeFontPadding="false" android:gravity="center_vertical" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMaxTextSize="32sp" android:autoSizeStepGranularity="1sp"  />
+<ImageView android:id="@+id/widget_mascot" android:layout_width="38dp" android:layout_height="38dp" android:scaleType="fitCenter" android:src="@mipmap/ic_launcher" android:importantForAccessibility="no" android:visibility="gone" />
+</LinearLayout>
+<ImageView android:id="@+id/widget_art" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginVertical="4dp" android:src="@drawable/widget_week_chart" android:scaleType="fitXY" android:importantForAccessibility="yes" android:contentDescription="@string/widget_preview_week_chart" />
+<TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="20dp" android:text="@string/widget_preview_week_status" android:textSize="13sp" android:textColor="#D7EBE8" android:autoSizeMinTextSize="9sp" android:includeFontPadding="false" android:gravity="center_vertical" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMaxTextSize="13sp" android:autoSizeStepGranularity="1sp" />
+<ProgressBar android:id="@+id/widget_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="5dp" android:progressDrawable="@drawable/widget_progress_track" android:max="100" android:progress="40" android:visibility="gone" />
+<TextView android:id="@+id/widget_review" android:layout_width="wrap_content" android:layout_height="24dp" android:text="@string/widget_review" android:textSize="12sp" android:textColor="#087F82" android:autoSizeMinTextSize="9sp" android:includeFontPadding="false" android:gravity="center_vertical" android:maxLines="1" android:ellipsize="end" android:autoSizeTextType="uniform" android:autoSizeMaxTextSize="12sp" android:autoSizeStepGranularity="1sp" android:paddingHorizontal="12dp" android:background="@drawable/widget_chip_background" android:textStyle="bold" />
 </LinearLayout>

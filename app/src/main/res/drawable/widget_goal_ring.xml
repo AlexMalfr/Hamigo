@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="160dp" android:height="160dp" android:viewportWidth="160" android:viewportHeight="160">
+    <path android:strokeColor="#A6D5CD" android:strokeWidth="9" android:fillColor="#00000000" android:pathData="M80,15 A65,65 0,1,1 80,145 A65,65 0,1,1 80,15" />
+    <path android:strokeColor="#087F82" android:strokeWidth="9" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M80,15 A65,65 0,0,1 118.2,132.6" />
+    <!-- Same vector character as the launcher, without the launcher's mask or background. -->
+    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.95" android:scaleY="0.95" android:translateX="26" android:translateY="26">
+        <path android:strokeColor="#FF7869" android:strokeWidth="4" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M22,58l-8,8 M86,53l8,-9" />
+        <path android:fillColor="#FFCA7B" android:pathData="M49,25h10v22h-10z" />
+        <path android:fillColor="#073D40" android:pathData="M28,83l-6,9h17l-2,-9z M70,83l1,9h17l-7,-9z" />
+        <path android:fillColor="#FFF8EA" android:pathData="M30,37h48q9,0 9,9v29q0,9 -9,9h-48q-9,0 -9,-9v-29q0,-9 9,-9z" />
+        <path android:fillColor="#FF7869" android:pathData="M61,55a9,9 0,1 0,18 0a9,9 0,1 0,-18 0" />
+        <path android:fillColor="#173F42" android:pathData="M33,51h6v8h-6z M46,51h6v8h-6z M34,66q8,9 17,0v4q-9,9 -17,0z M62,69h16v2h-16z M62,74h16v2h-16z" />
+        <path android:strokeColor="#087F82" android:strokeWidth="3" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M38,20q16,-12 32,0 M43,28q11,-8 22,0" />
+    </group>
+</vector>

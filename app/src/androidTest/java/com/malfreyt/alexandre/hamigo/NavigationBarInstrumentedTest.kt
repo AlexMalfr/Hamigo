@@ -158,7 +158,7 @@ class NavigationBarInstrumentedTest {
                 actual.green > backdrop.green*.65f && actual.green <= backdrop.green+.03f &&
                 actual.blue > backdrop.blue*.65f && actual.blue <= backdrop.blue+.03f)
         }
-        val ringOffset = with(ui.density) { 36.dp.toPx() }
+        val ringOffset = with(ui.density) { 33.5.dp.toPx() }
         assertCutoutShowsBackdrop(circle.center.x-ringOffset, circle.center.y)
         assertCutoutShowsBackdrop(circle.center.x+ringOffset, circle.center.y)
         assertCutoutShowsBackdrop(circle.center.x, circle.center.y+ringOffset)
@@ -166,7 +166,10 @@ class NavigationBarInstrumentedTest {
         assertTrue("The concave edge must cast a soft visible shadow inside the hole.", shadowPixel.blue < backdrop.blue-.01f)
         val circleHalo=pixels[(circle.center.x-rootBounds.left).toInt(),
             (circle.top-with(ui.density){3.dp.toPx()}-rootBounds.top).toInt()]
-        assertTrue("The raised circle needs its own visible halo above the navigation body.",circleHalo.blue<backdrop.blue-.08f)
+        assertTrue("The raised circle needs a light halo above the navigation body.",circleHalo.blue<backdrop.blue-.025f && circleHalo.blue>backdrop.blue*.85f)
+        val farHalo=pixels[(circle.center.x-rootBounds.left).toInt(),
+            (circle.top-with(ui.density){10.dp.toPx()}-rootBounds.top).toInt()]
+        assertTrue("The circle halo should fade outward rather than form a dense ring.",farHalo.blue>circleHalo.blue+.015f && farHalo.blue<backdrop.blue-.003f)
         // An extra radial shadow used to be cut at bodyTop, leaving two grey rectangular lips.
         val lipProbe=with(ui.density) {34.dp.toPx()}
         listOf(circle.center.x-lipProbe,circle.center.x+lipProbe).forEach {x ->

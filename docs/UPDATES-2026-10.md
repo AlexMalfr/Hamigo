@@ -96,3 +96,10 @@ La photo, le titre, le sous-titre et le bouton Paramètres restent fixes pendant
 - Atteindre l’objectif ou désactiver les rappels annule le report. Une notification d’un ancien jour ne crée pas de nouveau report, et un report expiré depuis plus de six heures est abandonné. L’alarme reste inexacte et Android peut retarder la livraison selon ses contraintes d’énergie. Le report est local à l’appareil et n’est pas exporté dans la sauvegarde GitHub.
 
 Références de plateforme : [layouts responsive des widgets](https://developer.android.com/develop/ui/views/appwidgets/layouts), [mise à jour des widgets](https://developer.android.com/develop/ui/views/appwidgets/advanced).
+
+## Finitions UI et refonte des widgets — 5 octobre 2026, 0.24
+
+- Les graphes de Moi gardent leurs données et leur navigation historique, sans les paragraphes explicatifs sous le calendrier et l'histogramme. Le total d'XP de la période accompagne son titre ; l'objectif reste dessiné en pointillés et décrit pour l'accessibilité.
+- L'avatar GitHub de Moi passe de 56 à 72 dp et descend de 16 dp lorsque l'en-tête est fixé, pour dépasser légèrement sous son bord. Une fine bordure couleur fond le détache du contenu.
+- La découpe de Parcours passe de 6 à 3 dp, avec des épaules arrondies raccordées par des arcs tangents. Le bouton conserve un halo diffus plus léger que l'ombre de la barre ; son label descend légèrement. Parcours, Équipe et Moi gagnent 40 dp de respiration en bas.
+- Les trois widgets ont quatre compositions réelles : compacte, horizontale, verticale et grande. Série utilise des tons chauds et ses jours de révision ; Objectif conserve une seule jauge avec Pico ; Cette semaine met le graphique en avant sur un fond turquoise sombre. Le contenu illustré et les textes s'adaptent à l'espace, avec des aperçus propres dans le sélecteur du launcher et des métriques natives accessibles.

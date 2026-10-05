@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -142,7 +143,7 @@ fun FriendsScreen(model: AppModel) {
     var receivedLink by remember { mutableStateOf("") }
     var inviteError by remember { mutableStateOf<String?>(null) }
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
         item {
             if (!connected) GitHubConnection(model)

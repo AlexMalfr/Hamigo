@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.os.SystemClock
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
@@ -124,9 +125,12 @@ class VisualAuditTest {
         navigate("profile")
         val header=ui.onNodeWithTag("profile-header",useUnmergedTree=true)
         val top=header.fetchSemanticsNode().boundsInRoot.top
+        val avatar=ui.onNodeWithContentDescription("Photo GitHub de Alex",useUnmergedTree=true)
+        check(avatar.fetchSemanticsNode().boundsInRoot.height>=with(ui.density){70.dp.toPx()})
         ui.onNodeWithTag("profile-list").performScrollToNode(hasText("Mieux retenir"))
         header.assertIsDisplayed()
         check(header.fetchSemanticsNode().boundsInRoot.top<=top+1f)
+        check(avatar.fetchSemanticsNode().boundsInRoot.bottom>header.fetchSemanticsNode().boundsInRoot.bottom+with(ui.density){4.dp.toPx()})
         ui.onNodeWithContentDescription("Réglages").assertIsDisplayed()
         capture("41-moi-entete-fixe")
         ui.onNodeWithContentDescription("Réglages").performClick()
@@ -166,6 +170,11 @@ class VisualAuditTest {
             }
             if (exists(lastText)) scrollTo(lastText)
             else ui.onAllNodes(verticalScroll).onFirst().performTouchInput { swipeUp() }
+            if(route in listOf("path","profile","friends")) {
+                val listTag=if(route=="friends")"friends-list" else "$route-list"
+                ui.onNodeWithTag(listTag).performSemanticsAction(SemanticsActions.ScrollBy) { it(0f,10_000f) }
+                ui.waitForIdle()
+            }
             capture("$label-lower")
         }
 

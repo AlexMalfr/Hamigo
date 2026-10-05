@@ -1,6 +1,9 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,6 +12,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -54,14 +58,16 @@ fun ProfileScreen(model: AppModel, content: Content) {
     val weeks = maxOf(4, (ChronoUnit.DAYS.between(earliest, today) / 7).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
     val listState = rememberLazyListState()
+    val avatarDrop by animateDpAsState(if(stickyHeaderDetached(listState))16.dp else 0.dp,tween(180),label="profile-avatar-overhang")
     LazyColumn(
         Modifier.fillMaxSize().testTag("profile-list"), state = listState,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp + LocalNavigationContentOverlap.current),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 56.dp + LocalNavigationContentOverlap.current),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         stickyHeader(key = "profile-header") {
             Row(Modifier.fillMaxWidth().testTag("profile-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.size(56.dp))
+                GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.align(Alignment.Bottom).size(72.dp)
+                    .offset(y=avatarDrop).border(3.dp,Cream,CircleShape))
                 Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
                 IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
             }
@@ -170,12 +176,6 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
                 }
             }
         }
-        Text("Objectif actuel : $goal XP/jour", fontSize = 12.sp, color = Muted)
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Canvas(Modifier.size(16.dp)) { drawCircle(Mist); drawCircle(Teal, radius = size.minDimension * .35f) }
-            Text("Le rond se remplit avec tes XP. Plein = objectif atteint.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
-        }
-        Text("Glisse vers la droite pour retrouver les mois précédents.", fontSize = 11.sp, color = Muted)
     }
 }
 
@@ -203,9 +203,13 @@ private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int, goal: Int) {
 private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
     val history = rememberPagerState(pageCount = { weeks })
     val scope = rememberCoroutineScope()
+    val visibleWeekXp=(0L..6L).sumOf { p.dayXp(today.minusDays(history.currentPage*7L+it)) }
     Panel {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (history.currentPage == 0) "Cette semaine" else "Ton historique", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Column(Modifier.weight(1f)) {
+                Text(if (history.currentPage == 0) "Cette semaine" else "Ton historique", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text("$visibleWeekXp XP",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
+            }
             IconButton({ scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < weeks - 1) {
                 Icon(Icons.Rounded.History, "Voir la semaine précédente")
             }
@@ -245,15 +249,7 @@ private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
                         Text(day.dayOfWeek.getDisplayName(TextStyle.NARROW, French), Modifier.weight(1f), fontSize = 11.sp, textAlign = TextAlign.Center)
                     }
                 }
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Canvas(Modifier.width(20.dp).height(8.dp)) {
-                        drawLine(GoalOrange, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), strokeWidth = 1.5.dp.toPx(),
-                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 3.dp.toPx())))
-                    }
-                    Text("Objectif : $goal XP/jour · $weeklyXp XP en 7 jours", fontSize = 12.sp, color = Muted)
-                }
             }
         }
-        Text("Glisse vers la droite pour remonter les semaines.", fontSize = 11.sp, color = Muted)
     }
 }

@@ -38,10 +38,15 @@ internal class BackMotionAnchors { var settings by mutableStateOf<Rect?>(null) }
 internal val LocalBackMotionAnchors = staticCompositionLocalOf<BackMotionAnchors?> { null }
 internal val LocalAnimatedBack = staticCompositionLocalOf<(() -> Unit)?> { null }
 
-@Composable internal fun Modifier.stickyHeaderShadow(state: LazyListState): Modifier {
+@Composable internal fun stickyHeaderDetached(state: LazyListState): Boolean {
     val detached by remember(state) { derivedStateOf {
         state.firstVisibleItemIndex>0 || state.firstVisibleItemScrollOffset>state.layoutInfo.beforeContentPadding
     } }
+    return detached
+}
+
+@Composable internal fun Modifier.stickyHeaderShadow(state: LazyListState): Modifier {
+    val detached=stickyHeaderDetached(state)
     val strength by animateFloatAsState(if(detached)1f else 0f,tween(150),label="sticky-header-shadow")
     return drawBehind {
         // Lists keep 16 dp side gutters for their content; the pinned surface and its

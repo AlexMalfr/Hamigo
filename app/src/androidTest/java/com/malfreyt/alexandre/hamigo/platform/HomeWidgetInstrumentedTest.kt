@@ -8,9 +8,12 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.SizeF
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -64,30 +67,65 @@ class HomeWidgetInstrumentedTest {
     }
 
     @Test fun everyDesignRendersAtCompactNarrowWideAndLargeSizesWithReadableNativeMetrics() {
-        val date=LocalDate.now()
+        val date=LocalDate.of(2026,10,10)
         val reminder=ReminderContent.build(ReminderState(18,30,setOf(date.toString(),date.minusDays(1).toString())),date)
         val monday=date.minusDays((date.dayOfWeek.value-1).toLong())
-        val snapshot=WidgetSnapshot(reminder,(0L..6L).map { WidgetDay(monday.plusDays(it),if(monday.plusDays(it).isAfter(date))0 else 18) })
-        val sizes=listOf(SizeF(120f,110f),SizeF(130f,220f),SizeF(220f,170f),SizeF(350f,220f),SizeF(450f,300f))
+        val snapshot=WidgetSnapshot(reminder,(0L..6L).map { WidgetDay(monday.plusDays(it),if(monday.plusDays(it).isAfter(date))0 else listOf(30,12,40,8,30,18,0)[it.toInt()]) })
+        val sizes=listOf(SizeF(120f,110f),SizeF(130f,170f),SizeF(130f,180f),SizeF(130f,220f),SizeF(200f,160f),SizeF(220f,110f),SizeF(220f,159f),SizeF(220f,170f),SizeF(350f,110f),SizeF(350f,220f),SizeF(450f,300f))
         HomeWidgetKind.entries.forEach { kind -> sizes.forEach { size ->
             instrumentation.runOnMainSync {
                 val view=HomeWidgets.views(context,kind,snapshot,size).apply(context,FrameLayout(context))
                 measure(view,size)
-                val metric=view.findViewById<TextView>(R.id.widget_metric)
-                assertTrue("The native metric must remain visible at $kind $size",metric.height>0 && metric.width>0)
-                assertTrue(metric.text.isNotEmpty())
-                assertEquals("The metric must not be truncated at $kind $size",0,metric.layout.getEllipsisCount(0))
-                assertTrue("Metric must fit inside widget",metric.right<=view.width)
-                val action=view.findViewById<TextView>(R.id.widget_review)
-                assertTrue("Review action must fit vertically at $kind $size",action.bottom<=view.height-8)
+                assertNativeContentFits(view,kind,size)
                 assertTrue(view.findViewById<View>(R.id.widget_root).hasOnClickListeners())
                 capture(view,"${kind.name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
             }
         } }
     }
 
+    @Test fun largeCountsAndGoalStayLegibleAtTheMinimumSizeAndTallGoalHasOnlyOneGauge() {
+        val date=LocalDate.of(2026,10,10)
+        val reminder=ReminderContent.build(ReminderState(12345,1000,setOf(date.toString())),date).copy(streak=365)
+        val monday=date.minusDays((date.dayOfWeek.value-1).toLong())
+        val snapshot=WidgetSnapshot(reminder,(0L..6L).map { WidgetDay(monday.plusDays(it),if(it<6)12345 else 0) })
+        instrumentation.runOnMainSync {
+            HomeWidgetKind.entries.forEach { kind ->
+                val size=SizeF(120f,110f)
+                val view=HomeWidgets.views(context,kind,snapshot,size).apply(context,FrameLayout(context))
+                measure(view,size)
+                assertNativeContentFits(view,kind,size)
+                capture(view,"${kind.name.lowercase()}-large-count-120x110")
+            }
+            val size=SizeF(130f,220f)
+            val view=HomeWidgets.views(context,HomeWidgetKind.GOAL,snapshot,size).apply(context,FrameLayout(context))
+            measure(view,size)
+            assertEquals(View.VISIBLE,view.findViewById<View>(R.id.widget_art).visibility)
+            assertEquals("The goal ring replaces the compact linear gauge",View.GONE,view.findViewById<View>(R.id.widget_progress).visibility)
+            assertEquals("Pico already lives inside the goal ring",View.GONE,view.findViewById<View>(R.id.widget_mascot).visibility)
+        }
+    }
+
+    @Test fun launcherPreviewsFitTheirDefaultSizesWithoutFlatteningTheGoalRing() {
+        val previews=listOf(
+            Triple(HomeWidgetKind.STREAK,R.layout.widget_streak_preview,SizeF(130f,130f)),
+            Triple(HomeWidgetKind.GOAL,R.layout.widget_goal_preview,SizeF(220f,150f)),
+            Triple(HomeWidgetKind.WEEK,R.layout.widget_week_preview,SizeF(280f,180f)),
+        )
+        instrumentation.runOnMainSync {
+            previews.forEach { (kind,layout,size) ->
+                val view=LayoutInflater.from(context).inflate(layout,FrameLayout(context),false)
+                measure(view,size)
+                assertNativeContentFits(view,kind,size)
+                val art=view.findViewById<View>(R.id.widget_art)
+                assertTrue("Launcher preview needs a visible illustration",art.height>0)
+                if(kind==HomeWidgetKind.GOAL)assertTrue("Goal preview keeps room for a round ring",art.height>=art.width)
+                capture(view,"preview-${kind.name.lowercase()}")
+            }
+        }
+    }
+
     @Test fun realWidgetHostAcceptsResponsiveViewsAndResizesAllThreeProviders() {
-        // Emulator receives appwidget grantbind before this test; no widget is added to the user's launcher.
+        // Binding permission belongs only to this isolated test host, never to the user's launcher.
         val manager=AppWidgetManager.getInstance(context)
         val host=AppWidgetHost(context,2822)
         instrumentation.uiAutomation.adoptShellPermissionIdentity(android.Manifest.permission.BIND_APPWIDGET)
@@ -107,16 +145,40 @@ class HomeWidgetInstrumentedTest {
                 instrumentation.runOnMainSync {
                     val view=host.createView(context,id,info)
                     view.setPadding(0,0,0,0)
-                    listOf(SizeF(120f,110f),SizeF(350f,220f),SizeF(130f,220f)).forEach { size ->
+                    listOf(SizeF(120f,110f),SizeF(350f,110f),SizeF(350f,220f),SizeF(130f,220f),SizeF(450f,300f)).forEach { size ->
                         view.updateAppWidgetSize(Bundle(),listOf(size))
-                        view.updateAppWidget(HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],WidgetSnapshot.read(context),options))
+                        val resizedOptions=Bundle(options).apply {
+                            putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,arrayListOf(size))
+                        }
+                        view.updateAppWidget(HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],WidgetSnapshot.read(context),resizedOptions))
                         measure(view,size)
                         assertNotNull("Responsive RemoteViews must inflate in a real host",view.findViewById<View>(R.id.widget_metric))
+                        assertNativeContentFits(view,HomeWidgetKind.entries[index],size)
+                        capture(view,"host-${HomeWidgetKind.entries[index].name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
                     }
                 }
                 host.deleteAppWidgetId(id)
             }
         } finally { host.deleteHost();instrumentation.uiAutomation.dropShellPermissionIdentity();HomeWidgets.refresh(context) }
+    }
+
+    private fun assertNativeContentFits(view: View,kind: HomeWidgetKind,size: SizeF) {
+        listOf(R.id.widget_title,R.id.widget_metric,R.id.widget_status,R.id.widget_review,R.id.widget_badge).forEach { id ->
+            val text=view.findViewById<TextView>(id)
+            if(text.visibility==View.VISIBLE) {
+                assertTrue("Native text must remain visible at $kind $size: ${text.text}",text.height>0 && text.width>0)
+                assertTrue(text.text.isNotEmpty())
+                val layout=text.layout
+                assertNotNull(layout)
+                (0 until layout.lineCount).forEach { line ->
+                    assertEquals("Native text must not be truncated at $kind $size: ${text.text}",0,layout.getEllipsisCount(line))
+                }
+                assertTrue("Text lines must fit vertically at $kind $size: ${text.text}",layout.height<=text.height)
+                val bounds=Rect(0,0,text.width,text.height)
+                (view as ViewGroup).offsetDescendantRectToMyCoords(text,bounds)
+                assertTrue("Native text ${context.resources.getResourceEntryName(id)} (${text.text}) must fit inside widget at $kind $size: $bounds in ${view.width}x${view.height}",bounds.left>=0 && bounds.top>=0 && bounds.right<=view.width && bounds.bottom<=view.height)
+            }
+        }
     }
 
     private fun measure(view: View,size: SizeF) {
@@ -129,7 +191,9 @@ class HomeWidgetInstrumentedTest {
         val bitmap=Bitmap.createBitmap(view.width,view.height,Bitmap.Config.ARGB_8888)
         val canvas=Canvas(bitmap);canvas.drawColor(Color.rgb(72,84,98));view.draw(canvas)
         val directory=File(context.getExternalFilesDir(null),"widgets-audit").apply { mkdirs() }
-        File(directory,"$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+        val font=context.resources.configuration.fontScale
+        val suffix=if(font>1.01f)"-font$font" else ""
+        File(directory,"$name$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
         bitmap.recycle()
     }
 }
