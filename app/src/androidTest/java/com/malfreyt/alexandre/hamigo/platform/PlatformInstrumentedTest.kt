@@ -145,6 +145,47 @@ class PlatformInstrumentedTest {
     }
 
     @Test
+    fun savedGistBrowserLinksUseLocalValidatedIdsWithoutContactingGitHub() {
+        val isolated = TokenTestContext(context, UUID.randomUUID().toString())
+        val prefs = isolated.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
+        var requests = 0
+        val gateway = object : GitHubGateway {
+            override suspend fun api(method: String, path: String, token: String?, body: String?): String {
+                requests++
+                error("Reading a saved browser link must not call the GitHub API")
+            }
+            override suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String): String {
+                requests++
+                error("Reading a saved browser link must not fetch backup content")
+            }
+        }
+        val sync = GitHubSync(isolated, gateway)
+        val socialId = "ABCDEF0123456789ABCDEF0123456789"
+        val backupId = "0123456789ABCDEF0123456789ABCDEF"
+        try {
+            assertNull(sync.savedGistUrl)
+            assertNull(sync.savedBackupUrl)
+            prefs.edit().putString("ownGistId", socialId).putString("ownBackupId", backupId)
+                .putString("ownGistUrl", "https://untrusted.example/previous-link").commit()
+            assertEquals("https://gist.github.com/${socialId.lowercase()}", sync.savedGistUrl)
+            assertEquals("https://gist.github.com/${backupId.lowercase()}", sync.savedBackupUrl)
+
+            // A legacy valid URL is reduced to its ID, without retaining its owner, query or fragment.
+            prefs.edit().remove("ownGistId")
+                .putString("ownGistUrl", "https://gist.github.com/previous-owner/$socialId?utm_source=message#file-other").commit()
+            assertEquals("https://gist.github.com/${socialId.lowercase()}", sync.savedGistUrl)
+
+            // Corrupt IDs and unrelated cached destinations never become clickable URLs.
+            prefs.edit().putString("ownGistId", "not-a-gist")
+                .putString("ownBackupId", "https://gist.github.com/$backupId")
+                .putString("ownGistUrl", "https://gist.github.com.evil.example/$socialId").commit()
+            assertNull(sync.savedGistUrl)
+            assertNull(sync.savedBackupUrl)
+            assertEquals(0, requests)
+        } finally { prefs.edit().clear().commit() }
+    }
+
+    @Test
     fun androidHttpsConnectionAcceptsPatchWithoutOpeningTheNetwork() {
         val connection = URL("https://api.github.com/").openConnection() as HttpURLConnection
         try {

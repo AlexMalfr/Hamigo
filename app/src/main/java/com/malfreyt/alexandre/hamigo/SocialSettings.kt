@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -181,13 +182,29 @@ fun FriendsScreen(model: AppModel) {
             }
         }
         items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
+            var menuOpen by remember { mutableStateOf(false) }
+            val socialGist = remember(friend.gist) { runCatching { GitHubSync.gistPageUrl(friend.gist) }.getOrNull() }
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(friend.progress.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons", color = Muted, fontSize = 12.sp)
                     }
-                    IconButton({ model.removeFriend(friend) }) { Icon(Icons.Rounded.Close, "Retirer cet équipier") }
+                    Box {
+                        IconButton({ menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            if (socialGist != null) DropdownMenuItem(
+                                text = { Text("Ouvrir le Gist social") },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, null) },
+                                onClick = { menuOpen = false; openLink(context, socialGist) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Retirer cet équipier") },
+                                leadingIcon = { Icon(Icons.Rounded.PersonRemove, null) },
+                                onClick = { menuOpen = false; model.removeFriend(friend) }
+                            )
+                        }
+                    }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Mis à jour le ${syncDate(friend.progress.updatedAt)}", fontSize = 11.sp, color = Muted, modifier = Modifier.weight(1f))
@@ -248,6 +265,8 @@ fun SettingsScreen(model: AppModel) {
     var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
     var permissionForTest by remember { mutableStateOf(false) }
     var backupExpanded by remember { mutableStateOf(false) }
+    val backupGist = remember(model.revision) { model.sync.savedBackupUrl }
+    val socialGist = remember(model.revision) { model.sync.savedGistUrl }
     fun configure(on: Boolean) {
         if (!on) {
             reminderEnabled = false
@@ -322,7 +341,7 @@ fun SettingsScreen(model: AppModel) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text("Sauvegarde manuelle", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Text("Une copie de secours, si tu en as besoin.", fontSize = 12.sp, color = Muted)
+                        Text("Une copie de secours et tes Gists GitHub.", fontSize = 12.sp, color = Muted)
                     }
                     IconButton({ backupExpanded = !backupExpanded }) {
                         Icon(if (backupExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
@@ -333,6 +352,20 @@ fun SettingsScreen(model: AppModel) {
                     Text("La copie contient tout ton apprentissage. Tes identifiants GitHub n’y figurent jamais.", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
                     OutlinedButton({ NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
                     TextButton({ picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
+                    if (backupGist != null || socialGist != null) {
+                        Text("Consulter sur GitHub", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
+                        Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                            if (backupGist != null) TextButton({ openLink(context, backupGist) }, contentPadding = PaddingValues(horizontal = 0.dp)) {
+                                Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp)); Text("Gist de sauvegarde", fontSize = 12.sp)
+                            }
+                            if (socialGist != null) TextButton({ openLink(context, socialGist) }, contentPadding = PaddingValues(horizontal = 0.dp)) {
+                                Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
+                                Spacer(Modifier.width(6.dp)); Text("Gist social", fontSize = 12.sp)
+                            }
+                        }
+                        Text("Non répertoriés, mais lisibles avec leur lien. Évite de partager ta sauvegarde complète.", fontSize = 11.sp, lineHeight = 16.sp, color = Muted)
+                    }
                 }
             }
         }

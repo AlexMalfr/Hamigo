@@ -194,6 +194,43 @@ class VisualAuditTest {
         ui.onNodeWithText("Annuler").performClick()
     }
 
+    @Test fun savedGistLinksStayDiscreetAndFriendMenuShowsOnlySocial() {
+        // Existing local IDs expose browser links without a token, discovery request or publication.
+        val social = context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
+        check(social.edit()
+            .putString("ownBackupId", "0123456789abcdef0123456789abcdef")
+            .putString("ownGistId", "abcdef0123456789abcdef0123456789")
+            .commit())
+        val friend = demoFriends().first().copy(gist = "https://gist.github.com/fedcba9876543210fedcba9876543210")
+        ui.runOnIdle {
+            model.progress.prefs.edit().putString("friends", JSONArray().put(
+                JSONObject().put("progress", JSONObject(friend.progress.toJson()))
+                    .put("gist", friend.gist).put("modifiedAt", 1L)
+            ).toString()).commit()
+            model.refresh()
+        }
+
+        navigate("settings")
+        scrollTo("Sauvegarde manuelle")
+        ui.onNodeWithText("Gist de sauvegarde").assertDoesNotExist()
+        ui.onNodeWithText("Gist social").assertDoesNotExist()
+        ui.onNodeWithContentDescription("Afficher les options de sauvegarde").performClick()
+        scrollTo("Gist social")
+        ui.onNodeWithText("Gist de sauvegarde").assertIsDisplayed()
+        ui.onNodeWithText("Gist social").assertIsDisplayed()
+        capture("24-reglages-liens-gists")
+
+        navigate("friends")
+        ui.onAllNodes(verticalScroll).onFirst().performScrollToNode(hasContentDescription("Options de ${friend.progress.name}"))
+        ui.onNodeWithText("Ouvrir le Gist social").assertDoesNotExist()
+        ui.onNodeWithContentDescription("Options de ${friend.progress.name}").performClick()
+        ui.onNodeWithText("Ouvrir le Gist social").assertIsDisplayed()
+        ui.onNodeWithText("Retirer cet équipier").assertIsDisplayed()
+        ui.onNodeWithText("Gist de sauvegarde").assertDoesNotExist()
+        capture("25-equipe-menu-gist-social")
+        // No link is clicked: the audit never opens a browser or sends a request to GitHub.
+    }
+
     @Test fun everyReferenceCategoryAndInteractiveTool() {
         for ((index, category) in model.content!!.references.withIndex()) {
             navigate("resources")

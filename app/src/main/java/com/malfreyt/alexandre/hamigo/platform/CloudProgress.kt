@@ -10,6 +10,106 @@ object CloudProgress {
     private const val MAX_BYTES = 8 * 1024 * 1024
     private const val MAX_EVENTS = 100_000
     private val eventId = Regex("[a-fA-F0-9-]{36}")
+    const val MAX_FRIENDS = 30
+    private const val MAX_FRIEND_RECORDS = 2_000
+    private val friendId = Regex("[a-f0-9]{5,64}")
+
+    /** Relationships are independent registers. Cache updates never modify relationship clocks. */
+    fun localFriends(active: JSONArray, tombstones: JSONObject): JSONObject {
+        val result = JSONObject()
+        for (index in 0 until minOf(active.length(), MAX_FRIENDS)) {
+            runCatching {
+                val entry = active.getJSONObject(index)
+                val id = GitHubSync.gistId(entry.getString("gist"))
+                val record = JSONObject().put("modifiedAt", entry.optLong("modifiedAt", 1L).coerceAtLeast(1L))
+                    .put("deleted", false).put("progress", JSONObject(ShareProgress.fromJson(entry.getJSONObject("progress").toString()).toJson()))
+                result.put(id, result.optJSONObject(id)?.let { chooseFriend(it, record) } ?: record)
+            }
+        }
+        tombstones.keys().forEach { id ->
+            if (friendId.matches(id) && tombstones.optLong(id) > 0) {
+                val record = JSONObject().put("modifiedAt", tombstones.getLong(id)).put("deleted", true)
+                result.put(id, result.optJSONObject(id)?.let { chooseFriend(it, record) } ?: record)
+            }
+        }
+        checkFriends(result)
+        return sortedFriends(result)
+    }
+
+    fun activeFriends(records: JSONObject): JSONArray = JSONArray(records.keys().asSequence().sorted().mapNotNull { id ->
+        val record = records.getJSONObject(id)
+        if (record.getBoolean("deleted")) null else JSONObject().put("gist", "https://gist.github.com/$id")
+            .put("modifiedAt", record.getLong("modifiedAt")).put("progress", copy(record.getJSONObject("progress")))
+    }.toList())
+
+    fun friendTombstones(records: JSONObject): JSONObject = JSONObject().also { result ->
+        records.keys().asSequence().sorted().forEach { id ->
+            val record = records.getJSONObject(id)
+            if (record.getBoolean("deleted")) result.put(id, record.getLong("modifiedAt"))
+        }
+    }
+
+    private fun chooseFriend(a: JSONObject, b: JSONObject): JSONObject {
+        val timeA = a.getLong("modifiedAt"); val timeB = b.getLong("modifiedAt")
+        val winner = when {
+            timeA > timeB -> a
+            timeB > timeA -> b
+            a.getBoolean("deleted") != b.getBoolean("deleted") -> if (a.getBoolean("deleted")) a else b
+            canonical(a) >= canonical(b) -> a
+            else -> b
+        }
+        val result = copy(winner)
+        // Compare cache dates within the same relationship version. A deliberate re-add starts
+        // a new version; an older pre-deletion cache must not leak across that boundary.
+        if (timeA == timeB && !winner.getBoolean("deleted") && !a.getBoolean("deleted") && !b.getBoolean("deleted")) {
+            val left = a.getJSONObject("progress"); val right = b.getJSONObject("progress")
+            val cache = when {
+                java.time.Instant.parse(left.getString("updatedAt")) > java.time.Instant.parse(right.getString("updatedAt")) -> left
+                java.time.Instant.parse(left.getString("updatedAt")) < java.time.Instant.parse(right.getString("updatedAt")) -> right
+                canonical(left) >= canonical(right) -> left
+                else -> right
+            }
+            result.put("progress", copy(cache))
+        }
+        return result
+    }
+
+    private fun mergeFriends(a: JSONObject, b: JSONObject): JSONObject {
+        val result = mergeObjects(a, b, ::chooseFriend)
+        require(result.length() <= MAX_FRIEND_RECORDS) { "L'historique des équipiers est trop volumineux." }
+        // Concurrent additions can exceed the UI limit. Keep the newest thirty deterministically;
+        // retain deletion records for the overflow, so a stale device cannot put it back.
+        val active = result.keys().asSequence().filter { !result.getJSONObject(it).getBoolean("deleted") }
+            .sortedWith(compareByDescending<String> { result.getJSONObject(it).getLong("modifiedAt") }.thenBy { it }).toList()
+        active.drop(MAX_FRIENDS).forEach { id ->
+            result.put(id, JSONObject().put("modifiedAt", result.getJSONObject(id).getLong("modifiedAt")).put("deleted", true))
+        }
+        return sortedFriends(result)
+    }
+
+    private fun sortedFriends(records: JSONObject): JSONObject = JSONObject().also { result ->
+        records.keys().asSequence().sorted().forEach { result.put(it, copy(records.getJSONObject(it))) }
+    }
+
+    private fun checkFriends(records: JSONObject) {
+        require(records.length() <= MAX_FRIEND_RECORDS) { "Trop de relations dans la sauvegarde." }
+        var active = 0
+        records.keys().forEach { id ->
+            require(friendId.matches(id)) { "Identifiant d'équipier invalide." }
+            val record = records.getJSONObject(id)
+            require(record.keys().asSequence().all { it in setOf("modifiedAt", "deleted", "progress") }) { "Relation de sauvegarde invalide." }
+            val modified = record.opt("modifiedAt")
+            require(modified is Number && modified.toDouble().isFinite() && modified.toDouble() % 1.0 == 0.0 && modified.toDouble() in 1.0..9_007_199_254_740_991.0) { "Date de relation invalide." }
+            require(record.opt("deleted") is Boolean) { "État de relation invalide." }
+            if (record.getBoolean("deleted")) {
+                require(!record.has("progress")) { "Une relation supprimée ne doit pas contenir de profil." }
+            } else {
+                active++
+                record.put("progress", JSONObject(ShareProgress.fromJson(record.getJSONObject("progress").toString()).toJson()))
+            }
+        }
+        require(active <= MAX_FRIENDS) { "La sauvegarde dépasse la limite de trente équipiers." }
+    }
 
     /** Call before the first local counter mutation, so that existing XP isn't counted twice. */
     fun ensureLedger(state: JSONObject) {
@@ -101,11 +201,14 @@ object CloudProgress {
             .put("reviews", reviews).put("awarded", awarded).put("syncBase", base).put("syncEvents", events)
         val profile = newer(local, remote, "profileUpdatedAt", "name")
         val preferences = newer(local, remote, "preferencesUpdatedAt", "preferences")
-        return JSONObject().put("app", "hamigo").put("schema", 2).put("name", profile.optString("name", "Pilote des ondes"))
+        val result = JSONObject().put("app", "hamigo").put("schema", 2).put("name", profile.optString("name", "Pilote des ondes"))
             .put("profileUpdatedAt", profile.optLong("profileUpdatedAt"))
             .put("preferences", preferences.optJSONObject("preferences") ?: JSONObject())
             .put("preferencesUpdatedAt", preferences.optLong("preferencesUpdatedAt"))
-            .put("progress", state).toString()
+            .put("progress", state)
+        if (local.has("friends") || remote.has("friends")) result.put("friends", mergeFriends(
+            local.optJSONObject("friends") ?: JSONObject(), remote.optJSONObject("friends") ?: JSONObject()))
+        return result.toString()
     }
 
     fun validate(json: String): String = checked(json).toString()
@@ -116,6 +219,10 @@ object CloudProgress {
         require(wrapper.optString("app") == "hamigo" && wrapper.optInt("schema") in 1..2) { "Ce Gist n'est pas une sauvegarde Hamigo." }
         val name = wrapper.opt("name")
         require(name is String && name.trim().isNotEmpty() && name.length <= 48) { "Pseudo de sauvegarde invalide." }
+        if (wrapper.has("friends")) {
+            require(wrapper.opt("friends") is JSONObject) { "Liste d'équipiers invalide." }
+            checkFriends(wrapper.getJSONObject("friends"))
+        }
         val state = wrapper.getJSONObject("progress")
         checkCollectionTypes(state)
         checkCounters(state)

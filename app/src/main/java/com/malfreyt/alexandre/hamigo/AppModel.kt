@@ -16,7 +16,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 
-data class Friend(val progress: ShareProgress, val gist: String = "")
+data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L)
 class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false) {
     var index = 0
     var correct = 0
@@ -229,21 +229,40 @@ class AppModel internal constructor(
     }
     fun leaveSession() { session=null; lesson=null; refreshSocial() }
     private fun loadFriends() {
-        friends = runCatching { JSONArray(progress.prefs.getString("friends","[]")).objects().map { f ->
-            Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.optString("gist")) } }.getOrDefault(emptyList())
+        friends = CloudProgress.activeFriends(progress.friendRecords()).objects().map { f ->
+            Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.getString("gist"), f.getLong("modifiedAt")) }
     }
     private fun saveFriends() {
-        progress.prefs.edit().putString("friends", JSONArray(friends.map { JSONObject().put("progress", JSONObject(it.progress.toJson())).put("gist",it.gist) }).toString()).apply()
+        val deleted = CloudProgress.friendTombstones(progress.friendRecords())
+        val active = JSONArray(friends.map { JSONObject().put("progress", JSONObject(it.progress.toJson()))
+            .put("gist",it.gist).put("modifiedAt",it.modifiedAt) })
+        progress.saveFriendRecords(CloudProgress.localFriends(active, deleted))
     }
     fun addFriend(friend: Friend) {
         synchronized(Progress.CLOUD_LOCK) {
-        loadFriends()
-        val identity = runCatching { GitHubSync.gistId(friend.gist) }.getOrNull()
-        friends=(friends.filterNot { identity != null && runCatching { GitHubSync.gistId(it.gist) }.getOrNull() == identity } + friend).takeLast(30)
-        saveFriends()
+            loadFriends()
+            val identity = GitHubSync.gistId(friend.gist)
+            val previous = progress.friendRecords().optJSONObject(identity)
+            require(previous?.optBoolean("deleted") == false || friends.size < CloudProgress.MAX_FRIENDS) { "Ton équipe peut compter jusqu'à trente équipiers." }
+            val modifiedAt = maxOf(System.currentTimeMillis(), (previous?.optLong("modifiedAt") ?: 0L) + 1L)
+            friends = friends.filterNot { GitHubSync.gistId(it.gist) == identity } +
+                friend.copy(gist="https://gist.github.com/$identity", modifiedAt=modifiedAt)
+            saveFriends()
         }
+        ProgressSyncScheduler.enqueue(context)
     }
-    fun removeFriend(friend: Friend) { synchronized(Progress.CLOUD_LOCK) { loadFriends();friends=friends.filterNot {it.gist==friend.gist && it.progress.name==friend.progress.name}; saveFriends() } }
+    fun removeFriend(friend: Friend) {
+        synchronized(Progress.CLOUD_LOCK) {
+            val id = GitHubSync.gistId(friend.gist)
+            val records = progress.friendRecords()
+            val previous = records.optJSONObject(id) ?: return
+            val modifiedAt = maxOf(System.currentTimeMillis(), previous.getLong("modifiedAt") + 1L)
+            records.put(id,JSONObject().put("modifiedAt",modifiedAt).put("deleted",true))
+            progress.saveFriendRecords(records)
+            loadFriends()
+        }
+        ProgressSyncScheduler.enqueue(context)
+    }
     fun startGitHubConnection() = connectGitHub()
     private fun connectGitHub(savedAuthorization: GitHubPkce.Session? = null) = task {
         try {
@@ -325,7 +344,8 @@ class AppModel internal constructor(
                     val updated=byGist[previous.gist]
                     val previousTime=runCatching { Instant.parse(previous.progress.updatedAt) }.getOrNull()
                     val updateTime=updated?.let { runCatching { Instant.parse(it.progress.updatedAt) }.getOrNull() }
-                    if(updated==null || (previousTime!=null && updateTime!=null && previousTime.isAfter(updateTime))) previous else updated
+                    if(updated==null || (previousTime!=null && updateTime!=null && previousTime.isAfter(updateTime))) previous
+                    else previous.copy(progress=updated.progress)
                 }
                 saveFriends()
             }; revision++

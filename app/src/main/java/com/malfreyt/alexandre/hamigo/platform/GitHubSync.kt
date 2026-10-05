@@ -31,10 +31,16 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
     private val appContext = context.applicationContext
     private val prefs = appContext.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
     val tokens = SecureTokenStore(context)
-    val savedGistUrl: String? get() = prefs.getString("ownGistUrl", null)
+    /** Local, canonical browser links only; reading these never discovers or creates a Gist. */
+    val savedGistUrl: String? get() = savedGistPage("ownGistId")
+        ?: prefs.getString("ownGistUrl", null)?.let { runCatching { gistPageUrl(it) }.getOrNull() }
+    val savedBackupUrl: String? get() = savedGistPage("ownBackupId")
     val lastSyncedAt: String? get() = prefs.getString("lastSyncedAt", null)
     val accountLogin: String? get() = prefs.getString("ownerLogin", null)
     val lastSyncError: String? get() = prefs.getString("lastSyncError", null)
+
+    private fun savedGistPage(key: String): String? = prefs.getString(key, null)
+        ?.takeIf { ID_PATTERN.matches(it) }?.let { gistPageUrl(it) }
 
     /** Validate account identity before replacing credentials, so account changes cannot overwrite another Gist. */
     suspend fun connect(token: String): GitHubIdentity = writeLock.withLock {
@@ -146,8 +152,7 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
         ensureConnected(token)
         val id = result.getString("id")
         require(ID_PATTERN.matches(id)) { "GitHub a renvoyé un identifiant inattendu." }
-        val url = result.optString("html_url").takeIf { it.startsWith("https://gist.github.com/") }
-            ?: "https://gist.github.com/$id"
+        val url = gistPageUrl(id)
         prefs.edit().putString("ownGistId", id).putString("ownGistUrl", url)
             .putString("ownerLogin", owner).putString("lastSyncedAt", Instant.now().toString()).apply()
         return GistSnapshot(id, url, safe)
@@ -223,6 +228,9 @@ class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHt
         private val ID_PATTERN = Regex("[a-fA-F0-9]{5,64}")
         private val DEVICE_FILE_PATTERN = Regex("hamigo-device-[a-fA-F0-9-]{36}\\.json")
         private val writeLock = Mutex()
+
+        /** Incoming URLs supply an ID, never a browser destination. */
+        fun gistPageUrl(value: String): String = "https://gist.github.com/${gistId(value)}"
 
         fun gistId(value: String): String {
             val clean = value.trim()

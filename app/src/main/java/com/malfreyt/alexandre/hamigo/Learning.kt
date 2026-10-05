@@ -188,7 +188,16 @@ class Progress(private val context: Context) {
             .put("preferences",JSONObject().put("dailyGoal",dailyGoal)
                 .put("reminderEnabled",prefs.getBoolean("reminderEnabled",false))
                 .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0)))
-            .put("progress",root).toString()
+            .put("progress",root).put("friends",friendRecords()).toString()
+    }
+    fun friendRecords(): JSONObject = synchronized(CLOUD_LOCK) {
+        val active = runCatching { JSONArray(prefs.getString("friends", "[]") ?: "[]") }.getOrDefault(JSONArray())
+        val deleted = runCatching { JSONObject(prefs.getString("friendTombstones", "{}") ?: "{}") }.getOrDefault(JSONObject())
+        CloudProgress.localFriends(active, deleted)
+    }
+    fun saveFriendRecords(records: JSONObject) = synchronized(CLOUD_LOCK) {
+        prefs.edit().putString("friends", CloudProgress.activeFriends(records).toString())
+            .putString("friendTombstones", CloudProgress.friendTombstones(records).toString()).apply()
     }
     fun mergeCloud(json:String):Boolean = synchronized(CLOUD_LOCK) {
         val previousReminder=reminderSettings()
@@ -204,6 +213,10 @@ class Progress(private val context: Context) {
                 .putInt("reminderHour",settings.optInt("reminderHour",20).coerceIn(0,23))
                 .putInt("reminderMinute",settings.optInt("reminderMinute",0).coerceIn(0,59))
                 .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
+        }
+        candidate.optJSONObject("friends")?.let { records ->
+            editor.putString("friends",CloudProgress.activeFriends(records).toString())
+                .putString("friendTombstones",CloudProgress.friendTombstones(records).toString())
         }
         editor.apply(); save()
         if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
@@ -225,6 +238,9 @@ class Progress(private val context: Context) {
         synchronized(CLOUD_LOCK) {
             val previousReminder=reminderSettings()
             root = state; name = candidate.optString("name", name)
+            // An old export has no relationships: preserve the local team in that case.
+            // An explicit new-format import replaces both active relationships and deletions.
+            candidate.optJSONObject("friends")?.let { saveFriendRecords(it) }
             candidate.optJSONObject("preferences")?.let {settings ->
                 prefs.edit().putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal))
                     .putInt("reminderHour",settings.optInt("reminderHour",20)).putInt("reminderMinute",settings.optInt("reminderMinute",0))

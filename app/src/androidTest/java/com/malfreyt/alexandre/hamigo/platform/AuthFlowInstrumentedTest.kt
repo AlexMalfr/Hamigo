@@ -206,7 +206,10 @@ class AuthFlowInstrumentedTest {
             val first = Progress(context)
             first.name = "Alex test"
             first.setDailyGoal(45)
-            first.prefs.edit().putString("friends", "[{\"private_local_friend\":true}]").commit()
+            val friendId = "abcde1234567890"
+            first.prefs.edit().putString("friends", org.json.JSONArray(listOf(JSONObject()
+                .put("gist", "https://gist.github.com/ami/$friendId")
+                .put("progress", JSONObject(ShareProgress("Équipier conservé", 120, 2, 3).toJson())))).toString()).commit()
             first.answer("question-first", true)
             first.complete("lesson-first")
             val firstSync = GitHubSync(context, fake)
@@ -221,7 +224,7 @@ class AuthFlowInstrumentedTest {
             assertEquals(45, backup.getJSONObject("preferences").getInt("dailyGoal"))
             assertTrue(backup.getJSONObject("progress").getJSONObject("reviews").has("question-first"))
             assertFalse(backup.toString().contains("fake_token_for_local_test"))
-            assertFalse(backup.toString().contains("private_local_friend"))
+            assertTrue(backup.getJSONObject("friends").has(friendId))
             val summary = JSONObject(socialGist.getJSONObject("files").getJSONObject(GitHubSync.FILE_NAME).getString("content"))
             assertEquals(9, summary.getInt("xp"))
             for (privateField in listOf("progress", "reviews", "preferences", "syncEvents", "friends", "token")) assertFalse(summary.has(privateField))
@@ -242,6 +245,7 @@ class AuthFlowInstrumentedTest {
             assertEquals(setOf("question-first", "question-second"), second.reviews.keys)
             assertEquals("Alex test", second.name)
             assertEquals(45, second.dailyGoal)
+            assertEquals("Équipier conservé", second.friendRecords().getJSONObject(friendId).getJSONObject("progress").getString("name"))
             assertEquals(published.social.id, restored.social.id)
             assertEquals(18, secondSync.read(restored.social.id).xp)
             assertEquals(3, fake.gists.getValue(backupGist.getString("id")).getJSONObject("files").length())

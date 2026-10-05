@@ -27,10 +27,36 @@ Après réception du jeton, la vérification du compte fait au plus trois essais
 ## Deux Gists distincts
 
 - `hamigo-progress.json` contient le résumé partageable : pseudo, XP, série, nombre de leçons terminées, XP de la semaine, date de mise à jour et jusqu'à 30 jours de points journaliers pour les graphiques. Il ne contient ni réponses, ni échéances SRS, ni jeton.
-- `hamigo-backup.json`, dans un **autre Gist**, contient la progression complète : XP et jours actifs, compteurs de réponses, leçons terminées, révisions SRS, historique des nouveaux événements, pseudo et préférences d'objectif/rappel. Il est retrouvé avec le même compte GitHub sur une nouvelle installation. Le jeton OAuth, les clés Keystore et la liste locale des amis ne font pas partie de cette sauvegarde.
+- `hamigo-backup.json`, dans un **autre Gist**, contient la progression complète : XP et jours actifs, compteurs de réponses, leçons terminées, révisions SRS, historique des nouveaux événements, pseudo, préférences d'objectif/rappel et relations d'équipe. Il est retrouvé avec le même compte GitHub sur une nouvelle installation, y compris les amis. Le jeton OAuth et les clés Keystore ne font pas partie de cette sauvegarde.
 - Chaque installation conserve aussi son fichier `hamigo-device-<UUID>.json` dans le Gist de sauvegarde. Un PATCH ne touche que le fichier de cette installation et le résumé agrégé. Les autres fichiers restent intacts, conformément au [contrat PATCH des Gists](https://docs.github.com/en/rest/gists/gists#update-a-gist). Cela conserve les événements de deux appareils qui publient simultanément.
 
 Les deux Gists sont créés avec `public: false`, donc **secrets / non répertoriés**. GitHub ne propose pas de Gist réellement privé : une personne ayant son URL peut le lire, et GitHub garde son historique. La sauvegarde complète n'est pas chiffrée. Son identifiant n'est jamais inclus dans l'invitation d'amis, le QR code ou l'image partagée. L'interface doit annoncer ces propriétés sans qualifier la sauvegarde de « privée ». Voir la [confidentialité des Gists](https://docs.github.com/en/get-started/writing-on-github/editing-and-sharing-content-with-gists/creating-gists).
+
+Les liens des deux Gists personnels se trouvent dans **Réglages → Sauvegarde manuelle**, après dépliage des options. Le menu ⋮ de chaque ami propose **Ouvrir le Gist social** et **Retirer cet équipier**. Ces liens sont reconstruits depuis des identifiants validés vers `https://gist.github.com/` ; afficher les options n'effectue aucune découverte réseau ni création de Gist.
+
+```mermaid
+flowchart TD
+    A["Hamigo sur ton téléphone<br/>Progression, réglages et amis locaux"]
+    B["Ton Gist de sauvegarde<br/>Apprentissage complet + amis<br/>Agrégat + un fichier par installation"]
+    C["Ton Gist social<br/>Pseudo, XP, série, leçons et activité récente"]
+    D["Hamigo chez ton ami<br/>Sa progression locale et sa liste d'amis"]
+    E["Gist social de ton ami"]
+    I["Lien HTTPS ou QR<br/>Identifiant du Gist social"]
+    P["Page statique GitHub Pages<br/>Bouton pour ouvrir Hamigo"]
+    A -->|"API GitHub : lecture et fusion"| B
+    B -->|"Restauration et fusion locales"| A
+    A -->|"API GitHub : publication du résumé"| C
+    D -->|"Publication de son résumé"| E
+    E -->|"Lecture seule de ses statistiques"| A
+    C -->|"Lecture si ton ami t'a ajouté"| D
+    A -->|"Partager une invitation"| I
+    I -->|"App Link si reconnu"| D
+    I -->|"Repli dans un navigateur"| P
+    P -->|"Ouvre Hamigo avec l'identifiant"| D
+    D -->|"Confirmation de l'ajout<br/>puis lecture seule"| C
+```
+
+Les flèches correspondent à des appels REST à GitHub, pas à des opérations Git `pull`/`push`. Chaque utilisateur possède également son propre Gist de sauvegarde ; celui de l'ami est omis pour garder le schéma lisible. L'image partagée est générée localement et envoyée via le menu Android ; elle ne déclenche aucune écriture dans le Gist d'un autre utilisateur.
 
 La suppression locale de la connexion supprime le jeton et les travaux programmés ; elle ne détruit pas les Gists sur GitHub. L'utilisateur peut supprimer les Gists depuis son compte. Une autorisation expirée demande une nouvelle connexion.
 
@@ -55,6 +81,10 @@ Le travail persistant demande une connexion réseau et une batterie suffisamment
 
 Les nouvelles tentatives sont des événements immuables identifiés par UUID. Leur union additionne les réponses sans les compter à nouveau lors d'une seconde lecture. L'XP associé à la même question et au même jour se fusionne par maximum ; le bonus d'une même leçon n'est attribué qu'une fois. Chaque révision porte une date de modification : la plus récente gagne, avec une règle déterministe en cas d'égalité. Le pseudo et les préférences sont horodatés uniquement lorsque l'utilisateur les modifie, afin que les valeurs par défaut d'un nouvel appareil n'écrasent pas le profil existant.
 
+Les amis se fusionnent par identifiant canonique du Gist social. Des ajouts indépendants sont conservés ; une suppression laisse une trace horodatée, qui gagne sur un ancien ajout et sur un ajout de date identique. Un réajout explicite plus récent est accepté. Actualiser les statistiques d'un ami ne change jamais la date de la relation. Le cache se fusionne par date de publication pour une même version de relation ; un réajout repart avec son nouveau cache. Les anciennes sauvegardes sans champ `friends` préservent les relations locales. Une importation manuelle d'une sauvegarde au nouveau format remplace explicitement la liste et ses traces de suppression ; la synchronisation GitHub, elle, fusionne. La limite est de trente amis actifs et deux mille relations, suppressions comprises. En cas de dépassement par ajouts concurrents, les trente relations les plus récentes sont conservées ; les autres deviennent des suppressions persistantes.
+
+Le pseudo et le bloc entier des préférences utilisent la modification la plus récente, pas une fusion champ par champ. Ces décisions reposent sur l'heure des appareils. La progression n'a pas encore de génération de remise à zéro : un autre appareil hors ligne conservant un ancien apprentissage peut le réintroduire. Une remise à zéro complète doit donc couvrir l'état local actif et tous les fichiers de sauvegarde lus par l'app ; un simple fichier vide est normalement fusionné avec les événements existants. Les anciennes révisions des Gists restent dans l'historique GitHub, que Hamigo ne consulte pas pour restaurer.
+
 Les fichiers de tous les appareils sont fusionnés à chaque lecture, puis republient une vue agrégée. Les lectures et mutations locales sont protégées par `Progress.CLOUD_LOCK`, et les publications dans un même processus par une coroutine `Mutex`. Le Gist n'est pas une base transactionnelle : une activité locale survenant pendant une publication peut attendre la prochaine actualisation, mais ses événements restent conservés localement et dans le fichier de son appareil dès publication. Aucune fusion ne remplace aveuglément l'état local par le dernier fichier reçu.
 
 Un écouteur des préférences rafraîchit les valeurs affichées lorsqu'un travail termine alors que la page reste ouverte. Il recharge la progression et les équipiers sans déclencher une nouvelle synchronisation, pour éviter une boucle de publications. Les cartes d'amis plus récentes ne sont pas remplacées par un ancien retour réseau.
@@ -62,6 +92,8 @@ Un écouteur des préférences rafraîchit les valeurs affichées lorsqu'un trav
 ## Lien HTTPS et QR code
 
 `FriendInvite.link` produit `https://alexmalfr.github.io/hamigo/?invite=<identifiant-du-Gist-social>`. Ce lien peut circuler dans Discord et les autres messageries qui reconnaissent HTTPS. Android App Links ouvre Hamigo ; la page statique GitHub Pages propose aussi un bouton vers `hamigo://join?invite=...`. Si l'application est absente, elle invite à demander l'APK à l'ami : les releases restent dans le dépôt privé. Le fichier `/.well-known/assetlinks.json` lie le domaine au package Android et au certificat de signature. Aucun serveur applicatif n'est nécessaire.
+
+L'identifiant dans le lien est bien celui du Gist social : l'URL complète n'y figure pas, mais on peut la reconstruire à partir de cet identifiant. Il n'est ni chiffré ni secret. L'app valide l'invitation, lit le résumé, puis demande confirmation avant d'enregistrer l'ami. La relation est à sens unique : ajouter quelqu'un permet de lire sa progression, sans modifier sa liste d'amis ni lui envoyer automatiquement une demande. Pour apparaître mutuellement, chacun doit ouvrir l'invitation de l'autre. Une demande réciproque pourrait utiliser GitHub comme boîte de réception avec validation et polling, mais ce protocole n'est pas implémenté. Le jeton d'un utilisateur ne permet pas de modifier le Gist appartenant à un autre.
 
 Le QR code encode exactement le même lien HTTPS, avec une marge blanche et une correction d'erreur M. L'appareil photo du téléphone suffit pour le lire ; Hamigo ne demande donc pas une permission caméra uniquement pour partager son invitation. Le parseur refuse les hôtes différents, les identifiants invalides, les URL contenant des identifiants de connexion, les fragments et les paramètres ambigus/répétés. L'import de profils via JSON est supprimé. Une sauvegarde JSON complète reste un outil avancé de migration, distinct du partage social.
 

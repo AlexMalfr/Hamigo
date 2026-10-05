@@ -64,7 +64,7 @@ class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : Corou
     }
 
     private fun readFriends(progress: Progress): List<JSONObject> = runCatching {
-        val array = JSONArray(progress.prefs.getString("friends", "[]"))
+        val array = CloudProgress.activeFriends(progress.friendRecords())
         (0 until minOf(array.length(), 30)).map { array.getJSONObject(it) }
     }.getOrDefault(emptyList())
 }

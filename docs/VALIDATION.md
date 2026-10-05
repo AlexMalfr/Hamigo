@@ -85,3 +85,12 @@ Le 4 octobre, l'utilisateur a confirmé l'autorisation du code Hamigo depuis son
 La revue de banque contrôle complétude, intégrité et notes d'obsolescence. Elle ne remplace pas une relecture pédagogique des 2 961 réponses communautaires et de tous les nouveaux cours par un opérateur formateur.
 
 Les correctifs et leurs limites sont détaillés dans [FIXES-2026-10.md](FIXES-2026-10.md). L'audit F6KGL est ciblé sur les lacunes et les ressources figées : il ne certifie pas une couverture exhaustive du programme.
+
+## Sauvegarde des amis et accès aux Gists — 5 octobre 2026
+
+- 65 tests JVM réussis ; 33 scénarios Android ciblés réussis : 9 relations/horloges/suppressions, 10 transport OAuth et restauration entre installations fictives, 10 fusion de progression et invitations, 1 validation des URLs sans requête réseau, 2 mises à jour ViewModel et 1 vérification visuelle des options Gists/menu ami.
+- Les fixtures sont synthétiques et isolées sur l'émulateur. Le scénario de restauration efface les préférences fictives, reconnecte une installation fictive et retrouve l'ami dans la sauvegarde. Il ne prétend pas avoir effacé les données personnelles du Samsung.
+- Analyse Android sans erreur, 67 avertissements et une indication. Compilation finale debug et APK de tests réussie ; les nouveaux warnings de nullabilité et d'icônes ont été corrigés.
+- Captures des options de sauvegarde dépliées et du menu ami inspectées : `output/progress-reset/ui/`. Rapports Android dans `output/progress-reset/`.
+- Remise à zéro personnelle autorisée : import local via l'interface, synchronisation temporairement suspendue, remise à zéro des six fichiers actuels de sauvegarde et du résumé social, puis réactivation et synchronisation. Le Samsung affiche 0 XP et 0 leçon ; l'ami déjà ajouté reste présent. Les deux Gists sont encore à zéro après cette synchronisation. Aucun Gist appartenant à l'ami n'a été modifié ; les anciennes révisions GitHub restent conservées. Cette procédure ne couvre pas un éventuel autre appareil hors ligne avec un ancien état.
+- Une première commande de tests contenait un nom de classe inexistant ; les 19 scénarios chargés passaient. La commande corrigée et complète passe ensuite sans échec. Les preuves précédentes sont conservées, sans transformer cet échec de sélection en défaut de l'app.

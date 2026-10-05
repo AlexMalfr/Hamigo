@@ -39,3 +39,9 @@ Les marges, espacements, titres et cartes ont été resserrés dans l'ensemble d
 3. **Faire une vraie session de calibration à deux.** Les tests vérifient les règles, pas le ressenti : observer deux joueurs durant une semaine permettrait de régler l'XP, la durée et le nombre de variantes, puis d'éprouver la synchronisation avec deux comptes et deux appareils réellement utilisés hors ligne. L'autorisation OAuth personnelle reste un acte volontaire à effectuer dans l'app.
 4. **Faire relire les contenus par un opérateur formateur.** Les contrôles de cohérence et la revue de calculs ne remplacent pas une lecture pédagogique de toutes les questions communautaires et de chaque nouvel approfondissement.
 5. **Chiffrer la sauvegarde si l'usage s'élargit.** Un Gist secret est accessible avec son URL. Un chiffrement avec une méthode explicite de récupération serait l'étape suivante si l'on stocke des informations plus personnelles ou partage Hamigo au-delà du petit groupe prévu.
+
+## Amis sauvegardés et liens Gists — 5 octobre 2026
+
+La sauvegarde GitHub et l'export manuel incluent désormais les amis. La reconnexion sur une installation vide restaure l'équipe. Les relations se fusionnent par identifiant de Gist ; les suppressions horodatées empêchent les anciennes sauvegardes de réintroduire un ami retiré. Une actualisation de ses statistiques ne vaut pas nouvel ajout. Les anciens exports sans relations restent compatibles et préservent les amis locaux.
+
+Les réglages permettent d'ouvrir ses Gists social et de sauvegarde dans les options manuelles repliées. Le menu d'un équipier permet d'ouvrir son Gist social ou de le retirer. Les URLs sont validées et reconstruites sur le domaine Gist ; afficher les liens ne provoque aucune découverte réseau. Le [schéma social et les règles de conflit](SOCIAL.md) détaillent le stockage, les invitations HTTPS/QR et leur caractère à sens unique.
