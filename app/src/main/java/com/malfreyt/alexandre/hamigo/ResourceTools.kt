@@ -67,6 +67,22 @@ object ResourceMath {
         require(db.isFinite())
         return 10.0.pow(db / if (voltage) 20.0 else 10.0)
     }
+    /** Difference of logarithms also handles powers whose direct ratio would overflow. */
+    fun powerGain(input: Double, output: Double): Double? {
+        if (!input.isFinite() || !output.isFinite() || input <= 0 || output <= 0) return null
+        return (10.0 * (log10(output) - log10(input))).takeIf { it.isFinite() }
+    }
+    fun powerAfterGain(input: Double, gainDb: Double): Double? {
+        if (!input.isFinite() || input <= 0 || !gainDb.isFinite()) return null
+        return 10.0.pow(log10(input) + gainDb / 10.0).takeIf { it.isFinite() && it > 0 }
+    }
+    data class PowerChain(val afterAmplifier: Double, val output: Double, val totalDb: Double)
+    fun powerChain(input: Double, gainDb: Double, lossDb: Double): PowerChain? {
+        if (!lossDb.isFinite() || lossDb < 0) return null
+        val amplified = powerAfterGain(input, gainDb) ?: return null
+        val output = powerAfterGain(amplified, -lossDb) ?: return null
+        return PowerChain(amplified, output, gainDb - lossDb)
+    }
     fun parallel(resistances: List<Double>): Double {
         require(resistances.isNotEmpty() && resistances.all { it.isFinite() && it > 0 })
         return 1.0 / resistances.sumOf { 1.0 / it }
@@ -77,7 +93,7 @@ object MorseReference {
     fun characterName(value: String): String = when (value) {
         "." -> "Point final"; "," -> "Virgule"; "?" -> "Point d’interrogation"; "/" -> "Barre oblique"
         "=" -> "Égal"; "+" -> "Plus"; "-" -> "Tiret"; "(" -> "Parenthèse ouvrante"; ")" -> "Parenthèse fermante"
-        ":" -> "Deux-points"; "@" -> "Arobase"; "'" -> "Apostrophe"
+        ":" -> "Deux-points"; "@" -> "Arobase"; "'" -> "Apostrophe"; "\"" -> "Guillemet"
         else -> value
     }
     val alphabet: Map<Char, String> = linkedMapOf(
@@ -88,7 +104,8 @@ object MorseReference {
         'Y' to "-.--", 'Z' to "--..", '0' to "-----", '1' to ".----", '2' to "..---", '3' to "...--",
         '4' to "....-", '5' to ".....", '6' to "-....", '7' to "--...", '8' to "---..", '9' to "----.",
         '.' to ".-.-.-", ',' to "--..--", '?' to "..--..", '/' to "-..-.", '=' to "-...-", '+' to ".-.-.",
-        '-' to "-....-", '(' to "-.--.", ')' to "-.--.-", ':' to "---...", '@' to ".--.-.", '\'' to ".----."
+        '-' to "-....-", '(' to "-.--.", ')' to "-.--.-", ':' to "---...", '@' to ".--.-.", '\'' to ".----.",
+        '"' to ".-..-.", 'É' to "..-.."
     )
     data class Translation(val output: String, val unsupported: List<String> = emptyList())
     fun encode(text: String): Translation {
@@ -124,7 +141,7 @@ private val resistorColors = listOf(
 )
 private fun bandColor(name: String): Color = resistorColors.firstOrNull { it.name.equals(name, true) || (name.equals("Marron", true) && it.name == "Brun") }?.color ?: Color(0xFFE5D5B8)
 fun resistorReferenceBands(term: String): List<String> {
-    val names = term.split('·').map { it.trim() }
+    val names = term.substringBefore(" : tolérance").split('·').map { it.trim() }
     return names.takeIf { values -> values.all { value -> resistorColors.any { it.name.equals(value, true) } } } ?: emptyList()
 }
 private fun multiplierName(exponent: Int) = when (exponent) { -2 -> "Argent"; -1 -> "Or"; else -> resistorColors[exponent].name }
@@ -140,7 +157,7 @@ private val toleranceOptions = listOf("Brun" to 1.0, "Rouge" to 2.0, "Vert" to .
         drawRoundRect(Color(0xFFE7CFAC), Offset(start, top), Size(bodyWidth, 46.dp.toPx()), CornerRadius(15.dp.toPx()))
         drawRoundRect(Color(0xFFCCAE85), Offset(start, top), Size(bodyWidth, 46.dp.toPx()), CornerRadius(15.dp.toPx()), style = Stroke(1.dp.toPx()))
         bands.forEachIndexed { i, band ->
-            val fraction = if (i == bands.lastIndex) .79f else .19f + i * if (bands.size == 5) .145f else .20f
+            val fraction = if (bands.size >= 4 && i == bands.lastIndex) .79f else .19f + i * if (bands.size == 5) .145f else .20f
             drawRect(bandColor(band), Offset(start + bodyWidth * fraction, top), Size(9.dp.toPx(), 46.dp.toPx()))
         }
     }
@@ -161,8 +178,8 @@ private data class ReferenceTool(val id: String, val title: String, val subtitle
 private fun categoryTools(category: String): List<ReferenceTool> = when (category) {
     "resistors" -> listOf(ReferenceTool("resistor", "Les anneaux en vrai", "Lire et composer une résistance"), ReferenceTool("networks", "Résistances ensemble", "Série et parallèle"))
     "morse", "morse-rhythm" -> listOf(ReferenceTool("morse", "Le traducteur de Pico", "Texte ↔ Morse, avec le son"))
-    "decibels" -> listOf(ReferenceTool("db", "La réglette des décibels", "Rapport ↔ gain ou atténuation"))
-    "units", "formulas" -> listOf(ReferenceTool("ohm", "Le trio U, R, I", "Deux valeurs, la troisième se révèle"), ReferenceTool("wavelength", "Une fréquence, une onde", "Fréquence ↔ longueur d’onde"), ReferenceTool("db", "La réglette des décibels", "Rapport ↔ gain ou atténuation"), ReferenceTool("networks", "Résistances ensemble", "Série et parallèle"))
+    "decibels" -> listOf(ReferenceTool("db", "La réglette des décibels", "Rapport ↔ gain ou atténuation"), ReferenceTool("dbchain", "Puissances et décibels", "Entrée → gain → sortie : schéma dynamique"))
+    "units", "formulas" -> listOf(ReferenceTool("ohm", "Le trio U, R, I", "Deux valeurs, la troisième se révèle"), ReferenceTool("wavelength", "Une fréquence, une onde", "Fréquence ↔ longueur d’onde"), ReferenceTool("db", "La réglette des décibels", "Rapport ↔ gain ou atténuation"), ReferenceTool("dbchain", "Puissances et décibels", "Entrée → gain → sortie : schéma dynamique"), ReferenceTool("networks", "Résistances ensemble", "Série et parallèle"))
     "propagation", "bands", "satellite" -> listOf(ReferenceTool("wavelength", "Une fréquence, une onde", "Fréquence ↔ longueur d’onde dans le vide"))
     else -> emptyList()
 }
@@ -190,6 +207,7 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
                     "resistor" -> ResistorCalculator()
                     "morse" -> MorseTranslator()
                     "db" -> DecibelCalculator()
+                    "dbchain" -> PowerChainCalculator()
                     "ohm" -> OhmCalculator()
                     "wavelength" -> WavelengthCalculator()
                     "networks" -> ResistanceNetworkCalculator()
@@ -372,21 +390,108 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
     var kind by remember { mutableIntStateOf(0) }
     var mode by remember { mutableIntStateOf(0) }
     var input by remember { mutableStateOf("2") }
+    var negative by remember { mutableStateOf(false) }
     val voltage = kind == 1
-    val number = if (mode == 0) ResourceMath.positive(input) else ResourceMath.number(input)
+    val magnitude = ResourceMath.number(input)?.takeIf { it >= 0 }
+    val number = if (mode == 0) ResourceMath.positive(input) else magnitude?.let { if (negative) -it else it }
     val value = number?.let { if (mode == 0) ResourceMath.decibels(it, voltage) else ResourceMath.ratio(it, voltage) }?.takeIf { it.isFinite() && (mode == 0 || it > 0) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ToolChoices(listOf("Puissance", "Tension"), kind) { kind = it }
-        ToolChoices(listOf("Rapport → dB", "dB → rapport"), mode) { mode = it; input = if (it == 0) "2" else "3" }
-        NumberField(input, { input = it }, if (mode == 0) (if (voltage) "U₂ / U₁" else "P₂ / P₁") else "Gain ou atténuation en dB")
-        if (mode == 1) Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            OutlinedButton({ input = if (input.startsWith('-')) input.drop(1) else "-$input" }) { Text("± Changer le signe", fontSize = 12.sp) }
+        ToolChoices(listOf("Rapport → dB", "dB → rapport"), mode) { mode = it; input = if (it == 0) "2" else "3"; negative = false }
+        if (mode == 1) {
+            SignedNumberField(input, { input = it }, negative, { negative = it }, "Valeur en dB")
+        } else {
+            NumberField(input, { input = it }, if (voltage) "U₂ / U₁" else "P₂ / P₁")
         }
         if (value != null) CalculationResult(if (mode == 0) "${ResourceMath.display(value)} dB" else "× ${ResourceMath.display(value)}",
             if (mode == 0) "${if (voltage) "20" else "10"} × log₁₀(${ResourceMath.display(number!!)})" else "10^(${ResourceMath.display(number!!)} / ${if (voltage) "20" else "10"})")
         else InputHint(if (mode == 0) "Le rapport doit être strictement positif : 0 n’a pas de logarithme fini." else "Entre un nombre fini de dB. Une atténuation utilise un signe moins ; les résultats hors plage numérique sont refusés.")
         if (voltage) Text("La formule 20 log₁₀(U₂/U₁) suppose des impédances identiques. Sinon, calcule d’abord les puissances.", fontSize = 12.sp, color = Ink, lineHeight = 17.sp)
         else InputHint("Un rapport supérieur à 1 donne un gain positif ; un rapport inférieur à 1 donne une atténuation négative. Un rapport est sans unité.")
+    }
+}
+
+@Composable private fun SignedNumberField(value: String, onChange: (String) -> Unit, negative: Boolean, onSign: (Boolean) -> Unit, label: String) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilledTonalIconButton({ onSign(!negative) }, Modifier.size(48.dp).semantics { contentDescription = if (negative) "Signe moins : passer au plus" else "Signe plus : passer au moins" }) {
+            Text(if (negative) "−" else "+", fontSize = 25.sp, fontWeight = FontWeight.Bold)
+        }
+        NumberField(value, { text ->
+            // A pasted signed value also updates the button, but the field always shows the magnitude.
+            val trimmed = text.trim()
+            if (trimmed.startsWith('-') || trimmed.startsWith('−')) onSign(true)
+            if (trimmed.startsWith('+')) onSign(false)
+            onChange(trimmed.removePrefix("-").removePrefix("−").removePrefix("+"))
+        }, label, Modifier.weight(1f))
+    }
+}
+
+private fun powerToolDisplay(value: Double) = ResourceMath.display(java.math.BigDecimal.valueOf(value).round(java.math.MathContext(4)).toDouble())
+
+/** Editable measurements and stages share one live schematic; no stored answer is required. */
+@Composable private fun PowerChainCalculator() {
+    var mode by remember { mutableIntStateOf(0) }
+    var unit by remember { mutableIntStateOf(0) }
+    var input by remember { mutableStateOf("10") }
+    var output by remember { mutableStateOf("20") }
+    var gain by remember { mutableStateOf("6") }
+    var gainNegative by remember { mutableStateOf(false) }
+    var loss by remember { mutableStateOf("3") }
+    val unitName = listOf("W", "mW", "µW")[unit]
+    val inValue = ResourceMath.positive(input)
+    val outValue = ResourceMath.positive(output)
+    val gainValue = ResourceMath.number(gain)?.takeIf { it >= 0 }?.let { if (gainNegative) -it else it }
+    val lossValue = ResourceMath.number(loss)?.takeIf { it >= 0 }
+    val measuredGain = if (inValue != null && outValue != null) ResourceMath.powerGain(inValue, outValue) else null
+    val singleOutput = if (inValue != null && gainValue != null) ResourceMath.powerAfterGain(inValue, gainValue) else null
+    val chain = if (inValue != null && gainValue != null && lossValue != null) ResourceMath.powerChain(inValue, gainValue, lossValue) else null
+    val finalOutput = when (mode) { 0 -> outValue; 1 -> singleOutput; else -> chain?.output }
+    val gainDb = if (mode == 0) measuredGain else gainValue
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ToolChoices(listOf("Mesurer le gain", "Calculer la sortie", "Ajouter un câble"), mode) { mode = it }
+        ToolChoices(listOf("W", "mW", "µW"), unit) { next ->
+            val previousScale = listOf(1.0, 1e-3, 1e-6)[unit]
+            val nextScale = listOf(1.0, 1e-3, 1e-6)[next]
+            ResourceMath.positive(input)?.let { input = ResourceMath.display(it * previousScale / nextScale) }
+            ResourceMath.positive(output)?.let { output = ResourceMath.display(it * previousScale / nextScale) }
+            unit = next
+        }
+        NumberField(input, { input = it }, "Puissance d’entrée Pe ($unitName)")
+        if (mode == 0) NumberField(output, { output = it }, "Puissance de sortie Ps ($unitName)")
+        else SignedNumberField(gain, { gain = it }, gainNegative, { gainNegative = it }, "Gain du bloc (dB)")
+        if (mode == 2) NumberField(loss, { loss = it }, "Perte du câble (dB, valeur positive)")
+        val nodes = if (mode == 2) listOf(
+            "Pe", "${inValue?.let(::powerToolDisplay) ?: "?"} $unitName",
+            "Après le bloc", "${chain?.afterAmplifier?.let(::powerToolDisplay) ?: "?"} $unitName",
+            "Ps", "${chain?.output?.let(::powerToolDisplay) ?: "?"} $unitName"
+        ) else listOf("Pe", "${inValue?.let(::powerToolDisplay) ?: "?"} $unitName", "Ps", "${finalOutput?.let(::powerToolDisplay) ?: "?"} $unitName")
+        PowerFlowSchematic(nodes.chunked(2).map { it[0] to it[1] },
+            if (mode == 2) listOf("${gainDb?.let(::powerToolDisplay) ?: "?"} dB", "−${lossValue?.let(::powerToolDisplay) ?: "?"} dB")
+            else listOf("${gainDb?.let(::powerToolDisplay) ?: "?"} dB"))
+        when {
+            mode == 0 && measuredGain != null -> CalculationResult("G ≈ ${powerToolDisplay(measuredGain)} dB", "10 × log₁₀(Ps/Pe) · ${if (measuredGain >= 0) "gain" else "atténuation"}")
+            mode == 1 && singleOutput != null -> CalculationResult("Ps ≈ ${powerToolDisplay(singleOutput)} $unitName", "Pe × 10^(G/10) · les deux puissances utilisent la même unité.")
+            mode == 2 && chain != null -> CalculationResult("Ps ≈ ${powerToolDisplay(chain.output)} $unitName", "Bilan : ${ResourceMath.display(gainValue!!)} − ${ResourceMath.display(lossValue!!)} = ${ResourceMath.display(chain.totalDb)} dB")
+            else -> InputHint("Les puissances doivent être positives ; le gain peut être nul ou négatif. La perte du câble est une valeur positive ou nulle. Les résultats hors plage sont refusés.")
+        }
+        Text("Affichage à quatre chiffres significatifs ; calcul sans arrondir les étapes. Les repères du cours (+3 dB ≈ ×2) sont des approximations.", color = Muted, fontSize = 12.sp, lineHeight = 17.sp)
+    }
+}
+
+@Composable private fun PowerFlowSchematic(nodes: List<Pair<String, String>>, stages: List<String>) {
+    Column(Modifier.fillMaxWidth().background(Mist.copy(alpha = .65f), RoundedCornerShape(14.dp)).padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        nodes.forEachIndexed { index, (label, value) ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(label, color = Ink, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(value, color = Teal, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+            }
+            if (index < stages.size) Row(Modifier.padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(Icons.Rounded.ArrowDownward, null, Modifier.size(24.dp), tint = Teal)
+                Surface(color = Color.White, shape = RoundedCornerShape(8.dp)) {
+                    Text(if (index == 0) "Bloc : ${stages[index]}" else "Câble : ${stages[index]}", Modifier.padding(horizontal = 12.dp, vertical = 7.dp), color = Ink, fontSize = 13.sp)
+                }
+            }
+        }
     }
 }
 

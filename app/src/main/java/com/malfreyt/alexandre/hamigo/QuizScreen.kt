@@ -30,6 +30,8 @@ import com.malfreyt.alexandre.hamigo.platform.ShareResults
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -44,6 +46,8 @@ import kotlin.random.Random
     val key="${q.id}-${s.index}"
     val context=LocalContext.current
     val focus=LocalFocusManager.current
+    val density=LocalDensity.current
+    var footerHeight by remember {mutableIntStateOf(0)}
     val scroll=rememberScrollState()
     var choice by rememberSaveable(key){mutableIntStateOf(s.responses[s.index]?.choiceIndex ?: -1)}
     var numeric by rememberSaveable(key){mutableStateOf(s.responses[s.index]?.display?.substringBeforeLast(" ").orEmpty())}
@@ -101,8 +105,9 @@ import kotlin.random.Random
     }
     fun saveDraft() {
         if(canAnswer)model.answer(check(),display=responseText(),choiceIndex=choice)
+        else if(s.exam)model.answer(false,omitted=true)
     }
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().imePadding()) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal=14.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically) {
             IconButton({quit=true}){Icon(Icons.Rounded.Close,"Quitter la séance")}
@@ -218,9 +223,9 @@ import kotlin.random.Random
                 }
             }
             // Keep the last answer/explanation scrollable above the floating calculator.
-            Spacer(Modifier.height(if(q.kind=="flash")6.dp else 54.dp))
+            Spacer(Modifier.height(if(q.kind=="flash")6.dp else 72.dp))
         }
-        Surface(color=Cream,shadowElevation=5.dp) {
+        Surface(modifier=Modifier.onSizeChanged {footerHeight=it.height},color=Cream,shadowElevation=5.dp) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
                 if(q.kind=="flash") {
                     if(!flipped)Action("Retourner la carte"){flipped=true}
@@ -236,17 +241,17 @@ import kotlin.random.Random
                     Action(if(s.exam)if(s.index+1<s.examPartEnd)"Enregistrer et continuer" else "Enregistrer et relire" else "Vérifier",enabled=canAnswer){focus.clearFocus();model.answer(check(),display=responseText(),choiceIndex=choice)}
                     if(s.exam) {
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                            TextButton({val previous=s.index-1;saveDraft();model.revisitExamQuestion(previous)},enabled=s.index>s.examPartStart,contentPadding=PaddingValues(horizontal=4.dp)) {Icon(Icons.Rounded.ArrowBack,null,modifier=Modifier.size(16.dp));Text("Précédente",fontSize=12.sp)}
-                            TextButton({model.answer(false,omitted=true)},contentPadding=PaddingValues(horizontal=4.dp)) {Text("Passer",fontSize=12.sp)}
+                            TextButton({val previous=s.index-1;focus.clearFocus();saveDraft();model.revisitExamQuestion(previous)},enabled=s.index>s.examPartStart,contentPadding=PaddingValues(horizontal=4.dp)) {Icon(Icons.Rounded.ArrowBack,null,modifier=Modifier.size(16.dp));Text("Précédent",fontSize=12.sp)}
                             TextButton({saveDraft();model.reviewExamPart()},contentPadding=PaddingValues(horizontal=4.dp)) {Text("Relire",fontSize=12.sp)}
+                            TextButton({focus.clearFocus();if(canAnswer)saveDraft() else model.answer(false,omitted=true)},contentPadding=PaddingValues(horizontal=4.dp)) {Text("Suivant",fontSize=12.sp);Icon(Icons.Rounded.ArrowForward,null,modifier=Modifier.size(16.dp))}
                         }
                     }
                 } else Action("Continuer"){model.next()}
             }
         }
     }
-    if(q.kind!="flash" && feedback==null)SmallFloatingActionButton({calculatorOpen=true},modifier=Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=if(s.exam)146.dp else 92.dp),containerColor=Teal,contentColor=Color.White) {
-        Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice")
+    if(q.kind!="flash" && feedback==null)FloatingActionButton({focus.clearFocus();calculatorOpen=true},modifier=Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp),containerColor=Teal,contentColor=Color.White) {
+        Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",modifier=Modifier.size(28.dp))
     }
     }
     FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null)

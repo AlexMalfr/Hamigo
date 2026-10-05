@@ -1,6 +1,6 @@
 # Sources pédagogiques et vérifications
 
-Contenu préparé le 3 octobre 2026 et références complétées le 4 octobre pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **18 catégories et 390 entrées**. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application; ils ne recopient pas les paragraphes du cours. Les ajouts, sources de la carte UIT et lacunes sont détaillés dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
+Contenu préparé le 3 octobre 2026 et ressources Mémo complétées le 5 octobre pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **38 catégories, 1 092 entrées et 969 flashcards**, dont les identifiants des 390 anciennes cartes sont conservés. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application ; ils ne recopient pas les paragraphes du cours. Les connaissances et tableaux des ressources sont suivis dans [la matrice Mémo](MEMO-COVERAGE-2026-10.md), [les sources radio](MEMO-RADIO-SOURCES.md) et [les sources techniques](MEMO-TECHNICAL-SOURCES.md). L'audit antérieur du parcours demeure dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
 
 ## Approfondissements du parcours
 

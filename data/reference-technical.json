@@ -1,0 +1,1378 @@
+{
+  "categories": [
+    {
+      "id": "resistors",
+      "title": "Résistances : couleurs et lecture",
+      "subtitle": "Valeur nominale, multiplicateur et tolérance",
+      "group": "Électricité et composants",
+      "order": 30,
+      "intro": "Lis les bandes sur le dessin, puis compare avec les exemples. La précision est présentée à part de la valeur.",
+      "source": "http://f6kgl.free.fr/COURS.html",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Lire une valeur",
+          "description": "Deux chiffres × multiplicateur",
+          "extra": "À 4 anneaux : les deux premiers forment un nombre de 10 à 99 ; le troisième le multiplie. Le dernier anneau donne la tolérance, à part de la valeur nominale.",
+          "group": "Lecture",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Noir",
+          "description": "Chiffre : 0 · multiplicateur ×1",
+          "extra": "Le noir peut être le deuxième chiffre ou le multiplicateur ×1, mais pas le premier chiffre d’une résistance usuelle.",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Brun",
+          "description": "Chiffre : 1 · multiplicateur ×10",
+          "extra": "Brun et marron désignent la même couleur.",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Rouge",
+          "description": "Chiffre : 2 · multiplicateur ×100",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Orange",
+          "description": "Chiffre : 3 · multiplicateur ×1 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Jaune",
+          "description": "Chiffre : 4 · multiplicateur ×10 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Vert",
+          "description": "Chiffre : 5 · multiplicateur ×100 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Bleu",
+          "description": "Chiffre : 6 · multiplicateur ×1 000 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Violet",
+          "description": "Chiffre : 7 · multiplicateur ×10 000 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Gris",
+          "description": "Chiffre : 8 · multiplicateur ×100 000 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Blanc",
+          "description": "Chiffre : 9 · multiplicateur ×1 000 000 000",
+          "extra": "",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Or",
+          "description": "Multiplicateur ×0,1",
+          "extra": "L’or ne code pas un chiffre significatif.",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Argent",
+          "description": "Multiplicateur ×0,01",
+          "extra": "L’argent ne code pas un chiffre significatif.",
+          "group": "Chiffres et multiplicateurs",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5"
+        },
+        {
+          "term": "Jaune · violet · rouge · or",
+          "description": "4,7 kΩ ±5 %",
+          "extra": "47 × 100 = 4 700 Ω. La bande or est la tolérance et ne participe pas à la multiplication.",
+          "group": "Exemples à 4 anneaux",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Brun · noir · orange · or",
+          "description": "10 kΩ ±5 %",
+          "extra": "10 × 1 000 = 10 000 Ω.",
+          "group": "Exemples à 4 anneaux",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Bleu · rouge · brun",
+          "description": "620 Ω",
+          "extra": "62 × 10 = 620 Ω. L’absence de bande de tolérance signifie ±20 %.",
+          "group": "Exemples à 3 anneaux",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "5 anneaux",
+          "description": "3 chiffres × multiplicateur ± tolérance",
+          "extra": "Les trois premières bandes donnent un nombre de 100 à 999, la quatrième le multiplie. Le cinquième anneau est réservé à la tolérance. F6KGL présente cette lecture pour les résistances de précision.",
+          "group": "Lecture à 5 anneaux",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5b"
+        },
+        {
+          "term": "Brun · rouge · orange · brun · brun",
+          "description": "1,23 kΩ ±1 %",
+          "extra": "123 × 10 = 1 230 Ω. La dernière bande brune n’est pas un chiffre : elle fixe l’intervalle 1 217,7 à 1 242,3 Ω.",
+          "group": "Exemples à 5 anneaux",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5b"
+        },
+        {
+          "term": "Jaune · violet · noir · brun · brun",
+          "description": "4,70 kΩ ±1 %",
+          "extra": "470 × 10 = 4 700 Ω. Avec 5 anneaux, le noir est ici le troisième chiffre.",
+          "group": "Exemples à 5 anneaux",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5b"
+        },
+        {
+          "term": "À propos de l’examen",
+          "description": "La lecture à cinq anneaux existe dans le cours",
+          "extra": "Le cours précise que les couleurs de tolérance n’ont pas à être mémorisées pour l’examen ; il ne formule pas d’exclusion générale des résistances à cinq anneaux. Les exemples à cinq anneaux servent aussi à comprendre les composants réels.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a–b"
+        },
+        {
+          "term": "Tolérance",
+          "description": "Écart maximum autour de la valeur nominale",
+          "extra": "Rmin = R × (1 − t/100) ; Rmax = R × (1 + t/100). Elle ne change pas le code des chiffres et du multiplicateur.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Brun : tolérance",
+          "description": "±1 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Rouge : tolérance",
+          "description": "±2 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Vert : tolérance",
+          "description": "±0,5 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Bleu : tolérance",
+          "description": "±0,25 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Violet : tolérance",
+          "description": "±0,1 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Gris : tolérance",
+          "description": "±0,05 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Or : tolérance",
+          "description": "±5 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Argent : tolérance",
+          "description": "±10 %",
+          "extra": "À lire sur la dernière bande, séparément des chiffres.",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a ; tableau fabricant Vishay"
+        },
+        {
+          "term": "Sans anneau de tolérance",
+          "description": "±20 %",
+          "extra": "",
+          "group": "Tolérance : la précision",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Séries E6, E12 et E24",
+          "description": "6, 12 ou 24 valeurs par décennie",
+          "extra": "E6 : 10, 15, 22, 33, 47, 68, à multiplier par une puissance de dix. Les séries plus fines rapprochent les valeurs disponibles.",
+          "group": "Valeurs normalisées",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5b"
+        },
+        {
+          "term": "Puissance admissible",
+          "description": "La valeur en Ω ne dit pas tout",
+          "extra": "Une résistance transforme l’énergie électrique en chaleur. Sa puissance nominale, exprimée en W, doit être suffisante pour la puissance dissipée P = U²/R ou P = R × I².",
+          "group": "Caractéristiques",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5c"
+        },
+        {
+          "term": "Sixième anneau",
+          "description": "Coefficient de température",
+          "extra": "Sur certains composants de précision, un sixième anneau exprime la variation de valeur avec la température. Ce n’est pas un quatrième chiffre significatif.",
+          "group": "Caractéristiques",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5b"
+        },
+        {
+          "term": "Ne Mangez Rien Ou Je Vous Battrai Violemment, Grand BOA",
+          "description": "Un mot par couleur, dans l’ordre",
+          "extra": "Ne → Noir (0), Mangez → Marron/Brun (1), Rien → Rouge (2), Ou → Orange (3), Je → Jaune (4), Vous → Vert (5), Battrai → Bleu (6), Violemment → Violet (7), Grand → Gris (8). BOA finit la liste : B → Blanc (9), O → Or, A → Argent. Or et argent ne sont pas des chiffres.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Lire dans le bon sens",
+          "description": "La tolérance se place à droite",
+          "extra": "La dernière bande est souvent plus éloignée. En cas de doute, repère l’espacement et vérifie si la valeur obtenue est plausible ; la première bande d’un code usuel n’est pas noire.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.5a"
+        },
+        {
+          "term": "Série E6",
+          "description": "6 valeurs nominales par décennie",
+          "extra": "Multiplie ces nombres par une puissance de dix pour choisir des Ω, kΩ ou MΩ. Une série plus fine fournit des valeurs plus rapprochées.",
+          "group": "Valeurs normalisées",
+          "kind": "fact",
+          "visual": "extra:preferred-series",
+          "source": "http://f6kgl.free.fr/COURS.html#T015"
+        },
+        {
+          "term": "Série E12",
+          "description": "12 valeurs nominales par décennie",
+          "extra": "Multiplie ces nombres par une puissance de dix pour choisir des Ω, kΩ ou MΩ. Une série plus fine fournit des valeurs plus rapprochées.",
+          "group": "Valeurs normalisées",
+          "kind": "fact",
+          "visual": "extra:preferred-series",
+          "source": "http://f6kgl.free.fr/COURS.html#T015"
+        },
+        {
+          "term": "Série E24",
+          "description": "24 valeurs nominales par décennie",
+          "extra": "Multiplie ces nombres par une puissance de dix pour choisir des Ω, kΩ ou MΩ. Une série plus fine fournit des valeurs plus rapprochées.",
+          "group": "Valeurs normalisées",
+          "kind": "fact",
+          "visual": "extra:preferred-series",
+          "source": "http://f6kgl.free.fr/COURS.html#T015"
+        }
+      ]
+    },
+    {
+      "id": "formulas",
+      "title": "Formules et schémas",
+      "subtitle": "À quoi sert chaque relation, avec ses unités",
+      "group": "Bases et calculs",
+      "order": 15,
+      "intro": "Chaque schéma montre les grandeurs à repérer avant de calculer. Les conditions indiquent quand la formule peut être utilisée.",
+      "source": "http://f6kgl.free.fr/COURS.html",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Loi d’Ohm",
+          "description": "U = R × I · I = U/R · R = U/I",
+          "extra": "Relie la tension appliquée à une résistance au courant qui la traverse. Sert à dimensionner une résistance ou trouver le courant.\nUnités : U en V, R en Ω, I en A.\nDans un conducteur ohmique ; attention à convertir mA et kΩ avant le calcul.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "ohm",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.2"
+        },
+        {
+          "term": "Puissance en continu",
+          "description": "P = U × I",
+          "extra": "Calcule l’énergie consommée ou fournie par seconde. Aide à choisir une alimentation.\nUnités : P en W, U en V, I en A.\nEn continu. Pour une charge réactive en alternatif, il faut aussi tenir compte du facteur de puissance.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "power",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.2"
+        },
+        {
+          "term": "Puissance dans une résistance",
+          "description": "P = U²/R = R × I²",
+          "extra": "Calcule la chaleur dissipée dans une résistance. Sert à choisir une puissance nominale suffisante.\nUnités : P en W, U en V, R en Ω, I en A.\nEn alternatif sinusoïdal, U et I sont les valeurs efficaces ; charge purement résistive.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "power-resistor",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.2"
+        },
+        {
+          "term": "Énergie",
+          "description": "E = P × t",
+          "extra": "Calcule une consommation pendant une durée. Par exemple, 10 W pendant 2 h correspondent à 20 Wh.\nUnités : W × s → J ; W × h → Wh ; 1 Wh = 3 600 J.\nLa puissance doit être constante ou être une puissance moyenne appropriée.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "energy",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.3"
+        },
+        {
+          "term": "Courant et charge",
+          "description": "I = Q/t · Q = I × t",
+          "extra": "Le courant est le débit de charges électriques. Cette relation donne la charge déplacée pendant une durée.\nUnités : I en A, Q en C, t en s.\nCourant constant ; 1 A = 1 C/s.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "charge",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.3"
+        },
+        {
+          "term": "Résistances en série",
+          "description": "Rtot = R₁ + R₂ + …",
+          "extra": "Remplace plusieurs résistances bout à bout par une seule. Le même courant traverse chacune et les tensions s’additionnent.\nUnités : R en Ω.\nLa résistance totale est supérieure à chacune des résistances positives.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "series-r",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.7–1.8"
+        },
+        {
+          "term": "Résistances en parallèle",
+          "description": "1/Rtot = 1/R₁ + 1/R₂ + …",
+          "extra": "Remplace plusieurs branches par une résistance équivalente. Même tension sur chaque branche ; les courants s’additionnent.\nUnités : R en Ω.\nLa résistance totale est inférieure à la plus petite résistance positive.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "parallel-r",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.7–1.8"
+        },
+        {
+          "term": "Deux résistances parallèles",
+          "description": "Rtot = R₁ × R₂/(R₁ + R₂)",
+          "extra": "Version rapide du calcul en parallèle lorsqu’il y a exactement deux résistances.\nUnités : R en Ω.\nPour deux résistances égales R, Rtot = R/2.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "parallel-r",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.7–1.8"
+        },
+        {
+          "term": "Diviseur non chargé",
+          "description": "Us = Ue × R₂/(R₁ + R₂)",
+          "extra": "Prélève une fraction de la tension d’entrée sur R₂. Utile pour obtenir une tension de référence.\nUnités : U en V, R en Ω.\nLa sortie ne doit pas être chargée : une charge branchée en parallèle avec R₂ change la tension.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "divider",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §1.7–1.8"
+        },
+        {
+          "term": "Condensateurs en parallèle",
+          "description": "Ctot = C₁ + C₂ + …",
+          "extra": "Augmente la capacité totale en reliant ensemble les bornes correspondantes des condensateurs.\nUnités : C en F.\nMême tension sur chaque condensateur ; charges stockées additionnées.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "parallel-c",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.3"
+        },
+        {
+          "term": "Condensateurs en série",
+          "description": "1/Ctot = 1/C₁ + 1/C₂ + …",
+          "extra": "Calcule la capacité équivalente de condensateurs bout à bout.\nUnités : C en F.\nLa capacité totale est inférieure à la plus petite ; mêmes charges dans le modèle idéal.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "series-c",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.3"
+        },
+        {
+          "term": "Inductances série non couplées",
+          "description": "Ltot = L₁ + L₂ + …",
+          "extra": "Calcule l’inductance équivalente de bobines montées bout à bout.\nUnités : L en H.\nSeulement si les champs magnétiques des bobines ne se couplent pas.",
+          "group": "Associations de composants",
+          "kind": "fact",
+          "visual": "series-l",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.3"
+        },
+        {
+          "term": "Réactance inductive",
+          "description": "XL = 2πfL",
+          "extra": "Mesure l’opposition d’une bobine idéale au courant alternatif. XL augmente avec la fréquence.\nUnités : XL en Ω, f en Hz, L en H.\nSinusoïde ; une bobine réelle possède aussi des pertes.",
+          "group": "Courant alternatif et résonance",
+          "kind": "fact",
+          "visual": "reactance-l",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.3"
+        },
+        {
+          "term": "Réactance capacitive",
+          "description": "XC = 1/(2πfC)",
+          "extra": "Mesure l’opposition d’un condensateur idéal au courant alternatif. XC diminue quand la fréquence augmente.\nUnités : XC en Ω, f en Hz, C en F.\nSinusoïde ; f et C strictement positifs.",
+          "group": "Courant alternatif et résonance",
+          "kind": "fact",
+          "visual": "reactance-c",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.3"
+        },
+        {
+          "term": "Impédance RLC série",
+          "description": "|Z| = √(R² + (XL − XC)²)",
+          "extra": "Combine la résistance et les réactances pour déterminer le courant I = U/|Z|.\nUnités : Z, R, XL et XC en Ω.\nCircuit R, L, C en série ; on ne peut pas additionner simplement R + XL + XC.",
+          "group": "Courant alternatif et résonance",
+          "kind": "fact",
+          "visual": "rlc",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.5 ; §4.4"
+        },
+        {
+          "term": "Résonance LC",
+          "description": "f₀ = 1/(2π√(LC))",
+          "extra": "Trouve la fréquence où les réactances de L et C se compensent. Sert à accorder un circuit.\nUnités : f₀ en Hz, L en H, C en F.\nModèle idéal ; à f₀, XL = XC.",
+          "group": "Courant alternatif et résonance",
+          "kind": "fact",
+          "visual": "resonance",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.3"
+        },
+        {
+          "term": "Constante de temps RC",
+          "description": "τ = R × C",
+          "extra": "Donne la vitesse de charge ou décharge d’un condensateur à travers une résistance.\nUnités : τ en s, R en Ω, C en F.\nAprès une constante de temps : environ 63 % de la charge finale ; en décharge il reste 37 %.",
+          "group": "Courant alternatif et résonance",
+          "kind": "fact",
+          "visual": "rc-charge",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.4 ; §4.2"
+        },
+        {
+          "term": "Période et fréquence",
+          "description": "T = 1/f · f = 1/T",
+          "extra": "Passe de la durée d’un cycle au nombre de cycles par seconde.\nUnités : T en s, f en Hz.\nPar exemple, 1 kHz correspond à une période de 1 ms.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "period",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.1"
+        },
+        {
+          "term": "Sinusoïde",
+          "description": "Ueff = Ucrête/√2 · Upp = 2 × Ucrête",
+          "extra": "Relie la hauteur maximale de la tension à la tension efficace, qui produit la même chaleur qu’une tension continue.\nUnités : Ueff, Ucrête et Upp en V.\nRelations valables uniquement pour une sinusoïde sans composante continue.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "sine",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §2.2"
+        },
+        {
+          "term": "Longueur d’onde dans le vide",
+          "description": "λ = c/f · λ(m) ≈ 300/f(MHz)",
+          "extra": "Donne la distance parcourue par l’onde pendant un cycle. Sert à estimer la taille d’une antenne.\nUnités : λ en m ; c ≈ 300 000 000 m/s ; f en Hz dans λ = c/f.\nDans une ligne, la vitesse est plus faible : λligne = facteur de vélocité × λvide.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "wavelength",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §9.1"
+        },
+        {
+          "term": "Transformateur idéal",
+          "description": "Us/Up = Ns/Np · Is/Ip = Np/Ns",
+          "extra": "Les nombres de spires fixent le rapport des tensions. Si la tension augmente, le courant diminue pour conserver la puissance.\nUnités : U en V, I en A ; N est le nombre de spires.\nModèle idéal ; rapport d’impédances Zs/Zp = (Ns/Np)².",
+          "group": "Transformation et bilan",
+          "kind": "fact",
+          "visual": "transformer",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §3.1"
+        },
+        {
+          "term": "Gain de puissance",
+          "description": "G(dB) = 10 log₁₀(Ps/Pe)",
+          "extra": "Exprime une amplification ou une perte sur une échelle additive.\nUnités : Pe et Ps dans la même unité ; G en dB.\nPs = Pe × 10^(G/10). Pe et Ps doivent être strictement positives.",
+          "group": "Transformation et bilan",
+          "kind": "fact",
+          "visual": "gain-power",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1"
+        },
+        {
+          "term": "Gain de tension",
+          "description": "G(dB) = 20 log₁₀(Us/Ue)",
+          "extra": "Compare deux amplitudes de tension ; un doublement de tension donne environ 6 dB.\nUnités : Ue et Us dans la même unité ; G en dB.\nPour correspondre à un gain de puissance, les résistances d’entrée et de sortie doivent être égales.",
+          "group": "Transformation et bilan",
+          "kind": "fact",
+          "visual": "gain-voltage",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1f"
+        },
+        {
+          "term": "ROS",
+          "description": "ROS = (1 + |Γ|)/(1 − |Γ|)",
+          "extra": "Quantifie le déséquilibre lié à la réflexion sur une ligne. ROS = 1 signifie adaptation parfaite.\nUnités : ROS et Γ sans unité.\nFormule pour une ligne idéale ; |Γ| < 1 pour une charge dissipative.",
+          "group": "Lignes et antennes",
+          "kind": "fact",
+          "visual": "reflection",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §10.3"
+        },
+        {
+          "term": "Réflexion sur charge résistive",
+          "description": "Γ = (Rcharge − Z₀)/(Rcharge + Z₀)",
+          "extra": "Donne l’amplitude et le signe de la tension réfléchie sur une charge résistive.\nUnités : Rcharge et Z₀ en Ω ; Γ sans unité.\nCharge réelle positive, ligne d’impédance caractéristique réelle. Pour une charge réactive, Γ devient complexe.",
+          "group": "Lignes et antennes",
+          "kind": "fact",
+          "visual": "reflection",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §10.3"
+        },
+        {
+          "term": "Rendement",
+          "description": "η = Putile/Palimentation · η(%) = 100 × η",
+          "extra": "Compare la puissance utile à la puissance absorbée. Le reste se dissipe en pertes.\nUnités : Les puissances dans la même unité ; η entre 0 et 1.\nUn rendement n’est pas un gain : l’amplificateur fournit sa sortie grâce à son alimentation.",
+          "group": "Transformation et bilan",
+          "kind": "fact",
+          "visual": "efficiency",
+          "source": "http://f6kgl.free.fr/COURS.html · Réglementation §R-5.1d"
+        },
+        {
+          "term": "Bande passante AM",
+          "description": "B ≈ 2 × faudio max",
+          "extra": "L’AM double bande latérale occupe deux bandes, une de chaque côté de la porteuse.\nUnités : B et faudio max en Hz.\nPour une modulation AM double bande latérale ; la BLU n’en conserve qu’une.",
+          "group": "Modulation et filtres",
+          "kind": "fact",
+          "visual": "am-bandwidth",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §12.1"
+        },
+        {
+          "term": "Bande FM, règle de Carson",
+          "description": "B ≈ 2(Δf + faudio max)",
+          "extra": "Estime la largeur occupée en FM à partir de la déviation et de la fréquence modulante maximale.\nUnités : B, déviation Δf et faudio max en Hz.\nEstimation de largeur contenant la majorité de la puissance, pas une limite spectrale abrupte.",
+          "group": "Modulation et filtres",
+          "kind": "fact",
+          "visual": "fm-bandwidth",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §12.2"
+        },
+        {
+          "term": "Qualité d’un circuit résonant",
+          "description": "Q = f₀/B",
+          "extra": "Mesure la sélectivité : à fréquence centrale égale, une bande plus étroite donne un Q plus grand.\nUnités : f₀ et B dans la même unité ; Q sans unité.\nB est la largeur entre les points à −3 dB, dans le modèle de circuit résonant étudié.",
+          "group": "Modulation et filtres",
+          "kind": "fact",
+          "visual": "quality",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.4"
+        },
+        {
+          "term": "Bilan de liaison",
+          "description": "Pr = Pt + Gt + Gr − pertes",
+          "extra": "Additionne les gains et retranche les pertes entre l’émetteur et le récepteur. Sert à estimer la puissance reçue.\nUnités : Pt et Pr en dBm ou dBW avec la même référence ; gains et pertes en dB.\nUtilise des gains d’antenne cohérents avec la formule et les pertes du trajet ; les dBm ne s’additionnent pas entre eux.",
+          "group": "Lignes et antennes",
+          "kind": "fact",
+          "visual": "link",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1 ; §9–10"
+        }
+      ]
+    },
+    {
+      "id": "decibels",
+      "title": "Décibels : gains, pertes et niveaux",
+      "subtitle": "Équations, références et exemples de bilan",
+      "group": "Bases et calculs",
+      "order": 20,
+      "intro": "Commence par les équations, puis manipule des puissances réelles dans le schéma dynamique. Les exemples sont distingués des définitions.",
+      "source": "http://f6kgl.free.fr/COURS.html",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Un rapport, pas une puissance",
+          "description": "Le dB compare deux valeurs",
+          "extra": "Le gain est positif si la sortie dépasse l’entrée, nul si elles sont égales et négatif s’il y a une perte. Un dB seul ne dit pas combien de watts sont présents.",
+          "group": "Définitions et équations",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1a"
+        },
+        {
+          "term": "Rapport de puissances",
+          "description": "G = 10 log₁₀(Ps/Pe)",
+          "extra": "Pe et Ps sont strictement positives et exprimées dans la même unité. Ps = Pe × 10^(G/10).",
+          "group": "Définitions et équations",
+          "kind": "fact",
+          "visual": "gain-power",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1a"
+        },
+        {
+          "term": "Rapport de tensions",
+          "description": "G = 20 log₁₀(Us/Ue)",
+          "extra": "À résistances égales : la puissance varie comme U². Si elles diffèrent, ajoute 10 log₁₀(Re/Rs) pour obtenir le gain de puissance.",
+          "group": "Définitions et équations",
+          "kind": "fact",
+          "visual": "gain-voltage",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1f"
+        },
+        {
+          "term": "Gains en cascade",
+          "description": "Gtotal = G₁ + G₂ − pertes",
+          "extra": "Les rapports de puissance se multiplient ; les dB s’additionnent. Une perte de 3 dB retire 3 au bilan.",
+          "group": "Définitions et équations",
+          "kind": "fact",
+          "visual": "link",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1d"
+        },
+        {
+          "term": "Perte d’un câble",
+          "description": "Perte(dB) = perte par mètre × longueur",
+          "extra": "Utilise la même fréquence que celle de la fiche du câble. Une perte de 3 dB/100 m vaut 0,03 dB/m.",
+          "group": "Définitions et équations",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1e"
+        },
+        {
+          "term": "+0 dB",
+          "description": "×1",
+          "extra": "Valeur exacte.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+1 dB",
+          "description": "×1,26",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+2 dB",
+          "description": "×1,58",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+3 dB",
+          "description": "×2",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+4 dB",
+          "description": "×2,51",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+5 dB",
+          "description": "×3,16",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+6 dB",
+          "description": "×4",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+7 dB",
+          "description": "×5",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+8 dB",
+          "description": "×6,31",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+9 dB",
+          "description": "×8",
+          "extra": "Repère arrondi de la table du cours ; le calcul logarithmique donne une valeur plus précise.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+10 dB",
+          "description": "×10",
+          "extra": "Valeur exacte.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+20 dB",
+          "description": "×100",
+          "extra": "Valeur exacte.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "+30 dB",
+          "description": "×1 000",
+          "extra": "Valeur exacte.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "−3 dB",
+          "description": "Puissance divisée par 2 environ",
+          "extra": "Le signe moins inverse le rapport : −10 dB → ÷10 ; −20 dB → ÷100.",
+          "group": "Repères : puissance",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1c"
+        },
+        {
+          "term": "dBW",
+          "description": "PdBW = 10 log₁₀(P/1 W)",
+          "extra": "0 dBW = 1 W. Un niveau relatif à 1 W devient une puissance absolue.",
+          "group": "Niveaux et références",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Réglementation §R-5.1 ; Technique §4.1"
+        },
+        {
+          "term": "dBm",
+          "description": "PdBm = 10 log₁₀(P/1 mW)",
+          "extra": "0 dBm = 1 mW ; 30 dBm = 1 W ; 50 dBm = 100 W. PdBm = PdBW + 30.",
+          "group": "Niveaux et références",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.4 ; §11.6"
+        },
+        {
+          "term": "dBµV",
+          "description": "UdBµV = 20 log₁₀(U/1 µV)",
+          "extra": "Un niveau de tension référencé à 1 microvolt. Il faut connaître la résistance pour convertir une tension en puissance.",
+          "group": "Niveaux et références",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Réglementation §R-1.3 ; Technique §11"
+        },
+        {
+          "term": "dBc",
+          "description": "Écart par rapport à la porteuse",
+          "extra": "Une composante à −40 dBc a une puissance 10 000 fois plus faible que celle de la porteuse.",
+          "group": "Niveaux et références",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Réglementation §R-1.3 ; §R-5.1"
+        },
+        {
+          "term": "dBi et dBd",
+          "description": "Antennes isotrope et dipôle comme références",
+          "extra": "dBi compare à une antenne isotrope idéale ; dBd compare à un dipôle demi-onde. G(dBi) ≈ G(dBd) + 2,15.",
+          "group": "Niveaux et références",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Réglementation §R-5.1 ; Technique §9.4"
+        },
+        {
+          "term": "Doublement de puissance",
+          "description": "5 W → 10 W : environ +3 dB",
+          "extra": "10 log₁₀(10/5) = 3,0103 dB. L’outil utilise le calcul exact, alors que les repères du cours sont arrondis.",
+          "group": "Exemples",
+          "kind": "example",
+          "visual": "gain-power",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "Amplificateur puis câble",
+          "description": "10 W → ampli +6 dB → câble −3 dB → environ 20 W",
+          "extra": "Le bilan donne +3 dB. Le calcul exact donne 10 × 10^(3/10) ≈ 19,95 W.",
+          "group": "Exemples",
+          "kind": "example",
+          "visual": "link",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1d"
+        },
+        {
+          "term": "Rapport de 400",
+          "description": "10 log₁₀(400) ≈ 26 dB",
+          "extra": "400 = 100 × 4 : +20 dB et environ +6 dB. Additionne les contributions.",
+          "group": "Exemples",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "Même tension, autre résistance",
+          "description": "1 V sur 50 Ω → 20 mW ; sur 100 Ω → 10 mW",
+          "extra": "Une tension seule ne permet pas de conclure sur la puissance. Utilise P = U²/R.",
+          "group": "Exemples",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1f"
+        },
+        {
+          "term": "Additionner les dB",
+          "description": "Les gains s’ajoutent, les watts se multiplient par le rapport",
+          "extra": "Ne fais pas « 10 W + 3 dB ». Convertis d’abord : 10 W × 10^(3/10) ≈ 19,95 W.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1d"
+        },
+        {
+          "term": "LOG et 10 puissance x",
+          "description": "Deux touches inverses",
+          "extra": "Pour le gain, prends LOG en base 10. Pour revenir au rapport, prends 10 puissance (G/10). La touche de notation scientifique « EXP » ne calcule pas cette puissance.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §4.1b"
+        },
+        {
+          "term": "Table : puissance et tension",
+          "description": "Les rapports usuels pour un gain ou une atténuation.",
+          "extra": "",
+          "group": "Repères de calcul",
+          "kind": "fact",
+          "visual": "extra:db-table",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "Dizaines et unités de dB",
+          "description": "Décompose le nombre de dB puis multiplie les deux rapports.",
+          "extra": "",
+          "group": "Repères de calcul",
+          "kind": "fact",
+          "visual": "extra:db-unit-table",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "−6 dB",
+          "description": "÷4 environ",
+          "cardId": "flash-decibels-3",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "−10 dB",
+          "description": "÷10",
+          "cardId": "flash-decibels-5",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "0 dBm",
+          "description": "1 mW",
+          "cardId": "flash-decibels-7",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "10 dBm",
+          "description": "10 mW",
+          "cardId": "flash-decibels-8",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "20 dBm",
+          "description": "100 mW",
+          "cardId": "flash-decibels-9",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "30 dBm",
+          "description": "1 W",
+          "cardId": "flash-decibels-10",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "40 dBm",
+          "description": "10 W",
+          "cardId": "flash-decibels-11",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "50 dBm",
+          "description": "100 W",
+          "cardId": "flash-decibels-12",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "0 dBW",
+          "description": "1 W",
+          "cardId": "flash-decibels-13",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T041"
+        },
+        {
+          "term": "dBi",
+          "description": "Gain par rapport à une antenne isotrope",
+          "cardId": "flash-decibels-14",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T094"
+        },
+        {
+          "term": "dBd",
+          "description": "Gain par rapport à un dipôle demi-onde",
+          "cardId": "flash-decibels-15",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T094"
+        },
+        {
+          "term": "dBi ↔ dBd",
+          "description": "dBi ≈ dBd + 2,15",
+          "cardId": "flash-decibels-16",
+          "kind": "flashcard-only",
+          "group": "Compatibilité des révisions",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T094"
+        }
+      ]
+    },
+    {
+      "id": "units",
+      "title": "Grandeurs et unités",
+      "subtitle": "Définition, symbole et usage",
+      "group": "Bases et calculs",
+      "order": 5,
+      "intro": "Les unités donnent le sens des mesures. Repère le symbole utilisé dans les formules et convertis les préfixes avant tout calcul.",
+      "source": "http://f6kgl.free.fr/COURS.html",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Tension U",
+          "description": "Volt · V",
+          "extra": "Différence de potentiel entre deux points : c’est la grandeur mesurée aux bornes d’un composant.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Courant I",
+          "description": "Ampère · A",
+          "extra": "Débit des charges électriques ; se mesure en série dans la branche.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Résistance R",
+          "description": "Ohm · Ω",
+          "extra": "Opposition d’un conducteur ohmique au passage du courant ; R = U/I.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Puissance P",
+          "description": "Watt · W",
+          "extra": "Énergie transférée par seconde : 1 W = 1 J/s.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Énergie E",
+          "description": "Joule · J",
+          "extra": "Quantité d’énergie transférée : 1 Wh = 3 600 J.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Charge Q",
+          "description": "Coulomb · C",
+          "extra": "Quantité d’électricité : 1 C = 1 A × 1 s. Ne pas confondre avec Q, facteur de qualité d’un circuit.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Conductance G",
+          "description": "Siemens · S",
+          "extra": "Inverse de la résistance : G = 1/R.",
+          "group": "Électricité en continu",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Capacité C",
+          "description": "Farad · F",
+          "extra": "Charge stockée par volt : C = Q/U. Un condensateur se mesure en F, souvent µF, nF ou pF.",
+          "group": "Composants et alternatif",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Inductance L",
+          "description": "Henry · H",
+          "extra": "Caractérise une bobine et sa réaction aux variations de courant.",
+          "group": "Composants et alternatif",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Impédance Z",
+          "description": "Ohm · Ω",
+          "extra": "Opposition complète en alternatif : résistance et réactance.",
+          "group": "Composants et alternatif",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Réactance X",
+          "description": "Ohm · Ω",
+          "extra": "Partie liée au stockage d’énergie dans les bobines et les condensateurs.",
+          "group": "Composants et alternatif",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Fréquence f",
+          "description": "Hertz · Hz",
+          "extra": "Nombre de cycles par seconde : 1 Hz = 1 cycle/s.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Période T",
+          "description": "Seconde · s",
+          "extra": "Durée d’un cycle : T = 1/f.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Longueur d’onde λ",
+          "description": "Mètre · m",
+          "extra": "Distance parcourue pendant un cycle : λ = c/f dans le vide.",
+          "group": "Signaux et ondes",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Débit de symboles",
+          "description": "Baud · Bd",
+          "extra": "Nombre de symboles par seconde ; un symbole peut coder plusieurs bits.",
+          "group": "Transmission numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Débit binaire",
+          "description": "Bit par seconde · bit/s",
+          "extra": "Nombre de bits transmis par seconde ; différent du débit de symboles.",
+          "group": "Transmission numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2 ; §1–2 ; §12.4"
+        },
+        {
+          "term": "Convertir avant de calculer",
+          "description": "20 mA = 0,020 A ; 4,7 kΩ = 4 700 Ω",
+          "extra": "Les formules utilisent les unités de base. Une erreur entre m et M change la valeur d’un facteur un milliard.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        }
+      ]
+    },
+    {
+      "id": "prefixes",
+      "title": "Préfixes et conversions SI",
+      "subtitle": "Des valeurs plus courtes, avec la bonne unité",
+      "group": "Bases et calculs",
+      "order": 10,
+      "intro": "Les préfixes ci-dessous sont ceux utilisés dans les calculs du cours. La fiche présente ensuite des conversions pour s’entraîner.",
+      "source": "http://f6kgl.free.fr/COURS.html",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "p · pico",
+          "description": "10⁻¹²",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "n · nano",
+          "description": "10⁻⁹",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "µ · micro",
+          "description": "10⁻⁶",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "m · milli",
+          "description": "10⁻³",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "c · centi",
+          "description": "10⁻²",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "d · déci",
+          "description": "10⁻¹",
+          "extra": "",
+          "group": "Sous-multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "da · déca",
+          "description": "10¹",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "h · hecto",
+          "description": "10²",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "k · kilo",
+          "description": "10³",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "M · méga",
+          "description": "10⁶",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "G · giga",
+          "description": "10⁹",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "T · téra",
+          "description": "10¹²",
+          "extra": "",
+          "group": "Multiples",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "1 kΩ",
+          "description": "1 000 Ω",
+          "extra": "kilo multiplie par mille.",
+          "group": "Conversions",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "1 mA",
+          "description": "0,001 A",
+          "extra": "milli divise par mille.",
+          "group": "Conversions",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "1 µF",
+          "description": "1 000 nF = 1 000 000 pF",
+          "extra": "Entre µ, n et p, chaque pas change d’un facteur mille.",
+          "group": "Conversions",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "1 MHz",
+          "description": "1 000 kHz = 1 000 000 Hz",
+          "extra": "",
+          "group": "Conversions",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        },
+        {
+          "term": "Respecter la casse",
+          "description": "m n’est pas M",
+          "extra": "m signifie milli (un millième) ; M signifie méga (un million). Le kilo s’écrit k minuscule ; le micro s’écrit µ.",
+          "group": "Astuces",
+          "kind": "tip",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html · Technique §0.2"
+        }
+      ]
+    }
+  ]
+}

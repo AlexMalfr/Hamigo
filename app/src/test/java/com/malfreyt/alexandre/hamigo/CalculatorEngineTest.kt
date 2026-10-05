@@ -5,6 +5,14 @@ import org.junit.Test
 import kotlin.math.PI
 
 class CalculatorEngineTest {
+    @Test fun ordinaryCalculatedAnswersUsePlainDecimalNotation() {
+        assertEquals("20", CalculatorEngine.format(CalculatorEngine.evaluate("20")))
+        assertEquals("1000", CalculatorEngine.format(1000.0))
+        assertEquals("-200", CalculatorEngine.format(-200.0))
+        assertEquals("0,000001", CalculatorEngine.format(1e-6))
+        assertTrue(LearningRules.numericCorrect(CalculatorEngine.format(20.0), 20.0, .01))
+        assertEquals(1e100, CalculatorEngine.evaluate(CalculatorEngine.format(1e100)), 1e88)
+    }
     @Test fun powerAndUnaryPrecedenceAreMathematical() {
         assertEquals(14.0, CalculatorEngine.evaluate("2+3×4"), 1e-10)
         assertEquals(-4.0, CalculatorEngine.evaluate("-2^2"), 1e-10)

@@ -48,20 +48,21 @@ class MemoNavigationInstrumentedTest {
 
     @Test fun returningFromLastFicheKeepsLibraryScrollAndDetailHeaderStaysVisible() {
         val libraryScroll = hasScrollAction() and SemanticsMatcher.keyIsDefined(SemanticsProperties.VerticalScrollAxisRange)
-        ui.onNode(libraryScroll).performScrollToNode(hasText("Les 3 régions UIT"))
+        val regionsTitle=model.content!!.references.first {it.id=="itu-regions"}.title
+        ui.onNode(libraryScroll).performScrollToNode(hasText(regionsTitle))
         val positionBefore = ui.onNode(libraryScroll).fetchSemanticsNode()
             .config[SemanticsProperties.VerticalScrollAxisRange].value()
         assertTrue("La bibliothèque doit avoir quitté le début de la liste", positionBefore > 0f)
-        ui.onNodeWithText("Les 3 régions UIT").performClick()
+        ui.onNodeWithText(regionsTitle).performClick()
         ui.onNodeWithContentDescription("Retour aux mémos").performClick()
         // Check the restored position before doing any further scroll.
-        ui.onNodeWithText("Les 3 régions UIT").assertIsDisplayed()
+        ui.onNodeWithText(regionsTitle).assertIsDisplayed()
         val positionAfter = ui.onNode(libraryScroll).fetchSemanticsNode()
             .config[SemanticsProperties.VerticalScrollAxisRange].value()
         assertEquals("Le retour doit conserver la position de la bibliothèque", positionBefore, positionAfter, 0.001f)
         ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "resistors" } }
         ui.onNode(libraryScroll).performScrollToNode(hasText("5 anneaux"))
-        ui.onNodeWithText("Code des résistances").assertIsDisplayed()
+        ui.onNodeWithText(model.content!!.references.first {it.id=="resistors"}.title).assertIsDisplayed()
         ui.onNodeWithText("Réviser avec les flashcards").assertIsDisplayed()
         ui.onNodeWithText("Ordre aléatoire").assertIsDisplayed()
     }

@@ -23,8 +23,11 @@ data class Question(
 data class Lesson(val id: String, val title: String, val summary: String, val body: List<String>,
     val formula: String, val topic: String, val questions: List<Question>)
 data class Chapter(val id: String, val title: String, val subtitle: String, val lessons: List<Lesson>)
-data class RefRow(val term: String, val description: String, val extra: String)
-data class RefCategory(val id: String, val title: String, val subtitle: String, val rows: List<RefRow>, val flashcards: Boolean)
+data class RefRow(val term: String, val description: String, val extra: String,
+    val group: String = "", val kind: String = "fact", val visual: String = "",
+    val source: String = "", val region: String = "", val cardId: String = "")
+data class RefCategory(val id: String, val title: String, val subtitle: String, val rows: List<RefRow>, val flashcards: Boolean,
+    val group: String = "", val order: Int = 0, val intro: String = "", val source: String = "")
 data class Review(val due: Long = 0, val interval: Double = 0.0, val ease: Double = 2.5,
     val repetitions: Int = 0, val lapses: Int = 0)
 
@@ -67,7 +70,10 @@ class Content(private val context: Context) {
     val lessons = chapters.flatMap { it.lessons }
     val references = JSONObject(json("reference.json")).getJSONArray("categories").objects().map { c ->
         RefCategory(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("rows").objects().map {
-            RefRow(it.getString("term"), it.getString("description"), it.optString("extra")) }, c.optBoolean("flashcards", true))
+            RefRow(it.getString("term"), it.getString("description"), it.optString("extra"),
+                it.optString("group"), it.optString("kind", "fact"), it.optString("visual"),
+                it.optString("source"), it.optString("region"), it.optString("cardId")) }, c.optBoolean("flashcards", true),
+            c.optString("group"), c.optInt("order"), c.optString("intro"), c.optString("source"))
     }
     val exam: List<Question> = run {
         val raw = json("exam1/questions.json").trim()
@@ -75,12 +81,15 @@ class Content(private val context: Context) {
         array.objects().map { parseQuestion(it) }
     }
     val excluded = runCatching { JSONArray(json("exam1/excluded.json")).strings().toSet() }.getOrDefault(emptySet())
-    val activeExam get() = exam.filter { it.id !in excluded }
-    val flashcards = references.filter { it.flashcards }.flatMap { cat -> cat.rows.mapIndexed { i, row ->
-        Question("flash-${cat.id}-$i", row.term, listOf(row.description), 0, row.extra,
+    val activeExam = exam.filter { it.id !in excluded }
+    val flashcards = references.filter { it.flashcards }.flatMap { cat -> cat.rows.mapIndexedNotNull { i, row ->
+        val preservedExample = row.kind == "example" && row.cardId.matches(Regex("flash-.+-\\d{1,3}"))
+        if ((!preservedExample && row.kind in setOf("tip", "example")) || row.region in setOf("2", "3")) return@mapIndexedNotNull null
+        Question(row.cardId.ifBlank { "flash-${cat.id}-$i" }, row.term, listOf(row.description), 0, row.extra,
             topic = cat.id, kind = "flash", source = cat.title)
     } }
     val procedural = ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
+    val mixIndex = PracticeMixIndex(activeExam, procedural)
     val allQuestions = (lessons.flatMap { it.questions } + exam + flashcards + procedural).associateBy { it.id }
     val topics = activeExam.groupBy { it.topic }.toSortedMap()
     fun nextLesson(completed: Set<String>) = lessons.firstOrNull { it.id !in completed }
@@ -241,15 +250,15 @@ object PracticeGenerator {
             val voltage = resistance * current
             when (n % 4) {
                 0 -> Question("proc-ohm-$resistance-$current", "Une résistance de $resistance Ω est parcourue par ${formatNumber(current * 1000)} mA. Quelle tension à ses bornes ?",
-                    emptyList(), 0, "U = R × I. ${resistance} × ${formatNumber(current)} = ${formatNumber(voltage)} V. Convertis les mA en A avant le calcul.", kind="number", value=voltage, unit="V", tolerance=.02)
+                    emptyList(), 0, "U = R × I. ${resistance} × ${formatNumber(current)} = ${formatNumber(voltage)} V. Convertis les mA en A avant le calcul.", topic="Loi d'Ohm",kind="number", value=voltage, unit="V", tolerance=.02)
                 1 -> Question("proc-power-$resistance-$current", "Avec U = ${formatNumber(voltage)} V et I = ${formatNumber(current)} A, quelle puissance est dissipée ?",
-                    emptyList(), 0, "P = U × I = ${formatNumber(voltage)} × ${formatNumber(current)} = ${formatNumber(voltage * current)} W.", kind="number", value=voltage * current, unit="W", tolerance=max(.000001,voltage * current * .01))
+                    emptyList(), 0, "P = U × I = ${formatNumber(voltage)} × ${formatNumber(current)} = ${formatNumber(voltage * current)} W.", topic="Grandeurs électriques",kind="number", value=voltage * current, unit="W", tolerance=max(.000001,voltage * current * .01))
                 2 -> { val f = listOf(3, 7, 14, 28, 50, 100, 150, 300).random(random)
                     Question("proc-wave-$f", "Un signal de $f MHz a quelle longueur d'onde approximative dans le vide ?", emptyList(), 0,
-                        "λ ≈ 300 / f(MHz) = ${formatNumber(300.0 / f)} m.", kind="number", value=300.0/f, unit="m", tolerance=.1) }
+                        "λ ≈ 300 / f(MHz) = ${formatNumber(300.0 / f)} m.", topic="Longueur d'onde",kind="number", value=300.0/f, unit="m", tolerance=.1) }
                 else -> { val f = listOf(145.0, 146.0, 144.0, 147.0).random(random)
                     Question("proc-band-$f", "Place le curseur sur $f MHz : entraîne-toi à lire une fréquence VHF.", emptyList(), 0,
-                        "144 à 146 MHz est la bande amateur dite « 2 mètres » en France métropolitaine. La fréquence $f MHz ${if (f < 146 && f >= 144) "se situe à l'intérieur" else "est une limite ou hors de l'intérieur"} de cette bande.", kind="frequency", value=f, unit="MHz", tolerance=.05) }
+                        "144 à 146 MHz est la bande amateur dite « 2 mètres » en France métropolitaine. La fréquence $f MHz ${if (f < 146 && f >= 144) "se situe à l'intérieur" else "est une limite ou hors de l'intérieur"} de cette bande.", topic="Longueur d'onde",kind="frequency", value=f, unit="MHz", tolerance=.05) }
             }
         }
     }

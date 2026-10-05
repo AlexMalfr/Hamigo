@@ -17,7 +17,9 @@ object CalculatorEngine {
     fun format(value: Double): String {
         require(value.isFinite())
         if (value == 0.0) return "0"
-        return BigDecimal.valueOf(value).round(MathContext(12)).stripTrailingZeros().toString().replace('.', ',')
+        val number = BigDecimal.valueOf(value).round(MathContext(12)).stripTrailingZeros()
+        // Keep everyday answers readable; scientific notation is reserved for extreme values.
+        return (if (abs(value) in 1e-9..1e12) number.toPlainString() else number.toString()).replace('.', ',')
     }
 
     private class Parser(source: String, private val mode: CalculatorAngleMode, private val answer: Double) {

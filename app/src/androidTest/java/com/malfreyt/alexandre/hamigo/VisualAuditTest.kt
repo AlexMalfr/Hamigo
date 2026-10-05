@@ -172,7 +172,7 @@ class VisualAuditTest {
         ui.runOnIdle { model.oauthSession = null; model.oauthStatus = null }
 
         navigate("resources")
-        scrollTo("Les petits mémos")
+        scrollTo("Mémo")
         ui.onNodeWithContentDescription("Rechercher un mémo").performClick()
         ui.onNode(hasSetTextAction()).performTextReplacement("Morse")
         capture("19-memo-recherche-compacte")

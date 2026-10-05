@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+        Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {
             if(backProgress>0f) {
                 when {
                     model.resource!=null->ResourceLibraryScreen(model,content)
