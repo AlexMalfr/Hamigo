@@ -323,7 +323,7 @@ class MainActivity : ComponentActivity() {
                     IconButton({scope.launch{history.animateScrollToPage(history.currentPage+1)}},enabled=history.currentPage<weeks-1) {Icon(Icons.Rounded.History,"Voir la semaine précédente")}
                     IconButton({scope.launch{history.animateScrollToPage(history.currentPage-1)}},enabled=history.currentPage>0) {Icon(Icons.Rounded.Update,"Voir la semaine suivante")}
                 }
-                HorizontalPager(history,Modifier.fillMaxWidth()) {week ->
+                HorizontalPager(history,Modifier.fillMaxWidth(),reverseLayout=true) {week ->
                     val days=(6L downTo 0L).map{today.minusDays(week*7L+it)}
                     val maximum=days.maxOf{p.dayXp(it)}.coerceAtLeast(p.dailyGoal)
                     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -340,7 +340,7 @@ class MainActivity : ComponentActivity() {
                     Text("${days.sumOf {p.dayXp(it)}} XP en 7 jours · objectif ${p.dailyGoal} XP/jour",fontSize=12.sp,color=Muted)
                     }
                 }
-                Text("Glisse vers la gauche pour remonter les semaines.",fontSize=11.sp,color=Muted)
+                Text("Glisse vers la droite pour remonter les semaines.",fontSize=11.sp,color=Muted)
             }
         }
         item {Panel {Text("Ton signal se renforce",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("${p.completed.size} / ${content.lessons.size} leçons terminées\n${p.reviews.values.count{it.repetitions>=3}} notions consolidées\n${p.totalAnswers} réponses · ${if(p.totalAnswers==0)0 else p.totalCorrect*100/p.totalAnswers}% de réussite",fontSize=14.sp,lineHeight=22.sp);Action("Partager mon bilan"){NativeShare.progressImage(context,p.snapshot())}}}
