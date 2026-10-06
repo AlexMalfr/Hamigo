@@ -563,6 +563,7 @@ fun SettingsScreen(model: AppModel) {
                     TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
                     TextButton({ openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
                     TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
+                    TextButton({ openLink(context, "https://github.com/AlexMalfr/Hamigo") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Code source de Hamigo · GitHub",fontSize=12.sp)}}
                 }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }

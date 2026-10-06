@@ -140,3 +140,9 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Retour à l'étape précédente, clavier pris en compte, texte défilable et actions fixes accessibles. La taille de Pico s'adapte aux grandes polices et les petits textes ont un interligne explicite ; les cartes d'objectif sont de hauteur égale par ligne.
 - Étape et brouillon conservés localement lors d'une interruption ; fin sur Parcours sans compte ou ouverture de GitHub depuis Équipe. Les anciens profils marqués `welcomed` ne repassent pas par cet accueil, et aucune progression n'est réinitialisée.
 - Clarification documentée des mails Gist : le manque d'API concerne aussi un appel séparé après création. Vérifications en lecture seule ; scopes OAuth inchangés.
+
+## Présentation publique du projet — 0.30
+
+- README réorganisé autour de l'installation, des fonctionnalités et de huit captures de démonstration. Les anciennes notes détaillées sont conservées dans `APP-DETAILS.md`.
+- Avertissement en tête : « Vibe codée avec ❤️ par @AlexMalfr », développement avec Codex, auteur débutant en RF et risque d'erreurs pédagogiques.
+- Lien vers le dépôt GitHub ajouté dans Paramètres → Sources & version. Documentation adaptée au passage du dépôt en public décidé par l'utilisateur.

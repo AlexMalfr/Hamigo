@@ -4,7 +4,7 @@ Ces consignes résument les préférences exprimées par l'utilisateur pour ce p
 
 ## Intention du produit
 
-- Hamigo est une app Android native, en français, pour préparer le certificat d'opérateur des services d'amateur. Identifiant : `com.malfreyt.alexandre.hamigo`. Usage personnel entre amis, dépôt GitHub **privé** `AlexMalfr/Hamigo`.
+- Hamigo est une app Android native, en français, pour préparer le certificat d'opérateur des services d'amateur. Identifiant : `com.malfreyt.alexandre.hamigo`. Conçue initialement pour un usage personnel entre amis ; l'utilisateur a rendu le dépôt GitHub **public** `AlexMalfr/Hamigo` le 6 octobre 2026.
 - Le design et les interactions ludiques sont une raison d'être du produit : Material 3 et Compose, palette crème/turquoise/corail/jaune, mascotte Pico. Préserver les composants et le langage visuel existants, avec des textes clairs, concrets et peu kitsch.
 - Parcours est la page principale. Ordre des onglets : Défis, Mémo, Parcours, Équipe, Moi. Retour depuis un autre onglet principal ramène à Parcours ; les écrans internes reviennent à leur parent.
 - Les cours enseignent des notions avant de les évaluer. Une progression ne doit pas récompenser une séance ratée comme une maîtrise acquise. Varier les exercices pertinents et expliquer les corrections.
@@ -14,14 +14,14 @@ Ces consignes résument les préférences exprimées par l'utilisateur pour ce p
 
 - Références principales : [F6KGL](http://f6kgl.free.fr/COURS.html) et [Exam1 REF](https://exam1.r-e-f.org/). Consulter `docs/SOURCES-COURSES.md`, `docs/SOURCES-EXAM1.md`, `docs/MEMO-COVERAGE-2026-10.md` et les audits du contenu.
 - Vérifier les affirmations techniques et réglementaires à leur source ; les textes réglementaires actuels doivent être distingués des tableaux d'une édition ancienne. Documenter les limites et exclusions, sans présenter un audit automatisé comme une certification pédagogique exhaustive.
-- Conserver les archives, attributions et imports reproductibles. Le caractère privé du projet n'autorise pas à présumer la licence de chaque source.
+- Conserver les archives, attributions et imports reproductibles. La visibilité publique du dépôt n'autorise pas à présumer la licence de chaque source.
 - Les exercices procéduraux doivent rester cohérents avec la notion enseignée, avec réponses, tolérances et explications vérifiables. Préserver les identifiants stables des cartes/questions déjà utilisés par la progression.
 - Représenter le Morse avec les composants graphiques de l'app, y compris dans outils, flashcards et corrections ; ne pas réintroduire un affichage ASCII comme représentation pédagogique. Une notation technique peut rester nécessaire au parsing et à l'échange.
 
 ## Façon de travailler
 
 - Avancer de manière autonome jusqu'au résultat demandé : implémentation, vérifications, correction des défauts, livraison. Ne pas redemander une permission déjà donnée pour une action dans le périmètre autorisé.
-- L'autorisation existante couvre le versionnement Git, le push et les releases sur le dépôt privé, ainsi que l'installation sur le téléphone via ADB. Elle ne couvre pas une publication publique, un effacement de données ou des messages réels à des amis.
+- L'autorisation existante couvre le versionnement Git, le push et les releases sur le dépôt Hamigo, désormais public par choix explicite de l'utilisateur, ainsi que l'installation sur le téléphone via ADB. Elle ne couvre pas une publication sur d'autres canaux, un effacement de données ou des messages réels à des amis.
 - Donner des mises à jour courtes en français : résultat appris, choix utile, point restant à vérifier. Terminer avec ce qui a changé, ce qui a réellement été testé et si l'APK a réellement été installé.
 - Pour du travail en parallèle demandé par l'utilisateur, attribuer des fichiers ou responsabilités distincts aux agents. Partager le contrat des interfaces, intégrer leurs changements et inspecter leurs résultats. Un agent principal coordonne builds, tests Android et livraison ; éviter les compilations concurrentes sur les mêmes sorties et les commandes ADB concurrentes.
 - Utiliser un worktree si l'isolation est utile, sans perdre les changements locaux. Ne pas imposer des worktrees quand des fichiers séparés suffisent. Résoudre les conflits en conservant le comportement attendu, pas en choisissant aveuglément un côté.
@@ -62,6 +62,6 @@ $env:GRADLE_USER_HOME="$env:USERPROFILE\.gradle"
 - Exécuter les tests pertinents pour le changement et les régressions touchées. Des assertions utiles portent sur le comportement réel, la conservation des données, les calculs ou les contraintes de layout ; ne pas ajouter des tests qui recopient simplement l'implémentation. Après succès, élargir seulement si un risque ou un changement supplémentaire le justifie.
 - Consigner dans `docs/VALIDATION.md` les résultats réellement exécutés, les échecs réparés, les captures inspectées et les limites. Garder APK, captures et rapports locaux dans `output/`. Mettre à jour les notes de version et le README lorsque le comportement documenté change.
 - Les versions normales suivent le nombre de commits : `versionCode = nombre de commits`, `versionName = 0.<nombre>+<SHA>`. Éviter les commits intermédiaires gratuits qui gonflent la numérotation. Une révision au même numéro utilise `-PhamigoVersionCommit=<nombre>` uniquement si l'utilisateur l'a demandée.
-- Construire la release depuis le commit propre destiné à être livré, avec l'historique Git complet. Vérifier la version effective (`:app:printAppVersion`), la signature et le SHA-256 de l'APK, puis pousser et publier la release privée avec cet APK.
+- Construire la release depuis le commit propre destiné à être livré, avec l'historique Git complet. Vérifier la version effective (`:app:printAppVersion`), la signature et le SHA-256 de l'APK, puis pousser et publier la release sur le dépôt Hamigo avec cet APK.
 - Après installation, contrôler la version du package sur le téléphone. Conserver une preuve de livraison locale (commit, version, hash, signature, lien de release, installation). Ne pas annoncer une installation ou un push sur la seule base d'une tentative.
 - Si le téléphone est indisponible, terminer les vérifications et la release réalisables, puis indiquer clairement que l'installation reste à faire. Ne pas prétendre une validation sur téléphone à partir de l'émulateur.
