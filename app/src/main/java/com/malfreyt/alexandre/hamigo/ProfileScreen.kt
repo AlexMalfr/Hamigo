@@ -1,8 +1,6 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -58,18 +56,24 @@ fun ProfileScreen(model: AppModel, content: Content) {
     val weeks = maxOf(4, (ChronoUnit.DAYS.between(earliest, today) / 7).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
     val listState = rememberLazyListState()
-    val avatarDrop by animateDpAsState(if(stickyHeaderDetached(listState))16.dp else 0.dp,tween(180),label="profile-avatar-overhang")
     LazyColumn(
         Modifier.fillMaxSize().testTag("profile-list"), state = listState,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 56.dp + LocalNavigationContentOverlap.current),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         stickyHeader(key = "profile-header") {
-            Row(Modifier.fillMaxWidth().testTag("profile-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.align(Alignment.Bottom).size(72.dp)
-                    .offset(y=avatarDrop).border(3.dp,Cream,CircleShape))
-                Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
-                IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
+            Box(Modifier.fillMaxWidth().testTag("profile-header")) {
+                Column {
+                    Row(Modifier.fillMaxWidth().testTag("profile-header-surface").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Spacer(Modifier.width(72.dp))
+                        Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
+                        IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
+                    }
+                    // The header's surface ends above the avatar, which stays in the same layout position.
+                    Spacer(Modifier.height(8.dp))
+                }
+                GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.align(Alignment.BottomStart).size(72.dp)
+                    .border(3.dp,Cream,CircleShape))
             }
         }
         item(key = "profile-level") {

@@ -126,11 +126,15 @@ class VisualAuditTest {
         val header=ui.onNodeWithTag("profile-header",useUnmergedTree=true)
         val top=header.fetchSemanticsNode().boundsInRoot.top
         val avatar=ui.onNodeWithContentDescription("Photo GitHub de Alex",useUnmergedTree=true)
+        val surface=ui.onNodeWithTag("profile-header-surface",useUnmergedTree=true)
+        val avatarRelativeTop=avatar.fetchSemanticsNode().boundsInRoot.top-top
         check(avatar.fetchSemanticsNode().boundsInRoot.height>=with(ui.density){70.dp.toPx()})
+        check(avatar.fetchSemanticsNode().boundsInRoot.bottom>surface.fetchSemanticsNode().boundsInRoot.bottom+with(ui.density){4.dp.toPx()})
         ui.onNodeWithTag("profile-list").performScrollToNode(hasText("Mieux retenir"))
         header.assertIsDisplayed()
         check(header.fetchSemanticsNode().boundsInRoot.top<=top+1f)
-        check(avatar.fetchSemanticsNode().boundsInRoot.bottom>header.fetchSemanticsNode().boundsInRoot.bottom+with(ui.density){4.dp.toPx()})
+        check(kotlin.math.abs(avatar.fetchSemanticsNode().boundsInRoot.top-header.fetchSemanticsNode().boundsInRoot.top-avatarRelativeTop)<1f)
+        check(avatar.fetchSemanticsNode().boundsInRoot.bottom>surface.fetchSemanticsNode().boundsInRoot.bottom+with(ui.density){4.dp.toPx()})
         ui.onNodeWithContentDescription("Réglages").assertIsDisplayed()
         capture("41-moi-entete-fixe")
         ui.onNodeWithContentDescription("Réglages").performClick()

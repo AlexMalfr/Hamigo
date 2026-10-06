@@ -103,3 +103,7 @@ Références de plateforme : [layouts responsive des widgets](https://developer.
 - L'avatar GitHub de Moi passe de 56 à 72 dp et descend de 16 dp lorsque l'en-tête est fixé, pour dépasser légèrement sous son bord. Une fine bordure couleur fond le détache du contenu.
 - La découpe de Parcours passe de 6 à 3 dp, avec des épaules arrondies raccordées par des arcs tangents. Le bouton conserve un halo diffus plus léger que l'ombre de la barre ; son label descend légèrement. Parcours, Équipe et Moi gagnent 40 dp de respiration en bas.
 - Les trois widgets ont quatre compositions réelles : compacte, horizontale, verticale et grande. Série utilise des tons chauds et ses jours de révision ; Objectif conserve une seule jauge avec Pico ; Cette semaine met le graphique en avant sur un fond turquoise sombre. Le contenu illustré et les textes s'adaptent à l'espace, avec des aperçus propres dans le sélecteur du launcher et des métriques natives accessibles.
+
+### Correction de l'avatar — 0.25
+
+La photo reste à sa place pendant le scroll : le fond et l'ombre du header s'arrêtent 8 dp au-dessus de son bas. Le débordement est une propriété fixe du layout, sans translation ni animation de la photo lorsque l'en-tête devient fixe.
