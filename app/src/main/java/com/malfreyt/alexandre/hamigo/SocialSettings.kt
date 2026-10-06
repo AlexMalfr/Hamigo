@@ -21,6 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -147,7 +150,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FriendsScreen(model: AppModel) {
     val context = LocalContext.current
@@ -161,8 +164,21 @@ fun FriendsScreen(model: AppModel) {
     var addOpen by remember { mutableStateOf(false) }
     var receivedLink by remember { mutableStateOf("") }
     var inviteError by remember { mutableStateOf<String?>(null) }
+    var scanOpen by remember { mutableStateOf(false) }
+    var cameraDenied by remember { mutableStateOf(false) }
+    val cameraPermission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {granted ->
+        cameraDenied=!granted
+        if(granted)scanOpen=true
+        else inviteError="Autorise la caméra pour scanner un QR, ou utilise le lien d’invitation."
+    }
     val listState = rememberLazyListState()
+    val pullState=rememberPullToRefreshState()
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
+    PullToRefreshBox(isRefreshing=model.socialRefreshing,onRefresh={model.refreshSocial(manual=true)},
+        state=pullState,modifier=Modifier.fillMaxSize().testTag("friends-refresh"),indicator={
+            PullToRefreshDefaults.Indicator(state=pullState,isRefreshing=model.socialRefreshing,
+                modifier=Modifier.align(Alignment.TopCenter),containerColor=Mist,color=Teal)
+        }) {
     LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), state = listState, contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         stickyHeader(key = "friends-header") {
             Column(Modifier.fillMaxWidth().testTag("friends-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp)) {
@@ -323,6 +339,10 @@ fun FriendsScreen(model: AppModel) {
             }
         }
     }
+    }
+    if (scanOpen) FriendQrScanner(onDismiss={scanOpen=false},onInvite={id ->
+        scanOpen=false;addOpen=false;receivedLink="";inviteError=null;model.pendingInvite=id
+    })
     if (showQr && invitation != null) {
         val qr = remember(invitation) { FriendInvite.qr(invitation).asImageBitmap() }
         AlertDialog(onDismissRequest = { showQr = false }, title = { Text("Invite ton équipe") }, text = {
@@ -338,17 +358,28 @@ fun FriendsScreen(model: AppModel) {
             }
         }, confirmButton = { TextButton({ showQr = false }) { Text("Fermer") } })
     }
-    if (addOpen) {
+    if (addOpen && !scanOpen) {
         AlertDialog(onDismissRequest = { addOpen = false }, title = { Text("Ajouter un équipier") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Colle le lien d’invitation Hamigo reçu. Tu peux aussi l’ouvrir directement depuis votre conversation.", fontSize = 13.sp, lineHeight = 19.sp)
-                OutlinedTextField(receivedLink, { receivedLink = it.take(512); inviteError = null },
+                Button({
+                    inviteError=null;cameraDenied=false
+                    if(context.checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED)scanOpen=true
+                    else cameraPermission.launch(Manifest.permission.CAMERA)
+                },Modifier.fillMaxWidth(),enabled=context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                    Icon(Icons.Rounded.QrCodeScanner,null);Spacer(Modifier.width(8.dp));Text("Scanner un QR code")
+                }
+                Text("Ou colle le lien d’invitation reçu.", fontSize = 13.sp, lineHeight = 19.sp)
+                OutlinedTextField(receivedLink, { receivedLink = it.take(512); inviteError = null;cameraDenied=false },
                     label = { Text("Lien d’invitation Hamigo") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
-                    isError = inviteError != null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
+                    isError = inviteError != null && !cameraDenied, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                 inviteError?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp) }
+                if(cameraDenied)TextButton({
+                    context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:${context.packageName}")))
+                },contentPadding=PaddingValues(0.dp)) {Text("Autoriser la caméra dans les réglages",fontSize=12.sp)}
             }
         }, confirmButton = {
             TextButton({
+                cameraDenied=false
                 val parsed = FriendInvite.parse(receivedLink.trim())
                 if (parsed == null) inviteError = "Ce lien n’est pas une invitation Hamigo valide."
                 else { model.pendingInvite = parsed; addOpen = false; receivedLink = "" }

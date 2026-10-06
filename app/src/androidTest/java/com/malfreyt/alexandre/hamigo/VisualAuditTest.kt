@@ -88,6 +88,42 @@ class VisualAuditTest {
         ui.waitForIdle()
     }
 
+    @Test fun teamAddOffersQrAndCameraCanBeClosedWithoutAddingAnInvitation() {
+        val qr=FriendInvite.qr(FriendInvite.link("0123456789abcdef0123456789abcdef"))
+        File(folder,"camera-invitation-fixture.png").outputStream().use {qr.compress(Bitmap.CompressFormat.PNG,100,it)}
+        qr.recycle()
+        navigate("friends")
+        scrollTo("Ajouter")
+        ui.onNodeWithText("Ajouter").performClick()
+        ui.onNodeWithText("Scanner un QR code").assertIsDisplayed()
+        capture("45-team-add-qr")
+        ui.onNodeWithText("Scanner un QR code").performClick()
+        ui.onNodeWithTag("friend-qr-scanner").assertIsDisplayed()
+        SystemClock.sleep(1500)
+        capture("46-team-qr-camera")
+        ui.onNodeWithContentDescription("Fermer le lecteur QR").performClick()
+        ui.onNodeWithTag("friend-qr-scanner").assertDoesNotExist()
+        ui.onNodeWithText("Ajouter un équipier").assertIsDisplayed()
+        ui.runOnIdle {check(model.pendingInvite==null);check(model.friends.isEmpty())}
+    }
+
+    /** Run without camera permission; cancelling the native request must keep the link usable. */
+    @Test fun teamCameraPermissionDenialKeepsTheLinkAvailable() {
+        navigate("friends");scrollTo("Ajouter")
+        ui.onNodeWithText("Ajouter").performClick()
+        ui.onNodeWithText("Scanner un QR code").performClick()
+        SystemClock.sleep(500)
+        val automation=InstrumentationRegistry.getInstrumentation().uiAutomation
+        val now=SystemClock.uptimeMillis()
+        automation.injectInputEvent(android.view.KeyEvent(now,now,android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.KEYCODE_BACK,0),true)
+        automation.injectInputEvent(android.view.KeyEvent(now,now,android.view.KeyEvent.ACTION_UP,android.view.KeyEvent.KEYCODE_BACK,0),true)
+        ui.onNodeWithText("Autorise la caméra pour scanner un QR, ou utilise le lien d’invitation.").assertIsDisplayed()
+        ui.onNodeWithText("Lien d’invitation Hamigo").assertIsDisplayed()
+        ui.onNodeWithText("Autoriser la caméra dans les réglages").assertIsDisplayed()
+        capture("49-team-camera-denied")
+        ui.runOnIdle {check(model.pendingInvite==null);check(model.friends.isEmpty())}
+    }
+
     @Test fun profileDistinguishesAnEmptyWeekFromEarlierProgress() {
         ui.runOnIdle {
             val progress=JSONObject(model.progress.prefs.getString("progress","{}")!!)

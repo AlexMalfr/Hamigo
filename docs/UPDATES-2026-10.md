@@ -126,3 +126,9 @@ La photo reste à sa place pendant le scroll : le fond et l'ombre du header s'ar
 - Le contenu, les identifiants des cours et la sauvegarde des joueurs sont inchangés. Lecture seule du parcours : il contient déjà la composition de DE, CQ, 73, F4ABC, F6KGL et CQ DE. L'évolution du parcours et sa migration sont reportées à une demande ultérieure.
 
 Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-E.pdf).
+
+## Scanner les invitations et tirer pour actualiser — 0.28
+
+- Équipe → Ajouter propose un lecteur QR avec caméra intégrée, cadre, fermeture et lampe si disponible. Autorisation demandée seulement à l'ouverture ; lien toujours disponible et accès aux réglages après refus. Décodage local avec ZXing Android Embedded 4.3.0, limité aux QR ; aucune image enregistrée ou transmise. Validation du lien puis confirmation habituelle avant ajout et demande réciproque.
+- Tirer la liste Équipe vers le bas relance l'actualisation manuelle complète. Indicateur lié au travail social, regroupement des appels concurrents et remise à zéro dans un bloc `finally` en cas d'annulation.
+- Documentation de la limite des notifications par mail des commentaires Gist : aucune désactivation automatique revendiquée, scope OAuth inchangé faute d'API publique de mise en silence d'un Gist.

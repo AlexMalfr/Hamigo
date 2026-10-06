@@ -74,6 +74,8 @@ class AppModel internal constructor(
     var friendRequests by mutableStateOf<List<FriendRequest>>(emptyList())
     var outgoingRequests by mutableStateOf<List<OutgoingFriendRequestState>>(emptyList())
     var busy by mutableStateOf(false)
+    var socialRefreshing by mutableStateOf(false)
+        private set
     private var taskJob: Job? = null
     private var socialJob: Job? = null
     private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -369,7 +371,9 @@ class AppModel internal constructor(
         if(busy || socialJob?.isActive==true) return
         // Foreground and finished sessions: network remains optional and never blocks learning.
         socialJob=scope.launch {
+            socialRefreshing=true
             if(manual) busy=true
+            try {
             var failures=0
             if((manual || progress.prefs.getBoolean("autoSync",true)) && runCatching { sync.tokens.get() }.getOrNull()!=null) {
                 try { sync.synchronize(progress) } catch(e:CancellationException){throw e} catch(e:Exception){failures++}
@@ -398,7 +402,8 @@ class AppModel internal constructor(
             try { friendInbox.refresh();loadFriendRequests() }
             catch(e:CancellationException){throw e}
             catch(_:Exception){failures++}
-            if(manual) { busy=false; message=if(failures==0) "Progressions actualisées." else "Connexion indisponible. Les dernières progressions restent consultables." }
+            if(manual) { message=if(failures==0) "Progressions actualisées." else "Connexion indisponible. Les dernières progressions restent consultables." }
+            } finally {socialRefreshing=false;if(manual)busy=false}
         }
     }
     fun task(action: suspend () -> Unit) {

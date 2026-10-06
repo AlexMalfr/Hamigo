@@ -104,6 +104,19 @@ class AppModelStateTest {
         ui.onAllNodesWithText("Équipier distant").onFirst().assertExists()
     }
 
+    @Test fun pullingTeamAtTheTopRefreshesAndAShortPullDoesNot() {
+        ui.runOnIdle {model.route="friends";model.message=null}
+        ui.onNodeWithTag("friends-list").performTouchInput {
+            swipe(start=center.copy(y=height*.25f),end=center.copy(y=height*.27f),durationMillis=250)
+        }
+        ui.runOnIdle {assertEquals(null,model.message)}
+        ui.onNodeWithTag("friends-list").performTouchInput {
+            swipe(start=center.copy(y=height*.25f),end=center.copy(y=height*.85f),durationMillis=700)
+        }
+        ui.waitUntil(10_000) {model.message=="Progressions actualisées."}
+        ui.runOnIdle {assertEquals(false,model.socialRefreshing);assertEquals(false,model.busy)}
+    }
+
     private class IsolatedContext(base: Context) : ContextWrapper(base) {
         private val prefix = "app-model-state-test-${UUID.randomUUID()}"
         private val preferenceNames = mutableSetOf<String>()

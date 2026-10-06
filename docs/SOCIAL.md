@@ -91,11 +91,17 @@ Un écouteur des préférences rafraîchit les valeurs affichées lorsqu'un trav
 
 ## Lien HTTPS et QR code
 
+Depuis **Équipe → Ajouter → Scanner un QR code**, Hamigo demande l'accès à la caméra puis ouvre un lecteur intégré basé sur ZXing Android Embedded. Le décodage est local, limité aux QR, sans capture enregistrée ni upload d'image. Une invitation reconnue repasse par `FriendInvite.parse` puis la confirmation d'ajout commune aux liens. Un autre QR reste dans le lecteur avec une explication ; un refus d'autorisation conserve la saisie du lien et propose l'accès aux réglages Android. La caméra est libérée quand le lecteur ferme ou l'activité passe en arrière-plan. La lampe est proposée si l'appareil la possède.
+
+Tirer la liste Équipe vers le bas déclenche la même actualisation manuelle que le bouton existant. L'indicateur suit le travail social actif ; les actualisations concurrentes sont regroupées et l'état est libéré même en cas d'annulation.
+
 `FriendInvite.link` produit `https://alexmalfr.github.io/hamigo/?invite=<identifiant-du-Gist-social>`. Ce lien peut circuler dans Discord et les autres messageries qui reconnaissent HTTPS. Android App Links ouvre Hamigo ; la page statique GitHub Pages propose aussi un bouton vers `hamigo://join?invite=...`. Si l'application est absente, elle invite à demander l'APK à l'ami : les releases restent dans le dépôt privé. Le fichier `/.well-known/assetlinks.json` lie le domaine au package Android et au certificat de signature. Aucun serveur applicatif n'est nécessaire.
 
 L'identifiant dans le lien est bien celui du Gist social : l'URL complète n'y figure pas, mais on peut la reconstruire à partir de cet identifiant. Il n'est ni chiffré ni secret. L'app valide l'invitation et lit le résumé après confirmation. **Ajouter seulement** crée une relation à sens unique. Avec GitHub connecté et un Gist social créé, **Ajouter et envoyer la demande** ajoute l'ami puis envoie une demande pour établir l'autre sens. Chacun garde la maîtrise de sa liste ; les fichiers de l'autre utilisateur ne sont jamais modifiés.
 
 ## Demandes réciproques
+
+**Mails GitHub :** les commentaires de demandes peuvent déclencher les notifications de Gist configurées sur le compte GitHub. Hamigo ne désactive pas ces mails automatiquement. La permission OAuth `gist` donne accès aux Gists ; `notifications` concerne d'autres abonnements, et aucune opération de mise en silence d'un Gist à sa création n'est exposée dans les API publiques REST ou dans l'objet Gist GraphQL. Ajouter cette permission ne suffit donc pas à promettre un mode silencieux. Le désabonnement passe pour l'instant par l'interface du Gist, selon les options disponibles sur le compte. Références : [scopes OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps), [API Gists](https://docs.github.com/en/rest/gists/gists), [schéma GraphQL officiel distribué par Octokit](https://github.com/octokit/graphql-schema/blob/master/schema.graphql).
 
 Les commentaires des Gists sociaux servent de boîte de réception, via [l'API GitHub des commentaires](https://docs.github.com/en/rest/gists/comments). Aucun troisième Gist ni serveur applicatif n'est nécessaire. Une demande contient un UUID et les identifiants des deux Gists sociaux. GitHub fournit l'identité de l'auteur du commentaire ; Hamigo vérifie que son identifiant numérique est celui du propriétaire du Gist social annoncé. Un nom ou une URL fournis dans le corps ne suffisent pas à établir une identité.
 
