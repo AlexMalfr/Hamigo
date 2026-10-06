@@ -22,16 +22,20 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
+
+private data class StickerPlacement(val angle: Float,val x: Int,val y: Int)
 
 /** A small foil seal, with stable placement so recomposition never makes it jump. */
 @Composable internal fun ChapterCompletionSticker(chapterId:String,modifier:Modifier=Modifier) {
-    val variation=remember(chapterId) { chapterId.hashCode().toUInt().toLong() }
-    val angle=((variation%17L)-8L).toFloat()
-    val shift=((variation/17L%5L)-2L).toInt()
-    Canvas(modifier.size(62.dp).offset(y=shift.dp).semantics {contentDescription="Chapitre terminé"}) {
+    val placement=remember(chapterId) {
+        val random=Random(chapterId.hashCode()*-1640531527)
+        StickerPlacement((if(random.nextBoolean())1f else -1f)*(7f+random.nextFloat()*9f),random.nextInt(-4,5),random.nextInt(-5,6))
+    }
+    Canvas(modifier.size(62.dp).offset(x=placement.x.dp,y=placement.y.dp).semantics {contentDescription="Chapitre terminé"}) {
         val radius=size.minDimension*.43f
         val center=Offset(size.width/2f,size.height/2f)
-        rotate(angle,center) {
+        rotate(placement.angle,center) {
             // Rounded serrations preserve the cut-paper silhouette at small sizes.
             val points=List(48) {index ->
                 val theta=index*2.0*PI/48-PI/2

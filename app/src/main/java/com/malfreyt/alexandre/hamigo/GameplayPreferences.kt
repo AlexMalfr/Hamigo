@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.sp
 
 data class MorseInputSettings(val singleKey: Boolean = false, val thresholdMs: Int = 300) {
     fun symbolFor(durationMs: Long): Char = if (durationMs >= thresholdMs.coerceIn(150, 600)) '-' else '.'
+    // The point/trait decision sits midway between one-unit dots and three-unit dashes.
+    val letterPauseMs get()=thresholdMs.coerceIn(150,600)*3L/2
+    val wordPauseMs get()=thresholdMs.coerceIn(150,600)*7L/2
 }
 
 object GameplayPreferences {
@@ -51,9 +54,18 @@ object GameplayPreferences {
 }
 
 /** A cancelled press never transmits; TalkBack can explicitly choose either signal. */
-@Composable internal fun MorseSignalInput(enabled: Boolean = true, onSignal: (Char) -> Unit) {
+@Composable internal fun MorseSignalInput(enabled: Boolean = true,
+    onTimedSignal: ((Char,Long,Long) -> Unit)? = null,
+    onPressChanged: ((Boolean) -> Unit)? = null,
+    onSignal: (Char) -> Unit) {
     val settings = rememberMorseInputSettings()
     val send by rememberUpdatedState(onSignal)
+    val timedSend by rememberUpdatedState(onTimedSignal)
+    val pressChanged by rememberUpdatedState(onPressChanged)
+    fun accessibleSignal(symbol: Char) {
+        val now=android.os.SystemClock.uptimeMillis()
+        timedSend?.invoke(symbol,now,now) ?: send(symbol)
+    }
     if (!settings.singleKey) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf('.' to "Point", '-' to "Trait").forEach { (symbol, label) ->
@@ -72,16 +84,20 @@ object GameplayPreferences {
                     contentDescription = "Manipulateur Morse : appui court pour un point, appui d’au moins ${settings.thresholdMs} millisecondes pour un trait"
                     if (!enabled) disabled()
                     else {
-                        onClick("Saisir un point") { send('.'); true }
-                        onLongClick("Saisir un trait") { send('-'); true }
+                        onClick("Saisir un point") { accessibleSignal('.'); true }
+                        onLongClick("Saisir un trait") { accessibleSignal('-'); true }
                     }
                 }.pointerInput(enabled, settings.thresholdMs) {
                     if (enabled) awaitEachGesture {
-                        val down = awaitFirstDown(); down.consume(); pressed = true
+                        val down = awaitFirstDown(); down.consume(); pressed = true;pressChanged?.invoke(true)
                         try {
                             val up = waitForUpOrCancellation()
-                            if (up != null) { up.consume(); send(settings.symbolFor(up.uptimeMillis - down.uptimeMillis)) }
-                        } finally { pressed = false }
+                            if (up != null) {
+                                up.consume()
+                                val symbol=settings.symbolFor(up.uptimeMillis-down.uptimeMillis)
+                                timedSend?.invoke(symbol,down.uptimeMillis,up.uptimeMillis) ?: send(symbol)
+                            }
+                        } finally { pressed = false;pressChanged?.invoke(false) }
                     }
                 }) {
             Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally,

@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -514,12 +515,25 @@ private data class BackScreenSnapshot(
             val c=content.chapters[index];val color=ChapterColors[index%ChapterColors.size]
             val finished=c.lessons.count {it.id in completed}
             Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                Surface(onClick={expanded=if(expanded==index)-1 else index},shape=RoundedCornerShape(22.dp),color=color) {
+                Surface(onClick={expanded=if(expanded==index)-1 else index},modifier=Modifier.testTag("chapter-${c.id}")
+                    .semantics {stateDescription=if(expanded==index)"Déplié" else "Replié"},shape=RoundedCornerShape(22.dp),color=color) {
                     Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
                         Text("%02d".format(index+1),Modifier.background(Color.White.copy(alpha=.18f),RoundedCornerShape(14.dp)).padding(12.dp),fontSize=21.sp,fontWeight=FontWeight.ExtraBold,color=Color.White)
-                        Spacer(Modifier.width(14.dp));Column(Modifier.weight(1f)) {Text(c.title,color=Color.White,fontSize=18.sp,fontWeight=FontWeight.Bold);Text("${finished}/${c.lessons.size} · ${c.subtitle}",color=Color.White.copy(alpha=.85f),fontSize=12.sp)}
-                        if(c.lessons.isNotEmpty() && finished==c.lessons.size) ChapterCompletionSticker(c.id,Modifier.padding(horizontal=5.dp))
-                        else Spacer(Modifier.width(6.dp))
+                        val complete=c.lessons.isNotEmpty() && finished==c.lessons.size
+                        Spacer(Modifier.width(14.dp))
+                        Box(Modifier.weight(1f).testTag("chapter-content-${c.id}")) {
+                            Column(Modifier.fillMaxWidth().testTag("chapter-copy-${c.id}")) {
+                                Text(c.title,Modifier.fillMaxWidth(),color=Color.White,fontSize=18.sp,fontWeight=FontWeight.Bold)
+                                Spacer(Modifier.height(2.dp))
+                                Text("${finished}/${c.lessons.size} · ${c.subtitle}",
+                                    Modifier.fillMaxWidth().padding(end=if(complete)52.dp else 0.dp),
+                                    color=Color.White.copy(alpha=.85f),fontSize=12.sp,lineHeight=16.sp)
+                            }
+                            if(complete)Box(Modifier.matchParentSize()) {
+                                ChapterCompletionSticker(c.id,Modifier.align(Alignment.CenterEnd)
+                                    .wrapContentSize(Alignment.CenterEnd,unbounded=true).size(68.dp).offset(x=12.dp))
+                            }
+                        }
                         Icon(if(expanded==index)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null,tint=Color.White)
                     }
                 }

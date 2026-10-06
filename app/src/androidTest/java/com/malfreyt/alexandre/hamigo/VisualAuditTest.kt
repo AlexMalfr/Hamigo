@@ -162,7 +162,7 @@ class VisualAuditTest {
         capture("40-moi-bilan-astuce")
     }
 
-    @Test fun completedChapterHasAStickerBesideItsReadableDescription() {
+    @Test fun completedChapterHasARaisedStickerOverItsFullWidthTitle() {
         val chapter=model.content!!.chapters.first()
         ui.runOnIdle {
             val progress=JSONObject(model.progress.prefs.getString("progress","{}")!!)
@@ -175,8 +175,32 @@ class VisualAuditTest {
         val sticker=ui.onNodeWithContentDescription("Chapitre terminé",useUnmergedTree=true)
         sticker.assertIsDisplayed()
         val title=ui.onNodeWithText(chapter.title,useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
-        check(title.right<=sticker.fetchSemanticsNode().boundsInRoot.left)
+        val seal=sticker.fetchSemanticsNode().boundsInRoot
+        check(title.right>seal.left)
+        check(seal.top<title.bottom)
+        val contentBounds=ui.onNodeWithTag("chapter-content-${chapter.id}",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        val copyBounds=ui.onNodeWithTag("chapter-copy-${chapter.id}",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        check(kotlin.math.abs(contentBounds.height-copyBounds.height)<1f)
         capture("42-parcours-sticker")
+    }
+
+    @Test fun severalCompletedChaptersShowTheirStickerVariations() {
+        val chapters=model.content!!.chapters.take(3)
+        ui.runOnIdle {
+            val progress=JSONObject(model.progress.prefs.getString("progress","{}")!!)
+            progress.put("completed",JSONArray(chapters.flatMap {chapter->chapter.lessons.map {it.id}}))
+            model.progress.prefs.edit().putString("progress",progress.toString()).commit()
+            model.progress.reload();model.refresh()
+        }
+        navigate("path")
+        chapters.forEach { chapter ->
+            ui.onNodeWithTag("path-list").performScrollToNode(hasText(chapter.title))
+            val card=ui.onNodeWithTag("chapter-${chapter.id}")
+            if(card.fetchSemanticsNode().config[SemanticsProperties.StateDescription]=="Déplié")card.performClick()
+        }
+        ui.onNodeWithTag("path-list").performScrollToNode(hasText(chapters.first().title))
+        ui.onNodeWithTag("path-list").performSemanticsAction(SemanticsActions.ScrollBy) {it(0f,with(ui.density){100.dp.toPx()})}
+        capture("44-parcours-stickers-varies")
     }
 
     @Test fun gameplaySettingsExposeTheLiveMorseControls() {

@@ -550,7 +550,6 @@ fun SettingsScreen(model: AppModel) {
 @Composable private fun GameplaySettings(model: AppModel, progress: Progress) {
     val settings = remember(model.revision) { GameplayPreferences.read(progress.prefs) }
     var threshold by remember(settings.thresholdMs) { mutableFloatStateOf(settings.thresholdMs.toFloat()) }
-    var example by remember { mutableStateOf("") }
     fun save(value: MorseInputSettings) {
         GameplayPreferences.save(progress.prefs, value)
         model.refresh(); model.refreshSocial()
@@ -572,22 +571,10 @@ fun SettingsScreen(model: AppModel) {
             Slider(threshold, { threshold = it }, valueRange = 150f..600f, steps = 8,
                 onValueChangeFinished = { save(settings.copy(thresholdMs = (kotlin.math.round(threshold / 50f) * 50).toInt())) },
                 modifier = Modifier.testTag("morse-timing"))
-            Text("Plus court : un point. Les boutons Lettre et Mot séparent les caractères.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
+            Text("Plus court : un point. L’essai reconnaît aussi les pauses entre lettres et mots.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
         }
         Surface(color = Mist, shape = RoundedCornerShape(14.dp)) {
-            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Essaie ici", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                    IconButton({ example = "" }, Modifier.size(32.dp), enabled = example.isNotEmpty()) {
-                        Icon(Icons.Rounded.DeleteSweep, "Effacer l’essai Morse", Modifier.size(20.dp))
-                    }
-                }
-                Box(Modifier.fillMaxWidth().heightIn(min = 28.dp)) {
-                    if (example.isEmpty()) Text("Aucun effet sur ta progression.", color = Muted, fontSize = 12.sp)
-                    else MorseVisual(example, compact = true)
-                }
-                MorseSignalInput { example = (example + it).takeLast(32) }
-            }
+            MorseSettingsPreview(settings)
         }
     }
 }

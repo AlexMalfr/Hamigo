@@ -118,3 +118,11 @@ La photo reste à sa place pendant le scroll : le fond et l'ombre du header s'ar
 - Les réglages Morse sont sauvegardés et fusionnés avec les préférences horodatées. Une ancienne sauvegarde qui n'a pas ces clés conserve les valeurs locales ; les types et bornes sont validés avant import.
 - La calculatrice conserve son fond de fenêtre transparent et ses marges de contenu défilent avec les touches : le clavier ne crée plus de bande crème fixe sous le viewport.
 - `AGENTS.md` résume les habitudes de travail, sources, vérifications visuelles, protections des données et procédure de livraison pour les prochaines conversations.
+
+## Aperçu Morse et placement des stickers — 0.27
+
+- L'essai Morse à un bouton dans les paramètres reconnaît les pauses entre lettres et mots, affiche le code graphique et le texte décodé, et matérialise aussi une pause de fin de mot. Une lettre utilise trois unités de point, un mot sept ; l'unité vaut la moitié du seuil point/trait. Les durées sont indiquées dans l'essai. Effacer ou changer de réglage réinitialise cet essai sans affecter la progression. Les questions et le traducteur conservent leurs séparateurs explicites.
+- Le sticker doré est agrandi à 68 dp et centré verticalement sur le bloc titre/description, qu'il peut chevaucher comme un véritable autocollant, ainsi que le chevron. Son inclinaison varie de 7 à 16 degrés dans les deux sens, avec de petits décalages horizontaux et verticaux ; ces variations sont stables par chapitre. Sa couche superposée ne contribue pas à la mesure de la carte. Le titre conserve toute sa largeur ; seule la description réserve un espace au badge. Son interligne passe explicitement à 16 sp pour une taille de texte de 12 sp.
+- Le contenu, les identifiants des cours et la sauvegarde des joueurs sont inchangés. Lecture seule du parcours : il contient déjà la composition de DE, CQ, 73, F4ABC, F6KGL et CQ DE. L'évolution du parcours et sa migration sont reportées à une demande ultérieure.
+
+Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-E.pdf).

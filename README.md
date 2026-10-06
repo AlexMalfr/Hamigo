@@ -29,6 +29,8 @@ Les flashcards ont deux faces et un flip horizontal avec perspective et ombre. E
 
 Les cinq pages principales ont un en-tête fixe avec ombre au scroll. Sur Moi, le contour de l'ombre suit le bas de l'avatar ; le calendrier propose un retour direct au mois courant. Les chapitres entièrement terminés portent un sticker doré dentelé, incliné de manière stable, avec un espace réservé à côté du texte. Les paramètres regroupent profil, synchronisation, gameplay, rappels et sauvegarde/application. Les liens vers nos Gists rejoignent les détails du panneau GitHub. La saisie du Morse propose deux boutons ou un manipulateur unique : appui court pour un point, appui d'au moins 150 à 600 ms pour un trait, seuil réglable et démonstrateur sans XP. Ces préférences s'appliquent aux questions et au traducteur, et suivent la sauvegarde ; Lettre/Mot restent des séparateurs explicites.
 
+Les stickers de chapitre sont superposés sans agrandir les cartes : titre sur toute la largeur, description plus compacte, inclinaison et petits décalages stables par chapitre. Dans les paramètres, l'essai du manipulateur unique détecte aussi les pauses entre lettres et mots et affiche le texte décodé ; cela ne change pas la saisie des exercices.
+
 ## Jouer ensemble
 
 Compare vos XP de la semaine et envoie un « coup d'antenne » via ton application de messagerie. **Partager mon bilan** depuis Moi produit une image personnelle avec un graphique d'activité ; **Partager le classement** depuis Équipe montre les équipiers et leurs XP hebdomadaires. **Partager mes résultats** à la fin d'un examen ou d'un mix produit une image de la séance avec ses scores, sa durée et son graphique. Les leçons et flashcards proposent **Partager mon parcours**.

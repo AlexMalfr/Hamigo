@@ -2,6 +2,7 @@ package com.malfreyt.alexandre.hamigo
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -60,5 +61,25 @@ class MorseInputInstrumentedTest {
         ui.runOnIdle { enabled.value = false }
         ui.onNodeWithTag("morse-single-key").assertIsNotEnabled().performTouchInput { click() }
         ui.runOnIdle { assertEquals("", received) }
+    }
+
+    @Test fun settingsPreviewSeparatesLettersAndWordsAndClearCancelsItsPendingPause() {
+        ui.setContent { HamigoTheme { MorseSettingsPreview(MorseInputSettings(true,300)) } }
+        val key=ui.onNodeWithTag("morse-single-key")
+        key.performTouchInput {
+            down(center);advanceEventTime(120);up()
+            advanceEventTime(450);down(center);advanceEventTime(350);up()
+            advanceEventTime(1050);down(center);advanceEventTime(120);up()
+        }
+        ui.onNodeWithTag("morse-preview-text").assertTextEquals("ET E")
+        org.junit.Assert.assertTrue(ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).fetchSemanticsNodes().isNotEmpty())
+        val bitmap=ui.onNodeWithTag("morse-settings-preview").captureToImage().asAndroidBitmap()
+        val folder=java.io.File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null),"morse-audit").apply {mkdirs()}
+        java.io.File(folder,"preview-letter-word.png").outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) }
+        bitmap.recycle()
+        ui.onNodeWithContentDescription("Effacer l’essai Morse").performClick()
+        ui.onNodeWithTag("morse-preview-text").assertDoesNotExist()
+        ui.mainClock.advanceTimeBy(2200)
+        ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).assertCountEquals(0)
     }
 }
