@@ -87,7 +87,8 @@ internal object HomeWidgets {
             // Exact launcher sizes avoid a stretched 2x2 composition on a wide 4x1 or tall 2x4 tile.
             @Suppress("DEPRECATION")
             val hostSizes = options.getParcelableArrayList<SizeF>(AppWidgetManager.OPTION_APPWIDGET_SIZES).orEmpty()
-            val sizes = (hostSizes.filter { it.width>=120f && it.height>=110f }.take(12) + listOf(
+            val sizes = (hostSizes.filter { it.width>=40f && it.height>=40f }.take(12) + listOf(
+                SizeF(40f,40f), SizeF(60f,60f), SizeF(100f,60f),
                 SizeF(120f,110f), SizeF(120f,180f), SizeF(220f,110f), SizeF(220f,170f),
                 SizeF(320f,110f), SizeF(320f,220f), SizeF(420f,300f)
             )).distinct().take(16)
@@ -102,6 +103,7 @@ internal object HomeWidgets {
         val format = WidgetFormat.forSize(size)
         val r = snapshot.reminder
         val title = when(kind) { HomeWidgetKind.STREAK -> "SÉRIE"; HomeWidgetKind.GOAL -> "OBJECTIF"; HomeWidgetKind.WEEK -> if(size.width>=200f)"CETTE SEMAINE" else "SEMAINE" }
+        val miniature = format==WidgetFormat.MINI
         val metric = when(kind) {
             HomeWidgetKind.STREAK -> "${r.streak} ${if(r.streak<=1)"jour" else "jours"}"
             HomeWidgetKind.GOAL -> "${r.todayXp} XP"
@@ -123,15 +125,17 @@ internal object HomeWidgets {
         val secondary = if(dark)Color.rgb(190,221,217) else Color.rgb(69,103,106)
         val density = context.resources.displayMetrics.density
         fun dp(value: Float)=(value*density).toInt()
-        val padding = when(format) { WidgetFormat.COMPACT -> 10f; WidgetFormat.TALL, WidgetFormat.WIDE -> 12f; else -> if(size.height<200f)12f else 16f }
+        val padding = when(format) { WidgetFormat.MINI -> if(minOf(size.width,size.height)<60f)4f else 6f; WidgetFormat.COMPACT -> 10f; WidgetFormat.TALL, WidgetFormat.WIDE -> 12f; else -> if(size.height<200f)12f else 16f }
         val artworkWidth = if(format==WidgetFormat.WIDE)((size.width-2*padding-8f)*.40f).coerceAtLeast(48f) else size.width-2*padding
         val artworkHeight = when(format) {
+            WidgetFormat.MINI -> 0f
             WidgetFormat.COMPACT -> if(kind==HomeWidgetKind.GOAL)0f else (size.height-91f).coerceAtLeast(10f)
             WidgetFormat.WIDE -> size.height-2*padding
             WidgetFormat.TALL -> (size.height-144f).coerceAtLeast(26f)
             WidgetFormat.EXPANDED -> (size.height-2*padding-112f).coerceAtLeast(24f)
         }
         val layout = when(format) {
+            WidgetFormat.MINI -> R.layout.widget_mini
             WidgetFormat.COMPACT -> R.layout.widget_compact
             WidgetFormat.WIDE -> R.layout.widget_wide
             WidgetFormat.TALL -> R.layout.widget_tall
@@ -144,19 +148,27 @@ internal object HomeWidgets {
                 HomeWidgetKind.WEEK -> R.drawable.widget_week_background
             })
             setViewPadding(R.id.widget_root,dp(padding),dp(padding),dp(padding),dp(padding))
-            setTextViewText(R.id.widget_title,title)
+            setTextViewText(R.id.widget_title,if(miniature)when(kind) {
+                HomeWidgetKind.STREAK -> "SÉRIE"; HomeWidgetKind.GOAL -> "XP / J"; HomeWidgetKind.WEEK -> "XP / SEM."
+            } else title)
             setTextColor(R.id.widget_title,if(dark)Color.rgb(124,213,199) else accent)
-            setTextViewText(R.id.widget_metric,metric)
+            val tinyMetric = when(kind) {
+                HomeWidgetKind.STREAK -> "${shortMetric(r.streak)} j"
+                HomeWidgetKind.GOAL -> shortMetric(r.todayXp)
+                HomeWidgetKind.WEEK -> shortMetric(snapshot.weeklyXp)
+            }
+            setTextViewText(R.id.widget_metric,if(miniature)tinyMetric else metric)
             setTextColor(R.id.widget_metric,ink)
             setTextViewText(R.id.widget_status,if(format==WidgetFormat.COMPACT && kind==HomeWidgetKind.GOAL)"/ ${r.goal} XP" else status)
             setTextColor(R.id.widget_status,secondary)
-            setViewVisibility(R.id.widget_status,if(format==WidgetFormat.COMPACT && kind!=HomeWidgetKind.GOAL || format==WidgetFormat.WIDE && size.height<135f)View.GONE else View.VISIBLE)
+            setViewVisibility(R.id.widget_status,if(miniature || format==WidgetFormat.COMPACT && kind!=HomeWidgetKind.GOAL || format==WidgetFormat.WIDE && size.height<135f)View.GONE else View.VISIBLE)
             setTextViewText(R.id.widget_badge,if(kind==HomeWidgetKind.STREAK)"Aujourd’hui" else "${r.goal} XP/j")
             setViewVisibility(R.id.widget_badge,if(format==WidgetFormat.EXPANDED && size.width>=280f)View.VISIBLE else View.GONE)
             setTextColor(R.id.widget_badge,Color.rgb(7,61,64))
             // The large goal has one ring. Only its tiny version needs a linear gauge.
             setProgressBar(R.id.widget_progress,r.goal,r.todayXp.coerceAtMost(r.goal),false)
-            setViewVisibility(R.id.widget_progress,if(kind==HomeWidgetKind.GOAL && format==WidgetFormat.COMPACT)View.VISIBLE else View.GONE)
+            setViewVisibility(R.id.widget_progress,if(kind==HomeWidgetKind.GOAL && (miniature || format==WidgetFormat.COMPACT))View.VISIBLE else View.GONE)
+            setViewVisibility(R.id.widget_review,if(miniature)View.GONE else View.VISIBLE)
             setContentDescription(R.id.widget_progress,"${r.todayXp} XP sur un objectif de ${r.goal} XP aujourd’hui")
             // On a short card Pico sits by the metric; taller cards give it its own illustrated area.
             val mascotVisible=kind==HomeWidgetKind.STREAK && format==WidgetFormat.EXPANDED && artworkHeight<75f
@@ -176,6 +188,11 @@ internal object HomeWidgets {
             setOnClickPendingIntent(R.id.widget_review,action)
             setContentDescription(R.id.widget_root,"Hamigo, $title. $metric. $status. Objectif quotidien : ${r.goal} XP. Ouvrir le parcours.")
         }
+    }
+    private fun shortMetric(value: Int): String = when {
+        value>=1_000_000 -> "${value/1_000_000}M"
+        value>=10_000 -> "${value/1000}k"
+        else -> value.toString()
     }
     private fun scheduleMidnight(context: Context, installed: Boolean) {
         val pending = PendingIntent.getBroadcast(context,REQUEST_CODE,
@@ -207,11 +224,12 @@ class StreakWidgetProvider : HamigoWidgetProvider() { override val kind = HomeWi
 class GoalWidgetProvider : HamigoWidgetProvider() { override val kind = HomeWidgetKind.GOAL }
 class WeekWidgetProvider : HamigoWidgetProvider() { override val kind = HomeWidgetKind.WEEK }
 
-/** Four real compositions, rather than a fixed picture stretched by the launcher. */
+/** Native compositions selected for the launcher's actual available space. */
 internal enum class WidgetFormat {
-    COMPACT, WIDE, TALL, EXPANDED;
+    MINI, COMPACT, WIDE, TALL, EXPANDED;
     companion object {
         fun forSize(size: SizeF): WidgetFormat = when {
+            size.width<120f || size.height<110f -> MINI
             size.width>=220f && size.height<160f -> WIDE
             size.width<200f && size.height>=170f -> TALL
             size.width>=200f && size.height>=160f -> EXPANDED

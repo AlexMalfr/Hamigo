@@ -161,3 +161,9 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Une séance terminée retrouve le retour prédictif sans confirmation et revient à son onglet d'origine, également via son bouton de retour. La confirmation reste présente pendant une séance en cours.
 - Mémo : flèche de crête réellement au sommet de la sinusoïde ; repères de période/longueur d'onde alignés sur les sommets, niveau efficace calculé. Raccords des condensateurs/bobines, filtres RC et circuits LC corrigés ; bornes du transformateur et instruments de mesure clarifiées. Point d'alimentation des antennes séparé visuellement, porteuse supprimée en BLU en pointillés, transitions CW adoucies.
 - Aucun changement des identifiants de cours/cartes ni remise à zéro de progression, d'amis ou de préférences.
+
+## Widgets miniatures — 0.33
+
+- Les trois widgets autorisent maintenant une réduction à une seule case de la grille du launcher : minima de redimensionnement abaissés à 40 × 40 dp, également avant Android 12.
+- Une composition miniature conserve un libellé court et la valeur principale, avec une jauge pour les XP du jour. Les textes s'adaptent à la place disponible ; les grands nombres sont abrégés dans ce format, et restent détaillés pour l'accessibilité.
+- Les formats existants réapparaissent en agrandissant le widget. La taille d'ajout initiale est conservée et toute la tuile ouvre Parcours.

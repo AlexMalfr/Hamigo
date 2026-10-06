@@ -133,8 +133,8 @@ class HomeWidgetInstrumentedTest {
             providers.forEachIndexed { index,provider ->
                 val id=host.allocateAppWidgetId()
                 val options=Bundle().apply {
-                    putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,120)
-                    putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,110)
+                    putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,40)
+                    putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,40)
                     putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,350)
                     putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,220)
                     putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,arrayListOf(SizeF(120f,110f),SizeF(350f,220f)))
@@ -145,7 +145,7 @@ class HomeWidgetInstrumentedTest {
                 instrumentation.runOnMainSync {
                     val view=host.createView(context,id,info)
                     view.setPadding(0,0,0,0)
-                    listOf(SizeF(120f,110f),SizeF(350f,110f),SizeF(350f,220f),SizeF(130f,220f),SizeF(450f,300f)).forEach { size ->
+                    listOf(SizeF(40f,40f),SizeF(60f,60f),SizeF(100f,60f),SizeF(60f,180f),SizeF(120f,110f),SizeF(350f,110f),SizeF(350f,220f),SizeF(130f,220f),SizeF(450f,300f)).forEach { size ->
                         view.updateAppWidgetSize(Bundle(),listOf(size))
                         val resizedOptions=Bundle(options).apply {
                             putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,arrayListOf(size))
