@@ -146,3 +146,8 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - README réorganisé autour de l'installation, des fonctionnalités et de huit captures de démonstration. Les anciennes notes détaillées sont conservées dans `APP-DETAILS.md`.
 - Avertissement en tête : « Vibe codée avec ❤️ par @AlexMalfr », développement avec Codex, auteur débutant en RF et risque d'erreurs pédagogiques.
 - Lien vers le dépôt GitHub ajouté dans Paramètres → Sources & version. Documentation adaptée au passage du dépôt en public décidé par l'utilisateur.
+
+## Formulaire de contact — 0.31
+
+- Bouton « Contacter / faire un retour » avec icône d'enveloppe tout en bas des paramètres, après les sources. Il ouvre le formulaire public Notion fourni par l'utilisateur dans le navigateur.
+- Aucun champ prérempli, donnée personnelle jointe automatiquement ou formulaire intégré ; le contenu du formulaire reste administré dans Notion.

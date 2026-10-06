@@ -191,3 +191,9 @@ Les correctifs et leurs limites sont détaillés dans [FIXES-2026-10.md](FIXES-2
 - Huit captures existantes de démonstration inspectées et copiées sans retouche dans `docs/screenshots/`. Vérification des liens locaux du README et des notes détaillées ; aucun fichier cible manquant.
 - Rendu via l'API Markdown GitHub vérifié dans `readme-render.html` : encadré Warning natif, huit images et deux tableaux de galerie conservés.
 - Aucun cours, identifiant, scope OAuth, ami ni sauvegarde personnelle modifié. Livraison signée et installation conservant les données documentées dans `output/delivery-0.30.json`.
+
+## Accès au formulaire de contact — 0.31
+
+- Compilation debug réussie (`output/ui-0.31/build-debug.txt`). Changement limité à un bouton ouvrant une URL ; aucun nouveau test automatisé ajouté ou exécuté pour ce lien.
+- Sur émulateur : bouton et icône visibles entièrement à la fin des paramètres, capture `contact.png` inspectée ; appui ouvrant exactement l'URL Notion demandée, confirmé par l'intent dans `contact-link-intent.txt`.
+- Le formulaire public a été consulté dans le navigateur sans connexion Notion ni envoi de réponse. Aucune modification du formulaire externe ; aucune donnée de progression, ami ou identifiant modifiée. Preuve de livraison signée et installation : `output/delivery-0.31.json`.

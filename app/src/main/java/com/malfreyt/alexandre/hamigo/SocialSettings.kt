@@ -568,6 +568,16 @@ fun SettingsScreen(model: AppModel) {
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
         }
+        item {
+            OutlinedButton(
+                { openLink(context, "https://alexandre-malfreyt.notion.site/3f1dbe8ec53680e18e5bd7682e0661c0") },
+                Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Rounded.MailOutline, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Contacter / faire un retour", fontSize = 14.sp)
+            }
+        }
     }
 }
 
