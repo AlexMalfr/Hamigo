@@ -88,6 +88,129 @@ class VisualAuditTest {
         ui.waitForIdle()
     }
 
+    @Test fun onboardingHasFourFullscreenStepsAndKeepsChoicesWhenGoingBack() {
+        beginOnboarding()
+        ui.onNodeWithTag("navigation-label-path").assertDoesNotExist()
+        ui.onNodeWithTag("onboarding-continue").assertIsNotEnabled()
+        capture("50-onboarding-pseudo")
+        ui.onNodeWithTag("onboarding-name").performClick().performTextInput("  F4Alex  ")
+        ui.runOnIdle {ui.activity.window.insetsController?.show(android.view.WindowInsets.Type.ime())}
+        ui.waitUntil(5000) {ui.activity.window.decorView.rootWindowInsets?.isVisible(android.view.WindowInsets.Type.ime())==true}
+        ui.onNodeWithTag("onboarding-continue").assertIsDisplayed()
+        capture("51-onboarding-keyboard")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-bar-0").assertContentDescriptionEquals("Pseudo : terminé")
+        ui.onNodeWithTag("onboarding-goal-60").performClick().assertIsSelected()
+        capture("52-onboarding-goal")
+        ui.onNodeWithContentDescription("Étape précédente").performClick()
+        ui.onNodeWithTag("onboarding-name").assertTextContains("F4Alex",substring=true)
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-goal-60").assertIsSelected()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        capture("53-onboarding-reminder")
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        capture("54-onboarding-github")
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding").assertDoesNotExist()
+        capture("57-onboarding-finished")
+        ui.onNodeWithTag("navigation-icon-path",useUnmergedTree=true).assertExists()
+        ui.onNodeWithText("Salut F4Alex !").assertIsDisplayed()
+        ui.runOnIdle {
+            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==60)
+            check(model.progress.xp==760);check(model.progress.prefs.getBoolean("welcomed",false))
+            check(!model.progress.prefs.getBoolean("reminderEnabled",false));check(!model.progress.prefs.contains("onboardingStep"))
+            check(model.authSession==null && model.oauthSession==null)
+        }
+    }
+
+    /** Run with POST_NOTIFICATIONS revoked and permission flags cleared on the emulator. */
+    @Test fun onboardingEnablesTheChosenReminderOnlyAfterTheNativePermissionIsGranted() {
+        beginOnboarding(2)
+        ui.onNodeWithTag("onboarding-reminder-time").performClick()
+        androidx.test.espresso.Espresso.onView(org.hamcrest.Matchers.instanceOf(android.widget.TimePicker::class.java))
+            .inRoot(androidx.test.espresso.matcher.RootMatchers.isDialog())
+            .perform(object:androidx.test.espresso.ViewAction {
+                override fun getDescription()="Choose 07:45 in the native time picker"
+                override fun getConstraints():org.hamcrest.Matcher<android.view.View> = androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom(android.widget.TimePicker::class.java)
+                override fun perform(controller:androidx.test.espresso.UiController,view:android.view.View) {
+                    (view as android.widget.TimePicker).apply {hour=7;minute=45}
+                }
+            })
+        capture("55-onboarding-time-picker")
+        androidx.test.espresso.Espresso.onView(androidx.test.espresso.matcher.ViewMatchers.withId(android.R.id.button1))
+            .inRoot(androidx.test.espresso.matcher.RootMatchers.isDialog()).perform(androidx.test.espresso.action.ViewActions.click())
+        ui.onNodeWithText("07:45").assertIsDisplayed()
+        ui.runOnIdle {check(!model.progress.prefs.getBoolean("reminderEnabled",false))}
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        clickNativePermissionButton("permission_allow_button")
+        ui.onNodeWithTag("onboarding-bar-2").assertContentDescriptionEquals("Rappel : terminé")
+        ui.runOnIdle {
+            check(model.progress.prefs.getBoolean("reminderEnabled",false))
+            check(model.progress.prefs.getInt("reminderHour",-1)==7)
+            check(model.progress.prefs.getInt("reminderMinute",-1)==45)
+        }
+    }
+
+    /** Run with POST_NOTIFICATIONS revoked and permission flags cleared on the emulator. */
+    @Test fun onboardingPermissionDenialCanBeSkippedWithoutBlockingTheApp() {
+        beginOnboarding(2)
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        clickNativePermissionButton("permission_deny_button")
+        ui.onNodeWithText("Les notifications restent désactivées. Tu peux continuer sans rappel.").assertIsDisplayed()
+        capture("56-onboarding-permission-denied")
+        ui.runOnIdle {check(!model.progress.prefs.getBoolean("reminderEnabled",false))}
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding").assertDoesNotExist()
+        ui.runOnIdle {check(model.progress.prefs.getBoolean("welcomed",false));check(model.progress.xp==760)}
+    }
+
+    @Test fun onboardingCanResumeFromItsSavedDraftAfterTheScreenIsRecreated() {
+        beginOnboarding()
+        ui.onNodeWithTag("onboarding-name").performTextInput("F4Alex")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-goal-100").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.runOnIdle {model.showWelcome=false}
+        ui.onNodeWithTag("onboarding").assertDoesNotExist()
+        ui.runOnIdle {model.showWelcome=true}
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/4 · Rappel")
+        ui.onNodeWithContentDescription("Étape précédente").performClick()
+        ui.onNodeWithTag("onboarding-goal-100").assertIsSelected()
+        ui.onNodeWithContentDescription("Étape précédente").performClick()
+        ui.onNodeWithTag("onboarding-name").assertTextContains("F4Alex")
+    }
+
+    private fun beginOnboarding(step:Int=0) {
+        ui.runOnIdle {
+            model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",step)
+                .remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute")
+                .putString("name",if(step==0)"" else "Alex").putBoolean("reminderEnabled",false).commit()
+            model.route="path";model.showWelcome=true
+        }
+        ui.onNodeWithTag("onboarding").assertIsDisplayed()
+    }
+
+    private fun clickNativePermissionButton(suffix:String) {
+        val automation=InstrumentationRegistry.getInstrumentation().uiAutomation
+        val info=automation.serviceInfo
+        info.flags=info.flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+        automation.serviceInfo=info
+        fun find(node:android.view.accessibility.AccessibilityNodeInfo?):android.view.accessibility.AccessibilityNodeInfo? {
+            if(node==null)return null
+            if(node.viewIdResourceName?.endsWith(":id/$suffix")==true)return node
+            for(i in 0 until node.childCount) find(node.getChild(i))?.let {return it}
+            return null
+        }
+        val deadline=SystemClock.elapsedRealtime()+5000
+        while(SystemClock.elapsedRealtime()<deadline) {
+            val button=find(automation.rootInActiveWindow)
+            if(button!=null) {check(button.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK));return}
+            SystemClock.sleep(50)
+        }
+        error("Native permission button not found: $suffix")
+    }
+
     @Test fun teamAddOffersQrAndCameraCanBeClosedWithoutAddingAnInvitation() {
         val qr=FriendInvite.qr(FriendInvite.link("0123456789abcdef0123456789abcdef"))
         File(folder,"camera-invitation-fixture.png").outputStream().use {qr.compress(Bitmap.CompressFormat.PNG,100,it)}
@@ -284,7 +407,10 @@ class VisualAuditTest {
         navigate("path")
         ui.runOnIdle { model.showWelcome = true }
         capture("07-onboarding-github")
-        ui.onNodeWithText("Commencer sur cet appareil").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-skip").performClick()
         val first = model.content!!.lessons.first()
         ui.runOnIdle { model.startLesson(first) }
         capture("08-cours-introduction")

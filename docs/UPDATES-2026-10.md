@@ -132,3 +132,11 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Équipe → Ajouter propose un lecteur QR avec caméra intégrée, cadre, fermeture et lampe si disponible. Autorisation demandée seulement à l'ouverture ; lien toujours disponible et accès aux réglages après refus. Décodage local avec ZXing Android Embedded 4.3.0, limité aux QR ; aucune image enregistrée ou transmise. Validation du lien puis confirmation habituelle avant ajout et demande réciproque.
 - Tirer la liste Équipe vers le bas relance l'actualisation manuelle complète. Indicateur lié au travail social, regroupement des appels concurrents et remise à zéro dans un bloc `finally` en cas d'annulation.
 - Documentation de la limite des notifications par mail des commentaires Gist : aucune désactivation automatique revendiquée, scope OAuth inchangé faute d'API publique de mise en silence d'un Gist.
+
+## Premier lancement en quatre étapes — 0.29
+
+- Onboarding plein écran : pseudo, objectif quotidien (20/30/60/100 XP), rappel quotidien puis connexion GitHub facultative. Quatre barres segmentées indiquent l'avancement ; Pico est agrandi et animé, avec une expression et une pose différentes par étape. Les transitions vont dans le sens de la navigation.
+- Le rappel propose une heure via le sélecteur Android et demande `POST_NOTIFICATIONS` à l'appui sur Activer. L'activation attend l'autorisation ; refuser ou passer permet de continuer sans rappel. Une heure non confirmée reste dans le brouillon, sans modifier un rappel actif.
+- Retour à l'étape précédente, clavier pris en compte, texte défilable et actions fixes accessibles. La taille de Pico s'adapte aux grandes polices et les petits textes ont un interligne explicite ; les cartes d'objectif sont de hauteur égale par ligne.
+- Étape et brouillon conservés localement lors d'une interruption ; fin sur Parcours sans compte ou ouverture de GitHub depuis Équipe. Les anciens profils marqués `welcomed` ne repassent pas par cet accueil, et aucune progression n'est réinitialisée.
+- Clarification documentée des mails Gist : le manque d'API concerne aussi un appel séparé après création. Vérifications en lecture seule ; scopes OAuth inchangés.

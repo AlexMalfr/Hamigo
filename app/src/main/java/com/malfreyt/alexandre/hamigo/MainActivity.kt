@@ -248,6 +248,7 @@ private data class BackScreenSnapshot(
             }
         };return
     }
+    if(model.showWelcome) {OnboardingScreen(model);return}
     val p=model.progress
     LaunchedEffect(model.route,model.session,model.lesson,model.resource) {
         if(backSource?.isCurrent(model)==false) resetBackMotion()
@@ -415,18 +416,6 @@ private data class BackScreenSnapshot(
     }
     if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text(if(model.session?.exam==true)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},
         confirmButton={TextButton({quit=false;model.leaveSession()}){Text("Quitter la séance")}},dismissButton={TextButton({quit=false}){Text("Continuer")}})
-    if(model.showWelcome) {
-        var name by remember {mutableStateOf("")}
-        AlertDialog(onDismissRequest={},icon={Pico(Modifier.size(110.dp))},title={Text("Bienvenue sur les ondes !")},
-            text={Column(verticalArrangement=Arrangement.spacedBy(14.dp)) {
-                Text("Quelques minutes par jour pour préparer ton certificat radioamateur. Pico t'accompagne, une notion à la fois.")
-                OutlinedTextField(name,{name=it.take(40)},label={Text("Ton pseudo")},singleLine=true)
-                Text("Tout fonctionne hors ligne. Connecte GitHub pour retrouver ton voyage sur plusieurs appareils et jouer avec ton équipe.",fontSize=12.sp,color=Muted)
-            }},confirmButton={Column(Modifier.fillMaxWidth()) {
-                Action("Se connecter avec GitHub") {model.welcome(name);model.startGitHubConnection()}
-                TextButton({model.welcome(name)},Modifier.align(Alignment.CenterHorizontally)) {Text("Commencer sur cet appareil")}
-            }})
-    }
     model.incoming?.let { json ->
         AlertDialog(onDismissRequest={model.incoming=null},title={Text("Restaurer la sauvegarde ?")},
             text={Text("La sauvegarde remplacera ta progression locale actuelle. Ton compte GitHub reste connecté.")},

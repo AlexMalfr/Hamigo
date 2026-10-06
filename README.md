@@ -4,6 +4,8 @@ Ton compagnon pour préparer le **certificat d’opérateur des services d’ama
 
 ## Apprendre et réviser
 
+Au premier lancement, l'accueil plein écran comporte quatre étapes : pseudo, objectif quotidien, rappel avec choix de l'heure et permission de notifications, puis connexion GitHub facultative. Pico est animé en grand et quatre barres suivent l'avancement. Les choix validés et le brouillon sont conservés si l'accueil est interrompu ; les profils déjà configurés gardent leurs préférences.
+
 - Parcours de **21 chapitres, 94 leçons et 826 exercices originaux**, avec un chapitre Morse de 14 leçons couvrant les lettres, les chiffres, la ponctuation, l'écoute et la transmission de groupes.
 - **15 formats d'exercice et de révision** : QCM, vrai/faux, phrases à compléter, sélection multiple, associations, étapes à ordonner, calculs, résistances dessinées, cadran VHF, estimation au curseur, interrupteurs binaires, formes d'onde, écoute Morse, composition Morse et flashcards. Treize de ces formats sont présents dans les cours.
 - **2 961 questions communautaires Exam1 REF**, avec toutes leurs illustrations archivées. Le mélange courant utilise 2 950 questions après 11 exclusions documentées.

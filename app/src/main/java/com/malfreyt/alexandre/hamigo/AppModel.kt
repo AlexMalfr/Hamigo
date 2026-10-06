@@ -144,7 +144,7 @@ class AppModel internal constructor(
                 .onFailure { error = "Chargement impossible : ${it.message}" }
         }
     }
-    fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).apply(); showWelcome=false; revision++ }
+    fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false; revision++ }
     fun startLesson(l: Lesson) { lesson=l; session=null }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
         require(questions.isNotEmpty())
