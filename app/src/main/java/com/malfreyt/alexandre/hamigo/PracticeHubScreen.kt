@@ -55,8 +55,8 @@ import kotlin.random.Random
                         Box(contentAlignment=Alignment.Center){Text("$n",fontSize=13.sp,fontWeight=if(count==n&&!customSelected)FontWeight.Bold else FontWeight.Normal,color=Ink)}
                     }
                 }
-                Surface(onClick={custom=count.toString();customOpen=true},modifier=Modifier.height(40.dp).widthIn(min=40.dp).semantics {this.selected=customSelected},color=if(customSelected)Mist else Cream,shape=androidx.compose.foundation.shape.RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,if(customSelected)Teal else Color(0xFFD4DEDA))) {
-                    Row(Modifier.padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp)) {
+                Surface(onClick={custom=count.toString();customOpen=true},modifier=Modifier.height(40.dp).widthIn(min=40.dp).testTag("custom-question-count").semantics {this.selected=customSelected},color=if(customSelected)Mist else Cream,shape=androidx.compose.foundation.shape.RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,if(customSelected)Teal else Color(0xFFD4DEDA))) {
+                    Row(Modifier.padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp,Alignment.CenterHorizontally)) {
                         Icon(Icons.Rounded.Edit,"Choisir un nombre personnalisé",modifier=Modifier.size(18.dp),tint=if(customSelected)Teal else Purple)
                         if(customSelected)Text("$count",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
                     }

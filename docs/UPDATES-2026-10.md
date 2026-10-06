@@ -151,3 +151,13 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 
 - Bouton « Contacter / faire un retour » avec icône d'enveloppe tout en bas des paramètres, après les sources. Il ouvre le formulaire public Notion fourni par l'utilisateur dans le navigateur.
 - Aucun champ prérempli, donnée personnelle jointe automatiquement ou formulaire intégré ; le contenu du formulaire reste administré dans Notion.
+
+## Correctifs de saisie, navigation et schémas — 0.32
+
+- Calculatrice : les touches travaillent à la position du curseur et remplacent la sélection. Les fonctions et parenthèses créent des groupes équilibrés ; la touche de fermeture traverse une parenthèse déjà présente. Carré et inverse utilisent la sélection ou le dernier opérande complet, y compris une fonction imbriquée.
+- Équipe : les demandes envoyées acceptées disparaissent de la liste. Leur état de confirmation reste sauvegardé, sans nouvelles vérifications réseau répétées ni nouvel envoi.
+- Défis : crayon centré dans le bouton de nombre personnalisé lorsqu'il n'y a pas de valeur. Navbar : les quatre labels secondaires sont rapprochés de leur icône ; Parcours garde son label plus bas.
+- Paramètres rangés en sept catégories : Profil, Rappels & Objectif, Gameplay, Sauvegarde & Synchronisation, Sources, Version et Contact & Projet. Les liens de contact et du dépôt GitHub partagent le même style de bouton.
+- Une séance terminée retrouve le retour prédictif sans confirmation et revient à son onglet d'origine, également via son bouton de retour. La confirmation reste présente pendant une séance en cours.
+- Mémo : flèche de crête réellement au sommet de la sinusoïde ; repères de période/longueur d'onde alignés sur les sommets, niveau efficace calculé. Raccords des condensateurs/bobines, filtres RC et circuits LC corrigés ; bornes du transformateur et instruments de mesure clarifiées. Point d'alimentation des antennes séparé visuellement, porteuse supprimée en BLU en pointillés, transitions CW adoucies.
+- Aucun changement des identifiants de cours/cartes ni remise à zéro de progression, d'amis ou de préférences.

@@ -161,6 +161,7 @@ private data class BackScreenSnapshot(
     val resource: RefCategory?,
 ) {
     val dockRoute get() = when {
+        session != null -> session.returnRoute
         resource != null -> "resources"
         lesson != null -> "path"
         route == "settings" -> "profile"
@@ -170,6 +171,7 @@ private data class BackScreenSnapshot(
         model.lesson === lesson && model.resource === resource
     fun navigate(model: AppModel) {
         when {
+            session != null -> model.leaveSession()
             lesson != null -> model.lesson = null
             resource != null -> model.resource = null
             route == "settings" -> model.route = "profile"
@@ -253,8 +255,8 @@ private data class BackScreenSnapshot(
     LaunchedEffect(model.route,model.session,model.lesson,model.resource) {
         if(backSource?.isCurrent(model)==false) resetBackMotion()
     }
-    BackHandler(enabled=model.session!=null) { quit=true }
-    PredictiveBackHandler(enabled=model.session==null && (model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
+    BackHandler(enabled=model.session?.done==false) { quit=true }
+    PredictiveBackHandler(enabled=model.session?.done!=false && (model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
         resetBackMotion()
         val generation=backGeneration
         val source=BackScreenSnapshot(model.route,model.session,model.lesson,model.resource)
@@ -365,7 +367,7 @@ private data class BackScreenSnapshot(
                             }
                         }
                         model.route=="settings"->ProfileScreen(model,content)
-                        model.session!=null || model.lesson!=null->MainDestination(model,content)
+                        model.session!=null || model.lesson!=null->MainDestination(model,content,backSource?.session?.returnRoute ?: model.route)
                         else->PathScreen(model,content)
                     }
                 }
@@ -441,8 +443,8 @@ private data class BackScreenSnapshot(
     }
 }
 
-@Composable private fun MainDestination(model:AppModel,content:Content) {
-    when(model.route) {
+@Composable private fun MainDestination(model:AppModel,content:Content,route:String=model.route) {
+    when(route) {
         "path"->PathScreen(model,content)
         "practice"->PracticeHubScreen(model,content)
         "resources"->ResourceLibraryScreen(model,content)

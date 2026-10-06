@@ -152,7 +152,7 @@ private fun DrawScope.TechnicalSketch(kind: String) {
         "ohm", "power", "power-resistor" -> {
             line(.12f, .33f, .84f, .33f); line(.12f, .75f, .84f, .75f)
             line(.84f, .33f, .84f, .75f); resistor(.5f, .33f, .21f)
-            line(.12f, .33f, .12f, .47f); line(.12f, .62f, .12f, .75f)
+            line(.12f, .33f, .12f, .48f); line(.12f, .60f, .12f, .75f)
             line(.075f, .48f, .165f, .48f); line(.093f, .60f, .147f, .60f)
             text("+", .19f, .49f); text("−", .19f, .65f)
             arrow(.25f, .19f, .4f, .19f); text("I (A)", .29f, .12f, small = true)
@@ -170,7 +170,7 @@ private fun DrawScope.TechnicalSketch(kind: String) {
             line(.06f, .52f, .94f, .52f)
             val symbol = kind.takeLast(1).uppercase()
             listOf(.31f, .69f).forEachIndexed { index, x ->
-                when (symbol) { "R" -> resistor(x, .52f); "C" -> { drawRect(Color.White, at(x - .026f, .39f), Size(w * .052f, h * .26f)); capacitor(x, .52f) }; else -> { drawRect(Color.White, at(x - .1f, .4f), Size(w * .2f, h * .2f)); coil(x, .52f) } }
+                when (symbol) { "R" -> resistor(x, .52f); "C" -> { drawRect(Color.White, at(x - .012f, .39f), Size(w * .024f, h * .26f)); capacitor(x, .52f) }; else -> { drawRect(Color.White, at(x - .095f, .4f), Size(w * .19f, h * .2f)); coil(x, .52f) } }
                 text("$symbol${if (index == 0) "₁" else "₂"}", x, .30f)
             }
             arrow(.07f, .77f, .30f, .77f); text("Même courant I", .62f, .81f)
@@ -180,7 +180,7 @@ private fun DrawScope.TechnicalSketch(kind: String) {
             line(.2f, .26f, .2f, .72f); line(.8f, .26f, .8f, .72f)
             listOf(.26f, .72f).forEachIndexed { index, y ->
                 line(.2f, y, .8f, y)
-                if (kind == "parallel-r") resistor(.5f, y, .21f) else { drawRect(Color.White, at(.474f, y - .13f), Size(w * .052f, h * .26f)); capacitor(.5f, y) }
+                if (kind == "parallel-r") resistor(.5f, y, .21f) else { drawRect(Color.White, at(.488f, y - .13f), Size(w * .024f, h * .26f)); capacitor(.5f, y) }
                 text("${if (kind == "parallel-r") "R" else "C"}${if (index == 0) "₁" else "₂"}", .62f, y - .075f)
             }
             text("Même tension U", .5f, .95f)
@@ -197,8 +197,8 @@ private fun DrawScope.TechnicalSketch(kind: String) {
         "reactance-l", "reactance-c", "rlc", "resonance" -> {
             line(.05f, .48f, .95f, .48f)
             if (kind == "rlc") { resistor(.23f, .48f, .14f); text("R", .23f, .24f) }
-            if (kind != "reactance-c") { drawRect(Color.White, at(.37f, .36f), Size(w * .22f, h * .23f)); coil(.48f, .48f); text("L", .48f, .23f) }
-            if (kind != "reactance-l") { val x = if (kind == "reactance-c") .48f else .77f; drawRect(Color.White, at(x - .026f, .33f), Size(w * .052f, h * .31f)); capacitor(x, .48f); text("C", x, .23f) }
+            if (kind != "reactance-c") { drawRect(Color.White, at(.385f, .36f), Size(w * .19f, h * .23f)); coil(.48f, .48f); text("L", .48f, .23f) }
+            if (kind != "reactance-l") { val x = if (kind == "reactance-c") .48f else .77f; drawRect(Color.White, at(x - .012f, .33f), Size(w * .024f, h * .31f)); capacitor(x, .48f); text("C", x, .23f) }
             text("Signal sinusoïdal de fréquence f", .49f, .84f, small = true)
         }
         "rc-charge" -> {
@@ -210,16 +210,28 @@ private fun DrawScope.TechnicalSketch(kind: String) {
             text("Tension Uc", .25f, .15f, small = true); text("Temps", .82f, .98f, small = true)
         }
         "period", "sine", "wavelength" -> {
-            line(.05f, .51f, .95f, .51f, Muted)
+            val geometry = SineReferenceGeometry
+            line(.05f, geometry.baseline, .95f, geometry.baseline, Muted)
             val path = Path()
-            for (i in 0..180) { val fraction = i / 180f; val point = at(.08f + .84f * fraction, .51f - .25f * sin(fraction * 4 * PI.toFloat())); if (i == 0) path.moveTo(point.x, point.y) else path.lineTo(point.x, point.y) }
+            for (i in 0..180) { val fraction = i / 180f; val x = geometry.left + geometry.span * fraction; val point = at(x, geometry.ordinate(x)); if (i == 0) path.moveTo(point.x, point.y) else path.lineTo(point.x, point.y) }
             drawPath(path, teal, style = Stroke(3.dp.toPx()))
-            if (kind == "sine") { arrow(.66f, .51f, .66f, .26f, orange); text("Ucrête", .8f, .23f, orange, true); line(.07f, .333f, .94f, .333f, orange); text("Ueff", .79f, .45f, orange, true) }
-            else { line(.185f, .86f, .605f, .86f); line(.185f, .82f, .185f, .90f); line(.605f, .82f, .605f, .90f); text(if (kind == "period") "T (secondes)" else "λ (mètres)", .395f, .99f) }
+            if (kind == "sine") {
+                arrow(geometry.secondPeakX, geometry.baseline, geometry.secondPeakX, geometry.crestY, orange)
+                line(geometry.secondPeakX, geometry.crestY, .72f, geometry.crestY, orange)
+                text("Ucrête", .8f, .23f, orange, true)
+                line(.07f, geometry.effectiveY, .94f, geometry.effectiveY, orange)
+                text("Ueff", .79f, .45f, orange, true)
+            } else {
+                line(geometry.firstPeakX, .86f, geometry.secondPeakX, .86f)
+                listOf(geometry.firstPeakX, geometry.secondPeakX).forEach { x -> line(x, .82f, x, .90f) }
+                text(if (kind == "period") "T (secondes)" else "λ (mètres)", (geometry.firstPeakX + geometry.secondPeakX) / 2, .99f)
+            }
         }
         "transformer" -> {
             listOf(.31f, .68f).forEach { x ->
-                for (i in 0..3) drawArc(teal, if (x < .5f) -90f else 90f, 180f, false, at(x - .055f, .25f + i * .13f), Size(w * .11f, h * .14f), style = Stroke(stroke))
+                for (i in 0..3) drawArc(teal, if (x < .5f) -90f else 90f, 180f, false, at(x - .055f, .23f + i * .14f), Size(w * .11f, h * .14f), style = Stroke(stroke))
+                val terminalX = if (x < .5f) .13f else .87f
+                line(terminalX, .23f, x, .23f); line(terminalX, .79f, x, .79f)
             }
             line(.46f, .23f, .46f, .83f); line(.53f, .23f, .53f, .83f)
             text("Np", .27f, .17f); text("Ns", .73f, .17f)

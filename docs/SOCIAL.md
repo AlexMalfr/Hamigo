@@ -118,10 +118,10 @@ sequenceDiagram
     B->>B: Afficher une pastille et Accepter / Ignorer
     B->>S: Accepter : enregistrer A et la décision
     B->>G: Commentaire signé par B : demande acceptée
-    G-->>A: Lors d'une lecture suivante, afficher Acceptée
+    G-->>A: Lecture suivante : confirmer l'ajout réciproque et masquer la demande
 ```
 
-Les demandes reçues apparaissent dans Équipe, avec la photo et le compte de leur auteur. Une pastille indique leur nombre sur l'onglet. **Accepter** vérifie de nouveau la source, enregistre localement l'ami et la décision ensemble, puis tente de publier une confirmation sur le propre Gist social du destinataire. Un échec de cette confirmation ne retire pas l'ami ; la confirmation pourra être réessayée lors d'une actualisation. **Ignorer** sauvegarde la décision sans publier de refus. Les demandes envoyées se consultent dans une section repliable ; un envoi échoué propose **Réessayer**. Relire ou importer une sauvegarde n'envoie jamais automatiquement de nouvelles demandes.
+Les demandes reçues apparaissent dans Équipe, avec la photo et le compte de leur auteur. Une pastille indique leur nombre sur l'onglet. **Accepter** vérifie de nouveau la source, enregistre localement l'ami et la décision ensemble, puis tente de publier une confirmation sur le propre Gist social du destinataire. Un échec de cette confirmation ne retire pas l'ami ; la confirmation pourra être réessayée lors d'une actualisation. **Ignorer** sauvegarde la décision sans publier de refus. Les demandes envoyées encore en attente se consultent dans une section repliable ; un envoi échoué propose **Réessayer**. Une demande acceptée disparaît de cette liste et n'est plus vérifiée à chaque actualisation. Son état durable est conservé pour confirmer la relation et empêcher un nouvel envoi involontaire. Relire ou importer une sauvegarde n'envoie jamais automatiquement de nouvelles demandes.
 
 Le champ de sauvegarde `socialInbox` conserve les décisions et les états d'envoi, avec des règles de fusion déterministes. Les demandes reçues restent un cache local attaché au compte et au Gist social courant. Les clés de décision incluent destinataire, expéditeur et UUID : copier un UUID public sous un autre compte ne masque pas la demande authentique. Les anciennes demandes d'un expéditeur déjà traitées, ou antérieures à son retrait, ne le réajoutent pas. L'identifiant conservé lors d'une reprise évite de publier deux fois après une réponse réseau perdue.
 

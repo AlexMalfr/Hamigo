@@ -21,6 +21,7 @@ import com.malfreyt.alexandre.hamigo.platform.*
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Before
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExternalResource
@@ -86,6 +87,87 @@ class VisualAuditTest {
             model.revision++
         }
         ui.waitForIdle()
+    }
+
+    @Test fun settingsCategoriesAndProjectLinksAreOrdered() {
+        navigate("settings")
+        val list = ui.onNodeWithTag("settings-list")
+        listOf("Profil", "Rappels & Objectif", "Gameplay", "Sauvegarde & Synchronisation", "Sources", "Version", "Contact & Projet").forEachIndexed { index, title ->
+            list.performScrollToNode(hasText(title))
+            ui.onNodeWithText(title).assertIsDisplayed()
+            capture("settings-$index")
+        }
+        ui.onNodeWithText("Contacter / faire un retour").assertIsDisplayed()
+        list.performScrollToNode(hasText("Code source de Hamigo · GitHub"))
+        ui.onNodeWithText("Code source de Hamigo · GitHub").assertIsDisplayed()
+        list.performScrollToNode(hasTestTag("version-panel"))
+        val version = ui.onNodeWithTag("version-panel")
+        // Alternate the card's padding and description, not just the version text.
+        repeat(6) { index -> version.performTouchInput {
+            click(if (index % 2 == 0) Offset(width - 8f, height / 2f) else Offset(width / 2f, height * .75f))
+        } }
+        ui.onNodeWithContentDescription("Pico, la mascotte radio. Pico sourit").assertDoesNotExist()
+        fun bottomBrightness(): Float {
+            val image = requireNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
+            return try { android.graphics.Color.red(image.getPixel(8, image.height - 8)) / 255f } finally { image.recycle() }
+        }
+        val initialBottom = bottomBrightness()
+        ui.mainClock.autoAdvance = false
+        try {
+            version.performTouchInput { click(Offset(width / 2f, height - 8f)) }
+            for (frame in 0 until 6) {
+                ui.mainClock.advanceTimeByFrame()
+                ui.waitForIdle()
+                if (ui.onAllNodesWithTag("version-pico-overlay").fetchSemanticsNodes().isNotEmpty()) break
+            }
+            ui.mainClock.advanceTimeByFrame()
+            ui.mainClock.advanceTimeBy(80)
+            capture("settings-transient-entering")
+            ui.mainClock.advanceTimeBy(160)
+            ui.onNodeWithContentDescription("Pico, la mascotte radio. Pico sourit").assertIsDisplayed()
+            capture("settings-transient")
+            val dimBottom = bottomBrightness()
+            check(dimBottom < initialBottom - .1f) { "The dimming must cover the bottom system bar too." }
+            ui.mainClock.advanceTimeBy(200)
+            capture("settings-transient-swing")
+            ui.onNodeWithTag("version-pico-overlay").performTouchInput {
+                repeat(12) { click(Offset(width * .8f, height * .75f)) }
+            }
+            ui.mainClock.advanceTimeBy(320)
+            ui.onNodeWithContentDescription("Pico, la mascotte radio. Pico sourit").assertIsDisplayed()
+            check(bottomBrightness() <= dimBottom + .02f) { "Repeated taps must not dismiss or fade the overlay." }
+            capture("settings-transient-held")
+            // Step through the hold and fade, allowing the dialog window to draw each frame.
+            ui.waitUntil(5000) {
+                ui.mainClock.advanceTimeBy(64)
+                ui.waitForIdle()
+                bottomBrightness() > dimBottom + .01f
+            }
+            capture("settings-transient-leaving")
+            val fadingBottom = bottomBrightness()
+            check(fadingBottom > dimBottom && fadingBottom < initialBottom) { "The dimming must fade away smoothly." }
+            ui.mainClock.advanceTimeBy(1000)
+            ui.onNodeWithContentDescription("Pico, la mascotte radio. Pico sourit").assertDoesNotExist()
+        } finally { ui.mainClock.autoAdvance = true }
+    }
+
+    @Test fun acceptedRequestsAreHiddenWhilePendingAndRetryableRequestsStayVisible() {
+        ui.runOnIdle {
+            model.route = "friends"
+            model.outgoingRequests = listOf("accepted", "sent", "failed").mapIndexed { index, status ->
+                OutgoingFriendRequestState(OutgoingFriendRequest(java.util.UUID.randomUUID().toString(), "abcde", "1234${index + 5}", java.time.Instant.now().toString()), status, "Équipier $status", System.currentTimeMillis())
+            }
+        }
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasText("Demandes envoyées · 2"))
+        ui.onNodeWithText("Demandes envoyées · 2").performClick()
+        ui.onNodeWithText("Équipier accepted").assertDoesNotExist()
+        ui.onNodeWithText("Équipier sent").assertExists()
+        ui.onNodeWithText("Équipier failed").assertExists()
+        capture("requests-pending-only")
+        ui.runOnIdle { model.outgoingRequests = model.outgoingRequests.map { it.copy(status = "accepted") } }
+        ui.onNodeWithText("Demandes envoyées", substring = true).assertDoesNotExist()
+        ui.runOnIdle { assertEquals(3, model.outgoingRequests.size) }
+        capture("requests-all-accepted")
     }
 
     @Test fun onboardingHasFourFullscreenStepsAndKeepsChoicesWhenGoingBack() {
@@ -386,7 +468,7 @@ class VisualAuditTest {
                 "resources" -> model.content!!.references.last().title
                 "friends" -> "Classement hebdomadaire"
                 "profile" -> "Mieux retenir"
-                else -> "Sources & version"
+                else -> "Contact & Projet"
             }
             if (exists(lastText)) scrollTo(lastText)
             else ui.onAllNodes(verticalScroll).onFirst().performTouchInput { swipeUp() }

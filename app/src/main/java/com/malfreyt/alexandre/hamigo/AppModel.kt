@@ -18,7 +18,7 @@ import java.time.Instant
 
 data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L,
     val githubIdentity: GitHubIdentity? = null, val githubIdentityCheckedAt: Long = 0L)
-class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false) {
+class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path") {
     var index = 0
     var correct = 0
     var firstCorrect = 0
@@ -148,7 +148,8 @@ class AppModel internal constructor(
     fun startLesson(l: Lesson) { lesson=l; session=null }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
         require(questions.isNotEmpty())
-        lesson=null; resource=null; session=Session(title, questions.toMutableList(), lessonId, exam)
+        lesson=null; resource=null; session=Session(title, questions.toMutableList(), lessonId, exam,
+            returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile") } ?: "path")
     }
     fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false,
                display: String = "", choiceIndex: Int = -1) {
@@ -236,7 +237,7 @@ class AppModel internal constructor(
         }
         revision++
     }
-    fun leaveSession() { session=null; lesson=null; refreshSocial() }
+    fun leaveSession() { session?.let { route=it.returnRoute }; session=null; lesson=null; refreshSocial() }
     private fun loadFriends() {
         friends = CloudProgress.activeFriends(progress.friendRecords()).objects().map { f ->
             Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.getString("gist"), f.getLong("modifiedAt"),

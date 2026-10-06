@@ -2,7 +2,9 @@ package com.malfreyt.alexandre.hamigo
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.core.view.ViewCompat
@@ -116,6 +118,20 @@ class MemoUpgradeInstrumentedTest {
             diagrams.forEachIndexed {index,row ->
                 ui.onNode(scroll).performScrollToNode(hasText(row.term))
                 ui.onNodeWithText(cat.title).assertIsDisplayed()
+                val sketch = SemanticsMatcher("Sketch of ${row.term}") { node ->
+                    node.config.getOrNull(SemanticsProperties.ContentDescription)?.any { it.startsWith("Schéma de ${row.term}.") } == true
+                }
+                if (ui.onAllNodes(sketch).fetchSemanticsNodes().isNotEmpty()) {
+                    ui.onNode(scroll).performScrollToNode(sketch)
+                    val drawing = ui.onNode(sketch).assertIsDisplayed()
+                    val image = drawing.captureToImage().asAndroidBitmap()
+                    val directory = File(context.getExternalFilesDir(null), "memo-diagram-canvases").apply { mkdirs() }
+                    try {
+                        File(directory, "detail-${cat.id}-${index.toString().padStart(2,'0')}.png").outputStream().use {
+                            check(image.compress(Bitmap.CompressFormat.PNG, 100, it))
+                        }
+                    } finally { image.recycle() }
+                }
                 capture("detail-${cat.id}-${index.toString().padStart(2,'0')}")
             }
             ui.runOnIdle {model.resource=null}
@@ -125,6 +141,11 @@ class MemoUpgradeInstrumentedTest {
     @Test fun customQuestionCountIsSelectedAndExamNavigationPreservesDrafts() {
         ui.runOnIdle {model.route="practice"}
         ui.onNodeWithText("Nombre de questions :").assertIsDisplayed()
+        val customButton = ui.onNodeWithTag("custom-question-count").fetchSemanticsNode().boundsInRoot
+        val pencil = ui.onNodeWithContentDescription("Choisir un nombre personnalisé", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        assertEquals(customButton.center.x, pencil.center.x, 1f)
+        assertEquals(customButton.center.y, pencil.center.y, 1f)
+        capture("practice-custom-empty")
         ui.onNodeWithContentDescription("Choisir un nombre personnalisé").performClick()
         ui.onNode(hasSetTextAction()).performTextReplacement("75")
         ui.onNodeWithText("Choisir").performClick()

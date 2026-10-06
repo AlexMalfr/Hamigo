@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.SystemClock
 import android.view.InputDevice
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.WindowInsets
 import android.view.inspector.WindowInspector
@@ -158,7 +159,13 @@ class CalculatorMotionInstrumentedTest {
         val harness = mount(initialOpen = true)
         ui.mainClock.autoAdvance = false
         try {
-            Espresso.pressBack()
+            // Deliver Back to the focused dialog window, rather than Espresso's
+            // activity root picker while the dialog animation clock is paused.
+            val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
+            val downTime = SystemClock.uptimeMillis()
+            listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP).forEach { action ->
+                assertTrue(automation.injectInputEvent(KeyEvent(downTime, SystemClock.uptimeMillis(), action, KeyEvent.KEYCODE_BACK, 0), true))
+            }
             ui.mainClock.advanceTimeBy(96)
             ui.runOnIdle { assertFalse(harness.open); assertFalse(ui.activity.isFinishing) }
             surface().assertExists()
@@ -184,8 +191,17 @@ class CalculatorMotionInstrumentedTest {
         assumeTrue(Build.VERSION.SDK_INT>=30)
         mount(initialOpen=true)
         expression().performClick()
-        ui.waitUntil(5_000) {
-            WindowInspector.getGlobalWindowViews().any { it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true }
+        try {
+            ui.waitUntil(10_000) {
+                WindowInspector.getGlobalWindowViews().any {
+                    val insets = it.rootWindowInsets
+                    insets?.isVisible(WindowInsets.Type.ime()) == true && insets.getInsets(WindowInsets.Type.ime()).bottom > 0
+                }
+            }
+        } catch (failure: Throwable) {
+            captureFullScreen("calculator-keyboard-unavailable")
+            println(WindowInspector.getGlobalWindowViews().joinToString { "${it.javaClass.simpleName}: ${it.rootWindowInsets}" })
+            throw failure
         }
         ui.waitForIdle()
         var keyboardHeight=0
@@ -210,6 +226,22 @@ class CalculatorMotionInstrumentedTest {
     }
 
     private fun surface() = ui.onNodeWithTag("calculator-surface", useUnmergedTree = true)
+
+    @Test fun editingWithCalculatorKeysPreservesTheSelectionAndNestedFunctions() {
+        mount(initialOpen = true)
+        expression().performTextReplacement("2+30×4")
+        expression().performSemanticsAction(SemanticsActions.SetSelection) { it(2, 4, false) }
+        ui.onNodeWithTag("calculator-key-sin").performScrollTo().performClick()
+        expression().assertTextContains("2+sin(30)×4")
+        ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
+        ui.onNodeWithTag("calculator-result").assertTextEquals("4")
+        expression().performSemanticsAction(SemanticsActions.SetSelection) { it(2, 9, false) }
+        ui.onNodeWithTag("calculator-key-√").performScrollTo().performClick()
+        expression().assertTextContains("2+sqrt(sin(30))×4")
+        val selection = expression().fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.TextSelectionRange]
+        assertEquals(15, selection.start)
+        captureFullScreen("calculator-selection-edit")
+    }
     private fun expression() = ui.onNodeWithTag("calculator-expression")
 
     private fun awaitOpeningSurface() {

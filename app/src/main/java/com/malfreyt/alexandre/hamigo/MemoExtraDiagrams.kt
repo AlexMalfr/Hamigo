@@ -227,27 +227,29 @@ private fun DrawScope.ExtraSketch(kind: String) {
         drawPath(path,Teal,style=Stroke(pen))
     }
     fun ground(x: Float,y: Float){line(x,y,x,y+.06f);line(x-.05f,y+.06f,x+.05f,y+.06f);line(x-.033f,y+.10f,x+.033f,y+.10f);line(x-.015f,y+.14f,x+.015f,y+.14f)}
-    fun meter(s: String,x: Float,y: Float){drawCircle(Teal,13.dp.toPx(),p(x,y),style=Stroke(pen));label(s,x,y+.035f)}
+    fun meter(s: String,x: Float,y: Float){drawCircle(Color.White,13.dp.toPx(),p(x,y));drawCircle(Teal,13.dp.toPx(),p(x,y),style=Stroke(pen));label(s,x,y+.035f)}
     fun axis(){arrow(.09f,.80f,.94f,.80f,Muted);arrow(.09f,.80f,.09f,.13f,Muted);label("f",.94f,.95f);label("Niveau",.17f,.12f)}
     when(kind){
         "junction" -> {drawCircle(accent,5.dp.toPx(),p(.50f,.5f));arrow(.1f,.5f,.47f,.5f);arrow(.50f,.53f,.5f,.89f);arrow(.52f,.48f,.9f,.2f);label("I₁",.22f,.43f);label("I₂",.74f,.2f);label("I₃",.58f,.8f)}
-        "battery" -> {line(.12f,.53f,.18f,.53f);line(.18f,.33f,.18f,.73f);line(.21f,.43f,.21f,.63f);line(.21f,.53f,.42f,.53f);resistor(.50f,.53f);line(.58f,.53f,.77f,.53f);resistor(.80f,.65f,true);line(.80f,.76f,.80f,.90f);line(.80f,.90f,.12f,.90f);line(.12f,.90f,.12f,.53f);label("E",.19f,.24f);label("Ri",.50f,.35f);label("R",.90f,.68f);arrow(.63f,.33f,.77f,.33f);label("I",.68f,.24f)}
+        "battery" -> {line(.12f,.53f,.18f,.53f);line(.18f,.33f,.18f,.73f);line(.21f,.43f,.21f,.63f);line(.21f,.53f,.42f,.53f);resistor(.50f,.53f);line(.58f,.53f,.80f,.53f);line(.80f,.53f,.80f,.54f);resistor(.80f,.65f,true);line(.80f,.76f,.80f,.90f);line(.80f,.90f,.12f,.90f);line(.12f,.90f,.12f,.53f);label("E",.19f,.24f);label("Ri",.50f,.35f);label("R",.90f,.68f);arrow(.63f,.33f,.77f,.33f);label("I",.68f,.24f)}
         "meter-voltage", "meter-current" -> {
             line(.13f,.45f,.42f,.45f);resistor(.50f,.45f);line(.58f,.45f,.87f,.45f);label("R",.5f,.25f)
             if(kind=="meter-voltage"){line(.31f,.45f,.31f,.80f);line(.31f,.80f,.46f,.80f);meter("V",.5f,.8f);line(.54f,.80f,.70f,.80f);line(.70f,.80f,.70f,.45f)}
             else {meter("A",.24f,.45f);arrow(.63f,.70f,.83f,.70f);label("I",.7f,.92f)}
         }
         "filter-low", "filter-high" -> {
-            val low=kind=="filter-low";line(.08f,.35f,.21f,.35f);line(.38f,.35f,.51f,.35f);line(.45f,.35f,.45f,.48f)
+            val low=kind=="filter-low"
+            line(.08f,.35f,if(low).22f else .286f,.35f);line(if(low).38f else .314f,.35f,.51f,.35f)
+            line(.45f,.35f,.45f,if(low).515f else .48f)
             if(low){resistor(.30f,.35f);capacitor(.45f,.54f,true)}else{capacitor(.30f,.35f);resistor(.45f,.59f,true)}
-            line(.45f,.64f,.45f,.76f);ground(.45f,.76f);label("Entrée",.12f,.19f);label("Sortie",.47f,.2f)
+            line(.45f,if(low).565f else .70f,.45f,.76f);ground(.45f,.76f);label("Entrée",.12f,.19f);label("Sortie",.47f,.2f)
             line(.65f,.75f,.97f,.75f,Muted);line(.65f,.75f,.65f,.2f,Muted);label("f",.94f,.94f)
             val path=Path();for(i in 0..80){val t=i/80f;val value=if(low)1f/(1f+exp((t-.45f)*10))else 1f-1f/(1f+exp((t-.45f)*10));val a=p(.65f+t*.30f,.73f-value*.47f);if(i==0)path.moveTo(a.x,a.y)else path.lineTo(a.x,a.y)};drawPath(path,accent,style=Stroke(pen))
         }
         "filter-band", "filter-notch" -> {axis();val path=Path();for(i in 0..100){val t=i/100f;val band=exp(-((t-.5f)*(t-.5f))*30);val value=if(kind=="filter-band")band else 1-band;val a=p(.1f+t*.8f,.76f-value*.5f);if(i==0)path.moveTo(a.x,a.y)else path.lineTo(a.x,a.y)};drawPath(path,Teal,style=Stroke(pen));label("f₀",.5f,.95f)}
-        "resonance-series" -> {line(.08f,.5f,.19f,.5f);coil(.31f,.5f);line(.43f,.5f,.61f,.5f);capacitor(.64f,.5f);line(.66f,.5f,.91f,.5f);label("L",.31f,.3f);label("C",.64f,.3f);label("À f₀ : XL = XC",.5f,.88f)}
-        "resonance-parallel" -> {line(.1f,.5f,.3f,.5f);line(.3f,.25f,.3f,.75f);line(.3f,.25f,.42f,.25f);coil(.54f,.25f);line(.66f,.25f,.78f,.25f);line(.78f,.25f,.78f,.75f);line(.78f,.5f,.92f,.5f);line(.3f,.75f,.52f,.75f);capacitor(.55f,.75f);line(.57f,.75f,.78f,.75f);label("L",.54f,.1f);label("C",.54f,.98f)}
-        "pi-network" -> {line(.08f,.25f,.38f,.25f);coil(.5f,.25f);line(.62f,.25f,.92f,.25f);listOf(.23f,.78f).forEach{x->line(x,.25f,x,.5f);capacitor(x,.53f,true);line(x,.56f,x,.76f);ground(x,.76f)};label("C₁",.12f,.58f);label("C₂",.90f,.58f);label("L",.50f,.11f)}
+        "resonance-series" -> {line(.08f,.5f,.19f,.5f);coil(.31f,.5f);line(.43f,.5f,.626f,.5f);capacitor(.64f,.5f);line(.654f,.5f,.91f,.5f);label("L",.31f,.3f);label("C",.64f,.3f);label("À f₀ : XL = XC",.5f,.88f)}
+        "resonance-parallel" -> {line(.1f,.5f,.3f,.5f);line(.3f,.25f,.3f,.75f);line(.3f,.25f,.42f,.25f);coil(.54f,.25f);line(.66f,.25f,.78f,.25f);line(.78f,.25f,.78f,.75f);line(.78f,.5f,.92f,.5f);line(.3f,.75f,.536f,.75f);capacitor(.55f,.75f);line(.564f,.75f,.78f,.75f);label("L",.54f,.1f);label("C",.54f,.98f)}
+        "pi-network" -> {line(.08f,.25f,.38f,.25f);coil(.5f,.25f);line(.62f,.25f,.92f,.25f);listOf(.23f,.78f).forEach{x->line(x,.25f,x,.505f);capacitor(x,.53f,true);line(x,.555f,x,.76f);ground(x,.76f)};label("C₁",.12f,.58f);label("C₂",.90f,.58f);label("L",.50f,.11f)}
         "diode" -> {line(.10f,.55f,.38f,.55f);val path=Path().apply{moveTo(w*.38f,h*.35f);lineTo(w*.38f,h*.75f);lineTo(w*.61f,h*.55f);close()};drawPath(path,Teal,style=Stroke(pen));line(.61f,.35f,.61f,.75f);line(.61f,.55f,.9f,.55f);label("A +",.18f,.33f);label("K −",.83f,.33f);arrow(.35f,.9f,.65f,.9f,accent)}
         "transistor-symbols" -> {
             listOf(.26f, .75f).forEachIndexed { index, x ->
@@ -275,10 +277,48 @@ private fun DrawScope.ExtraSketch(kind: String) {
             else{val roof=Path().apply{moveTo(w*.06f,h*.20f);quadraticBezierTo(w*.5f,h*.02f,w*.94f,h*.20f)};drawPath(roof,accent,style=Stroke(3.dp.toPx()));arrow(.18f,.61f,.5f,.13f);arrow(.5f,.13f,.82f,.61f);label("Région ionisée",.5f,.36f,accent)}
         }
         "dipole" -> {line(.1f,.4f,.48f,.4f);line(.52f,.4f,.9f,.4f);line(.48f,.4f,.48f,.8f);line(.52f,.4f,.52f,.8f);label("λ / 4",.29f,.26f);label("λ / 4",.71f,.26f);label("Alimentation",.5f,.97f);drawCircle(accent,3.dp.toPx(),p(.48f,.4f));drawCircle(accent,3.dp.toPx(),p(.52f,.4f))}
-        "ground-plane" -> {line(.5f,.17f,.5f,.65f);line(.5f,.65f,.21f,.9f);line(.5f,.65f,.79f,.9f);line(.5f,.65f,.50f,.97f);label("λ / 4",.65f,.40f);label("Radians",.23f,.65f);label("Alimentation",.81f,.72f);drawCircle(accent,4.dp.toPx(),p(.5f,.65f))}
-        "yagi" -> {line(.15f,.55f,.88f,.55f,Muted);listOf(.20f,.43f,.65f,.84f).forEachIndexed{i,x->val height=.36f-i*.05f;line(x,.55f-height,x,.55f+height)};label("Réflecteur",.2f,.10f);label("Dipôle",.43f,.17f);label("Directeurs",.75f,.23f);arrow(.57f,.94f,.92f,.94f,accent)}
+        "ground-plane" -> {
+            line(.5f,.17f,.5f,.61f)
+            line(.5f,.69f,.21f,.9f);line(.5f,.69f,.79f,.9f);line(.5f,.69f,.50f,.97f)
+            label("λ / 4",.65f,.40f);label("Radians",.23f,.65f);label("Alimentation",.81f,.72f)
+            listOf(.61f,.69f).forEach { y -> drawCircle(accent,3.dp.toPx(),p(.5f,y)) }
+        }
+        "yagi" -> {
+            line(.15f,.55f,.88f,.55f,Muted)
+            listOf(.20f,.43f,.65f,.84f).forEachIndexed { i,x ->
+                val height=.36f-i*.05f
+                if(i==1) {
+                    line(x,.55f-height,x,.52f);line(x,.58f,x,.55f+height)
+                    listOf(.52f,.58f).forEach { y -> drawCircle(accent,2.5.dp.toPx(),p(x,y)) }
+                } else line(x,.55f-height,x,.55f+height)
+            }
+            label("Réflecteur",.2f,.10f);label("Dipôle",.43f,.17f);label("Directeurs",.75f,.23f);arrow(.57f,.94f,.92f,.94f,accent)
+        }
         "coax" -> {drawRoundRect(Teal,p(.12f,.22f),Size(w*.76f,h*.60f),cornerRadius=androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),style=Stroke(3.dp.toPx()));drawRect(Color(0xFFE8ECE5),p(.15f,.27f),Size(w*.70f,h*.50f));line(.13f,.52f,.88f,.52f,accent);label("Blindage",.33f,.15f);label("Diélectrique",.52f,.40f);label("Âme",.51f,.68f,accent)}
-        "ssb-spectrum" -> {axis();line(.45f,.80f,.45f,.30f,Muted);val t=Path().apply{moveTo(w*.50f,h*.75f);lineTo(w*.79f,h*.32f);lineTo(w*.79f,h*.75f);close()};drawPath(t,Teal.copy(alpha=.2f));drawPath(t,Teal,style=Stroke(pen));label("fc",.45f,.96f);label("BLS",.70f,.23f);label("porteuse supprimée",.38f,.12f)}
-        "cw-wave", "fm-wave" -> {line(.07f,.52f,.95f,.52f,Muted);val path=Path();var phase=0.0;for(i in 0..500){val t=i/500f;val amplitude=if(kind=="cw-wave")if(t<.32f||t>.57f)1f else 0f else 1f;phase+=if(kind=="fm-wave").21+.11*sin(t*PI*3)else .23;val a=p(.08f+t*.85f,.52f-sin(phase).toFloat()*.24f*amplitude);if(i==0)path.moveTo(a.x,a.y)else path.lineTo(a.x,a.y)};drawPath(path,Teal,style=Stroke(pen));label("Temps →",.80f,.94f);label(if(kind=="cw-wave")"ON          OFF          ON"else "Fréquence variable",.50f,.12f)}
+        "ssb-spectrum" -> {
+            axis()
+            drawLine(Muted.copy(alpha=.6f),p(.45f,.80f),p(.45f,.30f),pen,
+                pathEffect=androidx.compose.ui.graphics.PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(),4.dp.toPx())))
+            val t=Path().apply{moveTo(w*.50f,h*.75f);lineTo(w*.79f,h*.32f);lineTo(w*.79f,h*.75f);close()}
+            drawPath(t,Teal.copy(alpha=.2f));drawPath(t,Teal,style=Stroke(pen));label("fc",.45f,.96f);label("BLS",.70f,.23f);label("porteuse supprimée",.38f,.12f)
+        }
+        "cw-wave", "fm-wave" -> {
+            line(.07f,.52f,.95f,.52f,Muted)
+            val path=Path();var phase=0.0
+            for(i in 0..500) {
+                val t=i/500f
+                val envelope = if (kind != "cw-wave") 1f else when {
+                    t < .28f -> 1f
+                    t < .34f -> ((1 + kotlin.math.cos(PI * (t - .28f) / .06f)) / 2).toFloat()
+                    t < .55f -> 0f
+                    t < .61f -> ((1 - kotlin.math.cos(PI * (t - .55f) / .06f)) / 2).toFloat()
+                    else -> 1f
+                }
+                phase+=if(kind=="fm-wave").21+.11*sin(t*PI*3)else .23
+                val a=p(.08f+t*.85f,.52f-sin(phase).toFloat()*.24f*envelope)
+                if(i==0)path.moveTo(a.x,a.y)else path.lineTo(a.x,a.y)
+            }
+            drawPath(path,Teal,style=Stroke(pen));label("Temps →",.80f,.94f);label(if(kind=="cw-wave")"ON          OFF          ON"else "Fréquence variable",.50f,.12f)
+        }
     }
 }

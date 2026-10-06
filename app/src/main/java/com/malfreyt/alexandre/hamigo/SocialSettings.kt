@@ -4,8 +4,16 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
+import android.os.SystemClock
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -28,8 +36,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,6 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.malfreyt.alexandre.hamigo.platform.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
@@ -234,7 +251,7 @@ fun FriendsScreen(model: AppModel) {
                 if (invitation == null) Text("Connecte GitHub ci-dessus pour créer ton lien d’invitation.", fontSize = 12.sp, color = Muted)
             }
         }
-        if(model.friendRequests.isNotEmpty() || model.outgoingRequests.isNotEmpty()) item { FriendRequestsPanel(model) }
+        if(model.friendRequests.isNotEmpty() || model.outgoingRequests.any { it.status != "accepted" }) item { FriendRequestsPanel(model) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -390,6 +407,7 @@ fun FriendsScreen(model: AppModel) {
 
 @Composable
 private fun FriendRequestsPanel(model: AppModel) {
+    val pendingOutgoing = model.outgoingRequests.filter { it.status != "accepted" }
     var allIncoming by remember { mutableStateOf(false) }
     var outgoingOpen by remember { mutableStateOf(false) }
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -420,19 +438,18 @@ private fun FriendRequestsPanel(model: AppModel) {
             } }
             if(!allIncoming && model.friendRequests.size>5) TextButton({allIncoming=true}) { Text("Voir les autres demandes") }
         }
-        if(model.outgoingRequests.isNotEmpty()) Panel {
+        if(pendingOutgoing.isNotEmpty()) Panel {
             TextButton({outgoingOpen=!outgoingOpen},Modifier.fillMaxWidth(),contentPadding=PaddingValues(0.dp)) {
                 Icon(Icons.Rounded.Send,null,modifier=Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Demandes envoyées · ${model.outgoingRequests.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold,fontSize=16.sp)
+                Text("Demandes envoyées · ${pendingOutgoing.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold,fontSize=16.sp)
                 Icon(if(outgoingOpen) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null)
             }
-            if(outgoingOpen) model.outgoingRequests.sortedByDescending { it.updatedAt }.take(10).forEach { outgoing ->
+            if(outgoingOpen) pendingOutgoing.sortedByDescending { it.updatedAt }.take(10).forEach { outgoing ->
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                     Column(Modifier.weight(1f)) {
                         Text(outgoing.recipientName,fontWeight=FontWeight.Bold,fontSize=14.sp)
                         Text(when(outgoing.status) {
-                            "accepted" -> "Acceptée ✓"
                             "sent" -> "En attente de sa réponse"
                             "failed" -> "Envoi à réessayer"
                             else -> "Envoi non confirmé"
@@ -456,6 +473,14 @@ fun SettingsScreen(model: AppModel) {
     var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
     var permissionForTest by remember { mutableStateOf(false) }
     var backupExpanded by remember { mutableStateOf(false) }
+    var versionTaps by remember { mutableIntStateOf(0) }
+    var lastVersionTap by remember { mutableLongStateOf(0L) }
+    var versionMoment by remember { mutableIntStateOf(0) }
+    var picoVisible by remember { mutableStateOf(false) }
+    var picoDismissing by remember { mutableStateOf(false) }
+    val picoScale = remember { Animatable(.1f) }
+    val picoAlpha = remember { Animatable(0f) }
+    val picoRotation = remember { Animatable(-9f) }
     fun configure(on: Boolean) {
         if (!on) {
             reminderEnabled = false
@@ -478,9 +503,10 @@ fun SettingsScreen(model: AppModel) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) model.task { model.incoming = withContext(Dispatchers.IO) { readImport(context.contentResolver, uri) } }
     }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Box(Modifier.fillMaxSize()) {
+    LazyColumn(Modifier.fillMaxSize().testTag("settings-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PageHeader("Paramètres", "Tes préférences et ton compte.") { if(animatedBack!=null)animatedBack() else model.route = "profile" } }
-        item { SettingsCategory("Profil & objectif", Icons.Rounded.Person) }
+        item { SettingsCategory("Profil", Icons.Rounded.Person) }
         item {
             Panel {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
@@ -491,6 +517,11 @@ fun SettingsScreen(model: AppModel) {
                 Action("Enregistrer le pseudo", enabled = name.isNotBlank()) {
                     p.name = name.trim(); model.refresh(); model.refreshSocial(); model.message = "Pseudo enregistré."
                 }
+            }
+        }
+        item { SettingsCategory("Rappels & Objectif", Icons.Rounded.Notifications) }
+        item {
+            Panel {
                 Text("Objectif quotidien", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf(20, 30, 60, 100).forEach { goal ->
@@ -500,11 +531,6 @@ fun SettingsScreen(model: AppModel) {
                 Text("Une leçon de huit réponses justes rapporte environ 30 XP à sa première validation.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
         }
-        item { SettingsCategory("Compte & synchronisation", Icons.Rounded.CloudSync) }
-        item { GitHubConnection(model, showGistLinks = true) }
-        item { SettingsCategory("Gameplay", Icons.Rounded.SportsEsports) }
-        item { GameplaySettings(model, p) }
-        item { SettingsCategory("Rappels", Icons.Rounded.Notifications) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -533,7 +559,10 @@ fun SettingsScreen(model: AppModel) {
                 Text("Android peut décaler le rappel pour préserver la batterie.", fontSize = 11.sp, color = Muted)
             }
         }
-        item { SettingsCategory("Sauvegarde & application", Icons.Rounded.Settings) }
+        item { SettingsCategory("Gameplay", Icons.Rounded.SportsEsports) }
+        item { GameplaySettings(model, p) }
+        item { SettingsCategory("Sauvegarde & Synchronisation", Icons.Rounded.CloudSync) }
+        item { GitHubConnection(model, showGistLinks = true) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -553,21 +582,33 @@ fun SettingsScreen(model: AppModel) {
                 }
             }
         }
+        item { SettingsCategory("Sources", Icons.Rounded.MenuBook) }
         item {
             Panel {
-                Text("Sources & version", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                val lessonCount = model.content?.lessons?.size ?: 0
-                Text("Hamigo ${BuildConfig.VERSION_NAME}\n$lessonCount leçons · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",
-                    fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
                 Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp)) {
                     TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
                     TextButton({ openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
                     TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
-                    TextButton({ openLink(context, "https://github.com/AlexMalfr/Hamigo") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Code source de Hamigo · GitHub",fontSize=12.sp)}}
                 }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
         }
+        item { SettingsCategory("Version", Icons.Rounded.Info) }
+        item {
+            Panel(Modifier.testTag("version-panel")
+                .clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
+                        val now = SystemClock.uptimeMillis()
+                        versionTaps = if (now - lastVersionTap > 1500) 1 else versionTaps + 1
+                        lastVersionTap = now
+                        if (versionTaps >= 7) { versionTaps = 0; picoDismissing = false; picoVisible = true; versionMoment++ }
+                }) {
+                Text("Hamigo ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+                val lessonCount = model.content?.lessons?.size ?: 0
+                Text("$lessonCount leçons · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",
+                    fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+            }
+        }
+        item { SettingsCategory("Contact & Projet", Icons.Rounded.Forum) }
         item {
             OutlinedButton(
                 { openLink(context, "https://alexandre-malfreyt.notion.site/3f1dbe8ec53680e18e5bd7682e0661c0") },
@@ -577,6 +618,51 @@ fun SettingsScreen(model: AppModel) {
                 Spacer(Modifier.width(8.dp))
                 Text("Contacter / faire un retour", fontSize = 14.sp)
             }
+        }
+        item {
+            OutlinedButton({ openLink(context, "https://github.com/AlexMalfr/Hamigo") }, Modifier.fillMaxWidth()) {
+                Icon(Icons.Rounded.Code, null, Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Code source de Hamigo · GitHub", fontSize = 14.sp)
+            }
+        }
+    }
+    }
+    if (picoVisible) Dialog(onDismissRequest = { picoDismissing = true },
+        properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false, dismissOnClickOutside = false)) {
+        val view = LocalView.current
+        DisposableEffect(view) {
+            (view.parent as? DialogWindowProvider)?.window?.let { window ->
+                window.setDimAmount(0f)
+                window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+                @Suppress("DEPRECATION")
+                window.navigationBarColor = android.graphics.Color.TRANSPARENT
+                if (Build.VERSION.SDK_INT >= 28) window.navigationBarDividerColor = android.graphics.Color.TRANSPARENT
+                if (Build.VERSION.SDK_INT >= 29) window.isNavigationBarContrastEnforced = false
+            }
+            onDispose {}
+        }
+        LaunchedEffect(versionMoment, picoDismissing) {
+            if (!picoDismissing) {
+                picoScale.snapTo(.1f); picoAlpha.snapTo(0f); picoRotation.snapTo(-9f)
+                coroutineScope {
+                    launch { picoAlpha.animateTo(1f, tween(160, easing = FastOutSlowInEasing)) }
+                    launch { picoScale.animateTo(1.12f, tween(130)); picoScale.animateTo(1f, tween(110)) }
+                    picoRotation.animateTo(8f, tween(190))
+                    picoRotation.animateTo(-6f, tween(190))
+                    picoRotation.animateTo(3f, tween(160))
+                    picoRotation.animateTo(0f, tween(120))
+                }
+                delay(1000)
+            }
+            picoAlpha.animateTo(0f, tween(190, easing = FastOutSlowInEasing))
+            picoVisible = false
+        }
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .22f * picoAlpha.value))
+            .pointerInput(Unit) { detectTapGestures {} }.testTag("version-pico-overlay"), contentAlignment = Alignment.Center) {
+            Pico(Modifier.size(260.dp).graphicsLayer {
+                scaleX = picoScale.value; scaleY = picoScale.value; alpha = picoAlpha.value; rotationZ = picoRotation.value
+            }, mood = MascotMood.HAPPY, pose = MascotPose.WAVE)
         }
     }
 }

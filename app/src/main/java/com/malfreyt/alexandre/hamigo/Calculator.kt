@@ -33,6 +33,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +45,8 @@ import androidx.compose.ui.window.DialogWindowProvider
 /** A floating calculator that leaves the question and its current answer intact beneath it. */
 @Composable
 fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null) {
-    var expression by rememberSaveable { mutableStateOf("") }
+    var input by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    val expression = input.text
     var result by rememberSaveable { mutableStateOf<Double?>(null) }
     var previousAnswer by rememberSaveable { mutableDoubleStateOf(0.0) }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
@@ -77,21 +80,15 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
             result = null; error = it.message ?: "Vérifie le calcul."; null
         })
     }
-    fun change(value: String) { expression = value.take(512); result = null; error = null }
+    fun change(value: TextFieldValue) {
+        if (value.text.length > 512) return
+        if (value.text != input.text) { result = null; error = null }
+        input = value
+    }
     fun press(label: String) {
-        when (label) {
-            "C" -> change("")
-            "⌫" -> change(expression.dropLast(1))
-            "=" -> calculate()
-            "x²" -> change("(${expression.ifBlank { "Ans" }})^2")
-            "1/x" -> change("1/(${expression.ifBlank { "Ans" }})")
-            "√" -> change(expression + "sqrt(")
-            "10ˣ" -> change(expression + "10^(")
-            "eˣ" -> change(expression + "exp(")
-            "EXP" -> change(expression + "e")
-            "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln" -> change(expression + "$label(")
-            else -> change(expression + label)
-        }
+        if (label == "=") { calculate(); return }
+        val edited = CalculatorEditing.press(CalculatorEdit(input.text, input.selection.start, input.selection.end), label)
+        change(TextFieldValue(edited.text, TextRange(edited.start, edited.end)))
     }
     if (!rendered) return
     Dialog(onDismissRequest = ::requestDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
@@ -135,13 +132,13 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     }
                     IconButton(::requestDismiss, modifier = Modifier.size(40.dp), enabled = isOpen && !dismissalRequested) { Icon(Icons.Rounded.Close, "Fermer la calculatrice") }
                 }
-                OutlinedTextField(expression, { change(it) }, modifier = Modifier.fillMaxWidth().testTag("calculator-expression"), label = { Text("Calcul") },
+                OutlinedTextField(input, { change(it) }, modifier = Modifier.fillMaxWidth().testTag("calculator-expression"), label = { Text("Calcul") },
                     singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { calculate();calculatorFocus.clearFocus();keyboard?.hide() }))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f).testTag("calculator-result"), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
-                    TextButton({ change(expression + "Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
-                    TextButton({ change(expression + "%") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("%") }
+                    TextButton({ keyboard?.hide(); press("Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
+                    TextButton({ keyboard?.hide(); press("%") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("%") }
                 }
                 error?.let { Text(it, color = Coral, fontSize = 12.sp, lineHeight = 16.sp) }
                 val rows = listOf(
@@ -157,7 +154,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         labels.forEach { label ->
                             val accent = label == "="
-                            Surface(onClick = { calculatorFocus.clearFocus();keyboard?.hide();press(label) }, modifier = Modifier.weight(1f).height(42.dp),
+                            Surface(onClick = { keyboard?.hide();press(label) }, modifier = Modifier.weight(1f).height(42.dp).testTag("calculator-key-$label"),
                                 shape = RoundedCornerShape(10.dp), color = if (accent) Teal else if (rowIndex < 3) Mist else Color.White,
                                 tonalElevation = if (accent) 0.dp else 1.dp) {
                                 Box(contentAlignment = Alignment.Center) {

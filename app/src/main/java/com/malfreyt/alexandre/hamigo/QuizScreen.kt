@@ -333,7 +333,7 @@ fun solution(q:Question):String=when(q.kind){
         }
         item {
             Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                Action(if(s.exam)"Revenir aux défis" else "Revenir au parcours"){model.leaveSession();model.route=if(s.exam)"practice" else "path"}
+                Action(when(s.returnRoute) { "practice" -> "Revenir aux défis"; "resources" -> "Revenir aux mémos"; else -> "Revenir au parcours" }){model.leaveSession()}
                 if(!s.exam&&s.lessonId!=null&&!passed)model.content?.lessons?.firstOrNull{it.id==s.lessonId}?.let{lesson->Action("Reprendre le cours"){model.startLesson(lesson)}}
                 if(s.missed.isNotEmpty())OutlinedButton({model.startQuestions("On consolide le signal",s.missed.values.toList())},Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)){Text("Revoir les ${s.missed.size} questions manquées")}
                 OutlinedButton({

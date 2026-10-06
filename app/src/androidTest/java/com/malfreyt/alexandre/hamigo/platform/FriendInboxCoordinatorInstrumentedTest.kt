@@ -158,9 +158,25 @@ class FriendInboxCoordinatorInstrumentedTest {
         finally {sync.tokens.delete();socialPreferences.remove(progress)}
     }
 
+    @Test fun acceptedOutgoingStaysDurableWithoutFurtherChecksOrDuplicateRequests() = runBlocking {
+        fixture { progress, _, gateway, coordinator ->
+            val sent = coordinator.send(peer, "Friend")
+            gateway.accepted = setOf(sent.request.id)
+            coordinator.refresh()
+            assertEquals("accepted", coordinator.outgoing().single().status)
+            assertEquals(1, gateway.acceptanceChecks)
+            coordinator.refresh()
+            assertEquals(1, gateway.acceptanceChecks)
+            assertEquals("accepted", coordinator.send(peer, "Friend").status)
+            assertEquals(1, gateway.sends)
+            assertEquals("accepted", FriendInboxState.outgoing(progress.socialInboxState(), own, fixed).single().status)
+        }
+    }
+
     private inner class FakeGateway : FriendInboxGateway {
         var incoming=emptyList<FriendRequest>()
         var sends=0;var acks=0;var failAck=false
+        var accepted = emptySet<String>(); var acceptanceChecks = 0
         val sentIds=mutableListOf<String>()
         override suspend fun readIncoming(ownSocialGist:String,token:String,handledIds:Set<String>) =
             incoming.filter { it.id !in handledIds && "${it.senderGistId}:${it.id}" !in handledIds }
@@ -171,6 +187,9 @@ class FriendInboxCoordinatorInstrumentedTest {
         override suspend fun acknowledgeAccepted(request:FriendRequest,ownSocialGist:String,token:String) {
             acks++;if(failAck) throw SocialException("Offline")
         }
-        override suspend fun acceptedOutgoing(ownSocialGist:String,outgoing:List<OutgoingFriendRequest>,token:String)=emptySet<String>()
+        override suspend fun acceptedOutgoing(ownSocialGist:String,outgoing:List<OutgoingFriendRequest>,token:String):Set<String> {
+            acceptanceChecks++
+            return accepted
+        }
     }
 }

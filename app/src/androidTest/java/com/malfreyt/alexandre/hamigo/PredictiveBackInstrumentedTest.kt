@@ -446,6 +446,32 @@ class PredictiveBackInstrumentedTest {
         ui.onNodeWithText("À revoir").assertDoesNotExist()
     }
 
+    @Test fun completedSessionsReturnToTheirStartingTabAndCanCancelPredictiveBack() {
+        listOf("path" to "Parcours", "practice" to "Défis").forEach { (route, label) ->
+            ui.runOnIdle {
+                model.route = route
+                model.startQuestions("Retour après séance", listOf(Question("finished-$route", "Témoin", listOf("Oui", "Non"), 0, "")))
+                model.answer(true); model.next()
+                assertTrue(model.session!!.done)
+            }
+            val finished = model.session!!
+            startAndProgress(.5f)
+            ui.onNodeWithTag("back-destination-$route").assertIsDisplayed()
+            ui.onNodeWithText("Une pause radio ?").assertDoesNotExist()
+            capture("completed-$route-preview")
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.dispatchOnBackCancelled() }
+            ui.waitForIdle()
+            ui.runOnIdle { assertSame(finished, model.session); assertEquals(route, model.route) }
+            startAndProgress(.8f)
+            ui.runOnIdle { ui.activity.onBackPressedDispatcher.onBackPressed() }
+            ui.waitForIdle()
+            ui.runOnIdle { assertNull(model.session); assertEquals(route, model.route) }
+            ui.onNodeWithText("Une pause radio ?").assertDoesNotExist()
+            navigationTab(label).assertIsSelected()
+            capture("completed-$route-return")
+        }
+    }
+
     private fun startAndProgress(progress: Float, edge: Int = BackEventCompat.EDGE_LEFT) {
         val start = if (edge == BackEventCompat.EDGE_LEFT) 0f else ui.activity.resources.displayMetrics.widthPixels.toFloat()
         val direction = if (edge == BackEventCompat.EDGE_LEFT) 1f else -1f

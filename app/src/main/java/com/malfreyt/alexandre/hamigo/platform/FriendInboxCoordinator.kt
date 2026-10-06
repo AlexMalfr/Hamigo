@@ -65,7 +65,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
         }.map { it.substringAfter(':') }.toSet()
         val incoming=gateway.readIncoming(bound.own,bound.token,exclude)
         assertCurrent(bound)
-        val activeOutgoing=FriendInboxState.outgoing(progress.socialInboxState(),bound.own,now()).take(100)
+        val activeOutgoing=FriendInboxState.outgoing(progress.socialInboxState(),bound.own,now()).filter { it.status != "accepted" }.take(100)
         val accepted=if(activeOutgoing.isEmpty()) emptySet() else gateway.acceptedOutgoing(bound.own,activeOutgoing.map { it.request },bound.token)
         assertCurrent(bound)
         var changed=false
