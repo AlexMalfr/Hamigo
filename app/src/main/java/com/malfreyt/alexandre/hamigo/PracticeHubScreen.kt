@@ -1,7 +1,9 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -9,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.selected
@@ -20,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
 /** Distinct modes; subthemes belong to the mix they configure. */
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class,ExperimentalFoundationApi::class)
 @Composable fun PracticeHubScreen(model:AppModel,content:Content) {
     val index=content.mixIndex
     val groups=index.groups
@@ -32,8 +35,9 @@ import kotlin.random.Random
     var custom by remember {mutableStateOf("100")}
     var customSelected by remember {mutableStateOf(false)}
     val available=remember(index,selected) {index.available(selected)}
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        item {BigTitle("À toi de jouer","Trois façons de renforcer ton signal.")}
+    val listState=rememberLazyListState()
+    LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Trois façons de renforcer ton signal.")}}
         item {Panel(color=Color(0xFFFFE8E0)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.School,null,tint=Coral);Spacer(Modifier.width(8.dp));Eyebrow("EXAMEN BLANC",Color(0xFFAC493B))}
             Text("20 questions réglementation en 15 min, puis 20 technique en 30 min. Il faut 10/20 dans chaque partie.",fontSize=13.sp,lineHeight=19.sp)

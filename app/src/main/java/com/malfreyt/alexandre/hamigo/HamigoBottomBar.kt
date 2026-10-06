@@ -202,6 +202,7 @@ fun HamigoBottomBar(
                         Text(
                             destination.label,
                             modifier = Modifier.height(14.dp + labelGrowth).offset(y=if(central)4.dp else 0.dp)
+                                .padding(horizontal=4.dp)
                                 .testTag("navigation-label-${destination.route}"),
                             color = if (selected) Teal else Muted,
                             fontSize = 11.sp,

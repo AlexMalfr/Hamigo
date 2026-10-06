@@ -139,7 +139,7 @@ class VisualAuditTest {
         capture("41-moi-entete-fixe")
         ui.onNodeWithContentDescription("Réglages").performClick()
         ui.runOnIdle { check(model.route=="settings") }
-        ui.onNodeWithText("À ta fréquence").assertIsDisplayed()
+        ui.onNodeWithText("Paramètres").assertIsDisplayed()
     }
 
     @Test fun monthlyCalendarKeepsItsHistoryAndDailyGoalVisible() {
@@ -147,11 +147,13 @@ class VisualAuditTest {
         scrollTo("Calendrier d’activité")
         ui.onNode(hasContentDescription("aujourd’hui",substring=true)).assertIsDisplayed()
         ui.onNodeWithContentDescription("Voir le mois suivant").assertIsNotEnabled()
+        ui.onNodeWithContentDescription("Revenir au mois en cours").assertIsNotEnabled()
         capture("37-moi-calendrier-mensuel")
         ui.onNodeWithContentDescription("Voir le mois précédent").performClick()
         ui.onNodeWithContentDescription("Voir le mois suivant").assertIsEnabled()
+        ui.onNodeWithContentDescription("Revenir au mois en cours").assertIsEnabled()
         capture("38-moi-calendrier-historique")
-        ui.onNodeWithContentDescription("Voir le mois suivant").performClick()
+        ui.onNodeWithContentDescription("Revenir au mois en cours").performClick()
         ui.onNode(hasContentDescription("aujourd’hui",substring=true)).assertIsDisplayed()
         scrollTo("Cette semaine")
         ui.onNodeWithContentDescription("Objectif journalier : 30 XP").assertIsDisplayed()
@@ -160,10 +162,41 @@ class VisualAuditTest {
         capture("40-moi-bilan-astuce")
     }
 
+    @Test fun completedChapterHasAStickerBesideItsReadableDescription() {
+        val chapter=model.content!!.chapters.first()
+        ui.runOnIdle {
+            val progress=JSONObject(model.progress.prefs.getString("progress","{}")!!)
+            progress.put("completed",JSONArray(chapter.lessons.map {it.id}))
+            model.progress.prefs.edit().putString("progress",progress.toString()).commit()
+            model.progress.reload();model.refresh()
+        }
+        navigate("path")
+        ui.onNodeWithTag("path-list").performScrollToNode(hasContentDescription("Chapitre terminé"))
+        val sticker=ui.onNodeWithContentDescription("Chapitre terminé",useUnmergedTree=true)
+        sticker.assertIsDisplayed()
+        val title=ui.onNodeWithText(chapter.title,useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        check(title.right<=sticker.fetchSemanticsNode().boundsInRoot.left)
+        capture("42-parcours-sticker")
+    }
+
+    @Test fun gameplaySettingsExposeTheLiveMorseControls() {
+        navigate("settings")
+        scrollTo("Saisie du Morse")
+        ui.onNodeWithText("Un bouton").performClick()
+        scrollTo("Essaie ici")
+        ui.onNodeWithTag("morse-single-key").assertIsDisplayed()
+        ui.onNodeWithTag("morse-single-key").performClick()
+        capture("43-parametres-gameplay")
+        ui.onNodeWithText("Deux boutons").performScrollTo().performClick()
+        ui.onNodeWithTag("morse-single-key").assertDoesNotExist()
+        ui.onNodeWithText("Point").assertIsDisplayed()
+    }
+
     @Test fun allMainPagesAndSocialDialogs() {
         for ((route, label) in listOf("path" to "01-parcours", "practice" to "02-defis", "resources" to "03-memo", "friends" to "04-equipe", "profile" to "05-moi", "settings" to "06-reglages")) {
             navigate(route)
             capture("$label-top")
+            if(route=="practice")ui.onNodeWithText("Choisir les thèmes",substring=true).performScrollTo().performClick()
             val lastText = when (route) {
                 "path" -> "Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous."
                 "practice" -> "Ouvrir le labo · 12 questions"
@@ -174,12 +207,18 @@ class VisualAuditTest {
             }
             if (exists(lastText)) scrollTo(lastText)
             else ui.onAllNodes(verticalScroll).onFirst().performTouchInput { swipeUp() }
-            if(route in listOf("path","profile","friends")) {
+            if(route in listOf("path","profile","friends","practice")) {
                 val listTag=if(route=="friends")"friends-list" else "$route-list"
                 ui.onNodeWithTag(listTag).performSemanticsAction(SemanticsActions.ScrollBy) { it(0f,10_000f) }
                 ui.waitForIdle()
             }
             capture("$label-lower")
+            if(route=="practice")ui.onNodeWithText("À toi de jouer").assertIsDisplayed()
+            if(route=="friends") {
+                ui.onNodeWithText("Sur la même fréquence").assertIsDisplayed()
+                check(ui.onNodeWithText("Sur la même fréquence",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot.bottom<=
+                    ui.onNodeWithText("En équipe, on garde le signal.",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot.top)
+            }
         }
 
         navigate("path")
@@ -280,7 +319,8 @@ class VisualAuditTest {
     }
 
     @Test fun savedGistLinksStayDiscreetAndFriendMenuShowsOnlySocial() {
-        // Existing local IDs expose browser links without a token, discovery request or publication.
+        // A synthetic connected account exposes saved IDs without discovery or publication.
+        model.sync.tokens.store("visual-audit-only-not-a-real-token")
         val social = context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
         check(social.edit()
             .putString("ownBackupId", "0123456789abcdef0123456789abcdef")
@@ -299,7 +339,8 @@ class VisualAuditTest {
         scrollTo("Sauvegarde manuelle")
         ui.onNodeWithText("Gist de sauvegarde").assertDoesNotExist()
         ui.onNodeWithText("Gist social").assertDoesNotExist()
-        ui.onNodeWithContentDescription("Afficher les options de sauvegarde").performClick()
+        scrollTo("Données sauvegardées et fréquence")
+        ui.onNodeWithText("Données sauvegardées et fréquence").performClick()
         scrollTo("Gist social")
         ui.onNodeWithText("Gist de sauvegarde").assertIsDisplayed()
         ui.onNodeWithText("Gist social").assertIsDisplayed()

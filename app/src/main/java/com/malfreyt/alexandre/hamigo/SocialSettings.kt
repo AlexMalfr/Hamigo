@@ -9,10 +9,12 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -57,13 +59,16 @@ private fun syncDate(value: String?): String = value?.let {
 }
 
 @Composable
-fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnly: Boolean = false) {
+fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnly: Boolean = false, showGistLinks: Boolean = false) {
+    val context = LocalContext.current
     val connected = remember(model.revision) { runCatching { model.sync.tokens.get() != null }.getOrDefault(false) }
     val login = remember(model.revision) { model.sync.accountLogin }
     val identity = remember(model.revision) { model.sync.accountIdentity }
     val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
     val lastError = remember(model.revision) { model.sync.lastSyncError }
     val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
+    val backupGist = remember(model.revision) { model.sync.savedBackupUrl }
+    val socialGist = remember(model.revision) { model.sync.savedGistUrl }
     var details by remember { mutableStateOf(false) }
     SyncPanel(modifier, controlsOnly) {
         if (!controlsOnly || !connected) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -122,6 +127,19 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
                 fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
             Text("Lecture et écriture au retour dans l’app, en fin de séance et après tes réponses regroupées pendant 8 secondes. En arrière-plan, Android essaie environ une fois par heure lorsque le réseau est disponible. Le bouton ci-dessus permet une mise à jour immédiate.",
                 fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
+            if (connected && showGistLinks && (backupGist != null || socialGist != null)) {
+                Text("Mes Gists sur GitHub", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
+                Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                    if (backupGist != null) TextButton({ openLink(context, backupGist) }, contentPadding = PaddingValues(0.dp)) {
+                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp)); Text("Gist de sauvegarde", fontSize = 12.sp)
+                    }
+                    if (socialGist != null) TextButton({ openLink(context, socialGist) }, contentPadding = PaddingValues(0.dp)) {
+                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
+                        Spacer(Modifier.width(6.dp)); Text("Gist social", fontSize = 12.sp)
+                    }
+                }
+            }
             if (connected) TextButton({ model.disconnectGitHub() }, enabled = !model.busy, contentPadding = PaddingValues(0.dp)) {
                 Text("Déconnecter GitHub")
             }
@@ -129,6 +147,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FriendsScreen(model: AppModel) {
     val context = LocalContext.current
@@ -142,9 +161,14 @@ fun FriendsScreen(model: AppModel) {
     var addOpen by remember { mutableStateOf(false) }
     var receivedLink by remember { mutableStateOf("") }
     var inviteError by remember { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
-    LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { BigTitle("Sur la même fréquence", "En équipe, on garde le signal.") }
+    LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), state = listState, contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        stickyHeader(key = "friends-header") {
+            Column(Modifier.fillMaxWidth().testTag("friends-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp)) {
+                BigTitle("Sur la même fréquence", "En équipe, on garde le signal.")
+            }
+        }
         item {
             if (!connected) GitHubConnection(model)
             else SyncPanel {
@@ -401,8 +425,6 @@ fun SettingsScreen(model: AppModel) {
     var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
     var permissionForTest by remember { mutableStateOf(false) }
     var backupExpanded by remember { mutableStateOf(false) }
-    val backupGist = remember(model.revision) { model.sync.savedBackupUrl }
-    val socialGist = remember(model.revision) { model.sync.savedGistUrl }
     fun configure(on: Boolean) {
         if (!on) {
             reminderEnabled = false
@@ -426,12 +448,13 @@ fun SettingsScreen(model: AppModel) {
         if (uri != null) model.task { model.incoming = withContext(Dispatchers.IO) { readImport(context.contentResolver, uri) } }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { PageHeader("À ta fréquence", "Tes préférences et ton compte.") { if(animatedBack!=null)animatedBack() else model.route = "profile" } }
+        item { PageHeader("Paramètres", "Tes préférences et ton compte.") { if(animatedBack!=null)animatedBack() else model.route = "profile" } }
+        item { SettingsCategory("Profil & objectif", Icons.Rounded.Person) }
         item {
             Panel {
                 Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                     GitHubAvatar(model.sync.accountIdentity,p.name,Modifier.size(44.dp))
-                    Text("Ton identité radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("Ton profil", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                 }
                 OutlinedTextField(name, { name = it.take(40) }, label = { Text("Pseudo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Action("Enregistrer le pseudo", enabled = name.isNotBlank()) {
@@ -446,12 +469,16 @@ fun SettingsScreen(model: AppModel) {
                 Text("Une leçon de huit réponses justes rapporte environ 30 XP à sa première validation.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
         }
-        item { GitHubConnection(model) }
+        item { SettingsCategory("Compte & synchronisation", Icons.Rounded.CloudSync) }
+        item { GitHubConnection(model, showGistLinks = true) }
+        item { SettingsCategory("Gameplay", Icons.Rounded.SportsEsports) }
+        item { GameplaySettings(model, p) }
+        item { SettingsCategory("Rappels", Icons.Rounded.Notifications) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Le rendez-vous radio", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Text("Rappel quotidien", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                         Text("Un message de Pico chaque jour, à l’heure locale.", fontSize = 12.sp, color = Muted)
                     }
                     Switch(reminderEnabled, { on ->
@@ -475,12 +502,13 @@ fun SettingsScreen(model: AppModel) {
                 Text("Android peut décaler le rappel pour préserver la batterie.", fontSize = 11.sp, color = Muted)
             }
         }
+        item { SettingsCategory("Sauvegarde & application", Icons.Rounded.Settings) }
         item {
             Panel {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text("Sauvegarde manuelle", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                        Text("Une copie de secours et tes Gists GitHub.", fontSize = 12.sp, color = Muted)
+                        Text("Importer ou exporter une copie locale.", fontSize = 12.sp, color = Muted)
                     }
                     IconButton({ backupExpanded = !backupExpanded }) {
                         Icon(if (backupExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
@@ -491,20 +519,6 @@ fun SettingsScreen(model: AppModel) {
                     Text("La copie contient tout ton apprentissage. Tes identifiants GitHub n’y figurent jamais.", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
                     OutlinedButton({ NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
                     TextButton({ picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
-                    if (backupGist != null || socialGist != null) {
-                        Text("Consulter sur GitHub", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
-                        Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                            if (backupGist != null) TextButton({ openLink(context, backupGist) }, contentPadding = PaddingValues(horizontal = 0.dp)) {
-                                Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
-                                Spacer(Modifier.width(6.dp)); Text("Gist de sauvegarde", fontSize = 12.sp)
-                            }
-                            if (socialGist != null) TextButton({ openLink(context, socialGist) }, contentPadding = PaddingValues(horizontal = 0.dp)) {
-                                Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
-                                Spacer(Modifier.width(6.dp)); Text("Gist social", fontSize = 12.sp)
-                            }
-                        }
-                        Text("Non répertoriés, mais lisibles avec leur lien. Évite de partager ta sauvegarde complète.", fontSize = 11.sp, lineHeight = 16.sp, color = Muted)
-                    }
                 }
             }
         }
@@ -520,6 +534,59 @@ fun SettingsScreen(model: AppModel) {
                     TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
                 }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
+            }
+        }
+    }
+}
+
+@Composable private fun SettingsCategory(title: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Row(Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(icon, null, Modifier.size(18.dp), tint = Teal)
+        Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Teal)
+    }
+}
+
+@Composable private fun GameplaySettings(model: AppModel, progress: Progress) {
+    val settings = remember(model.revision) { GameplayPreferences.read(progress.prefs) }
+    var threshold by remember(settings.thresholdMs) { mutableFloatStateOf(settings.thresholdMs.toFloat()) }
+    var example by remember { mutableStateOf("") }
+    fun save(value: MorseInputSettings) {
+        GameplayPreferences.save(progress.prefs, value)
+        model.refresh(); model.refreshSocial()
+    }
+    Panel {
+        Text("Saisie du Morse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text("Dans les questions et le traducteur.", fontSize = 12.sp, color = Muted)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(!settings.singleKey, { save(settings.copy(singleKey = false)) },
+                label = { Text("Deux boutons") }, modifier = Modifier.weight(1f))
+            FilterChip(settings.singleKey, { save(settings.copy(singleKey = true)) },
+                label = { Text("Un bouton") }, modifier = Modifier.weight(1f))
+        }
+        if (settings.singleKey) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text("Durée minimale d’un trait", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("${threshold.toInt()} ms", fontWeight = FontWeight.Bold, color = Teal, fontSize = 13.sp)
+            }
+            Slider(threshold, { threshold = it }, valueRange = 150f..600f, steps = 8,
+                onValueChangeFinished = { save(settings.copy(thresholdMs = (kotlin.math.round(threshold / 50f) * 50).toInt())) },
+                modifier = Modifier.testTag("morse-timing"))
+            Text("Plus court : un point. Les boutons Lettre et Mot séparent les caractères.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
+        }
+        Surface(color = Mist, shape = RoundedCornerShape(14.dp)) {
+            Column(Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Essaie ici", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
+                    IconButton({ example = "" }, Modifier.size(32.dp), enabled = example.isNotEmpty()) {
+                        Icon(Icons.Rounded.DeleteSweep, "Effacer l’essai Morse", Modifier.size(20.dp))
+                    }
+                }
+                Box(Modifier.fillMaxWidth().heightIn(min = 28.dp)) {
+                    if (example.isEmpty()) Text("Aucun effet sur ta progression.", color = Muted, fontSize = 12.sp)
+                    else MorseVisual(example, compact = true)
+                }
+                MorseSignalInput { example = (example + it).takeLast(32) }
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.malfreyt.alexandre.hamigo
 
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -98,9 +100,16 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
         val keyboard=LocalSoftwareKeyboardController.current
         DisposableEffect(view) { (view.parent as? DialogWindowProvider)?.window?.let { window ->
             window.setDimAmount(0f)
+            // The activity theme uses a cream navigation bar. A dialog over the IME
+            // must instead let our translucent backdrop reach its bottom edge.
+            window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+            @Suppress("DEPRECATION")
+            window.navigationBarColor=android.graphics.Color.TRANSPARENT
+            if(Build.VERSION.SDK_INT>=28) window.navigationBarDividerColor=android.graphics.Color.TRANSPARENT
+            if(Build.VERSION.SDK_INT>=29) window.isNavigationBarContrastEnforced=false
         }; onDispose {} }
         var panelBounds by remember { mutableStateOf(Rect.Zero) }
-        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.32f*visibility.value)).pointerInput(Unit) { detectTapGestures { requestDismiss() } }.imePadding().safeDrawingPadding(),contentAlignment=Alignment.Center) {
+        Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.32f*visibility.value)).pointerInput(Unit) { detectTapGestures { requestDismiss() } }.testTag("calculator-backdrop").imePadding().safeDrawingPadding(),contentAlignment=Alignment.Center) {
         Box(Modifier.padding(horizontal=14.dp).widthIn(max=430.dp).fillMaxWidth()
             .onGloballyPositioned { panelBounds=it.screenBounds(view) }) {
         Surface(modifier=Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures {} }.graphicsLayer {
@@ -116,7 +125,9 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
             shape=RoundedCornerShape((24f+80f*(1f-fraction)).dp);clip=true
         }.testTag("calculator-surface"), shape = RoundedCornerShape(24.dp), color = Cream, shadowElevation = 8.dp) {
             Box {
-            Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.padding(14.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(7.dp)) {
+            // Insets belong to the scrollable content, so a shortened IME viewport
+            // does not retain a fixed cream band that masks the bottom key row.
+            Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("Calculatrice", Modifier.weight(1f), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = Ink)
                     TextButton({ degrees = !degrees; result = null; error = null }, contentPadding = PaddingValues(horizontal = 8.dp)) {

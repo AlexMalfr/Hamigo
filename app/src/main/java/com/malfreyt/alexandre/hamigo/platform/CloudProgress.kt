@@ -219,9 +219,15 @@ object CloudProgress {
             .put("reviews", reviews).put("awarded", awarded).put("syncBase", base).put("syncEvents", events)
         val profile = newer(local, remote, "profileUpdatedAt", "name")
         val preferences = newer(local, remote, "preferencesUpdatedAt", "preferences")
+        val mergedPreferences=JSONObject((preferences.optJSONObject("preferences") ?: JSONObject()).toString())
+        // Older backups do not know these controls: retain them from the other side when absent.
+        val otherPreferences=(if(preferences===local)remote else local).optJSONObject("preferences")
+        listOf("morseSingleKey","morseThresholdMs").forEach { key ->
+            if(!mergedPreferences.has(key) && otherPreferences?.has(key)==true)mergedPreferences.put(key,otherPreferences.get(key))
+        }
         val result = JSONObject().put("app", "hamigo").put("schema", 2).put("name", profile.optString("name", "Pilote des ondes"))
             .put("profileUpdatedAt", profile.optLong("profileUpdatedAt"))
-            .put("preferences", preferences.optJSONObject("preferences") ?: JSONObject())
+            .put("preferences", mergedPreferences)
             .put("preferencesUpdatedAt", preferences.optLong("preferencesUpdatedAt"))
             .put("progress", state)
         if (local.has("friends") || remote.has("friends")) result.put("friends", mergeFriends(
@@ -278,13 +284,15 @@ object CloudProgress {
         require(wrapper.optLong("profileUpdatedAt") >= 0 && wrapper.optLong("preferencesUpdatedAt") >= 0)
         require(!wrapper.has("preferences") || wrapper.opt("preferences") is JSONObject) { "Paramètres de sauvegarde invalides." }
         val preferences = wrapper.optJSONObject("preferences") ?: JSONObject()
-        require(preferences.keys().asSequence().all { it in setOf("dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute") }) {
+        require(preferences.keys().asSequence().all { it in setOf("dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute", "morseSingleKey", "morseThresholdMs") }) {
             "La sauvegarde contient des paramètres non autorisés."
         }
         if (preferences.has("dailyGoal")) require(int(preferences, "dailyGoal") in 1..1000)
         if (preferences.has("reminderHour")) require(int(preferences, "reminderHour") in 0..23)
         if (preferences.has("reminderMinute")) require(int(preferences, "reminderMinute") in 0..59)
         if (preferences.has("reminderEnabled")) require(preferences.opt("reminderEnabled") is Boolean)
+        if (preferences.has("morseSingleKey")) require(preferences.opt("morseSingleKey") is Boolean)
+        if (preferences.has("morseThresholdMs")) require(int(preferences,"morseThresholdMs") in 150..600)
         return wrapper
     }
 

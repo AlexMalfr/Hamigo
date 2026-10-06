@@ -234,10 +234,7 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
     Panel(color=Mist) {
         if(code.isBlank())Text("Ton message attend son premier point…",fontSize=13.sp,color=Muted)
         else MorseSymbols(code)
-        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-            Button({onChange(code+".")},Modifier.weight(1f).height(54.dp),enabled=enabled){MorseVisual(".",compact=true,color=Color.White);Spacer(Modifier.width(8.dp));Text("Point",fontSize=16.sp,fontWeight=FontWeight.Bold)}
-            Button({onChange(code+"-")},Modifier.weight(1f).height(54.dp),enabled=enabled){MorseVisual("-",compact=true,color=Color.White);Spacer(Modifier.width(8.dp));Text("Trait",fontSize=16.sp,fontWeight=FontWeight.Bold)}
-        }
+        MorseSignalInput(enabled) { onChange(code + it) }
         Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
             OutlinedButton({if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
             OutlinedButton({if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}

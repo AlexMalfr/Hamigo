@@ -6,6 +6,7 @@ import android.os.SystemClock
 import android.view.InputDevice
 import android.view.MotionEvent
 import android.view.WindowInsets
+import android.view.inspector.WindowInspector
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import org.junit.Assume.assumeTrue
 import org.junit.runner.RunWith
 import java.io.File
 
@@ -178,6 +180,35 @@ class CalculatorMotionInstrumentedTest {
         }
     }
 
+    @Test fun theKeyboardKeepsTheCalculatorAboveItAndTheBackdropHasNoCreamBottomStrip() {
+        assumeTrue(Build.VERSION.SDK_INT>=30)
+        mount(initialOpen=true)
+        expression().performClick()
+        ui.waitUntil(5_000) {
+            WindowInspector.getGlobalWindowViews().any { it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true }
+        }
+        ui.waitForIdle()
+        var keyboardHeight=0
+        ui.runOnIdle {
+            keyboardHeight=WindowInspector.getGlobalWindowViews().maxOf {
+                it.rootWindowInsets?.getInsets(WindowInsets.Type.ime())?.bottom ?: 0
+            }
+        }
+        val backdrop=ui.onNodeWithTag("calculator-backdrop",useUnmergedTree=true)
+        val backdropBounds=backdrop.fetchSemanticsNode().boundsInRoot
+        val panelBounds=surface().fetchSemanticsNode().boundsInRoot
+        assertTrue("The IME should leave a useful floating calculator viewport.",keyboardHeight>0)
+        assertTrue("The calculator must remain entirely above the keyboard.",panelBounds.bottom<=backdropBounds.bottom-keyboardHeight+ui.density.density)
+        // Check the drawing just above the keyboard at the outer edge, away from
+        // the cream calculator itself: it must retain the grey dialog backdrop.
+        val image=backdrop.captureToImage().asAndroidBitmap()
+        val y=(image.height-keyboardHeight-3*ui.density.density).toInt().coerceIn(0,image.height-1)
+        val color=android.graphics.Color.valueOf(image.getPixel((3*ui.density.density).toInt(),y))
+        assertTrue("The keyboard boundary should have a dim backdrop, not a beige strip.",color.red()<.8f)
+        captureFullScreen("calculator-keyboard")
+        Espresso.closeSoftKeyboard()
+    }
+
     private fun surface() = ui.onNodeWithTag("calculator-surface", useUnmergedTree = true)
     private fun expression() = ui.onNodeWithTag("calculator-expression")
 
@@ -223,5 +254,14 @@ class CalculatorMotionInstrumentedTest {
         File(directory, "$name.png").outputStream().use {
             check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it))
         }
+    }
+
+    private fun captureFullScreen(name:String) {
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        val directory=requireNotNull(context.getExternalFilesDir("calculator-audit"))
+        check(directory.isDirectory || directory.mkdirs())
+        val bitmap=requireNotNull(InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot())
+        File(directory,"$name.png").outputStream().use {check(bitmap.compress(Bitmap.CompressFormat.PNG,100,it))}
+        bitmap.recycle()
     }
 }

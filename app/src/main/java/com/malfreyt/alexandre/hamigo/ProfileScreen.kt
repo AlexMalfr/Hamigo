@@ -19,6 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -56,15 +59,19 @@ fun ProfileScreen(model: AppModel, content: Content) {
     val weeks = maxOf(4, (ChronoUnit.DAYS.between(earliest, today) / 7).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
     val listState = rememberLazyListState()
+    var headerSurfaceHeight by remember { mutableIntStateOf(0) }
+    var avatarBounds by remember { mutableStateOf<Rect?>(null) }
     LazyColumn(
         Modifier.fillMaxSize().testTag("profile-list"), state = listState,
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 56.dp + LocalNavigationContentOverlap.current),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         stickyHeader(key = "profile-header") {
-            Box(Modifier.fillMaxWidth().testTag("profile-header")) {
+            Box(Modifier.fillMaxWidth().testTag("profile-header")
+                .profileHeaderShadow(listState,headerSurfaceHeight.toFloat(),avatarBounds)) {
                 Column {
-                    Row(Modifier.fillMaxWidth().testTag("profile-header-surface").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(Modifier.fillMaxWidth().testTag("profile-header-surface")
+                        .onSizeChanged { headerSurfaceHeight=it.height }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Spacer(Modifier.width(72.dp))
                         Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
                         IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
@@ -73,6 +80,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                     Spacer(Modifier.height(8.dp))
                 }
                 GitHubAvatar(model.sync.accountIdentity, p.name, Modifier.align(Alignment.BottomStart).size(72.dp)
+                    .onGloballyPositioned { avatarBounds=it.boundsInParent() }
                     .border(3.dp,Cream,CircleShape))
             }
         }
@@ -144,9 +152,9 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
     val goal = p.dailyGoal.coerceAtLeast(1)
     Panel {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Calendrier d’activité", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text("🔥 ${p.streak} jours de série", fontSize = 12.sp, color = Muted)
+            Text("Calendrier d’activité", Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            IconButton({ scope.launch { history.animateScrollToPage(0) } }, enabled=history.currentPage!=0) {
+                Icon(Icons.Rounded.CalendarToday,"Revenir au mois en cours")
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {

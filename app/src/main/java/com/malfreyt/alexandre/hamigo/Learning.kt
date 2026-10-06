@@ -191,10 +191,12 @@ class Progress(private val context: Context) {
         reload(); CloudProgress.ensureLedger(root); save()
         JSONObject().put("app","hamigo").put("schema",2).put("name",name)
             .put("profileUpdatedAt",prefs.getLong("profileUpdatedAt",if(name!="Pilote des ondes")1 else 0))
-            .put("preferencesUpdatedAt",prefs.getLong("preferencesUpdatedAt",if(prefs.contains("dailyGoal") || prefs.contains("reminderHour"))1 else 0))
+            .put("preferencesUpdatedAt",prefs.getLong("preferencesUpdatedAt",if(prefs.contains("dailyGoal") || prefs.contains("reminderHour") || prefs.contains(GameplayPreferences.SINGLE_KEY) || prefs.contains(GameplayPreferences.THRESHOLD))1 else 0))
             .put("preferences",JSONObject().put("dailyGoal",dailyGoal)
                 .put("reminderEnabled",prefs.getBoolean("reminderEnabled",false))
-                .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0)))
+                .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0))
+                .put(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey)
+                .put(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
             .put("progress",root).put("friends",cloudFriendRecords()).put("socialInbox",socialInboxState()).toString()
     }
     /** Keep verified avatar metadata local: older clients reject unknown relationship fields. */
@@ -254,6 +256,8 @@ class Progress(private val context: Context) {
                 .putInt("reminderHour",settings.optInt("reminderHour",20).coerceIn(0,23))
                 .putInt("reminderMinute",settings.optInt("reminderMinute",0).coerceIn(0,59))
                 .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
+                .putBoolean(GameplayPreferences.SINGLE_KEY,settings.optBoolean(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey))
+                .putInt(GameplayPreferences.THRESHOLD,settings.optInt(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
         }
         candidate.optJSONObject("friends")?.let { records ->
             editor.putString("friends",CloudProgress.activeFriends(retainLocalFriendIdentities(records)).toString())
@@ -288,6 +292,8 @@ class Progress(private val context: Context) {
                 prefs.edit().putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal))
                     .putInt("reminderHour",settings.optInt("reminderHour",20)).putInt("reminderMinute",settings.optInt("reminderMinute",0))
                     .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
+                    .putBoolean(GameplayPreferences.SINGLE_KEY,settings.optBoolean(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey))
+                    .putInt(GameplayPreferences.THRESHOLD,settings.optInt(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
                     .putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
             }
             save()

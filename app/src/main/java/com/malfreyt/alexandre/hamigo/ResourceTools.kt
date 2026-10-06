@@ -349,9 +349,8 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
                     else MorseVisual(code, compact = true)
                 }
             }
+            MorseSignalInput { code = (code + it).take(240) }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                OutlinedButton({ code = (code + ".").take(240) }, Modifier.weight(1f), contentPadding = PaddingValues(4.dp)) { MorseVisual(".", compact = true) }
-                OutlinedButton({ code = (code + "-").take(240) }, Modifier.weight(1f), contentPadding = PaddingValues(4.dp)) { MorseVisual("-", compact = true) }
                 OutlinedButton({ if (code.isNotBlank() && !code.endsWith(' ')) code = (code + " ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) { Text("Lettre", fontSize = 12.sp) }
                 OutlinedButton({ if (code.trim().isNotBlank() && !code.trim().endsWith('/')) code = (code.trimEnd() + " / ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) {
                     MorseVisual("/", compact = true); Text("Mot", fontSize = 12.sp)

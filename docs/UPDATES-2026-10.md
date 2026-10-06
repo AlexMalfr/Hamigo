@@ -107,3 +107,14 @@ Références de plateforme : [layouts responsive des widgets](https://developer.
 ### Correction de l'avatar — 0.25
 
 La photo reste à sa place pendant le scroll : le fond et l'ombre du header s'arrêtent 8 dp au-dessus de son bas. Le débordement est une propriété fixe du layout, sans translation ni animation de la photo lorsque l'en-tête devient fixe.
+
+## Finitions des pages et préférences de gameplay — 0.26
+
+- Le calendrier de Moi ne répète plus la série affichée au-dessus ; son bouton calendrier revient directement au mois courant. L'ombre du header suit une seule silhouette, y compris la portion circulaire de l'avatar qui dépasse.
+- Défis et Équipe rejoignent les trois autres pages principales avec un en-tête fixe et une ombre pleine largeur. Le titre et le sous-titre de l'équipe occupent deux lignes distinctes.
+- Les chapitres complets reçoivent un sticker rond doré, dentelé, avec reflet, liseré, coche et ombre. Son angle et son léger décalage sont déterminés par l'identifiant du chapitre ; ils ne changent pas à chaque recomposition. Le texte dispose d'une colonne plus étroite, sans chevauchement.
+- Les paramètres deviennent Profil & objectif, Compte & synchronisation, Gameplay, Rappels et Sauvegarde & application. Les liens vers nos Gists sont dans les détails du panneau GitHub, séparés de l'import/export manuel.
+- Le Morse propose deux boutons ou un bouton unique basé sur la durée de l'appui. Le seuil réglable entre 150 et 600 ms distingue point et trait ; un démonstrateur permet d'essayer sans XP. Annuler un appui ne transmet rien, les actions d'accessibilité distinguent point/trait, et Lettre/Mot restent explicites. Questions et traducteur utilisent le même composant.
+- Les réglages Morse sont sauvegardés et fusionnés avec les préférences horodatées. Une ancienne sauvegarde qui n'a pas ces clés conserve les valeurs locales ; les types et bornes sont validés avant import.
+- La calculatrice conserve son fond de fenêtre transparent et ses marges de contenu défilent avec les touches : le clavier ne crée plus de bande crème fixe sous le viewport.
+- `AGENTS.md` résume les habitudes de travail, sources, vérifications visuelles, protections des données et procédure de livraison pour les prochaines conversations.
