@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Local MockWebServer tests only. The signed release keeps Android's HTTPS policy. -->
-    <application android:usesCleartextTraffic="true" />
+    <application android:usesCleartextTraffic="true">
+        <activity android:name=".platform.WidgetVisualHostActivity" android:exported="false"
+            android:theme="@android:style/Theme.Material.Light.NoActionBar" android:hardwareAccelerated="true" />
+    </application>
 </manifest>

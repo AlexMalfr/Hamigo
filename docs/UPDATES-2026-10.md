@@ -167,3 +167,12 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Les trois widgets autorisent maintenant une réduction à une seule case de la grille du launcher : minima de redimensionnement abaissés à 40 × 40 dp, également avant Android 12.
 - Une composition miniature conserve un libellé court et la valeur principale, avec une jauge pour les XP du jour. Les textes s'adaptent à la place disponible ; les grands nombres sont abrégés dans ce format, et restent détaillés pour l'accessibilité.
 - Les formats existants réapparaissent en agrandissant le widget. La taille d'ajout initiale est conservée et toute la tuile ouvre Parcours.
+
+## Widgets composés pour leur taille — 0.34
+
+- Les trois widgets calculent leur composition depuis les dimensions réelles du launcher. Les bandes, colonnes, petites cases et grandes cartes répartissent autrement les statistiques, Pico et le graphique ; une grande colonne ne reste plus une miniature presque vide.
+- Chaque modèle garde son identité : calendrier et palette chaude pour la Série, jauge turquoise pour l'Objectif, barres sur fond sombre pour la Semaine. Les petites cases conservent Pico et un graphique miniature. Les grandes cartes utilisent une hiérarchie sobre, avec moins de compteurs répétés, des titres moins imposants et une illustration mieux mise en scène.
+- Espacement renforcé entre Pico, les cercles du calendrier et l'anneau de la jauge. Le pourcentage a une zone distincte sous la mascotte. La ligne d'objectif en pointillés reste devant les barres du graphique, y compris celles dépassant l'objectif.
+- Statistiques et libellés en texte Android natif, ajustés à la place disponible et à la police système. Les données exactes restent accessibles quand les petits formats abrègent les grands nombres.
+- Les variantes correspondent aux formats annoncés par le launcher ; les dimensions min/max servent de repli pour les orientations. Le budget d'images est partagé entre les variantes. La tuile ouvre toujours Parcours et les mises à jour de progression sont conservées.
+- Un outil d'audit produit une planche de 121 tailles pour chaque widget, avec captures détaillées, formes extrêmes et plusieurs états de progression. Documentation et commandes dans `WIDGETS.md`.

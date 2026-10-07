@@ -15,8 +15,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.malfreyt.alexandre.hamigo.Progress
 import com.malfreyt.alexandre.hamigo.R
@@ -27,12 +30,108 @@ import org.junit.runner.RunWith
 import java.io.File
 import java.time.LocalDate
 import java.util.UUID
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @RunWith(AndroidJUnit4::class)
+@SdkSuppress(minSdkVersion = 31)
 class HomeWidgetInstrumentedTest {
     private val instrumentation get()=InstrumentationRegistry.getInstrumentation()
     private val context get()=instrumentation.targetContext
     private val providers=listOf(StreakWidgetProvider::class.java,GoalWidgetProvider::class.java,WeekWidgetProvider::class.java)
+
+    @Test fun widgetsKeepTheirRoundedBackgroundAndTextsInAHardwareWindow() {
+        val manager=AppWidgetManager.getInstance(context)
+        val host=AppWidgetHost(context,2823)
+        val scenario=ActivityScenario.launch(WidgetVisualHostActivity::class.java)
+        val date=LocalDate.of(2026,10,8)
+        val r=ReminderContent.build(ReminderState(18,30,(0L..4L).map { date.minusDays(it).toString() }.toSet()),date)
+        val monday=date.minusDays((date.dayOfWeek.value-1).toLong())
+        val snapshot=WidgetSnapshot(r,(0L..6L).map { WidgetDay(monday.plusDays(it),listOf(30,12,48,18,0,0,0)[it.toInt()]) })
+        val views=mutableListOf<View>()
+        instrumentation.uiAutomation.adoptShellPermissionIdentity(android.Manifest.permission.BIND_APPWIDGET)
+        try {
+            scenario.onActivity { activity ->
+                val density=context.resources.displayMetrics.density
+                fun dp(value: Int)=(value*density).roundToInt()
+                val board=LinearLayout(activity).apply {
+                    orientation=LinearLayout.VERTICAL
+                    setBackgroundColor(Color.rgb(48,62,74)); setPadding(dp(8),dp(8),dp(8),dp(8))
+                }
+                board.setOnApplyWindowInsetsListener { view,insets ->
+                    val bars=insets.getInsets(android.view.WindowInsets.Type.systemBars())
+                    view.setPadding(dp(8),dp(8)+bars.top,dp(8),dp(8)+bars.bottom)
+                    insets
+                }
+                listOf(SizeF(40f,40f),SizeF(84f,91f),SizeF(120f,170f),SizeF(120f,260f)).forEach { size ->
+                    board.addView(TextView(activity).apply {
+                        text="${size.width.toInt()} × ${size.height.toInt()} dp"; textSize=12f
+                        setTextColor(Color.WHITE); setPadding(0,dp(5),0,dp(5))
+                    })
+                    val row=LinearLayout(activity).apply { orientation=LinearLayout.HORIZONTAL }
+                    providers.forEachIndexed { index,provider ->
+                        val id=host.allocateAppWidgetId()
+                        val options=Bundle().apply { putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,arrayListOf(size)) }
+                        assertTrue(manager.bindAppWidgetIdIfAllowed(id,ComponentName(context,provider),options))
+                        val view=host.createView(activity,id,manager.getAppWidgetInfo(id)).apply { setPadding(0,0,0,0) }
+                        view.updateAppWidget(HomeWidgets.responsiveViews(activity,HomeWidgetKind.entries[index],snapshot,options))
+                        val params=LinearLayout.LayoutParams(dp(size.width.toInt()),dp(size.height.toInt())).apply { marginEnd=dp(8) }
+                        row.addView(view,params); views+=view
+                    }
+                    board.addView(row)
+                }
+                activity.setContentView(board)
+                board.requestApplyInsets()
+            }
+            instrumentation.waitForIdleSync()
+            val committed=CountDownLatch(1)
+            scenario.onActivity {
+                views.forEach { view ->
+                    assertTrue(view.isAttachedToWindow)
+                    assertTrue("Screenshot must exercise hardware clipping",view.isHardwareAccelerated)
+                    val background=view.findViewById<View>(android.R.id.background)
+                    assertTrue(background.clipToOutline)
+                    val outline=android.graphics.Outline()
+                    background.outlineProvider.getOutline(background,outline)
+                    assertTrue("Transparent background still needs a real round outline",outline.canClip())
+                }
+                val content=it.findViewById<View>(android.R.id.content)
+                content.viewTreeObserver.registerFrameCommitCallback { committed.countDown() }
+                content.invalidate()
+            }
+            assertTrue("The hardware frame must be submitted before capture",committed.await(5,TimeUnit.SECONDS))
+            val regions=mutableListOf<android.graphics.Rect>()
+            scenario.onActivity {
+                views.forEach { view ->
+                    val location=IntArray(2); view.getLocationOnScreen(location)
+                    regions+=android.graphics.Rect(location[0],location[1],location[0]+view.width,location[1]+view.height)
+                }
+            }
+            fun widgetsArePainted(bitmap: Bitmap): Boolean = regions.withIndex().all { (index,rect) ->
+                if (rect.right>bitmap.width || rect.bottom>bitmap.height) return@all false
+                listOf(.25f,.50f,.75f).any { fx -> listOf(.25f,.50f,.75f).any { fy ->
+                    val color=bitmap.getPixel(rect.left+(rect.width()*fx).toInt(),rect.top+(rect.height()*fy).toInt())
+                    val red=Color.red(color); val green=Color.green(color); val blue=Color.blue(color)
+                    when(index%3) {
+                        0 -> red>=220 && green>=130 && blue<230
+                        1 -> red>=150 && green>=180 && blue>=170 && green>red
+                        else -> red<40 && green>35 && blue>35
+                    }
+                } }
+            }
+            var bitmap=instrumentation.uiAutomation.takeScreenshot()
+            val deadline=android.os.SystemClock.uptimeMillis()+5000
+            while (!widgetsArePainted(bitmap) && android.os.SystemClock.uptimeMillis()<deadline) {
+                Thread.sleep(100)
+                bitmap=instrumentation.uiAutomation.takeScreenshot()
+            }
+            assertTrue("The presented screenshot must contain every widget's coloured surface",widgetsArePainted(bitmap))
+            val suffix=if(context.resources.configuration.fontScale>1.01f)"-font${context.resources.configuration.fontScale}" else ""
+            val directory=File(context.getExternalFilesDir(null),"widgets-audit").apply { mkdirs() }
+            File(directory,"hardware-gallery$suffix.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) }
+        } finally { scenario.close();host.deleteHost();instrumentation.uiAutomation.dropShellPermissionIdentity();HomeWidgets.refresh(context) }
+    }
 
     @Test fun threeDifferentWidgetsAreRegisteredAndResizableInBothDirections() {
         val manager=AppWidgetManager.getInstance(context)
@@ -128,6 +227,10 @@ class HomeWidgetInstrumentedTest {
         // Binding permission belongs only to this isolated test host, never to the user's launcher.
         val manager=AppWidgetManager.getInstance(context)
         val host=AppWidgetHost(context,2822)
+        val date=LocalDate.of(2026,10,8)
+        val reminder=ReminderContent.build(ReminderState(18,30,(0L..4L).map { date.minusDays(it).toString() }.toSet()),date)
+        val monday=date.minusDays((date.dayOfWeek.value-1).toLong())
+        val snapshot=WidgetSnapshot(reminder,(0L..6L).map { WidgetDay(monday.plusDays(it),listOf(30,12,48,18,0,0,0)[it.toInt()]) })
         instrumentation.uiAutomation.adoptShellPermissionIdentity(android.Manifest.permission.BIND_APPWIDGET)
         try {
             providers.forEachIndexed { index,provider ->
@@ -145,17 +248,54 @@ class HomeWidgetInstrumentedTest {
                 instrumentation.runOnMainSync {
                     val view=host.createView(context,id,info)
                     view.setPadding(0,0,0,0)
-                    listOf(SizeF(40f,40f),SizeF(60f,60f),SizeF(100f,60f),SizeF(60f,180f),SizeF(120f,110f),SizeF(350f,110f),SizeF(350f,220f),SizeF(130f,220f),SizeF(450f,300f)).forEach { size ->
+                    listOf(SizeF(40f,40f),SizeF(60f,60f),SizeF(84f,91f),SizeF(100f,60f),SizeF(60f,180f),SizeF(96f,120f),
+                        SizeF(120f,110f),SizeF(130f,130f),SizeF(220f,150f),SizeF(280f,180f),SizeF(350f,110f),SizeF(350f,220f),
+                        SizeF(130f,220f),SizeF(450f,300f),SizeF(40f,800f),SizeF(800f,40f),SizeF(137f,59f),SizeF(91f,333f)).forEach { size ->
                         view.updateAppWidgetSize(Bundle(),listOf(size))
                         val resizedOptions=Bundle(options).apply {
                             putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,arrayListOf(size))
                         }
-                        view.updateAppWidget(HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],WidgetSnapshot.read(context),resizedOptions))
+                        view.updateAppWidget(HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],snapshot,resizedOptions))
                         measure(view,size)
                         assertNotNull("Responsive RemoteViews must inflate in a real host",view.findViewById<View>(R.id.widget_metric))
                         assertNativeContentFits(view,HomeWidgetKind.entries[index],size)
                         capture(view,"host-${HomeWidgetKind.entries[index].name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
                     }
+                    val hostSizes=listOf(SizeF(84f,91f),SizeF(300f,72f),SizeF(72f,300f),SizeF(600f,600f))
+                    val multipleOptions=Bundle(options).apply { putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,ArrayList(hostSizes)) }
+                    val response=HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],snapshot,multipleOptions)
+                    manager.updateAppWidget(id,response) // Real framework IPC and bitmap budget check.
+                    hostSizes.forEach { size ->
+                        view.updateAppWidgetSize(Bundle(),listOf(size))
+                        view.updateAppWidget(response)
+                        measure(view,size)
+                        assertNativeContentFits(view,HomeWidgetKind.entries[index],size)
+                        val expected=WidgetPresentation.composition(HomeWidgetKind.entries[index],snapshot,size).texts.first { it.id==R.id.widget_metric }.bounds
+                        val metric=view.findViewById<TextView>(R.id.widget_metric)
+                        assertEquals("Host must select its exact composition",(expected.left*context.resources.displayMetrics.density).roundToInt(),metric.paddingLeft)
+                        assertEquals("Host must select its exact composition",(expected.top*context.resources.displayMetrics.density).roundToInt(),metric.paddingTop)
+                        capture(view,"host-multiple-${HomeWidgetKind.entries[index].name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
+                    }
+                    val fallback=Bundle().apply {
+                        putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,84)
+                        putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,72)
+                        putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,300)
+                        putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,300)
+                    }
+                    val fallbackResponse=HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],snapshot,fallback)
+                    listOf(SizeF(84f,300f),SizeF(300f,72f)).forEach { size ->
+                        view.updateAppWidgetSize(Bundle(),listOf(size))
+                        view.updateAppWidget(fallbackResponse)
+                        measure(view,size)
+                        assertNativeContentFits(view,HomeWidgetKind.entries[index],size)
+                        val expected=WidgetPresentation.composition(HomeWidgetKind.entries[index],snapshot,size).texts.first { it.id==R.id.widget_metric }.bounds
+                        assertEquals("Min/max fallback retains both orientations",(expected.top*context.resources.displayMetrics.density).roundToInt(),view.findViewById<TextView>(R.id.widget_metric).paddingTop)
+                        capture(view,"host-fallback-${HomeWidgetKind.entries[index].name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
+                    }
+                    val many=Bundle(options).apply {
+                        putParcelableArrayList(AppWidgetManager.OPTION_APPWIDGET_SIZES,ArrayList((0..15).map { SizeF(600f+it*7,600f+it*11) }))
+                    }
+                    manager.updateAppWidget(id,HomeWidgets.responsiveViews(context,HomeWidgetKind.entries[index],snapshot,many))
                 }
                 host.deleteAppWidgetId(id)
             }
