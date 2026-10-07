@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import crypto from 'node:crypto';
+import {splitDigitalReferences} from './split_logic_content.mjs';
 import {execFileSync} from 'node:child_process';
 
 const root=process.cwd().replaceAll('\\','/');
@@ -20,7 +21,7 @@ for(const c of categories.values()) {
     if(c.id==='math-basics') c.group='Bases et calculs';
     if(!families.includes(c.group)) throw new Error(`Unknown family ${c.group}`);
 }
-const result=[...categories.values()].sort((a,b)=>families.indexOf(a.group)-families.indexOf(b.group)||(a.order??999)-(b.order??999));
+const result=splitDigitalReferences([...categories.values()]).sort((a,b)=>families.indexOf(a.group)-families.indexOf(b.group)||(a.order??999)-(b.order??999));
 const ids=new Set();
 for(const c of result) {
     if(!c.group || !c.source || !c.rows.length) throw new Error(`Incomplete category ${c.id}`);

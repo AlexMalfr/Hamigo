@@ -3,6 +3,7 @@ package com.malfreyt.alexandre.hamigo
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -14,12 +15,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,7 +80,11 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     var anchor by remember { mutableStateOf<Rect?>(null) }
     val view = androidx.compose.ui.platform.LocalView.current
     val overlap = LocalNavigationContentOverlap.current
-    Box(Modifier.fillMaxSize().imePadding()) {
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    Box(Modifier.fillMaxSize().imePadding().pointerInput(focus, keyboard) {
+        detectTapGestures(onTap = { focus.clearFocus(); keyboard?.hide() })
+    }) {
         content()
         FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap).onGloballyPositioned { anchor = it.screenBounds(view) }, containerColor = Teal, contentColor = Color.White) {
             Icon(Icons.Rounded.Calculate, "Ouvrir la calculatrice", Modifier.size(28.dp))
@@ -95,6 +105,30 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }
     }
     val density = LocalDensity.current
+    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
+    val searchFocus = remember { FocusRequester() }
+    var focusRequested by remember { mutableStateOf(false) }
+    var keyboardWasVisible by remember { mutableStateOf(false) }
+    val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
+    LaunchedEffect(focusRequested, state.searching) {
+        if (focusRequested && state.searching && returnTarget == null) {
+            withFrameNanos { }
+            searchFocus.requestFocus()
+            keyboard?.show()
+            focusRequested = false
+        }
+    }
+    LaunchedEffect(keyboardVisible) {
+        if (keyboardVisible) keyboardWasVisible = true
+        else if (keyboardWasVisible) {
+            keyboardWasVisible = false
+            if (returnTarget == null && state.searching) {
+                focus.clearFocus()
+                if (state.search.isBlank()) state.searching = false
+            }
+        }
+    }
     val overlap = LocalNavigationContentOverlap.current
     var viewportBounds by remember { mutableStateOf<Rect?>(null) }
     var headerBounds by remember { mutableStateOf<Rect?>(null) }
@@ -146,17 +180,25 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("Mémo", Modifier.weight(1f).testTag("memo-library-title"), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
-                        IconButton({ state.searching = !state.searching; if (!state.searching) state.search = "" }) {
+                        IconButton({
+                            state.searching = !state.searching
+                            if (state.searching) focusRequested = true
+                            else { state.search = ""; focus.clearFocus(); keyboard?.hide() }
+                        }) {
                             Icon(if (state.searching) Icons.Rounded.Close else Icons.Rounded.Search, if (state.searching) "Fermer la recherche des mémos" else "Rechercher un mémo")
                         }
                     }
-                    if (state.searching) OutlinedTextField(state.search, { state.search = it }, label = { Text("Rechercher un mémo") }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    if (state.searching) OutlinedTextField(state.search, { state.search = it }, label = { Text("Rechercher un mémo") }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, modifier = Modifier.fillMaxWidth().focusRequester(searchFocus).testTag("memo-search-input"), singleLine = true)
                 }
             }
             categories.forEach { (group, fiches) ->
                 item(key = "group-$group") { Text(group, Modifier.padding(top = 10.dp, bottom = 2.dp), color = Teal, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold) }
                 items(fiches, key = { it.id }) { category ->
-                    Surface(onClick = { if (returnTarget == null) model.resource = category }, modifier = Modifier.testTag("memo-row-${category.id}").onGloballyPositioned {
+                    Surface(onClick = { if (returnTarget == null) {
+                        focus.clearFocus(); keyboard?.hide()
+                        if (state.search.isBlank()) state.searching = false
+                        model.resource = category
+                    } }, modifier = Modifier.testTag("memo-row-${category.id}").onGloballyPositioned {
                         if (returnTarget?.categoryId == category.id) {
                             returnTarget.rowBounds = it.boundsInWindow()
                             returnTarget.fullRowHeight = it.size.height

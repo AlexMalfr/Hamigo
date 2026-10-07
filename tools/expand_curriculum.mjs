@@ -1,5 +1,6 @@
 // Original Hamigo exercises. Run with Node.js; stable original IDs are preserved.
 import fs from 'node:fs';
+import {splitDigitalCurriculum} from './split_logic_content.mjs';
 const file = 'data/curriculum.json';
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
 const Q = (prompt, correct, distractors, explanation) => ({kind:'choice',prompt,choices:[correct,...distractors],answer:0,explanation});
@@ -904,6 +905,7 @@ for(const question of punctuationLesson.questions) {
 const byId=new Map([...data.chapters,...newChapters].map(c=>[c.id,c]));
 const sequence=['c01','c02','c15','c16','c03','c04','c05','c06','c07','c17','c08','c09','c20','c10','c18','c11','c19','c12','c13','c21','c14'];
 data.chapters=sequence.map(id=>byId.get(id));
+splitDigitalCurriculum(data);
 const lessons=data.chapters.flatMap(c=>c.lessons);
 data.description=`${lessons.length} leçons originales, des premiers contacts aux calculs radio approfondis. Chapitre Morse complet et révisions par notion.`;
 const all=lessons.flatMap(l=>l.questions);

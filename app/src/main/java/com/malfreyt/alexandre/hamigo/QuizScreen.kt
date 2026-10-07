@@ -130,6 +130,7 @@ import kotlin.random.Random
                 when{feedback==true->MascotPose.JUMP;feedback==false->MascotPose.HUG;s.index%5==3->MascotPose.DANCE;else->MascotPose.POINT},
                 when{feedback==true->listOf("Ton signal passe cinq sur cinq !","Pico sort sa danse de victoire.","Bien joué, on garde le rythme !")[s.index%3];feedback==false->"On prend le temps de comprendre, puis on réessaie.";else->listOf("Pico est avec toi. À toi de jouer !","Un défi à la fois, on capte les bons réflexes.","Branche tes neurones, la radio attend !")[s.index%3]})
             if(q.image==null && q.kind!in listOf("cloze","flash"))MorseAwareText(q.prompt,fontSize=21.sp,lineHeight=28.sp,fontWeight=FontWeight.ExtraBold)
+            if(q.visual.isNotBlank() && q.kind!="flash") LogicLearningVisual(q.visual, showNames=false, showCaption=false)
             if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
             if(q.kind=="resistor") Resistor(q.bands)
             when(q.kind) {
@@ -372,6 +373,7 @@ fun solution(q:Question):String=when(q.kind){
                 Icon(if(response?.correct==true)Icons.Rounded.CheckCircle else Icons.Rounded.Lightbulb,null,tint=if(response?.correct==true)Teal else Coral,modifier=Modifier.size(20.dp))
             }
             if(q.image==null)MorseAwareText(q.prompt,fontWeight=FontWeight.Bold,fontSize=15.sp,lineHeight=21.sp)
+            if(q.visual.isNotBlank()) LogicLearningVisual(q.visual, showNames=false, showCaption=false)
             if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
             val answer=when {
                 response==null->"Réponse non enregistrée"

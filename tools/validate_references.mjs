@@ -21,9 +21,15 @@ for(const source of sources.filter(s=>s.startsWith('http://f6kgl.free.fr/COURS.h
 const kotlin=name=>fs.readFileSync(`app/src/main/java/com/malfreyt/alexandre/hamigo/${name}.kt`,'utf8');
 const technical=kotlin('TechnicalReferenceContent'),radio=kotlin('RadioReferenceContent'),extra=kotlin('MemoExtraDiagrams');
 for(const row of data.categories.flatMap(c=>c.rows).filter(r=>r.visual)) {
-  const key=row.visual.replace(/^extra:/,'');
-  const implementation=row.visual.startsWith('extra:')?extra:technical+radio;
-  assert(implementation.includes(`"${key}"`),`Missing native visual: ${row.visual}`);
+  if(row.visual.startsWith('logic:')) {
+    const key=row.visual.slice(6);
+    assert(['and','or','not','nand','nor','xor','nand-nor'].includes(key),`Unknown gate visual: ${row.visual}`);
+    assert(extra.includes('LogicLearningVisual'), 'Gate diagrams must be wired into reference rendering');
+  } else {
+    const key=row.visual.replace(/^extra:/,'');
+    const implementation=row.visual.startsWith('extra:')?extra:technical+radio;
+    assert(implementation.includes(`"${key}"`),`Missing native visual: ${row.visual}`);
+  }
 }
 assert.equal(data.categories.find(c=>c.id==='materials').rows.length,20,'Keep every material in the course table');
 const bands=data.categories.find(c=>c.id==='bands');

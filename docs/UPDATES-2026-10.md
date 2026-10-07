@@ -176,3 +176,10 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Statistiques et libellés en texte Android natif, ajustés à la place disponible et à la police système. Les données exactes restent accessibles quand les petits formats abrègent les grands nombres.
 - Les variantes correspondent aux formats annoncés par le launcher ; les dimensions min/max servent de repli pour les orientations. Le budget d'images est partagé entre les variantes. La tuile ouvre toujours Parcours et les mises à jour de progression sont conservées.
 - Un outil d'audit produit une planche de 121 tailles pour chaque widget, avec captures détaillées, formes extrêmes et plusieurs états de progression. Documentation et commandes dans `WIDGETS.md`.
+
+## Recherche Mémo et chapitre de logique — 0.35
+
+- La loupe de la bibliothèque Mémo place immédiatement le curseur dans la recherche et ouvre le clavier. Fermer le clavier par Retour ou toucher hors du champ replie une recherche vide ; un filtre saisi reste affiché. Revenir d’une fiche garde le filtre sans rouvrir le clavier.
+- Nouveau chapitre « Binaire et portes logiques » avec quatre leçons : la leçon binaire existante est déplacée sans changement d’identité, puis trois leçons ajoutent 24 exercices. Les validations et anciennes questions sont conservées. Parcours : 22 chapitres, 97 leçons, 850 exercices.
+- Mémo sépare les AOP, le binaire/les portes et la conversion/le traitement numérique. Les six fonctions utilisent les symboles rectangulaires CEI, également dans les leçons, exercices et flashcards. Un outil permet de manipuler les entrées et observer la sortie. Les cartes gardent leurs identifiants et échéances.
+- Documentation des sources, de la réorganisation et des limites dans `LOGIC.md`.

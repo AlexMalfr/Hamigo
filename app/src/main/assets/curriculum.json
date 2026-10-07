@@ -3,7 +3,7 @@
   "language": "fr-FR",
   "verifiedAt": "2026-10-03",
   "title": "Parcours du certificat d’opérateur",
-  "description": "94 leçons originales, des premiers contacts aux calculs radio approfondis. Chapitre Morse complet et révisions par notion.",
+  "description": "97 leçons originales, des premiers contacts aux calculs radio approfondis. Chapitres Morse et logique numérique, révisions par notion.",
   "sources": [
     "http://f6kgl.free.fr/COURS.html",
     "https://www.anfr.fr/gerer/radioamateurs/les-certificats",
@@ -9028,10 +9028,10 @@
       ]
     },
     {
-      "id": "c20",
-      "title": "Le numérique décodé",
-      "subtitle": "Bits, symboles, échantillons et correction",
-      "color": "#8DCFCF",
+      "id": "c22",
+      "title": "Binaire et portes logiques",
+      "subtitle": "Lire les bits, reconnaître les portes et suivre un circuit",
+      "color": "#558C85",
       "icon": "binary",
       "lessons": [
         {
@@ -9167,6 +9167,483 @@
           "section": "technique",
           "id": "c20-l01"
         },
+        {
+          "id": "c22-l02",
+          "title": "Du binaire à l’hexadécimal",
+          "summary": "Les poids des bits et les groupes de quatre",
+          "topic": "Circuits numériques",
+          "body": [
+            "En binaire, chaque position vaut deux fois celle à sa droite. Pour huit bits, lis les poids 128, 64, 32, 16, 8, 4, 2 et 1. Additionne seulement les poids dont le bit vaut 1 : 00101101₂ = 32 + 8 + 4 + 1 = 45.",
+            "Un octet contient huit bits, soit 256 combinaisons ; un entier non signé sur un octet va de 0 à 255. Un zéro placé à gauche ne change pas la valeur, mais permet de garder une largeur fixe.",
+            "L’hexadécimal utilise seize chiffres : 0 à 9, puis A pour 10, B pour 11, C pour 12, D pour 13, E pour 14 et F pour 15. Chaque chiffre correspond exactement à quatre bits. Sépare donc 00101101₂ en 0010 et 1101 : tu obtiens 2D₁₆.",
+            "Attention aux unités : bit et octet diffèrent d’un facteur huit. Les préfixes SI sont décimaux (1 ko = 1 000 octets) ; les préfixes IEC sont binaires (1 Kio = 1 024 octets). Le cours ancien utilise parfois « ko » pour cette seconde valeur."
+          ],
+          "formula": "1 octet = 8 bits · 1 chiffre hexadécimal = 4 bits",
+          "visuals": [],
+          "questions": [
+            {
+              "kind": "binary",
+              "prompt": "Compose 45 sur huit bits.",
+              "value": 45,
+              "unit": "8",
+              "choices": [],
+              "answer": 0,
+              "explanation": "45 = 32 + 8 + 4 + 1 : 00101101.",
+              "id": "c22-l02-q01",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "number",
+              "prompt": "Quelle est la valeur décimale de 00110010₂ ?",
+              "value": 50,
+              "unit": "base 10",
+              "tolerance": 0,
+              "choices": [],
+              "answer": 0,
+              "explanation": "32 + 16 + 2 = 50.",
+              "id": "c22-l02-q02",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Quel nombre représente A₁₆ ?",
+              "choices": [
+                "10",
+                "12",
+                "16",
+                "1"
+              ],
+              "answer": 0,
+              "explanation": "Les chiffres A à F représentent 10 à 15.",
+              "visual": "",
+              "id": "c22-l02-q03",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "choice",
+              "prompt": "11110000₂ s’écrit en hexadécimal…",
+              "choices": [
+                "F0",
+                "0F",
+                "FF",
+                "10"
+              ],
+              "answer": 0,
+              "explanation": "1111 vaut F et 0000 vaut 0. L’ordre des groupes compte.",
+              "visual": "",
+              "id": "c22-l02-q04",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "number",
+              "prompt": "Quelle est la plus grande valeur entière non signée d’un octet ?",
+              "value": 255,
+              "unit": "base 10",
+              "tolerance": 0,
+              "choices": [],
+              "answer": 0,
+              "explanation": "Huit bits donnent 256 valeurs, de 0 à 255.",
+              "id": "c22-l02-q05",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe chaque unité à sa taille.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "1 octet",
+                  "right": "8 bits"
+                },
+                {
+                  "left": "1 Kio",
+                  "right": "1 024 octets"
+                },
+                {
+                  "left": "1 ko",
+                  "right": "1 000 octets"
+                },
+                {
+                  "left": "1 chiffre hexadécimal",
+                  "right": "4 bits"
+                }
+              ],
+              "explanation": "Unité de données et préfixe donnent deux informations distinctes.",
+              "id": "c22-l02-q06",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "truefalse",
+              "prompt": "00001010₂ et 1010₂ représentent le même entier.",
+              "choices": [
+                "Vrai",
+                "Faux"
+              ],
+              "answer": 0,
+              "explanation": "Les zéros à gauche ne changent pas la somme des poids activés.",
+              "id": "c22-l02-q07",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            },
+            {
+              "kind": "binary",
+              "prompt": "Compose la valeur de FF₁₆ sur huit bits.",
+              "value": 255,
+              "unit": "8",
+              "choices": [],
+              "answer": 0,
+              "explanation": "F vaut 1111 ; deux F donnent huit bits à 1 : 255.",
+              "id": "c22-l02-q08",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T085"
+            }
+          ]
+        },
+        {
+          "id": "c22-l03",
+          "title": "Lire ET, OU et NON",
+          "summary": "Des symboles aux tables de vérité",
+          "topic": "Circuits numériques",
+          "body": [
+            "Une porte logique transforme des entrées binaires en une sortie binaire. 0 et 1 désignent des niveaux logiques ; les tensions réelles et leurs seuils dépendent de la famille du composant. Ne suppose pas que 1 signifie toujours exactement 5 V.",
+            "Dans la représentation rectangulaire CEI utilisée en France, les entrées arrivent à gauche et la sortie S est à droite. La marque dans le rectangle indique la fonction. Un petit cercle à une borne signifie une inversion logique.",
+            "La porte ET porte la marque &. Elle donne 1 seulement si A ET B valent tous deux 1. Pour 00, 01 et 10, la sortie vaut 0 ; pour 11, elle vaut 1.",
+            "La porte OU porte la marque ≥1 : il suffit d’au moins une entrée à 1. Ses sorties pour 00, 01, 10 et 11 sont 0, 1, 1 et 1. Ce OU est inclusif : deux entrées à 1 donnent aussi 1.",
+            "La porte NON possède une seule entrée. Son rectangle porte 1, et le cercle en sortie indique que la sortie est le complément : 0 devient 1 et 1 devient 0. Une table de vérité énumère les entrées possibles et la sortie correspondante."
+          ],
+          "formula": "ET : toutes les entrées à 1 · OU : au moins une à 1 · NON : inverse",
+          "visuals": [
+            "",
+            "",
+            "logic:and",
+            "logic:or",
+            "logic:not"
+          ],
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "Quelle fonction représente cette porte ?",
+              "choices": [
+                "ET",
+                "OU",
+                "NON",
+                "OU exclusif"
+              ],
+              "answer": 0,
+              "explanation": "La marque & désigne la fonction ET.",
+              "visual": "logic:and",
+              "id": "c22-l03-q01",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Cette porte reçoit A = 1 et B = 0. Quelle est S ?",
+              "choices": [
+                "1",
+                "0",
+                "2",
+                "Impossible à déterminer"
+              ],
+              "answer": 0,
+              "explanation": "OU donne 1 dès qu’au moins une entrée vaut 1.",
+              "visual": "logic:or",
+              "id": "c22-l03-q02",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Cette porte reçoit A = 1. Quelle est S ?",
+              "choices": [
+                "0",
+                "1",
+                "2",
+                "Elle conserve la dernière valeur"
+              ],
+              "answer": 0,
+              "explanation": "Le cercle inverse le niveau : NON 1 = 0.",
+              "visual": "logic:not",
+              "id": "c22-l03-q03",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "truefalse",
+              "prompt": "Une porte ET donne 1 pour A = 0 et B = 1.",
+              "choices": [
+                "Vrai",
+                "Faux"
+              ],
+              "answer": 1,
+              "explanation": "ET exige que les deux entrées soient à 1.",
+              "id": "c22-l03-q04",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe la marque à la fonction.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "&",
+                  "right": "ET"
+                },
+                {
+                  "left": "≥1",
+                  "right": "OU"
+                },
+                {
+                  "left": "1 avec cercle en sortie",
+                  "right": "NON"
+                }
+              ],
+              "explanation": "Lis la marque du rectangle, puis applique une éventuelle inversion.",
+              "id": "c22-l03-q05",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "number",
+              "prompt": "Deux entrées binaires indépendantes donnent combien de combinaisons ?",
+              "value": 4,
+              "unit": "combinaisons",
+              "tolerance": 0,
+              "choices": [],
+              "answer": 0,
+              "explanation": "Les quatre combinaisons sont 00, 01, 10 et 11 : 2² = 4.",
+              "id": "c22-l03-q06",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Les deux entrées d’une porte OU valent 1. La sortie vaut…",
+              "choices": [
+                "1",
+                "0",
+                "2",
+                "Un niveau indéfini"
+              ],
+              "answer": 0,
+              "explanation": "OU est inclusif. Ce n’est pas une addition arithmétique de 1 + 1.",
+              "visual": "",
+              "id": "c22-l03-q07",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "truefalse",
+              "prompt": "Le niveau logique 1 correspond à la même tension sur tous les composants.",
+              "choices": [
+                "Vrai",
+                "Faux"
+              ],
+              "answer": 1,
+              "explanation": "Les seuils et tensions dépendent de la technologie et de l’alimentation.",
+              "id": "c22-l03-q08",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            }
+          ]
+        },
+        {
+          "id": "c22-l04",
+          "title": "Inverser et combiner les portes",
+          "summary": "NON ET, NON OU et OU exclusif",
+          "topic": "Circuits numériques",
+          "body": [
+            "NON ET, ou NAND, est une porte ET suivie d’une inversion. Son rectangle porte & et un cercle en sortie. Elle vaut 0 seulement pour A = B = 1 ; elle vaut 1 pour les trois autres combinaisons.",
+            "NON OU, ou NOR, est une porte OU suivie d’une inversion. Son rectangle porte ≥1 et un cercle en sortie. Elle vaut 1 seulement pour A = B = 0 ; elle vaut 0 dès qu’une entrée vaut 1.",
+            "Le OU exclusif, ou XOR, à deux entrées porte =1 : exactement une entrée doit valoir 1. Les entrées différentes (01 ou 10) donnent 1 ; les entrées identiques (00 ou 11) donnent 0. Les exemples de cette leçon utilisent toujours deux entrées.",
+            "Pour lire un circuit combiné, suis les fils de gauche à droite. Calcule chaque sortie intermédiaire, puis utilise-la comme entrée de la porte suivante. Exemple : ET(1, 1) = 1, puis NON(1) = 0. Ce circuit équivaut à NON ET(1, 1).",
+            "Une inversion agit à l’endroit où son cercle est placé. Inverser A avant une porte ET n’est pas équivalent à inverser la sortie de ET. Pour A = 0 et B = 0, ET(NON A, B) vaut 0, alors que NON(ET(A, B)) vaut 1."
+          ],
+          "formula": "NAND = NON(ET) · NOR = NON(OU) · XOR = entrées différentes",
+          "visuals": [
+            "logic:nand",
+            "logic:nor",
+            "logic:xor"
+          ],
+          "questions": [
+            {
+              "kind": "choice",
+              "prompt": "A = 1 et B = 1 pour cette porte. Quelle est S ?",
+              "choices": [
+                "0",
+                "1",
+                "2",
+                "La valeur de A seulement"
+              ],
+              "answer": 0,
+              "explanation": "ET vaut 1 ; le cercle l’inverse en 0.",
+              "visual": "logic:nand",
+              "id": "c22-l04-q01",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "A = 0 et B = 0 pour cette porte. Quelle est S ?",
+              "choices": [
+                "1",
+                "0",
+                "2",
+                "Un niveau indéfini"
+              ],
+              "answer": 0,
+              "explanation": "OU vaut 0 ; le cercle l’inverse en 1.",
+              "visual": "logic:nor",
+              "id": "c22-l04-q02",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "A = 1 et B = 1 pour cette porte. Quelle est S ?",
+              "choices": [
+                "0",
+                "1",
+                "2",
+                "Elle oscille forcément"
+              ],
+              "answer": 0,
+              "explanation": "À deux entrées, =1 signifie exactement une entrée active. Deux entrées identiques donnent 0.",
+              "visual": "logic:xor",
+              "id": "c22-l04-q03",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "truefalse",
+              "prompt": "Pour deux entrées différentes, un OU exclusif donne 1.",
+              "choices": [
+                "Vrai",
+                "Faux"
+              ],
+              "answer": 0,
+              "explanation": "01 et 10 sont les deux lignes où XOR vaut 1.",
+              "id": "c22-l04-q04",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "ET(A, B), puis NON : pour A = 1 et B = 0, la sortie finale vaut…",
+              "choices": [
+                "1",
+                "0",
+                "2",
+                "Une tension toujours égale à 5 V"
+              ],
+              "answer": 0,
+              "explanation": "ET(1, 0) = 0 ; NON(0) = 1. C’est une fonction NON ET.",
+              "visual": "",
+              "id": "c22-l04-q05",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "choice",
+              "prompt": "A = 0, B = 1. On inverse A avant une porte ET avec B : sortie ?",
+              "choices": [
+                "1",
+                "0",
+                "2",
+                "Impossible avec deux portes"
+              ],
+              "answer": 0,
+              "explanation": "NON A vaut 1 ; ET(1, 1) vaut 1.",
+              "visual": "",
+              "id": "c22-l04-q06",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "match",
+              "prompt": "Associe chaque condition à la porte donnant 1.",
+              "choices": [],
+              "answer": 0,
+              "pairs": [
+                {
+                  "left": "Toutes les entrées sont 1",
+                  "right": "ET"
+                },
+                {
+                  "left": "Au moins une entrée est 1",
+                  "right": "OU"
+                },
+                {
+                  "left": "Toutes les entrées sont 0",
+                  "right": "NON OU"
+                },
+                {
+                  "left": "Deux entrées sont différentes",
+                  "right": "OU exclusif"
+                }
+              ],
+              "explanation": "Ces conditions distinguent les fonctions, pour des portes à deux entrées.",
+              "id": "c22-l04-q07",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            },
+            {
+              "kind": "truefalse",
+              "prompt": "Déplacer un cercle d’inversion de la sortie à une seule entrée conserve toujours le résultat.",
+              "choices": [
+                "Vrai",
+                "Faux"
+              ],
+              "answer": 1,
+              "explanation": "ET(NON A, B) et NON(ET(A, B)) sont deux fonctions différentes.",
+              "id": "c22-l04-q08",
+              "topic": "Circuits numériques",
+              "section": "technique",
+              "source": "http://f6kgl.free.fr/COURS.html#T084"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c20",
+      "title": "Le numérique décodé",
+      "subtitle": "Symboles, échantillons et correction d’erreurs",
+      "color": "#8DCFCF",
+      "icon": "binary",
+      "lessons": [
         {
           "title": "Du symbole au débit",
           "summary": "Bauds, bits et surcoût",

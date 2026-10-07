@@ -552,7 +552,12 @@ private data class BackScreenSnapshot(
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             PageHeader(lesson.title,lesson.summary){model.lesson=null}
             Row(verticalAlignment=Alignment.CenterVertically) {Pico(Modifier.size(64.dp),mood=MascotMood.THINKING,pose=MascotPose.POINT);Spacer(Modifier.width(12.dp));Text("D'abord le déclic.\nEnsuite, à toi de jouer.",fontWeight=FontWeight.Bold,color=Teal)}
-            lesson.body.forEach { MorseAwareText(it,fontSize=16.sp,lineHeight=24.sp) }
+            lesson.body.forEachIndexed { index, paragraph ->
+                MorseAwareText(paragraph,fontSize=16.sp,lineHeight=24.sp)
+                lesson.visuals.getOrNull(index)?.takeIf { it.isNotBlank() }?.let { visual ->
+                    Panel(color=Color.White) { LogicLearningVisual(visual, showNames=false, showCaption=false) }
+                }
+            }
             if(lesson.formula.isNotBlank()) Panel(color=Mist){Eyebrow("À RETENIR");MorseAwareText(lesson.formula,fontSize=21.sp,fontWeight=FontWeight.Bold)}
             Text("Cours original Hamigo, adapté des ressources F6KGL. Les références sont dans les réglages.",fontSize=12.sp,color=Muted)
         }

@@ -29,6 +29,10 @@ import kotlin.math.sin
 
 /** Diagrams supplement the factual rows; unknown kinds deliberately render nothing. */
 @Composable fun MemoExtraDiagram(row: RefRow) {
+    if (row.visual.startsWith("logic:")) {
+        LogicLearningVisual(row.visual, showNames=row.visual=="logic:nand-nor", showCaption=false)
+        return
+    }
     if (!row.visual.startsWith("extra:")) return
     val kind = row.visual.removePrefix("extra:")
     val table = ExtraTableData(kind)

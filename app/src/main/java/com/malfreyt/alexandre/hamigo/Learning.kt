@@ -19,10 +19,11 @@ data class Question(
     val explanation: String, val topic: String = "", val section: String = "technique",
     val kind: String = "choice", val image: String? = null, val value: Double? = null,
     val unit: String = "", val tolerance: Double = .01, val pairs: List<PairItem> = emptyList(),
-    val source: String = "Hamigo", val bands: List<String> = emptyList()
+    val source: String = "Hamigo", val bands: List<String> = emptyList(), val visual: String = ""
 )
+/** Optional visuals align with body paragraphs; empty entries leave the paragraph as text. */
 data class Lesson(val id: String, val title: String, val summary: String, val body: List<String>,
-    val formula: String, val topic: String, val questions: List<Question>)
+    val formula: String, val topic: String, val questions: List<Question>, val visuals: List<String> = emptyList())
 data class Chapter(val id: String, val title: String, val subtitle: String, val lessons: List<Lesson>)
 data class RefRow(val term: String, val description: String, val extra: String,
     val group: String = "", val kind: String = "fact", val visual: String = "",
@@ -65,7 +66,8 @@ class Content(private val context: Context) {
         Chapter(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("lessons").objects().map { l ->
             val topic = l.optString("topic")
             Lesson(l.getString("id"), l.getString("title"), l.optString("summary"), l.getJSONArray("body").strings(),
-                l.optString("formula"), topic, l.getJSONArray("questions").objects().map { parseQuestion(it, topic) })
+                l.optString("formula"), topic, l.getJSONArray("questions").objects().map { parseQuestion(it, topic) },
+                l.optJSONArray("visuals")?.strings() ?: emptyList())
         })
     }
     val lessons = chapters.flatMap { it.lessons }
@@ -87,7 +89,7 @@ class Content(private val context: Context) {
         val preservedExample = row.kind == "example" && row.cardId.matches(Regex("flash-.+-\\d{1,3}"))
         if ((!preservedExample && row.kind in setOf("tip", "example")) || row.region in setOf("2", "3")) return@mapIndexedNotNull null
         Question(row.cardId.ifBlank { "flash-${cat.id}-$i" }, row.term, listOf(row.description), 0, row.extra,
-            topic = cat.id, kind = "flash", source = cat.title)
+            topic = cat.id, kind = "flash", source = cat.title, visual = row.visual.takeIf { it.startsWith("logic:") }.orEmpty())
     } }
     val procedural = ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
     val mixIndex = PracticeMixIndex(activeExam, procedural)
@@ -101,7 +103,7 @@ class Content(private val context: Context) {
             q.optString("section", "technique"), q.optString("kind", "choice"), q.optString("image").takeIf { it.isNotBlank() && it != "null" },
             if (q.has("value") && !q.isNull("value")) q.getDouble("value") else null, q.optString("unit"),
             q.optDouble("tolerance", .01), pairs, q.optString("source", "Hamigo"),
-            q.optJSONArray("bands")?.strings() ?: q.optJSONObject("resistor")?.optJSONArray("bands")?.strings() ?: emptyList())
+            q.optJSONArray("bands")?.strings() ?: q.optJSONObject("resistor")?.optJSONArray("bands")?.strings() ?: emptyList(), q.optString("visual"))
     }
 }
 fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }

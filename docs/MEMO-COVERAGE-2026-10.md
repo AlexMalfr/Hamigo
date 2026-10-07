@@ -6,9 +6,9 @@ Cette matrice ne mesure pas la couverture en comptant les pages : elle relie cha
 
 ## Résultat de l'intégration
 
-La bibliothèque fusionnée dans `data/reference.json` contient **38 fiches, 1 092 entrées et 969 flashcards**. Le nombre d'entrées comprend les faits, exemples, astuces et cartes de compatibilité : ce n'est pas un nombre de faits indépendants ni un total de lignes toutes visibles. Les identifiants des **390 anciennes flashcards** sont préservés pour conserver leurs échéances de révision.
+La bibliothèque fusionnée dans `data/reference.json` contient **40 fiches, 1 093 entrées et 970 flashcards**. Le nombre d'entrées comprend les faits, exemples, astuces et cartes de compatibilité : ce n'est pas un nombre de faits indépendants ni un total de lignes toutes visibles. Les identifiants des **390 anciennes flashcards** sont préservés pour conserver leurs échéances de révision.
 
-`data/reference-additions.json` contient **23 fiches / 488 entrées**, dont 18 cartes de compatibilité invisibles dans la fiche et des exemples/astuces. Il remplace les anciennes fiches `propagation` et `exam-rules`, et ajoute 21 fiches, dont les **20 matériaux du tableau de résistivités**. Les autres fragments remanient alphabet, Morse, codes Q, bandes/satellites, indicatifs, classes d’émission, rapports, abréviations, régions UIT, résistances, dB, unités, préfixes SI et formules. L'ancienne fiche satellite est intégrée aux bandes amateur.
+`data/reference-additions.json` contient **25 fiches / 489 entrées**, dont 18 cartes de compatibilité invisibles dans la fiche et des exemples/astuces. Il remplace les anciennes fiches `propagation` et `exam-rules`, et ajoute 21 fiches, dont les **20 matériaux du tableau de résistivités**. Les autres fragments remanient alphabet, Morse, codes Q, bandes/satellites, indicatifs, classes d’émission, rapports, abréviations, régions UIT, résistances, dB, unités, préfixes SI et formules. L'ancienne fiche satellite est intégrée aux bandes amateur.
 
 La bibliothèque distingue six familles, normalisées lors de la fusion : Communiquer ; Réglementation et station ; Bases et calculs ; Électricité et composants ; Électronique ; Radio et antennes. La liste et les fiches ont un en-tête fixe, une recherche déployable, une calculatrice et un accès discret au cours complet. La fiche des bandes propose le choix de région et le regroupement par gamme ; les allocations satellite y sont intégrées. Les outils sont séparés du contenu factuel par leur fond turquoise et de l'espace. Les exemples et les astuces ont leur propre traitement visuel.
 
@@ -37,7 +37,7 @@ Les **16 tableaux HTML** de l'archive ont été inventoriés, avec une numérota
 | 10 | Série/parallèle : R, U, I et P | `dc-circuits`, tableau natif, formules et outils |
 | 11 | Application numérique série/parallèle | Notions et exemples de `dc-circuits`, `formulas` et outils ; les neuf calculs et valeurs de cet exercice ne sont pas recopiés à l'identique |
 | 12 | Dizaines/unités de dB et rapports | `decibels`, tableau natif de décomposition |
-| 13 | Décimal, binaire et hexadécimal de 0 à 15 | `logic-digital`, tableau natif |
+| 13 | Décimal, binaire et hexadécimal de 0 à 15 | `binary-logic`, tableau natif |
 | 14 | ROS, coefficient de réflexion et puissance réfléchie | `transmission-lines`, tableau natif et définitions |
 | 15 | S-mètre HF, dB/S9 et µV sous 50 Ω | `radio-blocks`, tableau natif ; `reports`, interprétation des reports |
 
@@ -162,10 +162,10 @@ Les anciens frais, formulaires, coordonnées téléphoniques et délais postaux 
 | T8.1 | AOP idéal, entrées +/−, gain ouvert, saturation | `logic-digital` AOP |
 | T8.2 | Inverseur, contre-réaction, masse virtuelle, −R₂/R₁ | `logic-digital` « Montage inverseur » et schéma natif |
 | T8.3 | Non-inverseur, suiveur, soustracteur, intégrateur, filtres actifs/PWM | `logic-digital` AOP ; classe D dans `amplifiers-oscillators` |
-| T8.4 | Tables ET/OU/NON/NAND/NOR/XOR, niveaux et combinaisons | `logic-digital` Logique avec tableau de vérité natif et définitions |
-| T8.5a–b | Bits/octets, binaire/hexadécimal, SI/IEC | `logic-digital` Binaire avec tableau natif des seize combinaisons |
-| T8.5c | CRC/ARQ/FEC | `logic-digital` Signal numérique |
-| T8.5d–h | CAN/CNA, Nyquist/alias, quantification, FFT/IQ, FIR/IIR/SAW | `logic-digital` Signal numérique ; `filters` « Quartz et SAW » |
+| T8.4 | Tables ET/OU/NON/NAND/NOR/XOR, niveaux et combinaisons | `binary-logic` Logique avec tableau de vérité natif et définitions |
+| T8.5a–b | Bits/octets, binaire/hexadécimal, SI/IEC | `binary-logic` Binaire avec tableau natif des seize combinaisons |
+| T8.5c | CRC/ARQ/FEC | `digital-signals` Signal numérique |
+| T8.5d–h | CAN/CNA, Nyquist/alias, quantification, FFT/IQ, FIR/IIR/SAW | `digital-signals` Signal numérique ; `filters` « Quartz et SAW » |
 
 ## Technique T9–T12 : radioélectricité
 

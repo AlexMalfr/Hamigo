@@ -2787,11 +2787,11 @@
     },
     {
       "id": "logic-digital",
-      "title": "Amplis opérationnels et logique numérique",
+      "title": "Amplificateurs opérationnels",
       "subtitle": "",
       "group": "Électronique",
       "order": 30,
-      "intro": "Comprendre la contre-réaction, les portes logiques et la conversion entre signal analogique et nombres.",
+      "intro": "Entrées, contre-réaction et montages utiles des AOP.",
       "source": "http://f6kgl.free.fr/COURS.html#T081a",
       "flashcards": true,
       "rows": [
@@ -2802,7 +2802,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-2cf62fd43d03"
         },
         {
           "term": "Avec contre-réaction négative",
@@ -2811,7 +2812,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-397bd7e3c710"
         },
         {
           "term": "Montage inverseur",
@@ -2820,7 +2822,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "extra:opamp-inverting",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-a14283712149"
         },
         {
           "term": "Montage non inverseur",
@@ -2829,7 +2832,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-2b0be39f6045"
         },
         {
           "term": "Suiveur et comparateur",
@@ -2838,7 +2842,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-858330be681b"
         },
         {
           "term": "Exemple inverseur",
@@ -2847,151 +2852,8 @@
           "group": "Exemple",
           "kind": "example",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Bit et octet",
-          "description": "Un bit vaut 0 ou 1 ; un octet contient 8 bits, donc 256 combinaisons de 0 à 255.",
-          "extra": "Les niveaux électriques correspondant à 0 et 1 dépendent de la famille logique.",
-          "group": "Binaire",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Base 2",
-          "description": "Chaque position pèse une puissance de deux : … 8, 4, 2, 1. 1011₂ = 8 + 2 + 1 = 11.",
-          "extra": "Un zéro au début n’ajoute pas de valeur.",
-          "group": "Binaire",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Hexadécimal",
-          "description": "Base 16 : 0–9 puis A=10, B=11, C=12, D=13, E=14, F=15. Un chiffre représente 4 bits.",
-          "extra": "FF₁₆ = 255 = 11111111₂.",
-          "group": "Binaire",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Préfixes numériques",
-          "description": "SI : 1 ko = 1 000 octets ; IEC : 1 Kio = 1 024 octets. Le cours emploie historiquement « ko » pour 1 024.",
-          "extra": "Distinguer notation ancienne et normalisée.",
-          "group": "Binaire",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Porte ET",
-          "description": "Sortie 1 seulement si les deux entrées sont 1 : 00→0, 01→0, 10→0, 11→1.",
-          "extra": "AND, symbole &.",
-          "group": "Logique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Porte OU",
-          "description": "Sortie 1 si au moins une entrée vaut 1 : 00→0, 01→1, 10→1, 11→1.",
-          "extra": "OR, symbole ≥1.",
-          "group": "Logique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Porte NON",
-          "description": "Inverse le niveau : 0→1 et 1→0. Un petit cercle sur une entrée ou sortie indique une inversion.",
-          "extra": "NOT.",
-          "group": "Logique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "NON ET et NON OU",
-          "description": "NAND : inverse de ET (00→1, 01→1, 10→1, 11→0). NOR : inverse de OU (00→1, autres→0).",
-          "extra": "Appliquer d’abord l’opération, puis l’inversion.",
-          "group": "Logique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "OU exclusif",
-          "description": "Sortie 1 si les entrées diffèrent : 00→0, 01→1, 10→1, 11→0.",
-          "extra": "XOR, symbole =1 pour deux entrées.",
-          "group": "Logique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "CAN et CNA",
-          "description": "CAN/ADC : analogique vers numérique ; CNA/DAC : numérique vers analogique.",
-          "extra": "Le cours comporte une inversion de l’abréviation anglaise dans le paragraphe DDS : DAC est bien numérique → analogique.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Échantillonnage",
-          "description": "Un signal limité à fmax doit être échantillonné à une fréquence supérieure à 2fmax pour être reconstruit sans ambiguïté, avec filtrage adapté.",
-          "extra": "Shannon-Nyquist : filtrer avant le CAN pour éviter le repliement spectral.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Quantification",
-          "description": "Avec n bits, 2ⁿ niveaux. La quantification produit une erreur et du bruit ; plus de bits améliorent la dynamique idéale.",
-          "extra": "Ordre de grandeur du cours : environ 6 dB par bit.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "DSP, FFT et I/Q",
-          "description": "DSP : traitement numérique (filtrage, démodulation) ; FFT : représentation fréquentielle ; I/Q : deux composantes en quadrature.",
-          "extra": "Ces fonctions ne remplacent pas les limites analogiques en entrée du récepteur.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "CRC, ARQ et FEC",
-          "description": "CRC détecte des erreurs ; ARQ demande une retransmission ; FEC ajoute de la redondance permettant de corriger certaines erreurs sans renvoi.",
-          "extra": "Détection et correction sont des fonctions différentes.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "FIR et IIR",
-          "description": "FIR : réponse impulsionnelle finie ; IIR : rétroaction pouvant donner une réponse qui se prolonge indéfiniment.",
-          "extra": "Ils permettent un filtrage numérique après conversion, avec contraintes de calcul et stabilité.",
-          "group": "Signal numérique",
-          "kind": "fact",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
-        },
-        {
-          "term": "Lecture combinatoire",
-          "description": "Calculer les portes dans l’ordre du trajet, puis appliquer chaque inversion repérée par un cercle.",
-          "extra": "Exemple : NON(ET(1, 1)) = 0.",
-          "group": "Logique",
-          "kind": "example",
-          "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-9fa560583ba6"
         },
         {
           "term": "Soustracteur",
@@ -3000,7 +2862,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-99c642320ec9"
         },
         {
           "term": "Intégrateur",
@@ -3009,7 +2872,8 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-fe56d68765c0"
         },
         {
           "term": "Filtres actifs",
@@ -3018,16 +2882,60 @@
           "group": "AOP",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T081a"
+          "source": "http://f6kgl.free.fr/COURS.html#T081a",
+          "cardId": "flash-logic-digital-b6a3677ce85e"
+        }
+      ]
+    },
+    {
+      "id": "binary-logic",
+      "title": "Binaire et portes logiques",
+      "subtitle": "",
+      "group": "Électronique",
+      "order": 30.1,
+      "intro": "Des poids des bits aux tables de vérité, avec les symboles rectangulaires CEI utilisés en France.",
+      "source": "http://f6kgl.free.fr/COURS.html#T084",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "Bit et octet",
+          "description": "Un bit vaut 0 ou 1 ; un octet contient 8 bits, donc 256 combinaisons de 0 à 255.",
+          "extra": "Les niveaux électriques correspondant à 0 et 1 dépendent de la famille logique.",
+          "group": "Binaire",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-d389a22a104e"
         },
         {
-          "term": "Tables de vérité des six portes",
-          "description": "Compare la sortie de chaque porte pour les quatre combinaisons de A et B.",
-          "extra": "ET, OU, NON, NAND, NOR et XOR : les définitions sont détaillées dans cette section.",
-          "group": "Logique",
+          "term": "Base 2",
+          "description": "Chaque position pèse une puissance de deux : … 8, 4, 2, 1. 1011₂ = 8 + 2 + 1 = 11.",
+          "extra": "Un zéro au début n’ajoute pas de valeur.",
+          "group": "Binaire",
           "kind": "fact",
-          "visual": "extra:logic-table",
-          "source": "http://f6kgl.free.fr/COURS.html#T084"
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-2e6593101f5c"
+        },
+        {
+          "term": "Hexadécimal",
+          "description": "Base 16 : 0–9 puis A=10, B=11, C=12, D=13, E=14, F=15. Un chiffre représente 4 bits.",
+          "extra": "FF₁₆ = 255 = 11111111₂.",
+          "group": "Binaire",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-4baca1549e6e"
+        },
+        {
+          "term": "Préfixes numériques",
+          "description": "SI : 1 ko = 1 000 octets ; IEC : 1 Kio = 1 024 octets. Le cours emploie historiquement « ko » pour 1 024.",
+          "extra": "Distinguer notation ancienne et normalisée.",
+          "group": "Binaire",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-f7c9642b5d4d"
         },
         {
           "term": "Décimal, binaire et hexadécimal",
@@ -3036,7 +2944,160 @@
           "group": "Binaire",
           "kind": "fact",
           "visual": "extra:binary-table",
-          "source": "http://f6kgl.free.fr/COURS.html#T085"
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-932818728488"
+        },
+        {
+          "term": "Lire les symboles rectangulaires",
+          "description": "Entrées à gauche, sortie S à droite. La marque du rectangle donne la fonction : & pour ET, ≥1 pour OU, =1 pour OU exclusif à deux entrées. Un cercle à une borne inverse le niveau.",
+          "extra": "La porte NON a une seule entrée, la marque 1 et un cercle en sortie. Les niveaux électriques réels dépendent de la famille du composant.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-binary-logic-reading-symbols"
+        },
+        {
+          "term": "Porte ET",
+          "description": "Sortie 1 seulement si les deux entrées sont 1 : 00→0, 01→0, 10→0, 11→1.",
+          "extra": "AND, symbole &.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "logic:and",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-03f25a16bfc5"
+        },
+        {
+          "term": "Porte OU",
+          "description": "Sortie 1 si au moins une entrée vaut 1 : 00→0, 01→1, 10→1, 11→1.",
+          "extra": "OR, symbole ≥1.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "logic:or",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-55b19f21db5c"
+        },
+        {
+          "term": "Porte NON",
+          "description": "Inverse le niveau : 0→1 et 1→0. Un petit cercle sur une entrée ou sortie indique une inversion.",
+          "extra": "NOT.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "logic:not",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-d5ac72e49715"
+        },
+        {
+          "term": "NON ET et NON OU",
+          "description": "NAND : inverse de ET (00→1, 01→1, 10→1, 11→0). NOR : inverse de OU (00→1, autres→0).",
+          "extra": "Appliquer d’abord l’opération, puis l’inversion.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "logic:nand-nor",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-d88ce6fe4490"
+        },
+        {
+          "term": "OU exclusif",
+          "description": "Sortie 1 si les entrées diffèrent : 00→0, 01→1, 10→1, 11→0.",
+          "extra": "XOR, symbole =1 pour deux entrées.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "logic:xor",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-cb5feac02f85"
+        },
+        {
+          "term": "Lecture combinatoire",
+          "description": "Calculer les portes dans l’ordre du trajet, puis appliquer chaque inversion repérée par un cercle.",
+          "extra": "Exemple : NON(ET(1, 1)) = 0.",
+          "group": "Logique",
+          "kind": "example",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-3fb3f256c9fe"
+        },
+        {
+          "term": "Tables de vérité des six portes",
+          "description": "Compare la sortie de chaque porte pour les quatre combinaisons de A et B.",
+          "extra": "ET, OU, NON, NAND, NOR et XOR : les définitions sont détaillées dans cette section.",
+          "group": "Logique",
+          "kind": "fact",
+          "visual": "extra:logic-table",
+          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "cardId": "flash-logic-digital-0252c10cac34"
+        }
+      ]
+    },
+    {
+      "id": "digital-signals",
+      "title": "Conversion et traitement numérique",
+      "subtitle": "",
+      "group": "Électronique",
+      "order": 30.2,
+      "intro": "Passer d’un signal analogique aux nombres : conversions, échantillonnage, quantification et traitement.",
+      "source": "http://f6kgl.free.fr/COURS.html#T085",
+      "flashcards": true,
+      "rows": [
+        {
+          "term": "CAN et CNA",
+          "description": "CAN/ADC : analogique vers numérique ; CNA/DAC : numérique vers analogique.",
+          "extra": "Le cours comporte une inversion de l’abréviation anglaise dans le paragraphe DDS : DAC est bien numérique → analogique.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-38d3de2c2e4a"
+        },
+        {
+          "term": "Échantillonnage",
+          "description": "Un signal limité à fmax doit être échantillonné à une fréquence supérieure à 2fmax pour être reconstruit sans ambiguïté, avec filtrage adapté.",
+          "extra": "Shannon-Nyquist : filtrer avant le CAN pour éviter le repliement spectral.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-a3a5f398b3b0"
+        },
+        {
+          "term": "Quantification",
+          "description": "Avec n bits, 2ⁿ niveaux. La quantification produit une erreur et du bruit ; plus de bits améliorent la dynamique idéale.",
+          "extra": "Ordre de grandeur du cours : environ 6 dB par bit.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-d99f08bf3dce"
+        },
+        {
+          "term": "DSP, FFT et I/Q",
+          "description": "DSP : traitement numérique (filtrage, démodulation) ; FFT : représentation fréquentielle ; I/Q : deux composantes en quadrature.",
+          "extra": "Ces fonctions ne remplacent pas les limites analogiques en entrée du récepteur.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-53dc4ad3f042"
+        },
+        {
+          "term": "CRC, ARQ et FEC",
+          "description": "CRC détecte des erreurs ; ARQ demande une retransmission ; FEC ajoute de la redondance permettant de corriger certaines erreurs sans renvoi.",
+          "extra": "Détection et correction sont des fonctions différentes.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-efba4d7d0ba0"
+        },
+        {
+          "term": "FIR et IIR",
+          "description": "FIR : réponse impulsionnelle finie ; IIR : rétroaction pouvant donner une réponse qui se prolonge indéfiniment.",
+          "extra": "Ils permettent un filtrage numérique après conversion, avec contraintes de calcul et stabilité.",
+          "group": "Signal numérique",
+          "kind": "fact",
+          "visual": "",
+          "source": "http://f6kgl.free.fr/COURS.html#T085",
+          "cardId": "flash-logic-digital-d355f9fa2700"
         }
       ]
     },

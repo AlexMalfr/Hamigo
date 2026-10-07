@@ -176,6 +176,7 @@ private val toleranceOptions = listOf("Brun" to 1.0, "Rouge" to 2.0, "Vert" to .
 
 private data class ReferenceTool(val id: String, val title: String, val subtitle: String)
 private fun categoryTools(category: String): List<ReferenceTool> = when (category) {
+    "binary-logic" -> listOf(ReferenceTool("logic", "Portes logiques", "Entrées → porte → sortie"))
     "resistors" -> listOf(ReferenceTool("resistor", "Les anneaux en vrai", "Lire et composer une résistance"), ReferenceTool("networks", "Résistances ensemble", "Série et parallèle"))
     "morse", "morse-rhythm" -> listOf(ReferenceTool("morse", "Le traducteur de Pico", "Texte ↔ Morse, avec le son"))
     "decibels" -> listOf(ReferenceTool("db", "La réglette des décibels", "Rapport ↔ gain ou atténuation"), ReferenceTool("dbchain", "Puissances et décibels", "Entrée → gain → sortie : schéma dynamique"))
@@ -204,6 +205,7 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
                 }
                 if (opened == tool.id) Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 when (tool.id) {
+                    "logic" -> LogicGateTool()
                     "resistor" -> ResistorCalculator()
                     "morse" -> MorseTranslator()
                     "db" -> DecibelCalculator()

@@ -82,6 +82,7 @@ internal val LocalAnimatedBack = staticCompositionLocalOf<(() -> Unit)?> { null 
             val prompt=if(question.topic=="morse")MorseReference.characterName(question.prompt) else question.prompt
             MorseAwareText(if(backVisible)question.choices.firstOrNull().orEmpty() else prompt,
                 fontSize=23.sp,lineHeight=30.sp,fontWeight=FontWeight.ExtraBold)
+            if (question.visual.startsWith("logic:")) LogicLearningVisual(question.visual, showNames=false, showCaption=false)
             if(backVisible && question.explanation.isNotBlank())MorseAwareText(question.explanation,fontSize=14.sp,lineHeight=20.sp,color=Muted)
             Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                 Icon(Icons.Rounded.SwapHoriz,null,Modifier.size(18.dp),tint=Teal)

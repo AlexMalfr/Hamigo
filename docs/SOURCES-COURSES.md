@@ -1,6 +1,6 @@
 # Sources pédagogiques et vérifications
 
-Contenu préparé le 3 octobre 2026 et ressources Mémo complétées le 5 octobre pour Hamigo. Le parcours comporte **21 chapitres, 94 leçons et 826 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **38 catégories, 1 092 entrées et 969 flashcards**, dont les identifiants des 390 anciennes cartes sont conservés. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application ; ils ne recopient pas les paragraphes du cours. Les connaissances et tableaux des ressources sont suivis dans [la matrice Mémo](MEMO-COVERAGE-2026-10.md), [les sources radio](MEMO-RADIO-SOURCES.md) et [les sources techniques](MEMO-TECHNICAL-SOURCES.md). L'audit antérieur du parcours demeure dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
+Contenu préparé le 3 octobre 2026 et ressources Mémo complétées les 5 et 7 octobre pour Hamigo. Le parcours comporte **22 chapitres, 97 leçons et 850 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **40 catégories, 1 093 entrées et 970 flashcards**, dont les identifiants des 390 anciennes cartes sont conservés. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application ; ils ne recopient pas les paragraphes du cours. Les connaissances et tableaux des ressources sont suivis dans [la matrice Mémo](MEMO-COVERAGE-2026-10.md), [les sources radio](MEMO-RADIO-SOURCES.md) et [les sources techniques](MEMO-TECHNICAL-SOURCES.md). L'audit antérieur du parcours demeure dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
 
 ## Approfondissements du parcours
 
@@ -11,10 +11,11 @@ Les identifiants des 14 chapitres, 56 leçons et 224 questions initiales sont co
 - **c17 — RLC, au-delà des recettes** : énergie stockée, réactances calculées, module/phase, accord, Q et chargement.
 - **c18 — RF : voir ce qui sort du poste** : spectres et harmoniques, mélangeurs et images, compression/intermodulation, dBm et rapport signal/bruit.
 - **c19 — Antennes et lignes à la loupe** : coefficient de réflexion, puissance réfléchie et ROS, longueur électrique, pertes et diagnostic mesuré.
-- **c20 — Le numérique décodé** : binaire, symboles et débit, échantillonnage/repliement, détection et correction d’erreurs.
+- **c20 — Le numérique décodé** : symboles et débit, échantillonnage/repliement, détection et correction d’erreurs.
+- **c22 — Binaire et portes logiques** : la leçon historique `c20-l01` est déplacée ici, avec son contenu et ses identifiants intacts. Trois leçons originales supplémentaires enseignent octets/hexadécimal, ET/OU/NON puis NAND/NOR/XOR et lecture combinatoire ; 24 nouveaux exercices. Placé avant c20, sans modifier les données sauvegardées des joueurs.
 - **c21 — Le labo des bons réflexes** : reports honnêtes, diagnostic reproductible, réglage d’émission et méthodes de révision.
 
-Chaque nouveau chapitre technique contient quatre leçons à huit exercices. Les leçons Morse utilisent de plus grands réservoirs pour couvrir chaque caractère en lecture, écoute et composition. La progression conserve un ordre pédagogique; la sélection de questions en séance peut varier. Ces nouvelles questions sont distinctes de la banque Exam’1 et ne prétendent pas être des sujets officiels.
+Les leçons techniques ajoutées contiennent huit exercices chacune ; après la séparation de la logique, c20 en compte trois et c22 quatre. Les leçons Morse utilisent de plus grands réservoirs pour couvrir chaque caractère en lecture, écoute et composition. La progression conserve un ordre pédagogique; la sélection de questions en séance peut varier. Ces nouvelles questions sont distinctes de la banque Exam’1 et ne prétendent pas être des sujets officiels.
 
 ## Source principale
 
