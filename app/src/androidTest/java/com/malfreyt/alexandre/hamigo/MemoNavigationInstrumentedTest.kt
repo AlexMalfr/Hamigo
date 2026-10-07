@@ -148,7 +148,7 @@ class MemoNavigationInstrumentedTest {
         capture("search-outside-collapsed")
     }
 
-    @Test fun dedicatedLogicFicheAndSandboxRenderEuropeanSymbols() {
+    @Test fun dedicatedLogicFicheAndSandboxRenderDistinctiveSymbols() {
         ui.runOnIdle { model.resource = model.content!!.references.first { it.id == "binary-logic" } }
         ui.onNodeWithText("Entrées → porte → sortie").performClick()
         ui.onNodeWithTag("logic-tool-output").assertTextEquals("S = 0")
@@ -208,7 +208,7 @@ class MemoNavigationInstrumentedTest {
             }
             assertTrue("The screenshot needs a submitted frame",frame.await(5,TimeUnit.SECONDS))
         }
-        val dir=File(context.getExternalFilesDir(null),"memo-logic-0.35").apply { mkdirs() }
+        val dir=File(context.getExternalFilesDir(null),"memo-logic-0.36").apply { mkdirs() }
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         try { File(dir,"$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG,100,it) } }
         finally { bitmap.recycle() }

@@ -9321,10 +9321,10 @@
           "topic": "Circuits numériques",
           "body": [
             "Une porte logique transforme des entrées binaires en une sortie binaire. 0 et 1 désignent des niveaux logiques ; les tensions réelles et leurs seuils dépendent de la famille du composant. Ne suppose pas que 1 signifie toujours exactement 5 V.",
-            "Dans la représentation rectangulaire CEI utilisée en France, les entrées arrivent à gauche et la sortie S est à droite. La marque dans le rectangle indique la fonction. Un petit cercle à une borne signifie une inversion logique.",
-            "La porte ET porte la marque &. Elle donne 1 seulement si A ET B valent tous deux 1. Pour 00, 01 et 10, la sortie vaut 0 ; pour 11, elle vaut 1.",
-            "La porte OU porte la marque ≥1 : il suffit d’au moins une entrée à 1. Ses sorties pour 00, 01, 10 et 11 sont 0, 1, 1 et 1. Ce OU est inclusif : deux entrées à 1 donnent aussi 1.",
-            "La porte NON possède une seule entrée. Son rectangle porte 1, et le cercle en sortie indique que la sortie est le complément : 0 devient 1 et 1 devient 0. Une table de vérité énumère les entrées possibles et la sortie correspondante."
+            "Les dessins de ce cours utilisent des formes distinctes, comme dans de nombreuses fiches techniques : ET arrondi à droite, OU courbé et NON triangulaire. Les entrées arrivent à gauche et la sortie S est à droite. Un petit cercle à une borne signifie une inversion logique. Tu peux aussi rencontrer des rectangles CEI avec une marque indiquant la fonction : les deux conventions décrivent les mêmes portes.",
+            "La porte ET a un côté gauche droit et un côté droit arrondi, comme un D. Elle donne 1 seulement si A ET B valent tous deux 1. Pour 00, 01 et 10, la sortie vaut 0 ; pour 11, elle vaut 1. Dans la notation rectangulaire CEI, sa marque est &.",
+            "La porte OU a une entrée courbe et une sortie en pointe : il suffit d’au moins une entrée à 1. Ses sorties pour 00, 01, 10 et 11 sont 0, 1, 1 et 1. Ce OU est inclusif : deux entrées à 1 donnent aussi 1. Sa marque rectangulaire CEI est ≥1.",
+            "La porte NON possède une seule entrée. Son triangle et le cercle en sortie indiquent que la sortie est le complément : 0 devient 1 et 1 devient 0. La notation rectangulaire CEI utilise la marque 1 avec le même cercle en sortie. Une table de vérité énumère les entrées possibles et la sortie correspondante."
           ],
           "formula": "ET : toutes les entrées à 1 · OU : au moins une à 1 · NON : inverse",
           "visuals": [
@@ -9345,7 +9345,7 @@
                 "OU exclusif"
               ],
               "answer": 0,
-              "explanation": "La marque & désigne la fonction ET.",
+              "explanation": "Le côté gauche droit et le côté droit arrondi forment le symbole ET.",
               "visual": "logic:and",
               "id": "c22-l03-q01",
               "topic": "Circuits numériques",
@@ -9402,24 +9402,24 @@
             },
             {
               "kind": "match",
-              "prompt": "Associe la marque à la fonction.",
+              "prompt": "Associe la forme du symbole à la fonction.",
               "choices": [],
               "answer": 0,
               "pairs": [
                 {
-                  "left": "&",
+                  "left": "Côté gauche droit, côté droit arrondi",
                   "right": "ET"
                 },
                 {
-                  "left": "≥1",
+                  "left": "Entrée courbe, sortie en pointe",
                   "right": "OU"
                 },
                 {
-                  "left": "1 avec cercle en sortie",
+                  "left": "Triangle avec cercle en sortie",
                   "right": "NON"
                 }
               ],
-              "explanation": "Lis la marque du rectangle, puis applique une éventuelle inversion.",
+              "explanation": "ET a une forme en D, OU un contour courbe, et NON un triangle avec cercle.",
               "id": "c22-l03-q05",
               "topic": "Circuits numériques",
               "section": "technique",
@@ -9478,9 +9478,9 @@
           "summary": "NON ET, NON OU et OU exclusif",
           "topic": "Circuits numériques",
           "body": [
-            "NON ET, ou NAND, est une porte ET suivie d’une inversion. Son rectangle porte & et un cercle en sortie. Elle vaut 0 seulement pour A = B = 1 ; elle vaut 1 pour les trois autres combinaisons.",
-            "NON OU, ou NOR, est une porte OU suivie d’une inversion. Son rectangle porte ≥1 et un cercle en sortie. Elle vaut 1 seulement pour A = B = 0 ; elle vaut 0 dès qu’une entrée vaut 1.",
-            "Le OU exclusif, ou XOR, à deux entrées porte =1 : exactement une entrée doit valoir 1. Les entrées différentes (01 ou 10) donnent 1 ; les entrées identiques (00 ou 11) donnent 0. Les exemples de cette leçon utilisent toujours deux entrées.",
+            "NON ET, ou NAND, est une porte ET suivie d’une inversion. Son symbole garde la forme en D de ET avec un cercle en sortie. Elle vaut 0 seulement pour A = B = 1 ; elle vaut 1 pour les trois autres combinaisons.",
+            "NON OU, ou NOR, est une porte OU suivie d’une inversion. Son symbole garde le contour courbe de OU avec un cercle en sortie. Elle vaut 1 seulement pour A = B = 0 ; elle vaut 0 dès qu’une entrée vaut 1.",
+            "Le OU exclusif, ou XOR, ajoute une seconde courbe du côté des entrées au symbole OU. À deux entrées, exactement une entrée doit valoir 1 : les entrées différentes (01 ou 10) donnent 1 ; les entrées identiques (00 ou 11) donnent 0. Sa marque rectangulaire CEI est =1. Les exemples de cette leçon utilisent toujours deux entrées.",
             "Pour lire un circuit combiné, suis les fils de gauche à droite. Calcule chaque sortie intermédiaire, puis utilise-la comme entrée de la porte suivante. Exemple : ET(1, 1) = 1, puis NON(1) = 0. Ce circuit équivaut à NON ET(1, 1).",
             "Une inversion agit à l’endroit où son cercle est placé. Inverser A avant une porte ET n’est pas équivalent à inverser la sortie de ET. Pour A = 0 et B = 0, ET(NON A, B) vaut 0, alors que NON(ET(A, B)) vaut 1."
           ],
@@ -9535,7 +9535,7 @@
                 "Elle oscille forcément"
               ],
               "answer": 0,
-              "explanation": "À deux entrées, =1 signifie exactement une entrée active. Deux entrées identiques donnent 0.",
+              "explanation": "La courbe supplémentaire distingue OU exclusif de OU. Deux entrées identiques donnent 0.",
               "visual": "logic:xor",
               "id": "c22-l04-q03",
               "topic": "Circuits numériques",

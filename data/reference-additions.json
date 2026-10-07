@@ -2893,7 +2893,7 @@
       "subtitle": "",
       "group": "Électronique",
       "order": 30.1,
-      "intro": "Des poids des bits aux tables de vérité, avec les symboles rectangulaires CEI utilisés en France.",
+      "intro": "Des poids des bits aux tables de vérité. Reconnaître les portes à leur forme et tester leurs entrées.",
       "source": "http://f6kgl.free.fr/COURS.html#T084",
       "flashcards": true,
       "rows": [
@@ -2948,19 +2948,19 @@
           "cardId": "flash-logic-digital-932818728488"
         },
         {
-          "term": "Lire les symboles rectangulaires",
-          "description": "Entrées à gauche, sortie S à droite. La marque du rectangle donne la fonction : & pour ET, ≥1 pour OU, =1 pour OU exclusif à deux entrées. Un cercle à une borne inverse le niveau.",
-          "extra": "La porte NON a une seule entrée, la marque 1 et un cercle en sortie. Les niveaux électriques réels dépendent de la famille du composant.",
+          "term": "Reconnaître les portes",
+          "description": "Entrées à gauche, sortie S à droite. ET a une forme en D ; OU un contour courbe et une sortie en pointe ; NON un triangle avec un cercle en sortie. OU exclusif ajoute une seconde courbe côté entrées. Un cercle à une borne indique une inversion.",
+          "extra": "Autre convention : les rectangles CEI portent & pour ET, ≥1 pour OU, =1 pour OU exclusif à deux entrées, et 1 avec cercle pour NON. Ces conventions donnent les mêmes tables de vérité.",
           "group": "Logique",
           "kind": "fact",
           "visual": "",
-          "source": "http://f6kgl.free.fr/COURS.html#T084",
+          "source": "https://www.ti.com/lit/pdf/scyd013",
           "cardId": "flash-binary-logic-reading-symbols"
         },
         {
           "term": "Porte ET",
           "description": "Sortie 1 seulement si les deux entrées sont 1 : 00→0, 01→0, 10→0, 11→1.",
-          "extra": "AND, symbole &.",
+          "extra": "AND. Forme en D ; marque & dans la convention rectangulaire CEI.",
           "group": "Logique",
           "kind": "fact",
           "visual": "logic:and",
@@ -2970,7 +2970,7 @@
         {
           "term": "Porte OU",
           "description": "Sortie 1 si au moins une entrée vaut 1 : 00→0, 01→1, 10→1, 11→1.",
-          "extra": "OR, symbole ≥1.",
+          "extra": "OR. Contour courbe ; marque ≥1 dans la convention rectangulaire CEI.",
           "group": "Logique",
           "kind": "fact",
           "visual": "logic:or",
@@ -2980,7 +2980,7 @@
         {
           "term": "Porte NON",
           "description": "Inverse le niveau : 0→1 et 1→0. Un petit cercle sur une entrée ou sortie indique une inversion.",
-          "extra": "NOT.",
+          "extra": "NOT. Triangle et cercle d’inversion en sortie.",
           "group": "Logique",
           "kind": "fact",
           "visual": "logic:not",
@@ -2990,7 +2990,7 @@
         {
           "term": "NON ET et NON OU",
           "description": "NAND : inverse de ET (00→1, 01→1, 10→1, 11→0). NOR : inverse de OU (00→1, autres→0).",
-          "extra": "Appliquer d’abord l’opération, puis l’inversion.",
+          "extra": "Appliquer d’abord l’opération, puis l’inversion indiquée par le cercle en sortie.",
           "group": "Logique",
           "kind": "fact",
           "visual": "logic:nand-nor",
@@ -3000,7 +3000,7 @@
         {
           "term": "OU exclusif",
           "description": "Sortie 1 si les entrées diffèrent : 00→0, 01→1, 10→1, 11→0.",
-          "extra": "XOR, symbole =1 pour deux entrées.",
+          "extra": "XOR. Une courbe supplémentaire côté entrées ; marque =1 dans la convention rectangulaire CEI à deux entrées.",
           "group": "Logique",
           "kind": "fact",
           "visual": "logic:xor",

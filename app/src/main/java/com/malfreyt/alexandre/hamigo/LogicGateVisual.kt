@@ -11,7 +11,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -22,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.foundation.shape.RoundedCornerShape
 
 internal enum class LogicGate(val label: String, val mark: String, val inverted: Boolean = false) {
@@ -56,10 +56,16 @@ internal enum class LogicGate(val label: String, val mark: String, val inverted:
     }
 }
 
-/** European rectangular notation. A bubble touches the output, never the function mark. */
+/** Distinctive shapes: D for AND, curved OR, triangle for NOT; XOR adds a rear curve. */
 @Composable internal fun LogicGateDiagram(gate: LogicGate, modifier: Modifier = Modifier, announceName: Boolean = true) {
     Canvas(modifier.fillMaxWidth().height(96.dp).testTag("logic-gate-${gate.name.lowercase()}").semantics {
-        contentDescription = (if (announceName) "Porte ${gate.label}, " else "") + "symbole rectangulaire CEI ${gate.mark}" +
+        val shape = when(gate) {
+            LogicGate.AND, LogicGate.NAND -> "forme en D"
+            LogicGate.OR, LogicGate.NOR -> "forme courbe, pointe à droite"
+            LogicGate.NOT -> "triangle, pointe à droite"
+            LogicGate.XOR -> "forme courbe, pointe à droite, courbe supplémentaire à gauche"
+        }
+        contentDescription = (if (announceName) "Porte ${gate.label}, " else "") + shape +
             (if (gate.inverted) ", cercle d’inversion en sortie" else "") +
             if (gate == LogicGate.NOT) ". Entrée A, sortie S." else ". Entrées A et B, sortie S."
     }) {
@@ -77,16 +83,48 @@ internal enum class LogicGate(val label: String, val mark: String, val inverted:
             paint.textSize = font
             drawContext.canvas.nativeCanvas.drawText(text, x, y - (paint.ascent() + paint.descent()) / 2f, paint)
         }
-        drawRect(Mist, Offset(left, top), Size(boxWidth, bottom - top))
-        drawRect(Teal, Offset(left, top), Size(boxWidth, bottom - top), style = Stroke(stroke))
-        label(gate.mark, w / 2f, mid, 26.sp.toPx())
+        val curved = gate in listOf(LogicGate.OR, LogicGate.NOR, LogicGate.XOR)
+        val body = Path().apply {
+            moveTo(left, top)
+            when {
+                gate == LogicGate.NOT -> { lineTo(right, mid); lineTo(left, bottom) }
+                curved -> {
+                    cubicTo(left + boxWidth*.45f, top, left + boxWidth*.78f, top, right, mid)
+                    cubicTo(left + boxWidth*.78f, bottom, left + boxWidth*.45f, bottom, left, bottom)
+                    quadraticTo(left + boxWidth*.5f, mid, left, top)
+                }
+                else -> {
+                    val shoulder = left + boxWidth*.45f
+                    val rx = right - shoulder
+                    val ry = (bottom - top)/2f
+                    val k = .55228475f
+                    lineTo(shoulder, top)
+                    cubicTo(shoulder + k*rx, top, right, mid - k*ry, right, mid)
+                    cubicTo(right, mid + k*ry, shoulder + k*rx, bottom, shoulder, bottom)
+                    lineTo(left, bottom)
+                }
+            }
+            close()
+        }
+        val outputX = right
+        drawPath(body, Mist)
+        drawPath(body, Teal, style = Stroke(stroke))
+        if (gate == LogicGate.XOR) {
+            val shift = 9.dp.toPx()
+            drawPath(Path().apply {
+                moveTo(left - shift, top)
+                quadraticTo(left + boxWidth*.5f - shift, mid, left - shift, bottom)
+            }, Teal, style = Stroke(stroke))
+        }
         val inputs = if (gate == LogicGate.NOT) listOf("A" to mid) else listOf("A" to h * .33f, "B" to h * .67f)
         inputs.forEach { (name, y) ->
-            drawLine(Teal, Offset(left - wire, y), Offset(left, y), stroke)
+            val t = (y - top) / (bottom - top)
+            val inputX = if (curved) left + boxWidth*t*(1-t) else left
+            drawLine(Teal, Offset(left - wire, y), Offset(inputX, y), stroke)
             label(name, left - wire - 12.dp.toPx(), y, 14.sp.toPx())
         }
-        if (gate.inverted) drawCircle(Teal, bubble, Offset(right + bubble, mid), style = Stroke(stroke))
-        val start = right + if (gate.inverted) bubble * 2 else 0f
+        if (gate.inverted) drawCircle(Teal, bubble, Offset(outputX + bubble, mid), style = Stroke(stroke))
+        val start = outputX + if (gate.inverted) bubble * 2 else 0f
         drawLine(Teal, Offset(start, mid), Offset(right + wire, mid), stroke)
         label("S", right + wire + 12.dp.toPx(), mid, 14.sp.toPx())
     }
@@ -105,6 +143,6 @@ internal enum class LogicGate(val label: String, val mark: String, val inverted:
             if (showNames) Text(gate.label, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Teal)
             LogicGateDiagram(gate, announceName=showNames)
         }
-        if (showCaption) Text("Symboles rectangulaires CEI · entrées à gauche, sortie à droite.", color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
+        if (showCaption) Text("Entrées à gauche, sortie à droite · le cercle indique une inversion.", color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
     }
 }

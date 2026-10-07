@@ -183,3 +183,8 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Nouveau chapitre « Binaire et portes logiques » avec quatre leçons : la leçon binaire existante est déplacée sans changement d’identité, puis trois leçons ajoutent 24 exercices. Les validations et anciennes questions sont conservées. Parcours : 22 chapitres, 97 leçons, 850 exercices.
 - Mémo sépare les AOP, le binaire/les portes et la conversion/le traitement numérique. Les six fonctions utilisent les symboles rectangulaires CEI, également dans les leçons, exercices et flashcards. Un outil permet de manipuler les entrées et observer la sortie. Les cartes gardent leurs identifiants et échéances.
 - Documentation des sources, de la réorganisation et des limites dans `LOGIC.md`.
+
+## Portes logiques à formes distinctes — 0.36
+
+- Les dessins de portes utilisent les formes demandées : ET en D, OU courbé, NON triangulaire, XOR avec une courbe supplémentaire. Les cercles d’inversion distinguent NON, NAND et NOR. Même représentation dans Mémo, le simulateur, les cours, les questions, corrections et flashcards.
+- Les explications et exercices de reconnaissance suivent les formes. La convention rectangulaire CEI reste expliquée comme alternative, sans classement exclusif par pays. Identifiants, tables de vérité et progression conservés.
