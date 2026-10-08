@@ -21,6 +21,7 @@ import android.widget.RemoteViews
 import com.malfreyt.alexandre.hamigo.MainActivity
 import com.malfreyt.alexandre.hamigo.PicoRenderer
 import com.malfreyt.alexandre.hamigo.R
+import com.malfreyt.alexandre.hamigo.dayCount
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -62,7 +63,7 @@ internal object WidgetPresentation {
             HomeWidgetKind.WEEK -> if (w < 160f || short) "Semaine" else "Cette semaine"
         }
         val value = when (kind) {
-            HomeWidgetKind.STREAK -> if (short) "${number(r.streak, true)} j" else "${r.streak} ${if (r.streak == 1) "jour" else "jours"}"
+            HomeWidgetKind.STREAK -> if (short) "${number(r.streak, true)} j" else dayCount(r.streak)
             HomeWidgetKind.GOAL -> if (short) "${number(r.todayXp, true)}/${number(r.goal, true)}" else "${r.todayXp} XP"
             HomeWidgetKind.WEEK -> "${number(snapshot.weeklyXp, short)} XP"
         }
@@ -74,7 +75,7 @@ internal object WidgetPresentation {
                 else -> "Une leçon pour démarrer"
             }
             HomeWidgetKind.GOAL -> if (r.todayXp >= r.goal) "Objectif atteint !" else "Encore ${r.goal - r.todayXp} XP"
-            HomeWidgetKind.WEEK -> "${snapshot.activeDays} ${if (snapshot.activeDays == 1) "jour actif" else "jours actifs"}"
+            HomeWidgetKind.WEEK -> "${dayCount(snapshot.activeDays)} ${if (snapshot.activeDays > 1) "actifs" else "actif"}"
         }
         val badge = when (kind) {
             HomeWidgetKind.STREAK -> "${number(r.todayXp, short)} XP aujourd’hui"
@@ -215,9 +216,9 @@ internal object WidgetPresentation {
             setOnClickPendingIntent(R.id.widget_root, action)
             val r = snapshot.reminder
             setContentDescription(R.id.widget_root, "Hamigo. ${when(kind) {
-                HomeWidgetKind.STREAK -> "Série : ${r.streak} jours."
+                HomeWidgetKind.STREAK -> "Série : ${dayCount(r.streak)}."
                 HomeWidgetKind.GOAL -> "Aujourd’hui : ${r.todayXp} XP."
-                HomeWidgetKind.WEEK -> "Cette semaine : ${snapshot.weeklyXp} XP, ${snapshot.activeDays} jours actifs."
+                HomeWidgetKind.WEEK -> "Cette semaine : ${snapshot.weeklyXp} XP, ${dayCount(snapshot.activeDays)} ${if (snapshot.activeDays > 1) "actifs" else "actif"}."
             }} Objectif : ${r.goal} XP par jour. ${snapshot.week.joinToString(" ; ") { "${it.date} : ${it.xp} XP" }}. Ouvrir le parcours.")
         }
     }

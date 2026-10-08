@@ -62,6 +62,7 @@ class LessonRevisionInstrumentedTest {
         ui.onNodeWithTag("path-list").performScrollToIndex(3)
         ui.onNodeWithText(first.title+" ✅").performScrollTo().assertIsDisplayed()
         ui.onNodeWithText(first.summary).assertIsDisplayed()
+        ui.onNodeWithText("🔥 1 jour").assertExists()
         val firstMenu=ui.onNodeWithTag("lesson-menu-${first.id}").fetchSemanticsNode().boundsInRoot
         val secondMenu=ui.onNodeWithTag("lesson-menu-${second.id}").fetchSemanticsNode().boundsInRoot
         assertEquals("Les menus restent sur le même bord",firstMenu.center.x,secondMenu.center.x,1f)
@@ -93,6 +94,11 @@ class LessonRevisionInstrumentedTest {
         ui.runOnIdle {model.startLesson(first)}
         ui.onNodeWithText("À toi de jouer ·",substring=true).assertIsDisplayed()
         capture("course-normal-introduction")
+        ui.runOnIdle {model.lesson=null;model.route="profile"}
+        ui.onNodeWithText("6 XP · 🔥 1 jour").assertIsDisplayed()
+        capture("profile-one-day")
+        val poster=com.malfreyt.alexandre.hamigo.platform.NativeShare.renderProgressImage(context,model.progress.snapshot())
+        poster.copyTo(File(context.getExternalFilesDir(null),"lesson-revision-0.38-r3/share-one-day.png").apply {parentFile!!.mkdirs()},overwrite=true)
     }
 
     @Test fun linkedMemoPredictiveBackCancelsOrMorphsIntoItsCourseRow() {
@@ -233,7 +239,7 @@ class LessonRevisionInstrumentedTest {
             }
             assertTrue(frame.await(5,TimeUnit.SECONDS))
         }
-        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38-r2").apply {mkdirs()}
+        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38-r3").apply {mkdirs()}
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }

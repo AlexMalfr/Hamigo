@@ -81,7 +81,7 @@ class AppModelStateTest {
     @Test fun backgroundPreferenceWritesRefreshTheOpenProfileAndFriendList() {
         ui.runOnIdle { model.route = "profile" }
         ui.onNodeWithText("Témoin").assertExists()
-        ui.onNodeWithText("0 XP · 🔥 0 jours").assertExists()
+        ui.onNodeWithText("0 XP · 🔥 0 jour").assertExists()
         val updatedFriend = Friend(ShareProgress("Équipier distant", 650, 8, 16), "https://gist.github.com/abcde12345")
         val write = thread(name = "hamigo-test-background-preferences") {
             // The worker uses its own Progress instance; no AppModel refresh/navigation is requested.
@@ -99,7 +99,7 @@ class AppModelStateTest {
                 model.progress.dailyGoal == 120 && model.friends.singleOrNull()?.progress?.name == "Équipier distant"
         }
         ui.onNodeWithText("Après synchronisation").assertExists()
-        ui.onNodeWithText("3 XP · 🔥 1 jours").assertExists()
+        ui.onNodeWithText("3 XP · 🔥 1 jour").assertExists()
         ui.runOnIdle { model.route = "friends" }
         ui.onAllNodesWithText("Équipier distant").onFirst().assertExists()
     }

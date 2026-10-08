@@ -210,3 +210,8 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Révisions reprend la file des rappels SRS de Parcours, y compris les flashcards Mémo et questions d'entraînement dues. Le compteur correspond donc aux notions à revoir de Parcours, même sans leçon terminée.
 - La section et la séance s'appellent Révisions. Le nombre à revoir rejoint la fin du paragraphe entre parenthèses, sans ligne de label séparée.
 - Révision demandée au même numéro de version : `-PhamigoVersionCommit=38`, commit de correction distinct, APK et release 0.38 remplacés avec la signature existante.
+
+### Accord du nombre de jours — 0.38
+
+- Les séries utilisent le même accord français partout : 0 jour, 1 jour, 2 jours. Correctif sur Parcours, Moi, Équipe, les récapitulatifs de séance, les images et textes partagés, les notifications illustrées et les widgets, y compris leur accessibilité.
+- Les variantes de notification gardent des formulations correctes autour du compteur ; les jours actifs des widgets suivent également le singulier/pluriel. Aucun changement du calcul de série, des objectifs ou des données sauvegardées.

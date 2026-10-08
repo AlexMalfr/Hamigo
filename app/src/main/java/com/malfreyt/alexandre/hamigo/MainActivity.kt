@@ -474,10 +474,10 @@ private data class BackScreenSnapshot(
                 Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}
                 Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Mist.copy(alpha=.6f))
                     .clickable(role=Role.Button) {model.route="profile"}
-                    .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${p.streak} jours de série, ${p.xp} XP"}
+                    .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${dayCount(p.streak)} de série, ${p.xp} XP"}
                     .padding(horizontal=10.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,
                     horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-                    Column(horizontalAlignment=Alignment.End) {Text("🔥 ${p.streak} jours",fontWeight=FontWeight.Bold,color=Color(0xFFB44D30));Text("⚡ ${p.xp} XP",fontSize=13.sp,color=Teal)}
+                    Column(horizontalAlignment=Alignment.End) {Text("🔥 ${dayCount(p.streak)}",fontWeight=FontWeight.Bold,color=Color(0xFFB44D30));Text("⚡ ${p.xp} XP",fontSize=13.sp,color=Teal)}
                     Icon(Icons.Rounded.ChevronRight,null,Modifier.size(17.dp),tint=Muted)
                 }
             }

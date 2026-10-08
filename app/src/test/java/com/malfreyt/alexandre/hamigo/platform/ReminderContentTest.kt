@@ -34,7 +34,10 @@ class ReminderContentTest {
                     ReminderContext.IN_PROGRESS -> ReminderState(12, 30, setOf(day.toString()))
                     ReminderContext.GOAL_REACHED -> ReminderState(30, 30, setOf(day.toString()))
                 }
-                ReminderContent.build(state, day).also { assertEquals(context, it.context) }
+                ReminderContent.build(state, day).also {
+                    assertEquals(context, it.context)
+                    assertFalse("One-day reminders must use the singular",it.message.contains("1 jours"))
+                }
             }
             assertEquals(9, contents.map { it.message }.toSet().size)
             assertTrue(contents.map { it.mood }.toSet().size >= 3)

@@ -10,6 +10,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import com.malfreyt.alexandre.hamigo.PicoRenderer
+import com.malfreyt.alexandre.hamigo.dayCount
 
 /** Artwork uses the standard BigPictureStyle template, preserving Android's accessible controls. */
 object ReminderArtwork {
@@ -36,7 +37,7 @@ object ReminderArtwork {
         paint.textSize = 30f
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         val metric = when (content.context) {
-            ReminderContext.CONTINUE -> "${content.streak} jours de série"
+            ReminderContext.CONTINUE -> "${dayCount(content.streak)} de série"
             ReminderContext.RESTART -> "Une nouvelle série, à ton rythme"
             ReminderContext.START -> "Ta première série commence ici"
             else -> "${content.todayXp} / ${content.goal} XP aujourd'hui"

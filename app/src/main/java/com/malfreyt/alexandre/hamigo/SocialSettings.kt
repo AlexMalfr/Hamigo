@@ -268,7 +268,7 @@ fun FriendsScreen(model: AppModel) {
                             profile.name,Modifier.size(36.dp))
                         Column(Modifier.weight(1f)) {
                             Text(profile.name + if (isOwn) " · toi" else "", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text("${profile.streak} jours de série · ${profile.lessons} leçons", fontSize = 11.sp, color = Muted)
+                            Text("${dayCount(profile.streak)} de série · ${profile.lessons} leçons", fontSize = 11.sp, color = Muted)
                         }
                         Text("${profile.weeklyXp} XP", fontWeight = FontWeight.ExtraBold, color = Teal, fontSize = 15.sp)
                     }

@@ -333,7 +333,7 @@ fun solution(q:Question):String=when(q.kind){
                         Text("+ ${s.gain} XP · ${s.unanswered} sans réponse",fontSize=12.sp,color=Muted)
                     } else {
                         Text("+ ${s.gain} XP",fontSize=35.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
-                        Text("${s.correct} réponses réussies sur ${s.questions.size} essais · ${model.progress.streak} jours de série",fontSize=13.sp,color=Muted)
+                        Text("${s.correct} réponses réussies sur ${s.questions.size} essais · ${dayCount(model.progress.streak)} de série",fontSize=13.sp,color=Muted)
                     }
                     if(!s.exam&&s.lessonId!=null) {
                         Text("${s.firstCorrect}/${s.firstCount} réponses justes au premier essai",fontWeight=FontWeight.Bold)

@@ -4,6 +4,7 @@ import com.malfreyt.alexandre.hamigo.LearningRules
 import com.malfreyt.alexandre.hamigo.MascotMood
 import com.malfreyt.alexandre.hamigo.MascotPose
 import com.malfreyt.alexandre.hamigo.Progress
+import com.malfreyt.alexandre.hamigo.dayCount
 import java.time.LocalDate
 
 enum class ReminderContext { START, CONTINUE, RESTART, IN_PROGRESS, GOAL_REACHED }
@@ -76,14 +77,14 @@ object ReminderContent {
             ReminderContext.CONTINUE -> {
                 titles = listOf("Ta série capte toujours !", "Une onde pour garder le rythme", "Pico est sur ta fréquence")
                 messages = listOf(
-                    "$streak jours de série ! Une petite révision pour continuer ?",
-                    "Ton antenne garde le rythme : $streak jours de série, et la suite t'attend.",
-                    "Pico vérifie les connexions : ta série de $streak jours est bien là !",
+                    "${dayCount(streak)} de série ! Une petite révision pour continuer ?",
+                    "Ton antenne garde le rythme : ${dayCount(streak)} de série, et la suite t'attend.",
+                    "Pico vérifie les connexions : ta série de ${dayCount(streak)} est bien là !",
                     "Une petite leçon aujourd'hui, et ta série continue son voyage.",
-                    "On garde la bonne fréquence ? Tes $streak jours de série attendent la suite.",
+                    "On garde la bonne fréquence ? Ta série de ${dayCount(streak)} attend la suite.",
                     "Pico a préparé une petite onde pour prolonger ton rythme.",
                     "Ta série fait bip-bip : une révision pour lui répondre ?",
-                    "$streak jours, plein de déclics. On en ajoute un aujourd'hui ?",
+                    "${dayCount(streak)}, plein de déclics. On en ajoute un aujourd'hui ?",
                     "Pas besoin d'un marathon : une petite révision entretient ta série."
                 )
                 moods = listOf(MascotMood.HAPPY, MascotMood.DETERMINED, MascotMood.GOOFY)

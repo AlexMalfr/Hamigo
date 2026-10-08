@@ -91,7 +91,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                         pose = if (p.streak > 0) MascotPose.JUMP else MascotPose.WAVE)
                     Column(Modifier.weight(1f)) {
                         Text("Niveau ${1 + p.xp / 250}", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("${p.xp} XP · 🔥 ${p.streak} jours", color = Teal, fontWeight = FontWeight.Bold)
+                        Text("${p.xp} XP · 🔥 ${dayCount(p.streak)}", color = Teal, fontWeight = FontWeight.Bold)
                     }
                 }
                 LinearProgressIndicator(progress = { (p.xp % 250) / 250f }, modifier = Modifier.fillMaxWidth(), color = Teal, trackColor = Color.White)

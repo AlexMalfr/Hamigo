@@ -16,6 +16,8 @@ import androidx.core.content.FileProvider
 import com.malfreyt.alexandre.hamigo.MascotMood
 import com.malfreyt.alexandre.hamigo.MascotPose
 import com.malfreyt.alexandre.hamigo.PicoRenderer
+import com.malfreyt.alexandre.hamigo.dayCount
+import com.malfreyt.alexandre.hamigo.dayUnit
 import java.io.File
 import java.text.NumberFormat
 import java.time.Instant
@@ -91,7 +93,7 @@ object NativeShare {
 
     fun progressImage(context: Context, progress: ShareProgress) {
         shareFile(context, renderProgressImage(context, progress), "image/png", "Ma progression Hamigo",
-            "${progress.name} : ${progress.xp} XP, ${progress.streak} jours de série sur Hamigo 📻")
+            "${progress.name} : ${progress.xp} XP, ${dayCount(progress.streak)} de série sur Hamigo 📻")
     }
 
     fun teamImage(context: Context, own: ShareProgress, others: List<ShareProgress>) {
@@ -130,7 +132,7 @@ object NativeShare {
         card.text("Une petite onde chaque jour.", 64f, 316f, 28f, Teal, heavy = false)
 
         card.stat(RectF(64f, 352f, 532f, 476f), format(progress.xp), "XP collectionnés", Mint)
-        card.stat(RectF(548f, 352f, 1016f, 476f), format(progress.streak), "jours de série", Peach)
+        card.stat(RectF(548f, 352f, 1016f, 476f), format(progress.streak), "${dayUnit(progress.streak)} de série", Peach)
         card.stat(RectF(64f, 492f, 532f, 616f), format(progress.lessons), "leçons terminées", GoldLight)
         card.stat(RectF(548f, 492f, 1016f, 616f), "+${format(progress.weeklyXp)}", "XP cette semaine", Mist)
 
