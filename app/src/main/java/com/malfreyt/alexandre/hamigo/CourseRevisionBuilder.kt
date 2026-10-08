@@ -5,12 +5,12 @@ import kotlin.random.Random
 
 /** Stable course identities: revising a due item uses the ordinary answer/SRS path. */
 object CourseRevisionBuilder {
-    fun eligible(lessons: List<Lesson>, completed: Set<String>, reviews: Map<String,Review>): List<Question> =
-        lessons.flatMap { lesson ->
+    fun eligible(lessons: List<Lesson>, completed: Set<String>, reviews: Map<String,Review>, due: List<Question> = emptyList()): List<Question> =
+        (lessons.flatMap { lesson ->
             val studied=lesson.id in completed || lesson.questions.any { it.id in reviews }
             if(!studied) emptyList() else lesson.questions.filter { lesson.id in completed || it.id in reviews } +
                 ExtendedPracticeGenerator.lessonExtraPool(lesson).filter { it.id in reviews }
-        }.distinctBy { it.id }
+        } + due).distinctBy { it.id }
 
     fun create(pool: List<Question>, reviews: Map<String,Review>, count: Int=10,
                now: Long=System.currentTimeMillis(), seed: Int=Random.nextInt()): List<Question> {

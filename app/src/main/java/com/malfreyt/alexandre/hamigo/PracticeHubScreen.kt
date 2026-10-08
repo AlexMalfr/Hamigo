@@ -40,8 +40,9 @@ import kotlin.random.Random
     val progress=model.displayedProgress ?: model.progress
     val reviews=progress.reviews
     val completed=progress.completed
-    val reviewPool=remember(content,completed,reviews) {CourseRevisionBuilder.eligible(content.lessons,completed,reviews)}
-    val dueCount=reviewPool.count {reviews[it.id]?.due?.let {date->date<=System.currentTimeMillis()}==true}
+    val due=progress.due(content)
+    val reviewPool=remember(content,completed,reviews,due) {CourseRevisionBuilder.eligible(content.lessons,completed,reviews,due)}
+    val dueCount=due.size
     LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
         item {Panel(color=Color(0xFFFFE8E0)) {
@@ -95,17 +96,16 @@ import kotlin.random.Random
             }
         }}
         item {Panel(color=Color(0xFFFFF0CF)) {
-            Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.History,null,tint=Color(0xFF94651A));Spacer(Modifier.width(8.dp));Eyebrow("RÉVISIONS ALÉATOIRES",Color(0xFF94651A))}
-            Text(if(reviewPool.isEmpty())"Réponds aux questions du Parcours pour retrouver ici les notions étudiées." else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance.",fontSize=13.sp,lineHeight=19.sp,color=Muted)
+            Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.History,null,tint=Color(0xFF94651A));Spacer(Modifier.width(8.dp));Eyebrow("RÉVISIONS",Color(0xFF94651A))}
+            Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées ($dueCount à revoir)." else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance ($dueCount à revoir).",fontSize=13.sp,lineHeight=19.sp,color=Muted)
             if(reviewPool.isNotEmpty()) {
-                Text("$dueCount à revoir",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Ink)
                 Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.CenterVertically) {
                     Text("Questions :",fontSize=12.sp,color=Muted)
                     listOf(10,20,40).forEach { n ->FilterChip(reviewCount==n,{reviewCount=n},label={Text("$n",fontSize=13.sp)})}
                 }
             }
             Action(if(reviewPool.isEmpty())"Lancer les révisions" else "Réviser · ${minOf(reviewCount,reviewPool.size)} questions",enabled=reviewPool.isNotEmpty()) {
-                model.startQuestions("Révisions du parcours",CourseRevisionBuilder.create(reviewPool,reviews,reviewCount))
+                model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,reviewCount))
             }
         }}
         item {Panel(color=Mist) {

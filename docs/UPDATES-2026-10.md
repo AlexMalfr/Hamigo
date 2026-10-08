@@ -203,3 +203,10 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Les quatre objectifs deviennent 30, 60, 120 et 240 XP/jour. Chaque joueur garde la même position de choix, avec des clés stables en préférences et dans la sauvegarde, sans migration ni réinitialisation.
 - Les conversions d'anciens formats sont retirées : sauvegarde/résumé social v1, progression sans registre et relations sans horodatage. Le format actuel, ses événements, ses socles déjà sauvegardés et ses suppressions restent intacts. Une installation neuve initialise uniquement un registre vide.
 - Import et fusion enregistrent les données dans une seule transaction locale : le rafraîchissement d'un écran ouvert ne peut plus remplacer la progression importée par l'état antérieur.
+
+### Correctifs de la 0.38
+
+- Les menus ⋮ des leçons partagent un bord droit fixe ; les icônes et textes des cours gardent leur indentation alternée et leur largeur précédente.
+- Révisions reprend la file des rappels SRS de Parcours, y compris les flashcards Mémo et questions d'entraînement dues. Le compteur correspond donc aux notions à revoir de Parcours, même sans leçon terminée.
+- La section et la séance s'appellent Révisions. Le nombre à revoir rejoint la fin du paragraphe entre parenthèses, sans ligne de label séparée.
+- Révision demandée au même numéro de version : `-PhamigoVersionCommit=38`, commit de correction distinct, APK et release 0.38 remplacés avec la signature existante.

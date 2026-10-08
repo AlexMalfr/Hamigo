@@ -532,14 +532,16 @@ private data class BackScreenSnapshot(
                 }
                 if(expanded==index) c.lessons.forEachIndexed { i,l ->
                     val done=l.id in completed;val active=l.id==next?.id
-                    Row(Modifier.fillMaxWidth().padding(start=if(i%2==0)12.dp else 34.dp,end=if(i%2==0)34.dp else 12.dp),verticalAlignment=Alignment.CenterVertically) {
+                    Row(Modifier.fillMaxWidth().padding(end=12.dp),verticalAlignment=Alignment.CenterVertically) {
+                        Row(Modifier.weight(1f).padding(start=if(i%2==0)12.dp else 34.dp,end=if(i%2==0)22.dp else 0.dp),verticalAlignment=Alignment.CenterVertically) {
                         Surface(onClick={model.startLesson(l)},modifier=Modifier.size(54.dp),shape=CircleShape,color=if(done)color else if(active)Gold else Color.White,shadowElevation=if(active)5.dp else 1.dp) {
                             Box(contentAlignment=Alignment.Center) {Icon(if(done)Icons.Rounded.Replay else if(active)Icons.Rounded.PlayArrow else Icons.Rounded.RadioButtonUnchecked,l.title,tint=if(done)Color.White else color)}
                         }
                         Spacer(Modifier.width(15.dp))
-                        Column(Modifier.weight(1f).clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button) {model.startLesson(l)}.padding(vertical=13.dp)) {
+                        Column(Modifier.weight(1f).testTag("lesson-copy-${l.id}").clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button) {model.startLesson(l)}.padding(vertical=13.dp)) {
                             Text(l.title+if(done)" ✅" else "",fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
                             Text(l.summary,maxLines=2,overflow=TextOverflow.Ellipsis,fontSize=12.sp,lineHeight=16.sp,color=Muted)
+                        }
                         }
                         var menu by remember(l.id) {mutableStateOf(false)}
                         Box {

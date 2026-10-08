@@ -19,6 +19,15 @@ class CourseRevisionBuilderTest {
         assertEquals(listOf("base",variant.id),selected.map {it.id})
         assertEquals(variant,selected.last())
     }
+    @Test fun dueMemoAndExamItemsJoinTheCourseBankWithoutDuplicatesOrUnstudiedCourses() {
+        val lessons=listOf(lesson("done",listOf(q("base"))),lesson("new",listOf(q("unseen"))))
+        val due=listOf(q("base"),q("flash-due"),q("exam-due"))
+        val reviews=due.associate {it.id to Review(due=1)}
+        val pool=CourseRevisionBuilder.eligible(lessons,setOf("done"),reviews,due)
+        assertEquals(setOf("base","flash-due","exam-due"),pool.map {it.id}.toSet())
+        assertEquals(3,pool.size)
+        assertEquals(due.map {it.id}.toSet(),CourseRevisionBuilder.create(pool,reviews,now=100).map {it.id}.toSet())
+    }
     @Test fun overdueItemsArePrioritizedButDistributedThroughTheSession() {
         val pool=(0..15).map {q("q$it")}
         val reviews=(0..9).associate {"q$it" to Review(due=it.toLong()+1)}

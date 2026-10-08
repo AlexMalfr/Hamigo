@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.activity.BackEventCompat
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -61,6 +62,12 @@ class LessonRevisionInstrumentedTest {
         ui.onNodeWithTag("path-list").performScrollToIndex(3)
         ui.onNodeWithText(first.title+" ✅").performScrollTo().assertIsDisplayed()
         ui.onNodeWithText(first.summary).assertIsDisplayed()
+        val firstMenu=ui.onNodeWithTag("lesson-menu-${first.id}").fetchSemanticsNode().boundsInRoot
+        val secondMenu=ui.onNodeWithTag("lesson-menu-${second.id}").fetchSemanticsNode().boundsInRoot
+        assertEquals("Les menus restent sur le même bord",firstMenu.center.x,secondMenu.center.x,1f)
+        val firstCopy=ui.onNodeWithTag("lesson-copy-${first.id}").fetchSemanticsNode().boundsInRoot
+        val secondCopy=ui.onNodeWithTag("lesson-copy-${second.id}").fetchSemanticsNode().boundsInRoot
+        assertEquals("Les cours gardent leur indentation alternée",with(ui.density){22.dp.toPx()},secondCopy.left-firstCopy.left,1f)
         capture("path-completed-next")
         for(lesson in listOf(first,second)) {
             ui.onNodeWithTag("lesson-menu-${lesson.id}").performScrollTo().performClick()
@@ -152,6 +159,40 @@ class LessonRevisionInstrumentedTest {
         capture("revisions-srs-answer")
     }
 
+    @Test fun memoAndExamRappelsMatchParcoursEvenWithoutAnyCompletedLesson() {
+        val content=model.content!!
+        val memo=content.flashcards.first();val exam=content.activeExam.first()
+        val ids=setOf(memo.id,exam.id)
+        ui.runOnIdle {
+            listOf(memo,exam).forEach {model.progress.answer(it.id,false)}
+            val backup=JSONObject(model.progress.cloudExport())
+            ids.forEach {backup.getJSONObject("progress").getJSONObject("reviews").getJSONObject(it).put("due",1)}
+            model.progress.import(backup.toString());model.refresh()
+            assertTrue(model.progress.completed.isEmpty())
+            assertEquals(ids,model.progress.due(content).map {it.id}.toSet())
+        }
+        ui.onNodeWithText("2 notions à revoir").performScrollTo().assertIsDisplayed()
+        capture("parcours-two-memo-exam-rappels")
+        ui.runOnIdle {model.route="practice"}
+        ui.onNodeWithTag("practice-list").performScrollToIndex(3)
+        ui.onNodeWithText("RÉVISIONS",substring=false).assertIsDisplayed()
+        ui.onNodeWithText("(2 à revoir).",substring=true).assertIsDisplayed()
+        ui.onNodeWithText("2 à revoir",substring=false).assertDoesNotExist()
+        ui.onNodeWithText("Réviser · 2 questions").assertIsEnabled()
+        capture("revisions-two-memo-exam-rappels")
+        ui.onNodeWithText("Réviser · 2 questions").performClick()
+        ui.runOnIdle {
+            assertEquals(ids,model.session!!.questions.map {it.id}.toSet())
+            repeat(2) {model.answer(true);model.next()}
+            assertTrue(model.progress.due(content).isEmpty())
+            assertTrue(model.progress.completed.isEmpty())
+            model.leaveSession();model.refresh()
+        }
+        ui.onNodeWithTag("practice-list").performScrollToIndex(3)
+        ui.onNodeWithText("(0 à revoir).",substring=true).assertIsDisplayed()
+        capture("revisions-rappels-completed")
+    }
+
     @Test fun dailyGoalKeepsItsOrdinalThroughBackupAndDoesNotRewritePreferences() {
         ui.runOnIdle {
             val p=model.progress
@@ -192,7 +233,7 @@ class LessonRevisionInstrumentedTest {
             }
             assertTrue(frame.await(5,TimeUnit.SECONDS))
         }
-        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38").apply {mkdirs()}
+        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38-r2").apply {mkdirs()}
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }
