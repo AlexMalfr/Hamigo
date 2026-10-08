@@ -89,14 +89,14 @@ class AppModelStateTest {
             background.answer("worker-recall", correct = true)
             background.name = "Après synchronisation"
             background.prefs.edit().putString("friends", JSONArray(listOf(
-                JSONObject().put("progress", JSONObject(updatedFriend.progress.toJson())).put("gist", updatedFriend.gist)
+                JSONObject().put("progress", JSONObject(updatedFriend.progress.toJson())).put("gist", updatedFriend.gist).put("modifiedAt",100)
             )).toString()).putInt("dailyGoal", 60).commit()
         }
         write.join(10_000)
         check(!write.isAlive) { "The fixture write did not complete." }
         ui.waitUntil(15_000) {
             model.progress.xp == 3 && model.progress.name == "Après synchronisation" &&
-                model.progress.dailyGoal == 60 && model.friends.singleOrNull()?.progress?.name == "Équipier distant"
+                model.progress.dailyGoal == 120 && model.friends.singleOrNull()?.progress?.name == "Équipier distant"
         }
         ui.onNodeWithText("Après synchronisation").assertExists()
         ui.onNodeWithText("3 XP · 🔥 1 jours").assertExists()

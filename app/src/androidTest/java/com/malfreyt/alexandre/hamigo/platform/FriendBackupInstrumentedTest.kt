@@ -59,9 +59,9 @@ class FriendBackupInstrumentedTest {
         assertFalse(JSONObject(left).getJSONObject("friends").getJSONObject(first).getBoolean("deleted"))
     }
 
-    @Test fun cachedStatsMergeIndependentlyAndSameGistUrlsDeduplicateDuringLegacyMigration() {
+    @Test fun cachedStatsMergeIndependentlyAndSameGistUrlsDeduplicateCurrentRecords() {
         val older = JSONObject().put("gist", "https://gist.github.com/person/$first")
-            .put("progress", relation(100).getJSONObject("progress"))
+            .put("progress", relation(100).getJSONObject("progress")).put("modifiedAt",100)
         val fresher = JSONObject().put("gist", first.uppercase()).put("modifiedAt", 100)
             .put("progress", relation(100, cacheDate="2026-10-06T10:00:00Z").getJSONObject("progress"))
         val records = CloudProgress.localFriends(JSONArray(listOf(older, fresher)), JSONObject())
@@ -74,10 +74,10 @@ class FriendBackupInstrumentedTest {
         assertEquals("2026-10-06T10:00:00Z",merged.getJSONObject("progress").getString("updatedAt"))
     }
 
-    @Test fun freshInstallationRestoresRelationshipsAndOldImportPreservesThem() = isolated { context ->
+    @Test fun freshInstallationRestoresRelationshipsAndPartialImportPreservesThem() = isolated { context ->
         val old = Progress(context)
         old.prefs.edit().putString("friends", JSONArray(listOf(JSONObject().put("gist", first)
-            .put("progress",relation(1).getJSONObject("progress")))).toString()).commit()
+            .put("progress",relation(1).getJSONObject("progress")).put("modifiedAt",1))).toString()).commit()
         val exported = old.cloudExport()
         val social = JSONObject(old.snapshot().toJson())
         assertFalse(social.has("friends"))
@@ -137,7 +137,7 @@ class FriendBackupInstrumentedTest {
             if (!deleted) it.put("progress",JSONObject(ShareProgress("Équipier",12,1,2,updatedAt=cacheDate).toJson()))
         }
     private fun backup(friends: JSONObject?) = JSONObject().put("app","hamigo").put("schema",2).put("name","Pilote des ondes")
-        .put("progress",JSONObject().put("xp",0).put("answers",0).put("correct",0)).also { friends?.let { f -> it.put("friends",f) } }
+        .put("progress",JSONObject().put("xp",0).put("answers",0).put("correct",0).apply {CloudProgress.ensureLedger(this)}).also { friends?.let { f -> it.put("friends",f) } }
 
     private fun isolated(test: (Context) -> Unit) {
         val base = InstrumentationRegistry.getInstrumentation().targetContext

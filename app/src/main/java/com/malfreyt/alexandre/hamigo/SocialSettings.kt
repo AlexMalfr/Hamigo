@@ -462,6 +462,7 @@ private fun FriendRequestsPanel(model: AppModel) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
@@ -523,9 +524,9 @@ fun SettingsScreen(model: AppModel) {
         item {
             Panel {
                 Text("Objectif quotidien", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf(20, 30, 60, 100).forEach { goal ->
-                        FilterChip(p.dailyGoal == goal, { p.setDailyGoal(goal); model.refresh(); model.refreshSocial() }, label = { Text("$goal XP", fontSize = 12.sp) })
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    DailyGoals.values.forEachIndexed { index,goal ->
+                        FilterChip(p.dailyGoalChoice == index, { p.setDailyGoalChoice(index); model.refresh(); model.refreshSocial() }, label = { Text("$goal XP", fontSize = 12.sp) })
                     }
                 }
                 Text("Une leçon de huit réponses justes rapporte environ 30 XP à sa première validation.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)

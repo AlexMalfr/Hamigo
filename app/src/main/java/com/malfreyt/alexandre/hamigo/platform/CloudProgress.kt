@@ -18,10 +18,11 @@ object CloudProgress {
     fun localFriends(active: JSONArray, tombstones: JSONObject): JSONObject {
         val result = JSONObject()
         for (index in 0 until minOf(active.length(), MAX_FRIENDS)) {
+            require(active.getJSONObject(index).has("modifiedAt")) { "Ancien format d’équipiers non pris en charge." }
             runCatching {
                 val entry = active.getJSONObject(index)
                 val id = GitHubSync.gistId(entry.getString("gist"))
-                val record = JSONObject().put("modifiedAt", entry.optLong("modifiedAt", 1L).coerceAtLeast(1L))
+                val record = JSONObject().put("modifiedAt", entry.getLong("modifiedAt"))
                     .put("deleted", false).put("progress", JSONObject(ShareProgress.fromJson(entry.getJSONObject("progress").toString()).toJson()))
                 entry.optJSONObject("githubIdentity")?.let { identity ->
                     record.put("githubIdentity", GitHubIdentity.fromJson(identity).toJson())
@@ -129,18 +130,20 @@ object CloudProgress {
         require(active <= MAX_FRIENDS) { "La sauvegarde dépasse la limite de trente équipiers." }
     }
 
-    /** Call before the first local counter mutation, so that existing XP isn't counted twice. */
+    /** Initialize a fresh empty ledger only. Existing formats are never upgraded here. */
     fun ensureLedger(state: JSONObject) {
-        if (!state.has("syncBase")) {
+        if (!state.has("syncBase") || !state.has("syncEvents")) {
+            require(!state.has("syncBase") && !state.has("syncEvents") &&
+                listOf("xp","answers","correct").all {state.optInt(it)==0} &&
+                state.optJSONArray("completed")?.length().let {it==null || it==0} &&
+                listOf("dailyXp","awarded","reviews").all {state.optJSONObject(it)?.length().let {n->n==null || n==0}}) {
+                "Ancien format de progression non pris en charge."
+            }
             state.put("syncBase", JSONObject()
-                .put("xp", state.optInt("xp"))
-                .put("answers", state.optInt("answers"))
-                .put("correct", state.optInt("correct"))
-                .put("dailyXp", copy(state.optJSONObject("dailyXp") ?: JSONObject()))
-                .put("awarded", copy(state.optJSONObject("awarded") ?: JSONObject()))
-                .put("completed", JSONArray(state.optJSONArray("completed")?.toString() ?: "[]")))
+                .put("xp",0).put("answers",0).put("correct",0)
+                .put("dailyXp",JSONObject()).put("awarded",JSONObject()).put("completed",JSONArray()))
+            state.put("syncEvents", JSONObject())
         }
-        if (!state.has("syncEvents")) state.put("syncEvents", JSONObject())
     }
 
     /** Records an attempt, independently of its XP award. Same question/day awards merge by maximum. */
@@ -185,7 +188,7 @@ object CloudProgress {
             val earned = event.getInt("xp")
             if (earned > 0 && (lesson.isBlank() || lesson !in strings(base.optJSONArray("completed")))) {
                 val key = if (lesson.isNotBlank()) "lesson:$lesson" else event.optString("awardKey").ifBlank { "event:$id" }
-                // A pre-ledger device already paid these question/day awards in its baseline.
+                // An award already represented in the current baseline must not be paid twice.
                 val questionId=key.takeIf { it.startsWith("answer:") && it.endsWith(":${event.getString("day")}") }
                     ?.removePrefix("answer:")?.removeSuffix(":${event.getString("day")}")
                 if(questionId!=null && historicalAwards.optString(questionId)==event.getString("day")) return@forEach
@@ -220,11 +223,6 @@ object CloudProgress {
         val profile = newer(local, remote, "profileUpdatedAt", "name")
         val preferences = newer(local, remote, "preferencesUpdatedAt", "preferences")
         val mergedPreferences=JSONObject((preferences.optJSONObject("preferences") ?: JSONObject()).toString())
-        // Older backups do not know these controls: retain them from the other side when absent.
-        val otherPreferences=(if(preferences===local)remote else local).optJSONObject("preferences")
-        listOf("morseSingleKey","morseThresholdMs").forEach { key ->
-            if(!mergedPreferences.has(key) && otherPreferences?.has(key)==true)mergedPreferences.put(key,otherPreferences.get(key))
-        }
         val result = JSONObject().put("app", "hamigo").put("schema", 2).put("name", profile.optString("name", "Pilote des ondes"))
             .put("profileUpdatedAt", profile.optLong("profileUpdatedAt"))
             .put("preferences", mergedPreferences)
@@ -242,7 +240,7 @@ object CloudProgress {
     private fun checked(json: String): JSONObject {
         require(json.toByteArray(Charsets.UTF_8).size <= MAX_BYTES) { "Sauvegarde GitHub trop volumineuse." }
         val wrapper = JSONObject(json)
-        require(wrapper.optString("app") == "hamigo" && wrapper.optInt("schema") in 1..2) { "Ce Gist n'est pas une sauvegarde Hamigo." }
+        require(wrapper.optString("app") == "hamigo" && wrapper.optInt("schema") == 2) { "Ce Gist n'est pas une sauvegarde Hamigo actuelle." }
         val name = wrapper.opt("name")
         require(name is String && name.trim().isNotEmpty() && name.length <= 48) { "Pseudo de sauvegarde invalide." }
         if (wrapper.has("friends")) {
@@ -251,6 +249,7 @@ object CloudProgress {
         }
         if(wrapper.has("socialInbox")) FriendInboxState.validate(wrapper.getJSONObject("socialInbox"))
         val state = wrapper.getJSONObject("progress")
+        require(state.opt("syncBase") is JSONObject && state.opt("syncEvents") is JSONObject) { "Ancien format de progression non pris en charge." }
         checkCollectionTypes(state)
         checkCounters(state)
         checkDays(state.optJSONObject("dailyXp") ?: JSONObject())

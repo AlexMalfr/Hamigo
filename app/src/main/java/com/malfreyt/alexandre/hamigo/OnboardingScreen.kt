@@ -57,7 +57,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
     val prefs=model.progress.prefs
     var step by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingStep",0).coerceIn(0,3))}
     var name by rememberSaveable {mutableStateOf(prefs.getString("onboardingName",prefs.getString("name","")) ?: "")}
-    var goal by rememberSaveable {mutableIntStateOf(model.progress.dailyGoal)}
+    var goal by rememberSaveable {mutableIntStateOf(model.progress.dailyGoal.takeIf {it in DailyGoals.values} ?: DailyGoals.values[1])}
     var hour by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderHour",prefs.getInt("reminderHour",20)).coerceIn(0,23))}
     var minute by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderMinute",prefs.getInt("reminderMinute",0)).coerceIn(0,59))}
     var permissionPending by remember {mutableStateOf(false)}
@@ -85,7 +85,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
     fun continueStep() {
         when(step) {
             0 -> if(name.isNotBlank()) {model.progress.name=name.trim();moveTo(1)}
-            1 -> {model.progress.setDailyGoal(goal);model.refresh();moveTo(2)}
+            1 -> {model.progress.setDailyGoalChoice(DailyGoals.values.indexOf(goal));model.refresh();moveTo(2)}
             2 -> {
                 permissionError=false
                 if(Build.VERSION.SDK_INT>=33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED) {
@@ -146,7 +146,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                             keyboardOptions=KeyboardOptions(capitalization=KeyboardCapitalization.Words,imeAction=ImeAction.Next),
                             keyboardActions=KeyboardActions(onNext={continueStep()}))
                         1->Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                            listOf(listOf(20 to "Léger",30 to "Régulier"),listOf(60 to "Soutenu",100 to "Intensif")).forEach {row ->
+                            DailyGoals.values.zip(listOf("Léger","Régulier","Soutenu","Intensif")).chunked(2).forEach {row ->
                                 Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                                     row.forEach {(value,label)->
                                         Surface(onClick={goal=value},modifier=Modifier.weight(1f).fillMaxHeight().testTag("onboarding-goal-$value").semantics {selected=goal==value},
@@ -158,7 +158,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                                                     if(goal==value)Icon(Icons.Rounded.CheckCircle,"Objectif sélectionné",Modifier.size(20.dp),tint=Teal)
                                                 }
                                                 Text(label,fontSize=14.sp,lineHeight=18.sp,fontWeight=FontWeight.Bold,color=Ink)
-                                                Text(if(value==30)"Conseillé pour démarrer" else "Par jour",fontSize=11.sp,lineHeight=15.sp,color=Muted)
+                                                Text(if(value==60)"Conseillé pour démarrer" else "Par jour",fontSize=11.sp,lineHeight=15.sp,color=Muted)
                                             }
                                         }
                                     }

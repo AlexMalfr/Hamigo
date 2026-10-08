@@ -14,11 +14,11 @@ Hamigo est une application Android en français pour préparer le **certificat d
 
 ## Ce qu’on peut faire
 
-- **Apprendre** avec un parcours de 22 chapitres et 97 leçons : réglementation, électricité, radio, Morse et binaire/portes logiques.
+- **Apprendre** avec un parcours de 22 chapitres et 97 leçons : réglementation, électricité, radio, Morse et binaire/portes logiques. Le menu de chaque leçon permet de relire le cours et ses fiches mémo sans lancer les questions.
 - **Manipuler** des quiz variés : associations, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse.
 - **Préparer ses réponses** avec une calculatrice scientifique et un brouillon au clavier, au doigt ou au stylet, remis à zéro à chaque question.
 - **Réviser** avec 40 fiches mémo, des flashcards et des outils interactifs : calculatrice, résistances, décibels, traducteur Morse, portes logiques…
-- **S’entraîner** en examen blanc ou avec un mix sur mesure, à partir de la banque Exam1 REF et de questions procédurales.
+- **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions aléatoires des notions étudiées, qui mélangent les rappels de la répétition espacée.
 - **Garder le rythme** avec un objectif quotidien, des XP, une série de jours, un calendrier, des rappels et des widgets.
 - **Jouer en équipe** : comparer les progrès de ses amis, les ajouter par lien ou QR et partager un bilan en image.
 

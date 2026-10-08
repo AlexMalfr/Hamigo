@@ -1,0 +1,424 @@
+{
+  "schema": 1,
+  "lessonReferences": {
+    "c01-l01": [
+      "radio-regulations"
+    ],
+    "c01-l02": [
+      "exam-rules"
+    ],
+    "c01-l03": [
+      "callsigns"
+    ],
+    "c01-l04": [
+      "bands",
+      "itu-regions"
+    ],
+    "c02-l01": [
+      "nato"
+    ],
+    "c02-l02": [
+      "qcodes"
+    ],
+    "c02-l03": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c02-l04": [
+      "operating-rules",
+      "reports",
+      "abbreviations"
+    ],
+    "c15-l01": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l02": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l03": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l04": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l05": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l06": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l07": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l08": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l09": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l10": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l11": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l12": [
+      "morse",
+      "morse-rhythm",
+      "callsigns"
+    ],
+    "c15-l13": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l14": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c16-l01": [
+      "prefixes",
+      "units"
+    ],
+    "c16-l02": [
+      "math-basics",
+      "formulas"
+    ],
+    "c16-l03": [
+      "math-basics",
+      "formulas"
+    ],
+    "c16-l04": [
+      "ac-circuits",
+      "measurements"
+    ],
+    "c03-l01": [
+      "units",
+      "prefixes"
+    ],
+    "c03-l02": [
+      "dc-circuits"
+    ],
+    "c03-l03": [
+      "dc-circuits",
+      "formulas"
+    ],
+    "c03-l04": [
+      "dc-circuits",
+      "formulas"
+    ],
+    "c04-l01": [
+      "dc-circuits",
+      "formulas"
+    ],
+    "c04-l02": [
+      "dc-circuits",
+      "formulas"
+    ],
+    "c04-l03": [
+      "dc-circuits",
+      "measurements"
+    ],
+    "c04-l04": [
+      "dc-circuits"
+    ],
+    "c05-l01": [
+      "resistors"
+    ],
+    "c05-l02": [
+      "ac-circuits"
+    ],
+    "c05-l03": [
+      "ac-circuits"
+    ],
+    "c05-l04": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c06-l01": [
+      "ac-circuits",
+      "measurements"
+    ],
+    "c06-l02": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c06-l03": [
+      "ac-circuits"
+    ],
+    "c06-l04": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c07-l01": [
+      "filters",
+      "ac-circuits"
+    ],
+    "c07-l02": [
+      "filters"
+    ],
+    "c07-l03": [
+      "transformers-batteries"
+    ],
+    "c07-l04": [
+      "decibels"
+    ],
+    "c17-l01": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c17-l02": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c17-l03": [
+      "ac-circuits",
+      "math-basics"
+    ],
+    "c17-l04": [
+      "filters"
+    ],
+    "c08-l01": [
+      "diodes-power"
+    ],
+    "c08-l02": [
+      "transistors-tubes"
+    ],
+    "c08-l03": [
+      "amplifiers-oscillators"
+    ],
+    "c08-l04": [
+      "amplifiers-oscillators",
+      "binary-logic"
+    ],
+    "c09-l01": [
+      "modulations",
+      "emissions"
+    ],
+    "c09-l02": [
+      "modulations",
+      "emissions"
+    ],
+    "c09-l03": [
+      "modulations",
+      "emissions",
+      "morse"
+    ],
+    "c09-l04": [
+      "digital-signals",
+      "modulations",
+      "emissions"
+    ],
+    "c20-l01": [
+      "binary-logic"
+    ],
+    "c22-l02": [
+      "binary-logic"
+    ],
+    "c22-l03": [
+      "binary-logic"
+    ],
+    "c22-l04": [
+      "binary-logic"
+    ],
+    "c20-l02": [
+      "digital-signals",
+      "modulations"
+    ],
+    "c20-l03": [
+      "digital-signals"
+    ],
+    "c20-l04": [
+      "digital-signals",
+      "binary-logic"
+    ],
+    "c10-l01": [
+      "radio-blocks",
+      "amplifiers-oscillators"
+    ],
+    "c10-l02": [
+      "radio-blocks",
+      "amplifiers-oscillators"
+    ],
+    "c10-l03": [
+      "radio-blocks",
+      "emc-noise"
+    ],
+    "c10-l04": [
+      "measurements"
+    ],
+    "c18-l01": [
+      "amplifiers-oscillators",
+      "emc-noise"
+    ],
+    "c18-l02": [
+      "amplifiers-oscillators",
+      "radio-blocks"
+    ],
+    "c18-l03": [
+      "amplifiers-oscillators",
+      "emc-noise"
+    ],
+    "c18-l04": [
+      "decibels",
+      "radio-blocks",
+      "emc-noise"
+    ],
+    "c11-l01": [
+      "antennas",
+      "physical-constants",
+      "formulas"
+    ],
+    "c11-l02": [
+      "antennas"
+    ],
+    "c11-l03": [
+      "antennas",
+      "decibels"
+    ],
+    "c11-l04": [
+      "transmission-lines"
+    ],
+    "c19-l01": [
+      "transmission-lines",
+      "measurements"
+    ],
+    "c19-l02": [
+      "transmission-lines",
+      "formulas"
+    ],
+    "c19-l03": [
+      "transmission-lines",
+      "decibels"
+    ],
+    "c19-l04": [
+      "transmission-lines",
+      "measurements"
+    ],
+    "c12-l01": [
+      "propagation"
+    ],
+    "c12-l02": [
+      "propagation",
+      "bands",
+      "antennas"
+    ],
+    "c12-l03": [
+      "decibels",
+      "antennas",
+      "propagation"
+    ],
+    "c12-l04": [
+      "bands",
+      "propagation",
+      "emissions"
+    ],
+    "c13-l01": [
+      "station-safety",
+      "diodes-power"
+    ],
+    "c13-l02": [
+      "station-safety",
+      "antennas"
+    ],
+    "c13-l03": [
+      "emc-noise"
+    ],
+    "c13-l04": [
+      "operating-rules",
+      "callsigns"
+    ],
+    "c21-l01": [
+      "reports"
+    ],
+    "c21-l02": [
+      "measurements",
+      "station-safety",
+      "emc-noise"
+    ],
+    "c21-l03": [
+      "transmitter-limits",
+      "emc-noise",
+      "modulations"
+    ],
+    "c21-l04": [
+      "operating-rules",
+      "qcodes",
+      "reports"
+    ],
+    "c14-l01": [
+      "radio-regulations",
+      "bands",
+      "callsigns",
+      "transmitter-limits"
+    ],
+    "c14-l02": [
+      "formulas",
+      "ac-circuits",
+      "antennas",
+      "radio-blocks"
+    ],
+    "c14-l03": [
+      "exam-rules",
+      "math-basics"
+    ],
+    "c14-l04": [
+      "station-safety",
+      "antennas",
+      "bands",
+      "operating-rules"
+    ]
+  },
+  "courseSources": {
+    "nato": "http://f6kgl.free.fr/COURS.html#R31",
+    "morse": "http://f6kgl.free.fr/COURS.html#R32d",
+    "morse-rhythm": "http://f6kgl.free.fr/COURS.html#R32d",
+    "qcodes": "http://f6kgl.free.fr/COURS.html#R32a",
+    "reports": "http://f6kgl.free.fr/COURS.html#R32b",
+    "abbreviations": "http://f6kgl.free.fr/COURS.html#R32c",
+    "emissions": "http://f6kgl.free.fr/COURS.html#R12",
+    "exam-rules": "http://f6kgl.free.fr/COURS.html#Intro5a",
+    "itu-regions": "http://f6kgl.free.fr/COURS.html#R21",
+    "radio-regulations": "http://f6kgl.free.fr/COURS.html#R11a",
+    "bands": "http://f6kgl.free.fr/COURS.html#R21",
+    "callsigns": "http://f6kgl.free.fr/COURS.html#R46",
+    "transmitter-limits": "http://f6kgl.free.fr/COURS.html#R22a",
+    "operating-rules": "http://f6kgl.free.fr/COURS.html#R33a",
+    "station-safety": "http://f6kgl.free.fr/COURS.html#R55a",
+    "math-basics": "http://f6kgl.free.fr/COURS.html#T0001a",
+    "units": "http://f6kgl.free.fr/COURS.html#T011a",
+    "prefixes": "http://f6kgl.free.fr/COURS.html#T0002a",
+    "formulas": "http://f6kgl.free.fr/COURS.html#T012a",
+    "decibels": "http://f6kgl.free.fr/COURS.html#T041a",
+    "physical-constants": "http://f6kgl.free.fr/COURS.html#T091a",
+    "materials": "http://f6kgl.free.fr/COURS.html#T014b",
+    "dc-circuits": "http://f6kgl.free.fr/COURS.html#T011a",
+    "resistors": "http://f6kgl.free.fr/COURS.html#T015",
+    "ac-circuits": "http://f6kgl.free.fr/COURS.html#T021a",
+    "transformers-batteries": "http://f6kgl.free.fr/COURS.html#T031a",
+    "measurements": "http://f6kgl.free.fr/COURS.html#T034a",
+    "filters": "http://f6kgl.free.fr/COURS.html#T042a",
+    "diodes-power": "http://f6kgl.free.fr/COURS.html#T051",
+    "transistors-tubes": "http://f6kgl.free.fr/COURS.html#T061a",
+    "amplifiers-oscillators": "http://f6kgl.free.fr/COURS.html#T071a",
+    "logic-digital": "http://f6kgl.free.fr/COURS.html#T081a",
+    "binary-logic": "http://f6kgl.free.fr/COURS.html#T084",
+    "digital-signals": "http://f6kgl.free.fr/COURS.html#T085",
+    "propagation": "http://f6kgl.free.fr/COURS.html#T092a",
+    "antennas": "http://f6kgl.free.fr/COURS.html#T094a",
+    "transmission-lines": "http://f6kgl.free.fr/COURS.html#T101a",
+    "radio-blocks": "http://f6kgl.free.fr/COURS.html#T111a",
+    "modulations": "http://f6kgl.free.fr/COURS.html#T121a",
+    "emc-noise": "http://f6kgl.free.fr/COURS.html#R54a"
+  }
+}

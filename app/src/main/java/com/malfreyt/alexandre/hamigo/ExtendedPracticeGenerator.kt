@@ -35,6 +35,9 @@ object ExtendedPracticeGenerator {
 
     /** Extra questions stay inside concepts already present in the authored lesson. */
     fun lessonExtras(lesson:Lesson,seed:Long=Random.nextLong()):List<Question> {
+        return lessonExtraPool(lesson).shuffled(Random(seed)).take(2)
+    }
+    fun lessonExtraPool(lesson:Lesson):List<Question> {
         val corpus=(lesson.topic+" "+lesson.title+" "+lesson.questions.joinToString(" "){it.prompt}).lowercase()
         val taughtMorse=lesson.questions.flatMap { q ->
             q.choices+q.pairs.map{it.left}+q.bands.mapNotNull{code->morse.entries.firstOrNull{it.value==code.trim()}?.key}
@@ -55,7 +58,7 @@ object ExtendedPracticeGenerator {
             "code" in corpus&&"couleur" in corpus -> variants.filter{it.kind=="resistor"}
             else -> emptyList()
         }
-        return candidates.filter{it.id !in lesson.questions.map(Question::id)}.shuffled(Random(seed)).take(2)
+        return candidates.filter{it.id !in lesson.questions.map(Question::id)}
     }
 
     private fun build(seed:Int):List<Question> {

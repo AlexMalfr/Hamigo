@@ -20,6 +20,7 @@ import androidx.browser.auth.AuthTabIntent
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -162,7 +163,7 @@ private data class BackScreenSnapshot(
 ) {
     val dockRoute get() = when {
         session != null -> session.returnRoute
-        resource != null -> "resources"
+        resource != null -> if(lesson!=null) "path" else "resources"
         lesson != null -> "path"
         route == "settings" -> "profile"
         else -> route
@@ -172,8 +173,8 @@ private data class BackScreenSnapshot(
     fun navigate(model: AppModel) {
         when {
             session != null -> model.leaveSession()
-            lesson != null -> model.lesson = null
             resource != null -> model.resource = null
+            lesson != null -> model.lesson = null
             route == "settings" -> model.route = "profile"
             else -> model.route = "path"
         }
@@ -356,6 +357,7 @@ private data class BackScreenSnapshot(
             if(backGestureActive) {
                 Box(Modifier.fillMaxSize().testTag("back-destination-${backSource?.dockRoute ?: model.route}")) {
                     when {
+                        model.resource!=null && model.lesson!=null -> LessonScreen(model,model.lesson!!,backMemoTarget)
                         model.resource!=null->{
                             // Match the future library viewport without changing the departing fiche.
                             val growth=((density.fontScale.coerceAtLeast(1f)-1f)*14f).dp
@@ -405,8 +407,8 @@ private data class BackScreenSnapshot(
                 .requiredSize(with(density){backWidth.toDp()},with(density){backHeight.toDp()}).graphicsLayer {alpha=(1f-dock/.65f).coerceIn(0f,1f)} else Modifier.fillMaxSize()) {
             when {
                 model.session!=null -> QuizScreen(model)
-                model.lesson!=null -> LessonScreen(model,model.lesson!!)
                 model.resource!=null -> ReferenceDetailScreen(model,model.resource!!)
+                model.lesson!=null -> LessonScreen(model,model.lesson!!)
                 model.route=="settings" -> SettingsScreen(model)
                 else -> MainDestination(model,content)
             }
@@ -532,35 +534,22 @@ private data class BackScreenSnapshot(
                     val done=l.id in completed;val active=l.id==next?.id
                     Row(Modifier.fillMaxWidth().padding(start=if(i%2==0)12.dp else 34.dp,end=if(i%2==0)34.dp else 12.dp),verticalAlignment=Alignment.CenterVertically) {
                         Surface(onClick={model.startLesson(l)},modifier=Modifier.size(54.dp),shape=CircleShape,color=if(done)color else if(active)Gold else Color.White,shadowElevation=if(active)5.dp else 1.dp) {
-                            Box(contentAlignment=Alignment.Center) {Icon(if(done)Icons.Rounded.Check else if(active)Icons.Rounded.PlayArrow else Icons.Rounded.RadioButtonUnchecked,l.title,tint=if(done)Color.White else color)}
+                            Box(contentAlignment=Alignment.Center) {Icon(if(done)Icons.Rounded.Replay else if(active)Icons.Rounded.PlayArrow else Icons.Rounded.RadioButtonUnchecked,l.title,tint=if(done)Color.White else color)}
                         }
                         Spacer(Modifier.width(15.dp))
-                        Column(Modifier.weight(1f).clickable {model.startLesson(l)}.padding(vertical=13.dp)) {
-                            Text(l.title,fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
-                            Text(if(done)"Signal reçu ✓" else if(active)"À toi de jouer · 5 à 8 min" else l.summary,maxLines=2,fontSize=12.sp,color=Muted)
+                        Column(Modifier.weight(1f).clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button) {model.startLesson(l)}.padding(vertical=13.dp)) {
+                            Text(l.title+if(done)" ✅" else "",fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
+                            Text(l.summary,maxLines=2,overflow=TextOverflow.Ellipsis,fontSize=12.sp,lineHeight=16.sp,color=Muted)
+                        }
+                        var menu by remember(l.id) {mutableStateOf(false)}
+                        Box {
+                            IconButton({menu=true},Modifier.size(40.dp).testTag("lesson-menu-${l.id}")) {Icon(Icons.Rounded.MoreVert,"Options du cours ${l.title}",tint=Muted)}
+                            DropdownMenu(menu,{menu=false}) {DropdownMenuItem(text={Text("Lire le cours")},leadingIcon={Icon(Icons.Rounded.MenuBook,null)},onClick={menu=false;model.previewLesson(l)})}
                         }
                     }
                 }
             }
         }
         item {Text("Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous.",fontSize=12.sp,color=Muted,modifier=Modifier.padding(vertical=8.dp))}
-    }
-}
-
-@Composable fun LessonScreen(model:AppModel,lesson:Lesson) {
-    Column(Modifier.fillMaxSize()) {
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
-            PageHeader(lesson.title,lesson.summary){model.lesson=null}
-            Row(verticalAlignment=Alignment.CenterVertically) {Pico(Modifier.size(64.dp),mood=MascotMood.THINKING,pose=MascotPose.POINT);Spacer(Modifier.width(12.dp));Text("D'abord le déclic.\nEnsuite, à toi de jouer.",fontWeight=FontWeight.Bold,color=Teal)}
-            lesson.body.forEachIndexed { index, paragraph ->
-                MorseAwareText(paragraph,fontSize=16.sp,lineHeight=24.sp)
-                lesson.visuals.getOrNull(index)?.takeIf { it.isNotBlank() }?.let { visual ->
-                    Panel(color=Color.White) { LogicLearningVisual(visual, showNames=false, showCaption=false) }
-                }
-            }
-            if(lesson.formula.isNotBlank()) Panel(color=Mist){Eyebrow("À RETENIR");MorseAwareText(lesson.formula,fontSize=21.sp,fontWeight=FontWeight.Bold)}
-            Text("Cours original Hamigo, adapté des ressources F6KGL. Les références sont dans les réglages.",fontSize=12.sp,color=Muted)
-        }
-        Action("À toi de jouer · ${lesson.questions.size} à ${lesson.questions.size+2} défis",Modifier.padding(16.dp)) {model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)}
     }
 }

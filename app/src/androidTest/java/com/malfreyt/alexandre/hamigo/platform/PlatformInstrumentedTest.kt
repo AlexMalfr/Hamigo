@@ -62,6 +62,7 @@ class PlatformInstrumentedTest {
         assertEquals(setOf("schema", "name", "xp", "streak", "lessons", "weeklyXp", "updatedAt", "dailyXp"),
             objectValue.keys().asSequence().toSet())
         assertRejected(JSONObject(json).put("schema",3).toString())
+        assertRejected(JSONObject(json).put("schema",1).toString())
         assertRejected(JSONObject(json).put("schema", "1").toString())
         assertRejected(JSONObject(json).put("schema", 1.5).toString())
         assertRejected(JSONObject(json).put("name", 123).toString())

@@ -37,7 +37,7 @@ data class ShareProgress(
                 throw IllegalArgumentException("Le fichier de progression n'est pas un JSON valide.")
             }
             val schema = data.opt("schema")
-            require(schema is Number && schema.toDouble() in listOf(1.0, 2.0)) { "Version du fichier de progression non reconnue." }
+            require(schema is Number && schema.toDouble() == 2.0) { "Version du fichier de progression non reconnue." }
             val suppliedName = data.opt("name")
             require(suppliedName is String) { "Pseudo absent ou invalide." }
             val name = suppliedName.trim()

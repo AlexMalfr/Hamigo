@@ -48,9 +48,10 @@ class CloudSyncInstrumentedTest {
     }
 
     @Test fun historicalQuestionAwardCannotReceiveAnotherBonusDuringFirstCloudRestore() {
-        val oldPhone=backup(80,6,4).put("schema",1)
+        val oldPhone=backup(80,6,4)
         val state=oldPhone.getJSONObject("progress")
-        state.remove("syncBase"); state.remove("syncEvents")
+        state.getJSONObject("syncBase").getJSONObject("awarded").put("already","2026-10-03")
+        state.getJSONObject("syncBase").getJSONObject("dailyXp").put("2026-10-03",3)
         state.getJSONObject("awarded").put("already","2026-10-03")
         state.getJSONObject("dailyXp").put("2026-10-03",3)
         val newPhone=backup(0,0,0)
@@ -85,16 +86,17 @@ class CloudSyncInstrumentedTest {
         assertEquals(90, merged.getJSONObject("progress").getInt("xp"))
     }
 
-    @Test fun legacyBackupsUseLargestHistoricalBaselineAndUnionCompletedLessons() {
+    @Test fun obsoleteBackupsAndMissingLedgersAreRejectedRatherThanMigrated() {
         val left = backup(70, 10, 6).put("schema", 1)
         val right = backup(40, 5, 4).put("schema", 1)
         left.getJSONObject("progress").remove("syncBase"); left.getJSONObject("progress").remove("syncEvents")
         right.getJSONObject("progress").remove("syncBase"); right.getJSONObject("progress").remove("syncEvents")
-        left.getJSONObject("progress").put("completed", JSONArray(listOf("first")))
-        right.getJSONObject("progress").put("completed", JSONArray(listOf("second")))
-        val state = JSONObject(CloudProgress.merge(left.toString(), right.toString())).getJSONObject("progress")
-        assertEquals(70, state.getInt("xp")); assertEquals(10, state.getInt("answers"))
-        assertEquals(2, state.getJSONArray("completed").length())
+        val valid=backup(0,0,0)
+        for(invalid in listOf(left,right,JSONObject(left.toString()).put("schema",2))) {
+            assertThrows(Exception::class.java) {CloudProgress.validate(invalid.toString())}
+            assertThrows(Exception::class.java) {CloudProgress.merge(valid.toString(),invalid.toString())}
+        }
+        assertThrows(Exception::class.java) {CloudProgress.ensureLedger(left.getJSONObject("progress"))}
     }
 
     @Test fun malformedCloudPreferencesAndCountersAreRejectedBeforeImport() {
@@ -136,7 +138,9 @@ class CloudSyncInstrumentedTest {
     private fun backup(xp: Int, answers: Int, correct: Int): JSONObject {
         val state = JSONObject().put("schema", 1).put("xp", xp).put("answers", answers).put("correct", correct)
             .put("dailyXp", JSONObject()).put("completed", JSONArray()).put("reviews", JSONObject()).put("awarded", JSONObject())
-        CloudProgress.ensureLedger(state)
+        state.put("syncBase",JSONObject().put("xp",xp).put("answers",answers).put("correct",correct)
+            .put("dailyXp",JSONObject()).put("awarded",JSONObject()).put("completed",JSONArray()))
+            .put("syncEvents",JSONObject())
         return JSONObject().put("app", "hamigo").put("schema", 2).put("name", "Ami")
             .put("profileUpdatedAt", 0).put("preferencesUpdatedAt", 0).put("preferences", JSONObject()).put("progress", state)
     }

@@ -77,6 +77,10 @@ class AppModel internal constructor(
     var revision by mutableIntStateOf(0)
     var route by mutableStateOf("path")
     var lesson by mutableStateOf<Lesson?>(null)
+    var lessonPreviewOnly by mutableStateOf(false)
+        private set
+    var lessonOpening by mutableIntStateOf(0)
+        private set
     var session by mutableStateOf<Session?>(null)
     var resource by mutableStateOf<RefCategory?>(null)
     var friends by mutableStateOf<List<Friend>>(emptyList())
@@ -154,10 +158,11 @@ class AppModel internal constructor(
         }
     }
     fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false; revision++ }
-    fun startLesson(l: Lesson) { lesson=l; session=null }
+    fun startLesson(l: Lesson) { lesson=l; resource=null; session=null; lessonPreviewOnly=false; lessonOpening++ }
+    fun previewLesson(l: Lesson) { startLesson(l); lessonPreviewOnly=true }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
         require(questions.isNotEmpty())
-        lesson=null; resource=null; session=Session(title, questions.toMutableList(), lessonId, exam,
+        lesson=null; resource=null; lessonPreviewOnly=false; session=Session(title, questions.toMutableList(), lessonId, exam,
             returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile") } ?: "path")
     }
     fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false,

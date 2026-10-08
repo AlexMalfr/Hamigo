@@ -81,6 +81,7 @@ class VisualAuditTest {
             val progress = JSONObject().put("schema", 1).put("xp", 760).put("answers", 236).put("correct", 192)
                 .put("dailyXp", days).put("reviews", JSONObject()).put("awarded", JSONObject())
                 .put("completed", JSONArray(model.content!!.lessons.take(6).map { it.id }))
+            progress.put("syncBase",JSONObject(progress.toString()).apply {remove("reviews")}).put("syncEvents",JSONObject())
             model.progress.prefs.edit().putString("progress", progress.toString()).commit()
             model.progress.reload()
             model.showWelcome = false
@@ -198,7 +199,7 @@ class VisualAuditTest {
         ui.onNodeWithTag("navigation-icon-path",useUnmergedTree=true).assertExists()
         ui.onNodeWithText("Salut F4Alex !").assertIsDisplayed()
         ui.runOnIdle {
-            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==60)
+            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==120)
             check(model.progress.xp==760);check(model.progress.prefs.getBoolean("welcomed",false))
             check(!model.progress.prefs.getBoolean("reminderEnabled",false));check(!model.progress.prefs.contains("onboardingStep"))
             check(model.authSession==null && model.oauthSession==null)
@@ -397,7 +398,7 @@ class VisualAuditTest {
         ui.onNodeWithContentDescription("Revenir au mois en cours").performClick()
         ui.onNode(hasContentDescription("aujourd’hui",substring=true)).assertIsDisplayed()
         scrollTo("Cette semaine")
-        ui.onNodeWithContentDescription("Objectif journalier : 30 XP").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Objectif journalier : 60 XP").assertIsDisplayed()
         capture("39-moi-objectif-graphique")
         scrollTo("Bilan d’apprentissage")
         capture("40-moi-bilan-astuce")
@@ -518,7 +519,7 @@ class VisualAuditTest {
             .putString("lastSyncedAt", "2026-10-03T18:00:00Z").commit()
         ui.runOnIdle {
             model.progress.prefs.edit().putString("friends", JSONArray(demoFriends().map { friend ->
-                JSONObject().put("progress", JSONObject(friend.progress.toJson())).put("gist", friend.gist)
+                JSONObject().put("progress", JSONObject(friend.progress.toJson())).put("gist", friend.gist).put("modifiedAt",100)
             }).toString()).commit()
             model.refresh()
         }
@@ -598,7 +599,7 @@ class VisualAuditTest {
         ui.runOnIdle {
             model.progress.prefs.edit().putString("friends", JSONArray().put(
                 JSONObject().put("progress", JSONObject(friend.progress.toJson()))
-                    .put("gist", friend.gist).put("modifiedAt", 1L)
+                    .put("gist", friend.gist).put("modifiedAt",100).put("modifiedAt", 1L)
             ).toString()).commit()
             model.refresh()
         }

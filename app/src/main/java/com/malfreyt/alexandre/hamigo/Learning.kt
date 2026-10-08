@@ -61,6 +61,10 @@ object LearningRules {
 }
 
 class Content(private val context: Context) {
+    private val resourceLinks=JSONObject(json("lesson-resources.json"))
+    val courseSources: Map<String,String> = resourceLinks.getJSONObject("courseSources").let { sources -> sources.keys().asSequence().associateWith(sources::getString) }
+    private val lessonReferenceIds=resourceLinks.getJSONObject("lessonReferences")
+    fun referencesFor(lesson:Lesson):List<RefCategory> = lessonReferenceIds.optJSONArray(lesson.id)?.strings().orEmpty().mapNotNull { id->references.firstOrNull { it.id==id } }
     private fun json(path: String) = context.assets.open(path).bufferedReader().use { it.readText() }
     val chapters: List<Chapter> = JSONObject(json("curriculum.json")).getJSONArray("chapters").objects().map { c ->
         Chapter(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("lessons").objects().map { l ->
@@ -76,7 +80,7 @@ class Content(private val context: Context) {
             RefRow(it.getString("term"), it.getString("description"), it.optString("extra"),
                 it.optString("group"), it.optString("kind", "fact"), it.optString("visual"),
                 it.optString("source"), it.optString("region"), it.optString("cardId")) }, c.optBoolean("flashcards", true),
-            c.optString("group"), c.optInt("order"), c.optString("intro"), c.optString("source"))
+            c.optString("group"), c.optInt("order"), c.optString("intro"), c.optString("source").let { source -> if(source.startsWith("http://f6kgl.free.fr/COURS.html")) courseSources[c.getString("id")] ?: source else source })
     }
     val exam: List<Question> = run {
         val raw = json("exam1/questions.json").trim()
@@ -132,7 +136,9 @@ class Progress(private val context: Context) {
     val weeklyXp get() = (0L..6L).sumOf { dayXp(LocalDate.now().minusDays(it)) }
     val totalAnswers get() = root.optInt("answers")
     val totalCorrect get() = root.optInt("correct")
-    val dailyGoal get() = prefs.getInt("dailyGoal", 30)
+    val dailyGoal get() = DailyGoals.xp(prefs.getInt("dailyGoal",30))
+    val dailyGoalChoice get() = DailyGoals.keys.indexOf(prefs.getInt("dailyGoal",30))
+    fun setDailyGoalChoice(index:Int) { require(index in DailyGoals.keys.indices);setDailyGoal(DailyGoals.keys[index]) }
     fun dayXp(day: LocalDate) = root.optJSONObject("dailyXp")?.optInt(day.toString()) ?: 0
     fun due(content: Content) = reviews.filter { (id, r) -> r.due <= System.currentTimeMillis() && id in content.allQuestions }
         .toList().sortedBy { it.second.due }.mapNotNull { content.allQuestions[it.first] }
@@ -174,8 +180,8 @@ class Progress(private val context: Context) {
             val day = LocalDate.now().toString(); days.put(day, days.optInt(day) + gain)
         }
     }
-    private fun save() {
-        root.put("schema", 2); prefs.edit().putString("progress", root.toString()).apply()
+    private fun save(editor: android.content.SharedPreferences.Editor = prefs.edit()) {
+        root.put("schema", 2); editor.putString("progress", root.toString()).apply()
         com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
         DailyReminder.progressChanged(context)
     }
@@ -194,14 +200,14 @@ class Progress(private val context: Context) {
         JSONObject().put("app","hamigo").put("schema",2).put("name",name)
             .put("profileUpdatedAt",prefs.getLong("profileUpdatedAt",if(name!="Pilote des ondes")1 else 0))
             .put("preferencesUpdatedAt",prefs.getLong("preferencesUpdatedAt",if(prefs.contains("dailyGoal") || prefs.contains("reminderHour") || prefs.contains(GameplayPreferences.SINGLE_KEY) || prefs.contains(GameplayPreferences.THRESHOLD))1 else 0))
-            .put("preferences",JSONObject().put("dailyGoal",dailyGoal)
+            .put("preferences",JSONObject().put("dailyGoal",prefs.getInt("dailyGoal",30))
                 .put("reminderEnabled",prefs.getBoolean("reminderEnabled",false))
                 .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0))
                 .put(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey)
                 .put(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
             .put("progress",root).put("friends",cloudFriendRecords()).put("socialInbox",socialInboxState()).toString()
     }
-    /** Keep verified avatar metadata local: older clients reject unknown relationship fields. */
+    /** Verified avatar metadata stays local; an imported cache is not GitHub verification. */
     private fun cloudFriendRecords(): JSONObject = friendRecords().also { records ->
         records.keys().forEach { id -> records.getJSONObject(id).remove("githubIdentity");records.getJSONObject(id).remove("githubIdentityCheckedAt") }
     }
@@ -254,7 +260,7 @@ class Progress(private val context: Context) {
             .putLong("profileUpdatedAt",candidate.optLong("profileUpdatedAt"))
             .putLong("preferencesUpdatedAt",candidate.optLong("preferencesUpdatedAt"))
         candidate.optJSONObject("preferences")?.let { settings ->
-            editor.putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal).coerceIn(1,1000))
+            editor.putInt("dailyGoal",settings.optInt("dailyGoal",prefs.getInt("dailyGoal",30)).coerceIn(1,1000))
                 .putInt("reminderHour",settings.optInt("reminderHour",20).coerceIn(0,23))
                 .putInt("reminderMinute",settings.optInt("reminderMinute",0).coerceIn(0,59))
                 .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
@@ -266,14 +272,14 @@ class Progress(private val context: Context) {
                 .putString("friendTombstones",CloudProgress.friendTombstones(records).toString())
         }
         candidate.optJSONObject("socialInbox")?.let { editor.putString("socialInbox",it.toString()) }
-        editor.apply(); save()
+        save(editor)
         if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
         before != cloudExport()
     }
     fun export() = cloudExport()
     fun import(json: String) {
         val candidate = JSONObject(json)
-        require(candidate.optString("app") == "hamigo" && candidate.optInt("schema") in 1..2) { "Ce fichier n'est pas une sauvegarde Hamigo." }
+        require(candidate.optString("app") == "hamigo" && candidate.optInt("schema") == 2) { "Ce fichier n'est pas une sauvegarde Hamigo actuelle." }
         val state = candidate.getJSONObject("progress")
         CloudProgress.validate(json)
         require(state.optInt("xp") >= 0 && state.optInt("answers") >= 0) { "Sauvegarde invalide." }
@@ -285,20 +291,26 @@ class Progress(private val context: Context) {
         }
         synchronized(CLOUD_LOCK) {
             val previousReminder=reminderSettings()
-            root = state; name = candidate.optString("name", name)
-            // An old export has no relationships: preserve the local team in that case.
-            // An explicit new-format import replaces both active relationships and deletions.
-            candidate.optJSONObject("friends")?.let { saveFriendRecords(retainLocalFriendIdentities(it)) }
-            candidate.optJSONObject("socialInbox")?.let { saveSocialInboxState(it) }
+            root = state
+            // Publish one preference transaction. A UI listener can reload immediately on apply().
+            val editor=prefs.edit().putString("name",candidate.optString("name",name).take(40).ifBlank {"Pilote des ondes"})
+                .putLong("profileUpdatedAt",System.currentTimeMillis())
+            // An explicit relationship register replaces active links and deletions together.
+            candidate.optJSONObject("friends")?.let {records->
+                val retained=retainLocalFriendIdentities(records)
+                editor.putString("friends",CloudProgress.activeFriends(retained).toString())
+                    .putString("friendTombstones",CloudProgress.friendTombstones(retained).toString())
+            }
+            candidate.optJSONObject("socialInbox")?.let {editor.putString("socialInbox",FriendInboxState.prune(it).toString())}
             candidate.optJSONObject("preferences")?.let {settings ->
-                prefs.edit().putInt("dailyGoal",settings.optInt("dailyGoal",dailyGoal))
+                editor.putInt("dailyGoal",settings.optInt("dailyGoal",prefs.getInt("dailyGoal",30)))
                     .putInt("reminderHour",settings.optInt("reminderHour",20)).putInt("reminderMinute",settings.optInt("reminderMinute",0))
                     .putBoolean("reminderEnabled",settings.optBoolean("reminderEnabled",false))
                     .putBoolean(GameplayPreferences.SINGLE_KEY,settings.optBoolean(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey))
                     .putInt(GameplayPreferences.THRESHOLD,settings.optInt(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
-                    .putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
+                    .putLong("preferencesUpdatedAt",System.currentTimeMillis())
             }
-            save()
+            save(editor)
             if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
         }
         ProgressSyncScheduler.enqueue(context)

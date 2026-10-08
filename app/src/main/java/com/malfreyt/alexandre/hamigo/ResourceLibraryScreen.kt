@@ -231,7 +231,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton({ model.resource=null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, "Retour aux mémos") }
+                        IconButton({ model.resource=null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, if(model.lesson!=null)"Retour au cours" else "Retour aux mémos") }
                         Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                             Text(cat.title, fontSize = 21.sp, lineHeight = 25.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                             if (cat.subtitle.isNotBlank()) Text(cat.subtitle, fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
@@ -254,7 +254,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 items(entries, key = { it.term }) { row -> ReferenceEntry(cat, row, audio) }
             }
             if (rows.isEmpty()) item { Text("Aucun repère trouvé dans cette fiche.", color = Muted, fontSize = 14.sp) }
-            item { CompleteCourseLink(cat.source) }
+            item { CompleteCourseLink(cat.source,model.content?.courseSources?.get(cat.id).orEmpty()) }
         }
     }
 }
@@ -344,11 +344,12 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     else Surface(color = background, shape = RoundedCornerShape(16.dp)) { body() }
 }
 
-@Composable private fun CompleteCourseLink(source: String = "") {
+@Composable private fun CompleteCourseLink(source: String = "", courseSource:String = "") {
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        if (source.isNotBlank() && source != courseUrl) TextButton({ openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
-        TextButton({ openLink(context, courseUrl) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Consulter le cours complet F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
+        val target=courseSource.ifBlank {courseUrl}
+        if (source.isNotBlank() && source != target) TextButton({ openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
+        TextButton({ openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
     }
 }
 

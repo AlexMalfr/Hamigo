@@ -54,7 +54,7 @@ class GitHubIdentityInstrumentedTest {
         val renamed=JSONObject(old.toString()).put("githubIdentity",GitHubIdentity("renamed",42L).toJson())
             .put("githubIdentityCheckedAt",300L)
         fun backup(record:JSONObject)=JSONObject().put("app","hamigo").put("schema",2).put("name","Me")
-            .put("progress",JSONObject().put("xp",0).put("answers",0).put("correct",0))
+            .put("progress",JSONObject().put("xp",0).put("answers",0).put("correct",0).apply {CloudProgress.ensureLedger(this)})
             .put("friends",JSONObject().put("abcde12345",record)).toString()
         val a=backup(old);val b=backup(enriched);val c=backup(renamed)
         val merged=CloudProgress.merge(CloudProgress.merge(a,b),c)

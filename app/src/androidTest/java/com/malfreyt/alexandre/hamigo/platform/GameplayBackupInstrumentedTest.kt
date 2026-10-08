@@ -63,7 +63,7 @@ class GameplayBackupInstrumentedTest {
         assertEquals(200L, progress.prefs.getLong("preferencesUpdatedAt", 0))
     }
 
-    @Test fun oldBackupsWithoutMorseKeysPreserveLocalSettingsDuringImportAndNewerCloudMerge() = isolated { context ->
+    @Test fun partialPreferencesKeepUnsetLocalGameplayControlsDuringImportAndMerge() = isolated { context ->
         val progress = Progress(context)
         GameplayPreferences.save(progress.prefs, MorseInputSettings(true, 470))
         val legacy = JSONObject(progress.export()).apply {

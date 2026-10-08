@@ -209,7 +209,7 @@ class AuthFlowInstrumentedTest {
             val friendId = "abcde1234567890"
             first.prefs.edit().putString("friends", org.json.JSONArray(listOf(JSONObject()
                 .put("gist", "https://gist.github.com/ami/$friendId")
-                .put("progress", JSONObject(ShareProgress("Équipier conservé", 120, 2, 3).toJson())))).toString()).commit()
+                .put("modifiedAt",1).put("progress", JSONObject(ShareProgress("Équipier conservé", 120, 2, 3).toJson())))).toString()).commit()
             first.answer("question-first", true)
             first.complete("lesson-first")
             val firstSync = GitHubSync(context, fake)
