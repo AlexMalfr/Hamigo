@@ -124,6 +124,46 @@ class WidgetAtlasInstrumentedTest {
         assertTrue(failures.take(30).joinToString("\n"),failures.isEmpty())
     }
 
+    @Test fun fiveReminderStatesHaveNoFauxActionsAndGoalCompletionChangesTheGraphic() {
+        val date=LocalDate.of(2026,10,8)
+        val states=listOf(
+            ReminderState(0,30,emptySet()),
+            ReminderState(0,30,setOf(date.minusDays(1).toString())),
+            ReminderState(18,30,setOf(date.toString(),date.minusDays(1).toString())),
+            ReminderState(30,30,setOf(date.toString(),date.minusDays(1).toString())),
+            ReminderState(0,30,setOf(date.minusDays(3).toString()))
+        )
+        states.forEach { state ->
+            val reminder=ReminderContent.build(state,date)
+            val snapshot=WidgetSnapshot(reminder,(0L..6L).map { WidgetDay(date.minusDays(6-it),if(it==6L)state.todayXp else 0) })
+            HomeWidgetKind.entries.forEach {kind->
+                listOf(SizeF(84f,91f),SizeF(130f,130f),SizeF(350f,220f),SizeF(72f,300f)).forEach {size->
+                    instrumentation.runOnMainSync {
+                        val view=HomeWidgets.views(context,kind,snapshot,size).apply(context,FrameLayout(context))
+                        measure(view,size)
+                        assertTrue(nativeIssues(view).joinToString(),nativeIssues(view).isEmpty())
+                        assertTrue(compositionIssues(WidgetPresentation.composition(kind,snapshot,size)).joinToString(),compositionIssues(WidgetPresentation.composition(kind,snapshot,size)).isEmpty())
+                        assertTrue("The complete tile opens the path without a duplicate CTA",view.findViewById<View>(R.id.widget_review).visibility==View.GONE)
+                        if(kind == HomeWidgetKind.WEEK || kind == HomeWidgetKind.GOAL && size == SizeF(84f,91f)) {
+                            val bitmap=(view.findViewById<ImageView>(R.id.widget_art).drawable as BitmapDrawable).bitmap
+                            // Probe only the plot, not Pico's cream face or the native counters.
+                            val chart=WidgetPresentation.composition(kind,snapshot,size).chart
+                            val scale=bitmap.width/size.width
+                            val left=(chart.left*scale).toInt();val top=(chart.top*scale).toInt()
+                            val width=((chart.right*scale).toInt()-left).coerceAtLeast(1)
+                            val height=((chart.bottom*scale).toInt()-top).coerceAtLeast(1)
+                            val pixels=IntArray(width*height)
+                            bitmap.getPixels(pixels,0,width,left,top,width,height)
+                            val gold=pixels.count {Color.red(it)>215 && Color.green(it) in 200..245 && Color.blue(it) in 55..185}
+                            assertTrue("Completed and incomplete goals must look different at $kind $size",if(state.todayXp>=state.goal)gold>0 else gold==0)
+                        }
+                        capture(view,"state-${reminder.context.name.lowercase()}-${kind.name.lowercase()}-${size.width.toInt()}x${size.height.toInt()}")
+                    }
+                }
+            }
+        }
+    }
+
     @Test fun continuousGeometryHasNoOverlappingOrOutOfBoundsElements() {
         val date=LocalDate.of(2026,10,8)
         val r=ReminderContent.build(ReminderState(18,30,setOf(date.toString())),date)
@@ -137,6 +177,32 @@ class WidgetAtlasInstrumentedTest {
         } } }
         File(directory,"geometry-report.json").writeText(JSONObject().put("compositions",count).put("failures",JSONArray(failures)).toString(2))
         assertTrue(failures.take(30).joinToString("\n"),failures.isEmpty())
+    }
+
+    @Test fun verticalGaugeGraduationsStayInsideAndVisibleOverTheFilledTrack() {
+        val date=LocalDate.of(2026,10,8)
+        val r=ReminderContent.build(ReminderState(30,30,setOf(date.toString())),date)
+        val snapshot=WidgetSnapshot(r,(0L..6L).map {WidgetDay(date.minusDays(it),0)})
+        val size=SizeF(72f,300f)
+        instrumentation.runOnMainSync {
+            val view=HomeWidgets.views(context,HomeWidgetKind.GOAL,snapshot,size).apply(context,FrameLayout(context))
+            measure(view,size)
+            val bitmap=(view.findViewById<ImageView>(R.id.widget_art).drawable as BitmapDrawable).bitmap
+            val box=WidgetPresentation.composition(HomeWidgetKind.GOAL,snapshot,size).chart
+            val scale=bitmap.width/size.width
+            val left=box.left+box.width()*.34f;val right=box.right-box.width()*.34f
+            val top=box.top+16f;val bottom=box.bottom-16f
+            fun dark(x:Float,y:Float):Boolean {
+                val pixel=bitmap.getPixel((x*scale).toInt(),(y*scale).toInt())
+                return Color.red(pixel)<60 && Color.green(pixel)<100 && Color.blue(pixel)<100
+            }
+            (1..3).forEach {i->
+                val y=bottom-(bottom-top)*i/4
+                assertTrue("A graduation must remain visible over a full gauge",(-1..1).any {dark((left+right)/2,y+it*.3f)})
+                assertTrue("Graduations must not protrude",!dark(left-2f,y) && !dark(right+2f,y))
+            }
+            capture(view,"goal-vertical-graduations")
+        }
     }
 
     private fun compositionIssues(layout: WidgetComposition): List<String> = buildList {

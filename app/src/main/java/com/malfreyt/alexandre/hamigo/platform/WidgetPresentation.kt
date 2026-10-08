@@ -20,6 +20,8 @@ import android.view.View
 import android.widget.RemoteViews
 import com.malfreyt.alexandre.hamigo.MainActivity
 import com.malfreyt.alexandre.hamigo.PicoRenderer
+import com.malfreyt.alexandre.hamigo.MascotMood
+import com.malfreyt.alexandre.hamigo.MascotPose
 import com.malfreyt.alexandre.hamigo.R
 import com.malfreyt.alexandre.hamigo.dayCount
 import java.time.format.DateTimeFormatter
@@ -39,12 +41,14 @@ internal object WidgetPresentation {
     private val gold = Color.rgb(186, 99, 32)
     private val coral = Color.rgb(255, 186, 111)
     private val mint = Color.rgb(102, 214, 195)
+    private val completed = Color.rgb(255, 209, 102)
     private val french = Locale.FRANCE
     private val dayLabels = listOf("L", "Ma", "Me", "J", "V", "S", "D")
 
     fun composition(kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF): WidgetComposition {
         val w = size.width.coerceAtLeast(40f); val h = size.height.coerceAtLeast(40f)
-        val p = (minOf(w, h) * .07f).coerceIn(3f, 24f)
+        // Keep native text clear of both our corners and the launcher's extra rounding.
+        val p = (minOf(w, h) * .10f).coerceIn(6f, 24f)
         val r = snapshot.reminder
         val dark = kind == HomeWidgetKind.WEEK
         val primary = if (dark) Color.WHITE else ink
@@ -119,9 +123,7 @@ internal object WidgetPresentation {
             val icon = minOf(w - 2 * p, h * .15f, 74f)
             val iconTop = p + titleH + metricH + 4f
             pico = RectF((w - icon) / 2, iconTop, (w + icon) / 2, iconTop + icon)
-            val footerH = (w * .21f).coerceIn(9f, 17f)
-            text(R.id.widget_review, p, h - p - footerH, w - 2 * p, footerH, if (w < 56f) "Jouer ›" else "Parcours ›", accent, true)
-            chart = RectF(p, iconTop + icon + 4f, w - p, h - p - footerH - 4f)
+            chart = RectF(p, iconTop + icon + 4f, w - p, h - p)
         } else if (sidePanel) {
             val infoW = ((w - 2 * p) * .38f).coerceAtMost(250f)
             val titleH = (h * .13f).coerceIn(12f, 24f)
@@ -132,8 +134,6 @@ internal object WidgetPresentation {
             val statusY = p + titleH + metricH + 6f
             text(R.id.widget_status, p, statusY, infoW, statusH, status, secondary)
             if (h >= 180f && kind != HomeWidgetKind.STREAK) text(R.id.widget_badge, p, statusY + statusH + 6f, infoW, 20f, badge, secondary)
-            val footerH = minOf(20f, h * .15f)
-            text(R.id.widget_review, p, h - p - footerH, minOf(infoW,92f), footerH, "Réviser ›", accent, true)
             chart = RectF(p + infoW + p, p, w - p, h - p)
             if (kind == HomeWidgetKind.WEEK) {
                 val side = minOf(52f, h * .24f, chart.width() * .35f)
@@ -151,9 +151,7 @@ internal object WidgetPresentation {
             text(R.id.widget_metric, p, p + titleH + 3f, cw - icon - 3f, metricH, value)
             val y = p + titleH + metricH + 5f
             text(R.id.widget_status, p, y, cw, statusH, status, secondary)
-            val footerH = (h * .09f).coerceIn(13f, 22f)
-            text(R.id.widget_review, p, h - p - footerH, minOf(cw,92f), footerH, "Réviser ›", accent, true)
-            chart = RectF(p, y + statusH + p * .5f, w - p, h - p - footerH - p * .5f)
+            chart = RectF(p, y + statusH + p * .5f, w - p, h - p)
             if (h >= 230f && w >= 160f && kind != HomeWidgetKind.STREAK) {
                 // Reserve a genuine footer line rather than scaling up a small empty composition.
                 text(R.id.widget_badge, p, chart.bottom - 22f, cw, 20f, badge, secondary)
@@ -243,10 +241,7 @@ internal object WidgetPresentation {
         val radius = minOf(w, h) * .35f
         (1..3).forEach { canvas.drawCircle(w, 0f, radius * it, paint) }
         paint.style = Paint.Style.FILL
-        layout.texts.firstOrNull { it.id == R.id.widget_review }?.let { slot ->
-            round(canvas,paint,slot.bounds,if (dark) Color.argb(20,255,255,255) else Color.argb(23,255,255,255),slot.bounds.height()/2)
-        }
-        layout.pico?.let { PicoRenderer.draw(canvas, it, snapshot.reminder.mood, snapshot.reminder.pose, .3f) }
+        layout.pico?.let { drawPico(canvas, it, snapshot) }
         val chart = layout.chart
         if (chart.width() > 1f && chart.height() > 1f) {
             when (kind) {
@@ -286,24 +281,39 @@ internal object WidgetPresentation {
     private fun hero(canvas: Canvas, p: Paint, snapshot: WidgetSnapshot, bounds: RectF) {
         p.style=Paint.Style.FILL; p.color=Color.argb(95,255,255,255)
         canvas.drawCircle(bounds.centerX(),bounds.centerY()+bounds.height()*.06f,bounds.width()*.46f,p)
-        PicoRenderer.draw(canvas,bounds,snapshot.reminder.mood,snapshot.reminder.pose,.3f)
+        drawPico(canvas,bounds,snapshot)
+    }
+
+    /** Widget expressions describe the present state; daily notification variants stay independent. */
+    private fun drawPico(canvas: Canvas, bounds: RectF, snapshot: WidgetSnapshot) {
+        val (mood, pose) = when (snapshot.reminder.context) {
+            ReminderContext.START -> MascotMood.HAPPY to MascotPose.WAVE
+            ReminderContext.CONTINUE -> MascotMood.DETERMINED to MascotPose.POINT
+            ReminderContext.IN_PROGRESS -> MascotMood.THINKING to MascotPose.HUG
+            ReminderContext.GOAL_REACHED -> MascotMood.CELEBRATE to MascotPose.DANCE
+            ReminderContext.RESTART -> MascotMood.SAD to MascotPose.HUG
+        }
+        PicoRenderer.draw(canvas, bounds, mood, pose, .3f)
     }
 
     private fun goal(canvas: Canvas, p: Paint, snapshot: WidgetSnapshot, box: RectF, column: Boolean, horizontal: Boolean, font: Float) {
         val r = snapshot.reminder
         val ratio = (r.todayXp.toFloat() / r.goal.coerceAtLeast(1)).coerceIn(0f, 1f)
+        val fill = if (ratio >= 1f) completed else teal
         if (column) {
             val labelH = if (box.height() >= 70f) 16f else 0f
             val track = RectF(box.left + box.width() * .34f, box.top + labelH, box.right - box.width() * .34f, box.bottom - labelH)
             round(canvas, p, track, Color.argb(34, 8, 127, 130), track.width() / 2)
-            if (ratio > 0f) round(canvas, p, RectF(track.left, track.bottom - track.height() * ratio, track.right, track.bottom), teal, track.width() / 2)
+            if (ratio > 0f) round(canvas, p, RectF(track.left, track.bottom - track.height() * ratio, track.right, track.bottom), fill, track.width() / 2)
             if (labelH > 0f) {
                 fitted(canvas, p, "${(ratio * 100).roundToInt()} %", RectF(box.left, box.top, box.right, box.top + labelH), 12f * font, teal)
                 fitted(canvas, p, "${number(r.goal, true)} XP", RectF(box.left, box.bottom - labelH, box.right, box.bottom), 10f * font, ink)
             }
             if (track.height() >= 70f) {
-                p.color = Color.argb(80, 8, 127, 130); p.strokeWidth = 1f
-                (1..3).forEach { i -> val y = track.bottom - track.height() * i / 4; canvas.drawLine(track.left - 3, y, track.right + 3, y, p) }
+                // Foreground graduations are inset, including when the goal is completely filled.
+                p.color = ink; p.strokeWidth = 1.1f
+                val inset = (track.width() * .20f).coerceIn(1f, 4f)
+                (1..3).forEach { i -> val y = track.bottom - track.height() * i / 4; canvas.drawLine(track.left + inset, y, track.right - inset, y, p) }
             }
         } else if (box.height() < 34f || horizontal) {
             // The small tile already says XP/goal; two tiny axis labels would repeat it.
@@ -313,7 +323,7 @@ internal object WidgetPresentation {
             val top = box.top + (box.height() - gap - thickness) / 2
             val track = RectF(box.left, top, box.right, top + thickness)
             round(canvas, p, track, Color.argb(35, 8, 127, 130), thickness / 2)
-            if (ratio > 0) round(canvas, p, RectF(track.left, top, track.left + track.width() * ratio, track.bottom), teal, thickness / 2)
+            if (ratio > 0) round(canvas, p, RectF(track.left, top, track.left + track.width() * ratio, track.bottom), fill, thickness / 2)
             if (track.width() >= 130f) {
                 p.color = Color.argb(85, 255, 255, 255); p.strokeWidth = 1f
                 (1..3).forEach { i -> val x = track.left + track.width() * i / 4; canvas.drawLine(x, top + 2, x, track.bottom - 2, p) }
@@ -335,9 +345,11 @@ internal object WidgetPresentation {
             val thickness = (side * .045f).coerceIn(3f, 12f)
             p.style = Paint.Style.STROKE; p.strokeCap = Paint.Cap.ROUND; p.strokeWidth = thickness
             p.color = Color.argb(35, 8, 127, 130); canvas.drawCircle(cx, cy, radius, p)
-            p.color = teal; canvas.drawArc(RectF(cx - radius, cy - radius, cx + radius, cy + radius), -90f, 360f * ratio, false, p)
+            val ring = RectF(cx - radius, cy - radius, cx + radius, cy + radius)
+            p.color = fill; if (ratio >= 1f) p.shader = goldReflection(ring)
+            canvas.drawArc(ring, -90f, 360f * ratio, false, p); p.shader = null
             p.style = Paint.Style.FILL
-            PicoRenderer.draw(canvas, RectF(cx - radius * .55f, cy - radius * .67f, cx + radius * .55f, cy + radius * .39f), r.mood, r.pose, .3f)
+            drawPico(canvas, RectF(cx - radius * .55f, cy - radius * .67f, cx + radius * .55f, cy + radius * .39f), snapshot)
             fitted(canvas, p, "${(ratio * 100).roundToInt()} %", RectF(cx - radius * .58f, cy + radius * .52f, cx + radius * .58f, cy + radius * .80f), minOf(26f, side * .14f) * font, teal)
             if (hasHistory) {
                 val history = RectF(box.left,ringTop+side+12f,box.right,ringTop+side+12f+historyH)
@@ -370,7 +382,7 @@ internal object WidgetPresentation {
         } else {
             val step = box.width() / 7
             val labels = box.height() >= 25f
-            val labelH = if (labels) minOf(17f, box.height() * .28f) else 0f
+            val labelH = if (labels) minOf(20f, box.height() * .28f) else 0f
             val radius = minOf(step * .30f, (box.height() - labelH) * .36f, 24f)
             val contentH = 2 * radius + labelH + if (labels) 5f else 0f
             val cy = box.centerY() - contentH / 2 + radius
@@ -380,7 +392,7 @@ internal object WidgetPresentation {
                 val cx = box.left + (i + .5f) * step
                 dayCircle(canvas, p, snapshot, day, cx, cy, radius, warm)
                 val labelTop = cy + radius + 5f
-                if (labels) fitted(canvas, p, dayLabels[i], RectF(cx - step * .45f, labelTop, cx + step * .45f, labelTop + labelH), 12f * font, ink)
+                if (labels) horizontalDayLabel(canvas, p, i, RectF(cx - step * .45f, labelTop, cx + step * .45f, labelTop + labelH), font, ink)
             }
         }
     }
@@ -389,7 +401,16 @@ internal object WidgetPresentation {
         p.style = Paint.Style.FILL; p.color = Color.argb(180, 255, 255, 255)
         canvas.drawCircle(cx, cy, radius, p)
         val ratio = (day.xp.toFloat() / snapshot.reminder.goal.coerceAtLeast(1)).coerceIn(0f, 1f)
-        if (ratio > 0) { p.color = color; canvas.drawCircle(cx, cy, radius * sqrt(ratio), p) }
+        if (ratio > 0) {
+            p.color = if (ratio >= 1f) completed else color
+            if (ratio >= 1f) p.shader = goldReflection(RectF(cx-radius,cy-radius,cx+radius,cy+radius))
+            canvas.drawCircle(cx, cy, radius * sqrt(ratio), p); p.shader = null
+        }
+        if (ratio >= 1f && radius >= 6f) {
+            p.style = Paint.Style.STROKE; p.strokeCap = Paint.Cap.ROUND; p.strokeWidth = radius * .18f; p.color = ink
+            canvas.drawPath(Path().apply { moveTo(cx-radius*.4f,cy); lineTo(cx-radius*.1f,cy+radius*.28f); lineTo(cx+radius*.43f,cy-radius*.32f) }, p)
+            p.style = Paint.Style.FILL
+        }
         if (day.date == snapshot.reminder.date) {
             p.style = Paint.Style.STROKE; p.strokeWidth = (radius*.13f).coerceIn(.6f,1.2f); p.color = color
             // A fixed 2dp halo makes adjacent dots touch in the smallest calendars.
@@ -410,7 +431,7 @@ internal object WidgetPresentation {
                 val cy = box.top + (i + .5f) * step
                 fitted(canvas, p, dayLabels[i], RectF(box.left, cy - step * .30f, left - 2, cy + step * .30f), 12f * font, mint, false)
                 round(canvas, p, RectF(left, cy - thickness / 2, right, cy + thickness / 2), Color.argb(23, 255, 255, 255), thickness / 2)
-                if (day.xp > 0) round(canvas, p, RectF(left, cy - thickness / 2, left + (right - left) * day.xp / maximum, cy + thickness / 2), if (day.date == snapshot.reminder.date) coral else mint, thickness / 2)
+                if (day.xp > 0) round(canvas, p, RectF(left, cy - thickness / 2, left + (right - left) * day.xp / maximum, cy + thickness / 2), if (day.xp >= snapshot.reminder.goal) completed else if (day.date == snapshot.reminder.date) coral else mint, thickness / 2)
                 if (valuesW > 0 && day.xp>0) fitted(canvas, p, number(day.xp, valuesW < 35), RectF(right + 3, cy - step * .30f, box.right, cy + step * .30f), 13f * font, Color.WHITE)
             }
             val goalX = left + (right - left) * snapshot.reminder.goal / maximum
@@ -429,8 +450,8 @@ internal object WidgetPresentation {
                 val cx = box.left + (i + .5f) * step
                 round(canvas, p, RectF(cx - thickness / 2, top, cx + thickness / 2, bottom), Color.argb(23, 255, 255, 255), minOf(thickness / 2, 8f))
                 val y = bottom - height * day.xp / maximum
-                if (day.xp > 0) round(canvas, p, RectF(cx - thickness / 2, y, cx + thickness / 2, bottom), if (day.date == snapshot.reminder.date) coral else mint, minOf(thickness / 2, 8f))
-                if (labels) fitted(canvas, p, dayLabels[i], RectF(cx - step * .45f, bottom + 1, cx + step * .45f, box.bottom), 12f * font, if (day.date == snapshot.reminder.date) coral else mint)
+                if (day.xp > 0) round(canvas, p, RectF(cx - thickness / 2, y, cx + thickness / 2, bottom), if (day.xp >= snapshot.reminder.goal) completed else if (day.date == snapshot.reminder.date) coral else mint, minOf(thickness / 2, 8f))
+                if (labels) horizontalDayLabel(canvas, p, i, RectF(cx - step * .45f, bottom + 1, cx + step * .45f, box.bottom), font, if (day.date == snapshot.reminder.date) coral else mint)
                 if (values && day.xp>0) fitted(canvas, p, number(day.xp, step < 50f), RectF(cx - step * .45f, maxOf(box.top, y - 20), cx + step * .45f, y - 1), 14f * font, Color.WHITE)
             }
             // The goal is a reference in the foreground, including across a bar that exceeds it.
@@ -441,7 +462,19 @@ internal object WidgetPresentation {
     private fun round(c: Canvas, p: Paint, rect: RectF, color: Int, radius: Float) {
         if (rect.width() <= 0 || rect.height() <= 0) return
         p.style = Paint.Style.FILL; p.color = color; p.pathEffect = null
-        c.drawRoundRect(rect, radius, radius, p)
+        if (color == completed) p.shader = goldReflection(rect)
+        c.drawRoundRect(rect, radius, radius, p); p.shader = null
+    }
+    private fun goldReflection(rect: RectF) = LinearGradient(rect.left,rect.top,rect.right,rect.bottom,
+        intArrayOf(Color.rgb(242,195,84),completed,Color.rgb(255,228,160),completed),
+        floatArrayOf(0f,.35f,.53f,1f),Shader.TileMode.CLAMP)
+
+    private fun horizontalDayLabel(c: Canvas, p: Paint, day: Int, rect: RectF, font: Float, color: Int) {
+        // All main initials share one baseline; Tuesday/Wednesday have a smaller letter below.
+        val first = RectF(rect.left,rect.top,rect.right,rect.top+rect.height()*.64f)
+        fitted(c,p,dayLabels[day].take(1),first,12f*font,color)
+        if (day in 1..2) fitted(c,p,dayLabels[day].takeLast(1),
+            RectF(rect.left,rect.top+rect.height()*.64f,rect.right,rect.bottom),8f*font,color)
     }
     private fun dashed(c: Canvas, p: Paint, x1: Float, y1: Float, x2: Float, y2: Float, color: Int) {
         p.style = Paint.Style.STROKE; p.color = color; p.strokeWidth = 1.2f

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -13,11 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
@@ -31,18 +27,26 @@ import kotlin.random.Random
     var selected by remember {mutableStateOf(keys)}
     var count by remember {mutableIntStateOf(20)}
     var themesOpen by remember {mutableStateOf(false)}
-    var customOpen by remember {mutableStateOf(false)}
-    var custom by remember {mutableStateOf("100")}
     var customSelected by remember {mutableStateOf(false)}
     val available=remember(index,selected) {index.available(selected)}
     val listState=rememberLazyListState()
     var reviewCount by remember {mutableIntStateOf(10)}
+    var reviewCustomSelected by remember {mutableStateOf(false)}
     val progress=model.displayedProgress ?: model.progress
     val reviews=progress.reviews
     val completed=progress.completed
     val due=progress.due(content)
     val reviewPool=remember(content,completed,reviews,due) {CourseRevisionBuilder.eligible(content.lessons,completed,reviews,due)}
     val dueCount=due.size
+    val effectiveReviewCount=if(reviewPool.isEmpty())0 else reviewCount.coerceIn(1,reviewPool.size)
+    val reviewOptions=questionCountOptions(reviewPool.size)
+    val effectiveReviewCustom=effectiveReviewCount==reviewCount&&(reviewCustomSelected||effectiveReviewCount !in reviewOptions)
+    LaunchedEffect(reviewPool.size) {
+        if(reviewPool.isNotEmpty()) {
+            if(reviewCount!=effectiveReviewCount) {reviewCount=effectiveReviewCount;reviewCustomSelected=false}
+            else if(reviewCount !in reviewOptions)reviewCustomSelected=true
+        }
+    }
     LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
         item {Panel(color=Color(0xFFFFE8E0)) {
@@ -55,20 +59,7 @@ import kotlin.random.Random
         }}
         item {Panel {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.Shuffle,null,tint=Purple);Spacer(Modifier.width(8.dp));Eyebrow("MIX SUR MESURE",Purple)}
-            Text("Nombre de questions :",fontSize=13.sp,fontWeight=FontWeight.Bold,color=Ink)
-            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) {
-                listOf(10,20,40,80,150).forEach {n ->
-                    Surface(onClick={count=n;customSelected=false},modifier=Modifier.weight(1f).height(40.dp),color=if(count==n&&!customSelected)Mist else Cream,shape=androidx.compose.foundation.shape.RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,if(count==n&&!customSelected)Teal else Color(0xFFD4DEDA))) {
-                        Box(contentAlignment=Alignment.Center){Text("$n",fontSize=13.sp,fontWeight=if(count==n&&!customSelected)FontWeight.Bold else FontWeight.Normal,color=Ink)}
-                    }
-                }
-                Surface(onClick={custom=count.toString();customOpen=true},modifier=Modifier.height(40.dp).widthIn(min=40.dp).testTag("custom-question-count").semantics {this.selected=customSelected},color=if(customSelected)Mist else Cream,shape=androidx.compose.foundation.shape.RoundedCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(1.dp,if(customSelected)Teal else Color(0xFFD4DEDA))) {
-                    Row(Modifier.padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp,Alignment.CenterHorizontally)) {
-                        Icon(Icons.Rounded.Edit,"Choisir un nombre personnalisé",modifier=Modifier.size(18.dp),tint=if(customSelected)Teal else Purple)
-                        if(customSelected)Text("$count",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
-                    }
-                }
-            }
+            QuestionCountSelector(count,customSelected,{n,isCustom ->count=n;customSelected=isCustom},"mix-question-count","custom-question-count")
             if(count>available)Text("Choisis plus de thèmes ou réduis la longueur du mix.",fontSize=12.sp,color=Coral)
             Action("Lancer mon mix",enabled=count in 1..available) {
                 model.startQuestions("Mix radio · $count questions",index.questions(selected,count))
@@ -100,13 +91,10 @@ import kotlin.random.Random
             val reviewSummary="($dueCount à revoir · ${reviewPool.size} question${if(reviewPool.size==1)"" else "s"} disponible${if(reviewPool.size==1)"" else "s"})."
             Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées $reviewSummary" else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance $reviewSummary",fontSize=13.sp,lineHeight=19.sp,color=Muted)
             if(reviewPool.isNotEmpty()) {
-                Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.CenterVertically) {
-                    Text("Questions :",fontSize=12.sp,color=Muted)
-                    listOf(10,20,40).forEach { n ->FilterChip(reviewCount==n,{reviewCount=n},label={Text("$n",fontSize=13.sp)})}
-                }
+                QuestionCountSelector(effectiveReviewCount,effectiveReviewCustom,{n,isCustom ->reviewCount=n;reviewCustomSelected=isCustom},"review-question-count","custom-review-question-count",availableCount=reviewPool.size)
             }
-            Action(if(reviewPool.isEmpty())"Lancer les révisions" else "Réviser · ${minOf(reviewCount,reviewPool.size)} questions",enabled=reviewPool.isNotEmpty()) {
-                model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,reviewCount))
+            Action("Lancer les révisions",enabled=reviewPool.isNotEmpty()) {
+                model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,effectiveReviewCount))
             }
         }}
         item {Panel(color=Mist) {
@@ -118,7 +106,4 @@ import kotlin.random.Random
         }}
         item {Text("L’examen blanc utilise Exam1 REF, avec ses sources et illustrations. Le mix ajoute les variantes Hamigo.",fontSize=11.sp,lineHeight=17.sp,color=Muted)}
     }
-    if(customOpen) AlertDialog(onDismissRequest={customOpen=false},title={Text("Combien de questions ?")},text={Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(custom,{custom=it.filter(Char::isDigit).take(4)},singleLine=true,label={Text("De 1 à 1 000")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),modifier=Modifier.fillMaxWidth())
-    }},confirmButton={TextButton({count=custom.toInt();customSelected=true;customOpen=false},enabled=custom.toIntOrNull() in 1..1000) {Text("Choisir")}},dismissButton={TextButton({customOpen=false}) {Text("Annuler")}})
 }

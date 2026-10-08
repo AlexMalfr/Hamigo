@@ -112,7 +112,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Synchronisation automatique", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
+                    if(!controlsOnly)Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
                 }
                 Switch(automatic, { model.setAutoSync(it) }, modifier=Modifier.height(40.dp), enabled = !model.busy)
             }
@@ -177,6 +177,7 @@ fun FriendsScreen(model: AppModel) {
     val invitation = remember(model.revision) { model.sync.savedGistUrl?.let { FriendInvite.link(it) } }
     val connected = remember(model.revision) { model.sync.tokens.hasToken() }
     val accountLogin = remember(model.revision) { model.sync.accountLogin }
+    val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
     val lastSyncError = remember(model.revision) { model.sync.lastSyncError }
     var syncExpanded by remember { mutableStateOf(false) }
     var showQr by remember { mutableStateOf(false) }
@@ -218,9 +219,9 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (lastSyncError != null) "Synchronisation à vérifier" else "Sauvegarde et équipe GitHub",
+                    Text("Dernière synchro : ${syncDate(lastSync)}",
                         color = if (lastSyncError != null) MaterialTheme.colorScheme.error else Muted,
-                        fontSize = 11.sp, modifier = Modifier.weight(1f))
+                        fontSize = 11.sp,lineHeight=15.sp, modifier = Modifier.weight(1f).testTag("team-last-sync"))
                     TextButton({ model.refreshSocial(manual = true) }, enabled = !model.busy,modifier=Modifier.height(32.dp),
                         contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) {
                         Icon(Icons.Rounded.Refresh, null, Modifier.size(17.dp))
@@ -610,7 +611,7 @@ fun SettingsScreen(model: AppModel) {
         item { SettingsCategory("Contact & Projet", Icons.Rounded.Forum) }
         item {
             OutlinedButton(
-                { openLink(context, "https://alexandre-malfreyt.notion.site/3f1dbe8ec53680e18e5bd7682e0661c0") },
+                { openLink(context, ContentFeedback.FORM_URL) },
                 Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Rounded.MailOutline, null, Modifier.size(18.dp))

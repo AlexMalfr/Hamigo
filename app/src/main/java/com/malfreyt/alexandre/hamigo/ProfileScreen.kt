@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +46,8 @@ import java.util.Locale
 import kotlin.math.sqrt
 
 private val GoalOrange = Color(0xFFD97827)
+private val GoalCompleted = Color(0xFFFFD166)
+private val GoalMetal = listOf(Color(0xFFF2C354), GoalCompleted, Color(0xFFFFE4A0), GoalCompleted)
 private val French = Locale.FRENCH
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -203,7 +206,13 @@ private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int, goal: Int) {
         Canvas(Modifier.size(27.dp)) {
             val radius = size.minDimension / 2f - 2.dp.toPx()
             drawCircle(if (future) Color(0xFFF0F2F0) else Mist, radius = radius)
-            if (ratio > 0f) drawCircle(Teal, radius = radius * sqrt(ratio))
+            if (ratio >= 1f) drawCircle(Brush.linearGradient(GoalMetal), radius = radius)
+            else if (ratio > 0f) drawCircle(Teal, radius = radius * sqrt(ratio))
+            if (ratio >= 1f) {
+                val c = center
+                drawLine(Ink, Offset(c.x-radius*.4f,c.y), Offset(c.x-radius*.1f,c.y+radius*.28f), strokeWidth=1.6.dp.toPx())
+                drawLine(Ink, Offset(c.x-radius*.1f,c.y+radius*.28f), Offset(c.x+radius*.43f,c.y-radius*.32f), strokeWidth=1.6.dp.toPx())
+            }
             if (isToday) drawCircle(GoalOrange, radius = size.minDimension / 2f - 1.dp.toPx(), style = Stroke(1.5.dp.toPx()))
         }
         Text("${date.dayOfMonth}", fontSize = 10.sp, fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.Normal,
@@ -243,8 +252,13 @@ private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
                     Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Bottom) {
                         days.forEach { day ->
                             Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.BottomCenter) {
+                                val achieved = p.dayXp(day) >= goal
+                                val fill = if (day == today) Coral else Teal
                                 Box(Modifier.fillMaxWidth().fillMaxHeight((p.dayXp(day) / maximum).coerceIn(0f, 1f))
-                                    .background(if (day == today) Coral else Teal, RoundedCornerShape(5.dp)))
+                                    .background(Brush.horizontalGradient(if (achieved) GoalMetal else listOf(fill, fill)), RoundedCornerShape(5.dp))) {
+                                    if (achieved) Icon(Icons.Rounded.Check,null,tint=Ink,
+                                        modifier=Modifier.align(Alignment.TopCenter).padding(top=3.dp).size(14.dp))
+                                }
                             }
                         }
                     }

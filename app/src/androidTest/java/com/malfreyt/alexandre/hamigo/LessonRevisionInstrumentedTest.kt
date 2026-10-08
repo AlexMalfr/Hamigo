@@ -149,10 +149,10 @@ class LessonRevisionInstrumentedTest {
         }
         val eligible=CourseRevisionBuilder.eligible(model.content!!.lessons,model.progress.completed,model.progress.reviews)
         ui.onNodeWithTag("practice-list").performScrollToIndex(3)
-        ui.onNodeWithText("Réviser · ${minOf(10,eligible.size)} questions").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Lancer les révisions").performScrollTo().assertIsDisplayed()
         ui.onNodeWithText("(3 à revoir · ${eligible.size} questions disponibles).",substring=true).assertIsDisplayed()
         capture("revisions-ready")
-        ui.onNodeWithText("Réviser · ${minOf(10,eligible.size)} questions").performClick()
+        ui.onNodeWithText("Lancer les révisions").performClick()
         ui.runOnIdle {
             val session=model.session!!
             assertEquals("practice",session.returnRoute);assertNull(session.lessonId)
@@ -190,9 +190,11 @@ class LessonRevisionInstrumentedTest {
         ui.onNodeWithText("RÉVISIONS",substring=false).assertIsDisplayed()
         ui.onNodeWithText("(2 à revoir · 2 questions disponibles).",substring=true).assertIsDisplayed()
         ui.onNodeWithText("2 à revoir",substring=false).assertDoesNotExist()
-        ui.onNodeWithText("Réviser · 2 questions").assertIsEnabled()
+        ui.onNodeWithText("Lancer les révisions").assertIsEnabled()
+        ui.onNodeWithTag("review-question-count-2").assertIsDisplayed().assertIsSelected()
+        ui.onNodeWithTag("review-question-count-10").assertDoesNotExist()
         capture("revisions-two-memo-exam-rappels")
-        ui.onNodeWithText("Réviser · 2 questions").performClick()
+        ui.onNodeWithText("Lancer les révisions").performClick()
         ui.runOnIdle {
             assertEquals(ids,model.session!!.questions.map {it.id}.toSet())
             repeat(2) {model.answer(true);model.next()}

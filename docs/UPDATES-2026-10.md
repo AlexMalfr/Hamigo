@@ -221,8 +221,20 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Le bouton de départ dit simplement « À toi de jouer », sans annoncer une fourchette de défis. Un bouton audio à droite de Pico lit titre, résumé, paragraphes et formule avec le moteur TTS français du téléphone ; un second appui arrête la lecture. La lecture s'arrête en quittant le cours ou l'application et libère le moteur/focus audio.
 - Défis retrouve le même espace de 56 dp sous le dernier contenu que les autres pages, ajouté à la compensation de la navbar.
 
-### Heure et compteur de révisions — correction de la 0.38
+## Rappels, objectifs et signalements — 0.42
 
-- Heure du rappel choisie via le sélecteur Android natif et enregistrée à sa confirmation, sans activer un rappel désactivé. Le test est à droite ; annuler ne modifie rien.
-- Révisions affiche les notions à revoir et le total des questions disponibles dans les mêmes parenthèses.
-- Commit de cette release amendé au même numéro 0.38 ; descendants rebasés, signature conservée. Règle d'amendement consignée dans `AGENTS.md`.
+- Paramètres : l’heure du rappel se choisit avec le sélecteur Android natif, suivant le format 12/24 h du téléphone. Sa confirmation enregistre directement l’heure, même lorsque le rappel est désactivé ; « Tester le rappel » est à droite, sans bouton de sauvegarde. L’avertissement sur les délais Android commence par une icône d’information cerclée.
+- Moi et widgets : les jours ayant atteint l’objectif actuel sont dorés, avec un léger reflet statique et une coche dans les calendriers assez grands et les barres de Moi. Aucune légende supplémentaire. Les pointillés d’objectif restent au premier plan des barres. Les widgets libèrent l’espace des anciens CTA et conservent l’ouverture de Parcours sur toute leur surface.
+- Pico montre cinq expressions/poses dans les widgets : première activité, série à poursuivre sans activité aujourd’hui, activité sous l’objectif, objectif atteint et reprise après interruption. Les notifications gardent leur variété quotidienne.
+- Widgets : marges de sécurité renforcées près des bords pour les arrondis des launchers. Les graduations de la jauge verticale restent dans sa largeur et passent devant le remplissage.
+- Les lettres de Ma/Me sont empilées dans les timelines horizontales des widgets ; les autres initiales restent alignées sur leur première ligne.
+- Défis : Mix et Révisions utilisent le même sélecteur compact. Mix garde 10, 20, 40, 80, 150 et le crayon personnalisé. Révisions masque les valeurs supérieures à la banque étudiée et ajoute son nombre exact à la fin des choix s’il manque, sans doublon. « Questions : » reste sur la ligne si la place le permet, sinon au-dessus ; chaque ligne de choix se répartit alors sur toute la largeur, et un choix seul est centré aux formats très étroits. Le champ personnalisé n’apparaît qu’à l’appui sur le crayon et est borné à la banque disponible en Révisions. Le CTA dit simplement « Lancer les révisions », sans nombre ni précision redondante ; la valeur sélectionnée correspond à la longueur lancée.
+- Équipe : la date de dernière synchro est à gauche d’Actualiser l’équipe, sans doublon sous Synchronisation automatique. Les paramètres conservent leur date dans le sous-titre.
+- Signalements : drapeau en haut à droite des questions et bouton libellé tout en bas des fiches Mémo. Le formulaire reçoit en paramètres les identifiants de contenu et la version/environnement, sans données personnelles de progression. Notion ne les exploite pas encore automatiquement. Les questions Exam1 proposent d’abord le contact officiel du responsable de la banque, tout en laissant signaler un problème d’app à Hamigo. Détails : [FEEDBACK.md](FEEDBACK.md).
+
+### Correction des releases 0.38 et 0.42 — 8 octobre 2026
+
+- Heure du rappel enregistrée à la confirmation du sélecteur, test à droite. Cette interface est aussi reportée dans la release 0.38.
+- Révisions indique les notions à revoir et le nombre total de questions disponibles dans les mêmes parenthèses, en 0.38 et 0.42.
+- En 0.42, les URLs de signalement incluent aussi l'énoncé et le titre de séance. Le lien Exam1 de secours, utilisé sans client mail, conserve maintenant tous les paramètres ; le brouillon mail contient également le contexte. Les identifiants de questions restent inchangés.
+- Commits des deux releases amendés et descendants rebasés ; numéros 38/42 conservés. Aucun APK 0.39–0.41 n'a été publié : ces commits avaient corrigé la 0.38 au même numéro. La règle d'amendement demandée pour les prochaines corrections est consignée dans `AGENTS.md`.

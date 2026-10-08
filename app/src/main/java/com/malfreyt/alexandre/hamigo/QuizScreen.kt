@@ -127,6 +127,7 @@ import kotlin.random.Random
                 Text("${s.index+1}/${s.questions.size}",fontSize=13.sp,fontWeight=FontWeight.Bold,color=Teal)
                 if(s.exam)Text(examDuration(timer),fontSize=12.sp,fontWeight=FontWeight.Bold,color=if(timer<60000)Coral else Muted)
             }
+            QuestionFeedbackButton(q,s.index,s.questions.size,s.lessonId,s.title)
         }
         Column(Modifier.weight(1f).verticalScroll(scroll).padding(horizontal=16.dp,vertical=8.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             if(s.exam)Eyebrow("${s.examPartLabel.uppercase()} · ${s.examMinutes} MIN")

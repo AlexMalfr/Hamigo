@@ -227,7 +227,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }.groupBy { it.group }
     }
     MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize(), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-detail-list"), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -255,6 +255,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             }
             if (rows.isEmpty()) item { Text("Aucun repère trouvé dans cette fiche.", color = Muted, fontSize = 14.sp) }
             item { CompleteCourseLink(cat.source,model.content?.courseSources?.get(cat.id).orEmpty()) }
+            item { MemoFeedbackButton(cat) }
         }
     }
 }

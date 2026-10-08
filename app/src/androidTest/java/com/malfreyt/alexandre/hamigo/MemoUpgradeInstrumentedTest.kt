@@ -140,13 +140,13 @@ class MemoUpgradeInstrumentedTest {
 
     @Test fun customQuestionCountIsSelectedAndExamNavigationPreservesDrafts() {
         ui.runOnIdle {model.route="practice"}
-        ui.onNodeWithText("Nombre de questions :").assertIsDisplayed()
+        ui.onNodeWithTag("mix-question-count-label").assertIsDisplayed()
         val customButton = ui.onNodeWithTag("custom-question-count").fetchSemanticsNode().boundsInRoot
-        val pencil = ui.onNodeWithContentDescription("Choisir un nombre personnalisé", useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
+        val pencil = ui.onNode(hasContentDescription("Choisir un nombre personnalisé") and hasAnyAncestor(hasTestTag("custom-question-count")), useUnmergedTree = true).fetchSemanticsNode().boundsInRoot
         assertEquals(customButton.center.x, pencil.center.x, 1f)
         assertEquals(customButton.center.y, pencil.center.y, 1f)
         capture("practice-custom-empty")
-        ui.onNodeWithContentDescription("Choisir un nombre personnalisé").performClick()
+        ui.onNodeWithTag("custom-question-count").performClick()
         ui.onNode(hasSetTextAction()).performTextReplacement("75")
         ui.onNodeWithText("Choisir").performClick()
         ui.onNodeWithText("75").assertIsDisplayed()
