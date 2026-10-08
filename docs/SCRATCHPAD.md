@@ -1,0 +1,13 @@
+# Brouillon et calculatrice pendant les questions — 0.37
+
+Le bouton Brouillon se trouve au-dessus de la calculatrice. Texte conserve les notes et leur sélection/cursor ; Dessin ouvre une feuille quadrillée avec annulation de la dernière modification, effacement et option Stylet seul. Les deux modes conservent leur contenu en passant de l’un à l’autre ou en fermant/réouvrant le panneau sur une même question. Les panneaux se replient vers leur bouton et s’adaptent au clavier.
+
+Le dessin est une View Android intégrée à Compose : doigt, stylet actif standard (dont S Pen), points historiques et pression, `ACTION_CANCEL` et `FLAG_CANCELED`. Un stylet entrant prend la priorité sur un contact doigt/paume en cours ; l’annulation d’un autre pointeur ne doit pas supprimer le trait du stylet. Une gomme native ou le bouton principal du stylet efface les traits touchés à la fin du geste, avec annulation disponible. Le mode Stylet seul ignore les événements doigt ; les stylets capacitifs assimilés au doigt fonctionnent dans le mode normal.
+
+Référence des événements : [documentation Android officielle](https://developer.android.com/develop/ui/views/touch-and-input/stylus-input/advanced-stylus-features). Le rejet de paume fourni par le système varie avec l’appareil ; le mode Stylet seul est disponible pour éviter les marques de doigts. Le dessin ne fait pas de reconnaissance de texte.
+
+Le brouillon appartient à la séance en mémoire, avec ses modes et sa sélection. Un changement d’identité ou de position de question crée une feuille vide, même lorsqu’une question est revisitée ; les choix de mode restent identiques. Le ViewModel conserve le brouillon lors d’une recréation de l’activité sur la même question, mais il ne survit pas à la mort du processus. Aucun brouillon n’est exporté dans une sauvegarde ou un Gist.
+
+La calculatrice garde son calcul lors d’une réouverture sur la même question et dans Mémo. Pendant une séance, un changement de question réinitialise expression, résultat, erreur et mémoire Ans ; le choix DEG/RAD reste inchangé tant que le composant reste ouvert dans la séance. Les touches C et effacement ont un fond rose et un texte/icone foncé. Un appui long sur l’effacement équivaut exactement à C ; l’action est aussi exposée à l’accessibilité.
+
+Contrôles Android : `QuestionWorkspaceInstrumentedTest` vérifie le clavier réel, l’effacement court/long, réouverture, une transition entre questions portant le même ID à deux positions, mémoire Ans, notes/dessin et événements natifs de stylet, gomme et annulation. `CalculatorMotionInstrumentedTest` vérifie les animations et l’édition. Les événements de stylet d’émulateur sont synthétiques : ils ne valent pas un essai physique avec S Pen. Résultats et limites dans `VALIDATION.md`.

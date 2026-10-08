@@ -19,6 +19,15 @@ import java.time.Instant
 data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L,
     val githubIdentity: GitHubIdentity? = null, val githubIdentityCheckedAt: Long = 0L)
 class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path") {
+    private var scratchpadKey: String? = null
+    private var scratchpad = ScratchpadState()
+    internal fun scratchpadFor(key: String): ScratchpadState {
+        if (scratchpadKey != key) {
+            scratchpadKey = key
+            scratchpad = ScratchpadState().also { it.typing=scratchpad.typing; it.stylusOnly=scratchpad.stylusOnly }
+        }
+        return scratchpad
+    }
     var index = 0
     var correct = 0
     var firstCorrect = 0

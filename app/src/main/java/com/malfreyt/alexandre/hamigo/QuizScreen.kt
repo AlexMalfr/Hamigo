@@ -35,6 +35,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.testTag
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -50,6 +51,7 @@ import kotlin.random.Random
     val context=LocalContext.current
     val focus=LocalFocusManager.current
     val density=LocalDensity.current
+    val imeVisible=WindowInsets.ime.getBottom(density)>0
     var footerHeight by remember {mutableIntStateOf(0)}
     val scroll=rememberScrollState()
     var choice by rememberSaveable(key){mutableIntStateOf(s.responses[s.index]?.choiceIndex ?: -1)}
@@ -68,8 +70,11 @@ import kotlin.random.Random
     var estimate by rememberSaveable(key){mutableFloatStateOf(estimateMin)}
     var quit by remember{mutableStateOf(false)}
     var enlarged by remember{mutableStateOf(false)}
-    var calculatorOpen by rememberSaveable {mutableStateOf(false)}
+    var calculatorOpen by rememberSaveable(key) {mutableStateOf(false)}
     var calculatorAnchor by remember {mutableStateOf<Rect?>(null)}
+    var scratchpadOpen by rememberSaveable(key) {mutableStateOf(false)}
+    var scratchpadAnchor by remember {mutableStateOf<Rect?>(null)}
+    val scratchpad = remember(s,key) { s.scratchpadFor(key) }
     val view=LocalView.current
     val feedback=s.feedback
     LaunchedEffect(key){scroll.scrollTo(0);focus.clearFocus()}
@@ -138,7 +143,7 @@ import kotlin.random.Random
                     FlippingFlashcard(q,flipped){flipped=!flipped;revealed=true}
                 }
                 "number" -> {
-                    OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth(),enabled=feedback==null)
+                    OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth().padding(end=if(imeVisible)76.dp else 0.dp).testTag("question-number-input"),enabled=feedback==null)
                     if((q.value ?: 0.0)<0) OutlinedButton({numeric=if(numeric.startsWith("-"))numeric.drop(1) else "-$numeric"},enabled=feedback==null){Text("± Changer le signe")}
                     Text(toleranceLabel(q.tolerance,q.unit),fontSize=12.sp,color=Muted)
                     Text("La virgule ou le point sont acceptés.",fontSize=11.sp,color=Muted)
@@ -222,7 +227,7 @@ import kotlin.random.Random
                 }
             }
             // Keep the last answer/explanation scrollable above the floating calculator.
-            Spacer(Modifier.height(if(q.kind=="flash")6.dp else 72.dp))
+            Spacer(Modifier.height(if(q.kind=="flash")6.dp else 136.dp))
         }
         Surface(modifier=Modifier.onSizeChanged {footerHeight=it.height},color=Cream,shadowElevation=5.dp) {
             Column(Modifier.padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
@@ -250,11 +255,17 @@ import kotlin.random.Random
             }
         }
     }
-    if(q.kind!="flash" && feedback==null)FloatingActionButton({focus.clearFocus();calculatorOpen=true},modifier=Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp).onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
-        Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",modifier=Modifier.size(28.dp))
+    if(q.kind!="flash" && feedback==null)Column(Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+        FloatingActionButton({focus.clearFocus();scratchpadOpen=true},Modifier.onGloballyPositioned{scratchpadAnchor=it.screenBounds(view)},containerColor=Mist,contentColor=Teal) {
+            Icon(Icons.Rounded.EditNote,"Ouvrir le brouillon",Modifier.size(28.dp))
+        }
+        FloatingActionButton({focus.clearFocus();calculatorOpen=true},Modifier.onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
+            Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",modifier=Modifier.size(28.dp))
+        }
     }
     }
-    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor)
+    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor,resetKey=s to key)
+    key(s,key) { FloatingScratchpad(scratchpadOpen,{scratchpadOpen=false},scratchpad,scratchpadAnchor) }
     if(quit)AlertDialog(onDismissRequest={quit=false},title={Text("Faire une pause ?")},text={Text(if(s.exam)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},confirmButton={TextButton({model.leaveSession();quit=false}){Text("Quitter")}},dismissButton={TextButton({quit=false}){Text("Revenir au défi")}})
     if(enlarged && artwork!=null)FullscreenExamIllustration(artwork.original){enlarged=false}
 }

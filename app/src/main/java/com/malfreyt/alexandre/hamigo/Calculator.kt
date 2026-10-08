@@ -7,6 +7,8 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +24,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -44,12 +48,13 @@ import androidx.compose.ui.window.DialogWindowProvider
 
 /** A floating calculator that leaves the question and its current answer intact beneath it. */
 @Composable
-fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null) {
-    var input by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+@OptIn(ExperimentalFoundationApi::class)
+fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null, resetKey: Any? = null) {
+    var input by rememberSaveable(resetKey, stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
     val expression = input.text
-    var result by rememberSaveable { mutableStateOf<Double?>(null) }
-    var previousAnswer by rememberSaveable { mutableDoubleStateOf(0.0) }
-    var error by rememberSaveable { mutableStateOf<String?>(null) }
+    var result by rememberSaveable(resetKey) { mutableStateOf<Double?>(null) }
+    var previousAnswer by rememberSaveable(resetKey) { mutableDoubleStateOf(0.0) }
+    var error by rememberSaveable(resetKey) { mutableStateOf<String?>(null) }
     var degrees by rememberSaveable { mutableStateOf(true) }
     val visibility = remember { Animatable(0f) }
     var rendered by remember { mutableStateOf(false) }
@@ -154,12 +159,16 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         labels.forEach { label ->
                             val accent = label == "="
-                            Surface(onClick = { keyboard?.hide();press(label) }, modifier = Modifier.weight(1f).height(42.dp).testTag("calculator-key-$label"),
-                                shape = RoundedCornerShape(10.dp), color = if (accent) Teal else if (rowIndex < 3) Mist else Color.White,
+                            val erases = label in listOf("C", "⌫")
+                            Surface(modifier = Modifier.weight(1f).height(42.dp).testTag("calculator-key-$label").clip(RoundedCornerShape(10.dp)).combinedClickable(role=Role.Button,
+                                onClick = { keyboard?.hide();press(label) },
+                                onLongClick = if(label=="⌫") ({ keyboard?.hide();press("C") }) else null,
+                                onLongClickLabel = if(label=="⌫") "Tout effacer" else null),
+                                shape = RoundedCornerShape(10.dp), color = if (accent) Teal else if (erases) Color(0xFFFFDFE5) else if (rowIndex < 3) Mist else Color.White,
                                 tonalElevation = if (accent) 0.dp else 1.dp) {
                                 Box(contentAlignment = Alignment.Center) {
-                                    if (label == "⌫") Icon(Icons.Rounded.Backspace, "Effacer le dernier caractère", tint = Ink, modifier = Modifier.size(19.dp))
-                                    else Text(label, fontSize = if (label.length > 3) 12.sp else 16.sp, color = if (accent) Color.White else Ink, fontWeight = FontWeight.Bold)
+                                    if (label == "⌫") Icon(Icons.Rounded.Backspace, "Effacer le dernier caractère", tint = Color(0xFF963E54), modifier = Modifier.size(19.dp))
+                                    else Text(label, fontSize = if (label.length > 3) 12.sp else 16.sp, color = if (accent) Color.White else if(erases) Color(0xFF963E54) else Ink, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }

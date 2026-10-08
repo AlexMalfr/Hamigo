@@ -188,3 +188,9 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 
 - Les dessins de portes utilisent les formes demandées : ET en D, OU courbé, NON triangulaire, XOR avec une courbe supplémentaire. Les cercles d’inversion distinguent NON, NAND et NOR. Même représentation dans Mémo, le simulateur, les cours, les questions, corrections et flashcards.
 - Les explications et exercices de reconnaissance suivent les formes. La convention rectangulaire CEI reste expliquée comme alternative, sans classement exclusif par pays. Identifiants, tables de vérité et progression conservés.
+## Calculatrice et brouillon par question — 0.37
+
+- Les touches C et effacement ont un fond rose et des symboles foncés. L’effacement retire toujours un caractère au clic ; un appui long efface tout comme C, avec action accessible.
+- Un bouton Brouillon se trouve au-dessus de la calculatrice : notes au clavier avec sélection conservée, feuille quadrillée au doigt ou au stylet, annulation de trait, effacement et mode Stylet seul. L’entrée native prend en compte les points historiques, la pression et les contacts annulés. Les panneaux se replient vers leur bouton et restent utilisables avec clavier.
+- Sur une même question, fermer/réouvrir conserve le calcul, les notes et les dessins. Passer à une autre question vide expression, résultat, erreur, mémoire Ans, texte et traits ; les choix de mode du brouillon sont conservés dans la séance. Le brouillon reste temporaire, hors progression/Gists.
+- Détails et limites de la saisie stylet dans `SCRATCHPAD.md`.
