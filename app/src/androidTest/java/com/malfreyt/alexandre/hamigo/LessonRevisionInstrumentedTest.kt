@@ -75,7 +75,8 @@ class LessonRevisionInstrumentedTest {
             capture("course-menu-${lesson.id}")
             ui.onNodeWithText("Lire le cours").performClick()
             ui.runOnIdle {assertTrue(model.lessonPreviewOnly);assertNull(model.session);assertEquals(lesson,model.lesson)}
-            ui.onNodeWithText("À toi de jouer ·",substring=true).assertDoesNotExist()
+            ui.onNodeWithText("À toi de jouer",substring=true).assertDoesNotExist()
+            ui.onNodeWithContentDescription("Écouter le cours").assertIsDisplayed()
             capture("course-readonly-${lesson.id}")
             val category=content.referencesFor(lesson).first()
             val row="lesson-memo-${category.id}"
@@ -92,13 +93,17 @@ class LessonRevisionInstrumentedTest {
             ui.runOnIdle {assertEquals(answers,model.progress.totalAnswers);ui.activity.onBackPressedDispatcher.onBackPressed()}
         }
         ui.runOnIdle {model.startLesson(first)}
-        ui.onNodeWithText("À toi de jouer ·",substring=true).assertIsDisplayed()
+        ui.onNodeWithText("À toi de jouer",substring=true).assertIsDisplayed()
+        ui.onNodeWithContentDescription("Écouter le cours").assertIsDisplayed()
         capture("course-normal-introduction")
         ui.runOnIdle {model.lesson=null;model.route="profile"}
         ui.onNodeWithText("6 XP · 🔥 1 jour").assertIsDisplayed()
         capture("profile-one-day")
         val poster=com.malfreyt.alexandre.hamigo.platform.NativeShare.renderProgressImage(context,model.progress.snapshot())
-        poster.copyTo(File(context.getExternalFilesDir(null),"lesson-revision-0.38-r3/share-one-day.png").apply {parentFile!!.mkdirs()},overwrite=true)
+        poster.copyTo(File(context.getExternalFilesDir(null),"lesson-revision-0.38-r4/share-one-day.png").apply {parentFile!!.mkdirs()},overwrite=true)
+        ui.runOnIdle {model.route="practice"}
+        ui.onNodeWithTag("practice-list").performScrollToIndex(5)
+        capture("practice-bottom-space")
     }
 
     @Test fun linkedMemoPredictiveBackCancelsOrMorphsIntoItsCourseRow() {
@@ -122,7 +127,7 @@ class LessonRevisionInstrumentedTest {
         ui.waitUntil(5_000) {model.resource==null}
         ui.onNodeWithTag(row).assertIsDisplayed()
         ui.runOnIdle {assertEquals(lesson,model.lesson);assertEquals("path",model.route);assertTrue(model.lessonPreviewOnly);assertNull(model.session)}
-        ui.onNodeWithText("À toi de jouer ·",substring=true).assertDoesNotExist()
+        ui.onNodeWithText("À toi de jouer",substring=true).assertDoesNotExist()
         capture("course-memo-back-complete")
     }
 
@@ -145,6 +150,7 @@ class LessonRevisionInstrumentedTest {
         val eligible=CourseRevisionBuilder.eligible(model.content!!.lessons,model.progress.completed,model.progress.reviews)
         ui.onNodeWithTag("practice-list").performScrollToIndex(3)
         ui.onNodeWithText("Réviser · ${minOf(10,eligible.size)} questions").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("(3 à revoir · ${eligible.size} questions disponibles).",substring=true).assertIsDisplayed()
         capture("revisions-ready")
         ui.onNodeWithText("Réviser · ${minOf(10,eligible.size)} questions").performClick()
         ui.runOnIdle {
@@ -182,7 +188,7 @@ class LessonRevisionInstrumentedTest {
         ui.runOnIdle {model.route="practice"}
         ui.onNodeWithTag("practice-list").performScrollToIndex(3)
         ui.onNodeWithText("RÉVISIONS",substring=false).assertIsDisplayed()
-        ui.onNodeWithText("(2 à revoir).",substring=true).assertIsDisplayed()
+        ui.onNodeWithText("(2 à revoir · 2 questions disponibles).",substring=true).assertIsDisplayed()
         ui.onNodeWithText("2 à revoir",substring=false).assertDoesNotExist()
         ui.onNodeWithText("Réviser · 2 questions").assertIsEnabled()
         capture("revisions-two-memo-exam-rappels")
@@ -195,7 +201,7 @@ class LessonRevisionInstrumentedTest {
             model.leaveSession();model.refresh()
         }
         ui.onNodeWithTag("practice-list").performScrollToIndex(3)
-        ui.onNodeWithText("(0 à revoir).",substring=true).assertIsDisplayed()
+        ui.onNodeWithText("(0 à revoir · 0 questions disponibles).",substring=true).assertIsDisplayed()
         capture("revisions-rappels-completed")
     }
 
@@ -239,7 +245,7 @@ class LessonRevisionInstrumentedTest {
             }
             assertTrue(frame.await(5,TimeUnit.SECONDS))
         }
-        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38-r3").apply {mkdirs()}
+        val dir=File(context.getExternalFilesDir(null),"lesson-revision-0.38-r4").apply {mkdirs()}
         val bitmap=InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }

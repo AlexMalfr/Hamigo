@@ -215,3 +215,14 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 
 - Les séries utilisent le même accord français partout : 0 jour, 1 jour, 2 jours. Correctif sur Parcours, Moi, Équipe, les récapitulatifs de séance, les images et textes partagés, les notifications illustrées et les widgets, y compris leur accessibilité.
 - Les variantes de notification gardent des formulations correctes autour du compteur ; les jours actifs des widgets suivent également le singulier/pluriel. Aucun changement du calcul de série, des objectifs ou des données sauvegardées.
+
+### Lecture des cours et respiration de Défis — 0.38
+
+- Le bouton de départ dit simplement « À toi de jouer », sans annoncer une fourchette de défis. Un bouton audio à droite de Pico lit titre, résumé, paragraphes et formule avec le moteur TTS français du téléphone ; un second appui arrête la lecture. La lecture s'arrête en quittant le cours ou l'application et libère le moteur/focus audio.
+- Défis retrouve le même espace de 56 dp sous le dernier contenu que les autres pages, ajouté à la compensation de la navbar.
+
+### Heure et compteur de révisions — correction de la 0.38
+
+- Heure du rappel choisie via le sélecteur Android natif et enregistrée à sa confirmation, sans activer un rappel désactivé. Le test est à droite ; annuler ne modifie rien.
+- Révisions affiche les notions à revoir et le total des questions disponibles dans les mêmes parenthèses.
+- Commit de cette release amendé au même numéro 0.38 ; descendants rebasés, signature conservée. Règle d'amendement consignée dans `AGENTS.md`.

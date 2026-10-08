@@ -43,7 +43,7 @@ import kotlin.random.Random
     val due=progress.due(content)
     val reviewPool=remember(content,completed,reviews,due) {CourseRevisionBuilder.eligible(content.lessons,completed,reviews,due)}
     val dueCount=due.size
-    LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=16.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
         item {Panel(color=Color(0xFFFFE8E0)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.School,null,tint=Coral);Spacer(Modifier.width(8.dp));Eyebrow("EXAMEN BLANC",Color(0xFFAC493B))}
@@ -97,7 +97,8 @@ import kotlin.random.Random
         }}
         item {Panel(color=Color(0xFFFFF0CF)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.History,null,tint=Color(0xFF94651A));Spacer(Modifier.width(8.dp));Eyebrow("RÉVISIONS",Color(0xFF94651A))}
-            Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées ($dueCount à revoir)." else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance ($dueCount à revoir).",fontSize=13.sp,lineHeight=19.sp,color=Muted)
+            val reviewSummary="($dueCount à revoir · ${reviewPool.size} question${if(reviewPool.size==1)"" else "s"} disponible${if(reviewPool.size==1)"" else "s"})."
+            Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées $reviewSummary" else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance $reviewSummary",fontSize=13.sp,lineHeight=19.sp,color=Muted)
             if(reviewPool.isNotEmpty()) {
                 Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.CenterVertically) {
                     Text("Questions :",fontSize=12.sp,color=Muted)

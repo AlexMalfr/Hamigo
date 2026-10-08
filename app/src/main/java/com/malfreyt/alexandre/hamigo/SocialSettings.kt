@@ -1,6 +1,8 @@
 package com.malfreyt.alexandre.hamigo
 
 import android.Manifest
+import android.app.TimePickerDialog
+import android.text.format.DateFormat
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -483,16 +485,10 @@ fun SettingsScreen(model: AppModel) {
     val picoAlpha = remember { Animatable(0f) }
     val picoRotation = remember { Animatable(-9f) }
     fun configure(on: Boolean) {
-        if (!on) {
-            reminderEnabled = false
-            DailyReminder.configure(context, false, p.prefs.getInt("reminderHour", 20), p.prefs.getInt("reminderMinute", 0))
-            p.prefs.edit().putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
-            model.refresh(); model.refreshSocial(); return
-        }
         val h = hour.toIntOrNull(); val m = minute.toIntOrNull()
         if (h !in 0..23 || m !in 0..59) { model.message = "Choisis une heure de 00:00 à 23:59."; return }
-        reminderEnabled = true
-        DailyReminder.configure(context, true, h!!, m!!)
+        reminderEnabled = on
+        DailyReminder.configure(context, on, h!!, m!!)
         p.prefs.edit().putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
         model.refresh(); model.refreshSocial()
     }
@@ -545,19 +541,21 @@ fun SettingsScreen(model: AppModel) {
                         } else configure(on)
                     })
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedTextField(hour, { hour = it.filter(Char::isDigit).take(2) }, label = { Text("Heure") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), singleLine = true)
-                    OutlinedTextField(minute, { minute = it.filter(Char::isDigit).take(2) }, label = { Text("Minute") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), singleLine = true)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton({ configure(reminderEnabled) }, Modifier.weight(1f).heightIn(min = 48.dp)) { Text("Enregistrer l’heure", fontSize = 12.sp) }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
+                    OutlinedButton({TimePickerDialog(context,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
+                        Icon(Icons.Rounded.Schedule,null,Modifier.size(22.dp));Spacer(Modifier.width(8.dp))
+                        Text("${hour.padStart(2,'0')}:${minute.padStart(2,'0')}",fontSize=20.sp,fontWeight=FontWeight.Bold)
+                    }
                     OutlinedButton({
                         if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                             permissionForTest = true; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else DailyReminder.showTest(context)
-                    }, Modifier.weight(1f).heightIn(min = 48.dp)) { Text("Tester le rappel", fontSize = 12.sp) }
+                    }, Modifier.heightIn(min = 48.dp).testTag("test-reminder")) { Text("Tester le rappel", fontSize = 12.sp) }
                 }
-                Text("Android peut décaler le rappel pour préserver la batterie.", fontSize = 11.sp, color = Muted)
+                Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.Top) {
+                    Icon(Icons.Rounded.Info,null,Modifier.size(16.dp).testTag("reminder-information"),tint=Muted)
+                    Text("Android peut décaler le rappel pour préserver la batterie.",Modifier.weight(1f),fontSize = 11.sp,lineHeight=16.sp, color = Muted)
+                }
             }
         }
         item { SettingsCategory("Gameplay", Icons.Rounded.SportsEsports) }

@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Stop
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +18,10 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,6 +42,14 @@ private object LessonIntroNavigation {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable internal fun LessonScreen(model:AppModel,lesson:Lesson,returnTarget:MemoReturnTarget?=null) {
+    val context=LocalContext.current
+    val lifecycle=LocalLifecycleOwner.current.lifecycle
+    val speech=remember(context,lesson.id,returnTarget) {if(returnTarget==null)LessonSpeech(context) else null}
+    DisposableEffect(speech,lifecycle) {
+        val observer=LifecycleEventObserver {_,event->if(event==Lifecycle.Event.ON_STOP)speech?.stop()}
+        lifecycle.addObserver(observer)
+        onDispose {lifecycle.removeObserver(observer);speech?.close()}
+    }
     val saved=remember(model,lesson.id,model.lessonOpening) {LessonIntroNavigation.state(model,lesson)}
     val list=remember(saved,returnTarget) {if(returnTarget==null)saved else LazyListState(saved.firstVisibleItemIndex,saved.firstVisibleItemScrollOffset)}
     val references=model.content?.referencesFor(lesson).orEmpty()
@@ -63,7 +78,10 @@ private object LessonIntroNavigation {
                 Row(verticalAlignment=Alignment.CenterVertically) {
                     Pico(Modifier.size(64.dp),mood=MascotMood.THINKING,pose=MascotPose.POINT)
                     Spacer(Modifier.width(12.dp))
-                    Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",fontWeight=FontWeight.Bold,color=Teal)
+                    Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f),fontWeight=FontWeight.Bold,color=Teal)
+                    IconButton({speech?.toggle(lesson)},Modifier.size(48.dp).testTag("lesson-listen"),enabled=speech!=null) {
+                        Icon(if(speech?.reading==true)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,if(speech?.reading==true)"Arrêter la lecture du cours" else "Écouter le cours",tint=Teal)
+                    }
                 }
             }
             lesson.body.forEachIndexed { index,paragraph -> item {
@@ -79,7 +97,7 @@ private object LessonIntroNavigation {
                 },color=Color.White,shape=RoundedCornerShape(18.dp)) {MemoMorphRow(category)}
             }
         }
-        if(!model.lessonPreviewOnly) Action("À toi de jouer · ${lesson.questions.size} à ${lesson.questions.size+2} défis",Modifier.padding(16.dp)) {
+        if(!model.lessonPreviewOnly) Action("À toi de jouer",Modifier.padding(16.dp)) {
             model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)
         }
     }
