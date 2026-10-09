@@ -21,16 +21,16 @@ import com.malfreyt.alexandre.hamigo.platform.copyGitHubCode
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(session.userCode, Modifier.weight(1f), fontSize = 22.sp,
             color = Teal, fontWeight = FontWeight.ExtraBold)
-        IconButton({ copyGitHubCode(context, session.userCode) }) {
+        IconButton(feedbackClick { copyGitHubCode(context, session.userCode) }) {
             Icon(Icons.Rounded.ContentCopy, "Copier le code GitHub")
         }
-        IconButton({ model.openGitHubBrowser() }) {
+        IconButton(feedbackClick { model.openGitHubBrowser() }) {
             Icon(Icons.Rounded.OpenInBrowser, "Rouvrir l’onglet GitHub")
         }
     }
     Text("Dans la première case GitHub : appui long → Coller. Le presse-papiers du clavier peut ne pas remplir les autres cases.",
         color = Muted, fontSize = 12.sp, lineHeight = 17.sp)
-    TextButton({ model.cancelTask() }, contentPadding = PaddingValues(0.dp)) {
+    TextButton(feedbackClick { model.cancelTask() }, contentPadding = PaddingValues(0.dp)) {
         Text("Annuler la connexion")
     }
 }

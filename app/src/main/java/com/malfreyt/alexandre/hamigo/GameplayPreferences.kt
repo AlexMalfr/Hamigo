@@ -69,7 +69,7 @@ object GameplayPreferences {
     if (!settings.singleKey) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf('.' to "Point", '-' to "Trait").forEach { (symbol, label) ->
-                Button({ send(symbol) }, Modifier.weight(1f).height(52.dp), enabled = enabled) {
+                Button(feedbackClick { send(symbol) }, Modifier.weight(1f).height(52.dp), enabled = enabled) {
                     MorseVisual(symbol.toString(), compact = true, color = Color.White)
                     Spacer(Modifier.width(8.dp)); Text(label, fontWeight = FontWeight.Bold)
                 }

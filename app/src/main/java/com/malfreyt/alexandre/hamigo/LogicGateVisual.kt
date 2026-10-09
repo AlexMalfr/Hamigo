@@ -40,12 +40,12 @@ internal enum class LogicGate(val label: String, val mark: String, val inverted:
     var b by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            LogicGate.entries.forEach { choice -> FilterChip(gate == choice, { gate = choice }, { Text(choice.label) }) }
+            LogicGate.entries.forEach { choice -> FilterChip(gate == choice, feedbackClick { gate = choice }, { Text(choice.label) }) }
         }
         LogicGateDiagram(gate)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            FilterChip(a, { a = !a }, { Text("A = ${if (a) 1 else 0}") })
-            if (gate != LogicGate.NOT) FilterChip(b, { b = !b }, { Text("B = ${if (b) 1 else 0}") })
+            FilterChip(a, feedbackClick { a = !a }, { Text("A = ${if (a) 1 else 0}") })
+            if (gate != LogicGate.NOT) FilterChip(b, feedbackClick { b = !b }, { Text("B = ${if (b) 1 else 0}") })
             Spacer(Modifier.weight(1f))
             val output = gate.output(a,b)
             Surface(color = if (output) Teal else Mist, shape = RoundedCornerShape(12.dp)) {

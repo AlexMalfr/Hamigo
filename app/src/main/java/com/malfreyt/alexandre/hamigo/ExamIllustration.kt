@@ -155,7 +155,7 @@ object ExamImageProcessor {
 }
 
 @Composable fun ExamIllustration(artwork:ExamArtwork,onEnlarge:()->Unit,modifier:Modifier=Modifier) {
-    Surface(onClick=onEnlarge,color=Color.Transparent,shape=RoundedCornerShape(12.dp),modifier=modifier.fillMaxWidth()) {
+    Surface(onClick=feedbackClick(onEnlarge),color=Color.Transparent,shape=RoundedCornerShape(12.dp),modifier=modifier.fillMaxWidth()) {
         Column(Modifier.padding(vertical=4.dp),horizontalAlignment=Alignment.CenterHorizontally) {
             Image(artwork.preview,"Question illustrée Exam1",Modifier.fillMaxWidth().aspectRatio(artwork.preview.width.toFloat()/artwork.preview.height))
             Text("Toucher pour agrandir",fontSize=10.sp,color=Muted,modifier=Modifier.padding(top=4.dp))

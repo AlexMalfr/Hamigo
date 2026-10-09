@@ -132,7 +132,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
             Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text("Calculatrice", Modifier.weight(1f), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = Ink)
-                    TextButton({ degrees = !degrees; result = null; error = null }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    TextButton(feedbackClick { degrees = !degrees; result = null; error = null }, contentPadding = PaddingValues(horizontal = 8.dp)) {
                         Text(if (degrees) "DEG" else "RAD", fontWeight = FontWeight.Bold)
                     }
                     IconButton(::requestDismiss, modifier = Modifier.size(40.dp), enabled = isOpen && !dismissalRequested) { Icon(Icons.Rounded.Close, "Fermer la calculatrice") }
@@ -142,8 +142,8 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                     keyboardActions = KeyboardActions(onDone = { calculate();calculatorFocus.clearFocus();keyboard?.hide() }))
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f).testTag("calculator-result"), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
-                    TextButton({ keyboard?.hide(); press("Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
-                    TextButton({ keyboard?.hide(); press("%") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("%") }
+                    TextButton(feedbackClick { keyboard?.hide(); press("Ans") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("Ans") }
+                    TextButton(feedbackClick { keyboard?.hide(); press("%") }, contentPadding = PaddingValues(horizontal = 8.dp)) { Text("%") }
                 }
                 error?.let { Text(it, color = Coral, fontSize = 12.sp, lineHeight = 16.sp) }
                 val rows = listOf(
@@ -161,7 +161,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                             val accent = label == "="
                             val erases = label in listOf("C", "⌫")
                             Surface(modifier = Modifier.weight(1f).height(42.dp).testTag("calculator-key-$label").clip(RoundedCornerShape(10.dp)).combinedClickable(role=Role.Button,
-                                onClick = { keyboard?.hide();press(label) },
+                                onClick = feedbackClick { keyboard?.hide();press(label) },
                                 onLongClick = if(label=="⌫") ({ keyboard?.hide();press("C") }) else null,
                                 onLongClickLabel = if(label=="⌫") "Tout effacer" else null),
                                 shape = RoundedCornerShape(10.dp), color = if (accent) Teal else if (erases) Color(0xFFFFDFE5) else if (rowIndex < 3) Mist else Color.White,
@@ -176,7 +176,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                 }
                 Text("Angles en ${if (degrees) "degrés" else "radians"} · log = base 10 · EXP = ×10ⁿ", fontSize = 10.sp, color = Muted)
                 if (onInsertResult != null) {
-                    Button({
+                    Button(feedbackClick {
                         if (currentOpen && !dismissalRequested) (result ?: calculate())?.let { value ->
                             // Lock before the callback: two taps in the same frame still insert only once.
                             dismissalRequested = true

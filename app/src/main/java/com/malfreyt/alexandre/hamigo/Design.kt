@@ -56,7 +56,7 @@ val ChapterColors=listOf(Teal,Color(0xFF547FCD),Purple,Color(0xFFD47648))
     }
 }
 @Composable fun Action(label: String,modifier: Modifier=Modifier,enabled: Boolean=true,onClick:()->Unit) {
-    Button(onClick,modifier.fillMaxWidth().heightIn(min=48.dp),enabled=enabled,shape=RoundedCornerShape(15.dp),
+    Button(feedbackClick(onClick),modifier.fillMaxWidth().heightIn(min=48.dp),enabled=enabled,shape=RoundedCornerShape(15.dp),
         elevation=ButtonDefaults.buttonElevation(defaultElevation=2.dp),contentPadding=PaddingValues(horizontal=16.dp,vertical=10.dp)) {
         Text(label,fontWeight=FontWeight.Bold,fontSize=16.sp)
     }

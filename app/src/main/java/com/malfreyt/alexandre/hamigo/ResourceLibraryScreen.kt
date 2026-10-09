@@ -86,7 +86,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         detectTapGestures(onTap = { focus.clearFocus(); keyboard?.hide() })
     }) {
         content()
-        FloatingActionButton({ calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap).onGloballyPositioned { anchor = it.screenBounds(view) }, containerColor = Teal, contentColor = Color.White) {
+        FloatingActionButton(feedbackClick { calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap).onGloballyPositioned { anchor = it.screenBounds(view) }, containerColor = Teal, contentColor = Color.White) {
             Icon(Icons.Rounded.Calculate, "Ouvrir la calculatrice", Modifier.size(28.dp))
         }
     }
@@ -180,7 +180,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("Mémo", Modifier.weight(1f).testTag("memo-library-title"), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
-                        IconButton({
+                        IconButton(feedbackClick {
                             state.searching = !state.searching
                             if (state.searching) focusRequested = true
                             else { state.search = ""; focus.clearFocus(); keyboard?.hide() }
@@ -194,7 +194,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             categories.forEach { (group, fiches) ->
                 item(key = "group-$group") { Text(group, Modifier.padding(top = 10.dp, bottom = 2.dp), color = Teal, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold) }
                 items(fiches, key = { it.id }) { category ->
-                    Surface(onClick = { if (returnTarget == null) {
+                    Surface(onClick=feedbackClick { if (returnTarget == null) {
                         focus.clearFocus(); keyboard?.hide()
                         if (state.search.isBlank()) state.searching = false
                         model.resource = category
@@ -231,12 +231,12 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        IconButton({ model.resource=null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, if(model.lesson!=null)"Retour au cours" else "Retour aux mémos") }
+                        IconButton(feedbackClick { model.resource=null }, Modifier.size(40.dp)) { Icon(Icons.Rounded.ArrowBack, if(model.lesson!=null)"Retour au cours" else "Retour aux mémos") }
                         Column(Modifier.weight(1f).padding(horizontal = 4.dp)) {
                             Text(cat.title, fontSize = 21.sp, lineHeight = 25.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                             if (cat.subtitle.isNotBlank()) Text(cat.subtitle, fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
                         }
-                        IconButton({ searching = !searching; if (!searching) search = "" }, Modifier.size(40.dp)) {
+                        IconButton(feedbackClick { searching = !searching; if (!searching) search = "" }, Modifier.size(40.dp)) {
                             Icon(if (searching) Icons.Rounded.Close else Icons.Rounded.Search, if (searching) "Fermer le filtre de la fiche" else "Filtrer cette fiche")
                         }
                     }
@@ -267,7 +267,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
 
 @Composable private fun ReferenceReviewButtons(model: AppModel, cat: RefCategory) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Button({
+        Button(feedbackClick {
             val cards = model.content?.flashcards.orEmpty().filter { it.topic == cat.id }
             val reviews = model.progress.reviews
             val now = System.currentTimeMillis()
@@ -276,7 +276,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }, Modifier.weight(1.1f).heightIn(min = 48.dp), contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp), shape = RoundedCornerShape(14.dp)) {
             Text("Réviser avec les flashcards", fontSize = 12.sp, fontWeight = FontWeight.Bold, lineHeight = 16.sp)
         }
-        OutlinedButton({
+        OutlinedButton(feedbackClick {
             val cards = model.content?.flashcards.orEmpty().filter { it.topic == cat.id }.shuffled().take(24)
             if (cards.isNotEmpty()) model.startQuestions(cat.title + " · hasard", cards)
         }, Modifier.weight(1f).heightIn(min = 48.dp), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp), shape = RoundedCornerShape(14.dp)) {
@@ -335,7 +335,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 }
                 if (speak != null) IconButton(speak, Modifier.size(44.dp)) { Icon(Icons.Rounded.VolumeUp, "Écouter " + row.term) }
                 if (cat.id == "callsigns") radioCallsignMapQuery(row)?.let { location ->
-                    IconButton({ openLink(context, "https://www.google.com/maps/search/?api=1&query=" + Uri.encode(location)) }, Modifier.size(44.dp)) { Icon(Icons.Rounded.LocationOn, "Situer " + location, tint = Teal) }
+                    IconButton(feedbackClick { openLink(context, "https://www.google.com/maps/search/?api=1&query=" + Uri.encode(location)) }, Modifier.size(44.dp)) { Icon(Icons.Rounded.LocationOn, "Situer " + location, tint = Teal) }
                 }
             }
             if (row.visual.isNotBlank()) {
@@ -346,7 +346,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             if (row.extra.isNotBlank() && row.visual !in setOf("report-r", "report-s", "report-t")) MorseAwareText(row.extra, fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
         }
     }
-    if (speak != null) Surface(onClick = speak, color = background, shape = RoundedCornerShape(16.dp)) { body() }
+    if (speak != null) Surface(onClick = feedbackClick(speak), color = background, shape = RoundedCornerShape(16.dp)) { body() }
     else Surface(color = background, shape = RoundedCornerShape(16.dp)) { body() }
 }
 
@@ -354,8 +354,8 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         val target=courseSource.ifBlank {courseUrl}
-        if (source.isNotBlank() && source != target) TextButton({ openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
-        TextButton({ openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
+        if (source.isNotBlank() && source != target) TextButton(feedbackClick { openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
+        TextButton(feedbackClick { openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
     }
 }
 

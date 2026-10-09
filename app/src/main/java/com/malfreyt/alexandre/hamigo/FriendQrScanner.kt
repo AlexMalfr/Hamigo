@@ -63,7 +63,7 @@ import com.malfreyt.alexandre.hamigo.platform.FriendInvite
                 }
                 error?.let {Text(it,color=MaterialTheme.colorScheme.error,fontSize=13.sp)}
                 Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                    if(hasFlash)OutlinedButton({torch=!torch},enabled=!cameraError) {
+                    if(hasFlash)OutlinedButton(feedbackClick {torch=!torch},enabled=!cameraError) {
                         Icon(if(torch)Icons.Rounded.FlashlightOff else Icons.Rounded.FlashlightOn,null)
                         Spacer(Modifier.width(6.dp));Text(if(torch)"Éteindre la lampe" else "Lampe")
                     }

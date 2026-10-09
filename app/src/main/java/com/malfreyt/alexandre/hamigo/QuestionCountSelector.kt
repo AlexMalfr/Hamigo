@@ -117,15 +117,15 @@ fun QuestionCountSelector(
         text={OutlinedTextField(custom,{custom=it.filter(Char::isDigit).take(4)},singleLine=true,
             label={Text(if(customMaximum==1000)"De 1 à 1 000" else "De 1 à $customMaximum")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),
             modifier=Modifier.fillMaxWidth().testTag("$testTag-input"))},
-        confirmButton={TextButton({onCountSelected(custom.toInt(),true);customOpen=false},enabled=custom.toIntOrNull() in 1..customMaximum) {Text("Choisir")}},
-        dismissButton={TextButton({customOpen=false}) {Text("Annuler")}},
+        confirmButton={TextButton(feedbackClick {onCountSelected(custom.toInt(),true);customOpen=false},enabled=custom.toIntOrNull() in 1..customMaximum) {Text("Choisir")}},
+        dismissButton={TextButton(feedbackClick {customOpen=false}) {Text("Annuler")}},
     )
 }
 
 /** Forty-dp touch area around a chip whose painted body is only thirty-two dp high. */
 @Composable
 private fun QuestionCountChoice(active:Boolean,onClick:()->Unit,modifier:Modifier,content:@Composable ()->Unit) {
-    Surface(onClick=onClick,modifier=modifier.height(40.dp).widthIn(min=40.dp).semantics {selected=active},
+    Surface(onClick=feedbackClick(onClick),modifier=modifier.height(40.dp).widthIn(min=40.dp).semantics {selected=active},
         color=Color.Transparent,shape=RoundedCornerShape(10.dp)) {
         Surface(modifier=Modifier.padding(vertical=4.dp),color=if(active)Mist else Cream,shape=RoundedCornerShape(10.dp),
             border=BorderStroke(1.dp,if(active)Teal else Color(0xFFD4DEDA)),content=content)

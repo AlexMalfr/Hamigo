@@ -60,7 +60,7 @@ class ClozeDragState {
         Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center),start,start+"[mot à compléter]".length)))
     Text(sentence,color=Ink,fontWeight=FontWeight.ExtraBold,fontSize=font,lineHeight=(font.value*1.32f).sp,textAlign=textAlign,
         inlineContent=mapOf("answer" to InlineTextContent(Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center)) {
-            Surface(onClick={onChoice(-1)},enabled=enabled&&choice>=0,shape=RoundedCornerShape(10.dp),
+            Surface(onClick=feedbackClick {onChoice(-1)},enabled=enabled&&choice>=0,shape=RoundedCornerShape(10.dp),
                 modifier=Modifier.fillMaxSize().padding(2.dp).onGloballyPositioned {state.slot=it.boundsInWindow()}
                     .semantics {contentDescription=if(choice<0)"Emplacement pour le mot à compléter" else "Mot choisi : ${q.choices.getOrNull(choice).orEmpty()}. Toucher pour enlever."},
                 color=if(hover)Gold.copy(alpha=.4f) else accent.copy(alpha=.10f),border=BorderStroke(2.dp,accent)) {
@@ -77,18 +77,19 @@ class ClozeDragState {
 @Composable fun ClozeBoard(q:Question,choice:Int,enabled:Boolean,feedback:Boolean?=null,
     showPrompt:Boolean=true,state:ClozeDragState=rememberClozeDragState(q.id),onChoice:(Int)->Unit) {
     val currentChoice by rememberUpdatedState(onChoice)
+    val feedbackController=LocalAppFeedback.current
     Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
         if(showPrompt)ClozeSentence(q,choice,enabled,feedback,state,onChoice=onChoice)
         FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp,Alignment.CenterHorizontally),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             q.choices.forEachIndexed {index,word->
-                Surface(onClick={currentChoice(index)},enabled=enabled,shape=RoundedCornerShape(10.dp),
+                Surface(onClick=feedbackAction(FeedbackCue.SELECT) {currentChoice(index)},enabled=enabled,shape=RoundedCornerShape(10.dp),
                     color=if(choice==index)Purple else Color.White,border=BorderStroke(1.dp,Purple.copy(alpha=.4f)),
                     modifier=Modifier.onGloballyPositioned {state.chips[index]=it.boundsInWindow()}
                         .graphicsLayer {alpha=if(state.dragged==index).35f else 1f}
                         .pointerInput(q.id,index,enabled) {
-                            if(enabled)detectDragGestures(onDragStart={state.dragged=index;state.position=(state.chips[index]?.topLeft ?: Offset.Zero)+it},
+                            if(enabled)detectDragGestures(onDragStart={feedbackController?.event(FeedbackCue.DRAG);state.dragged=index;state.position=(state.chips[index]?.topLeft ?: Offset.Zero)+it},
                                 onDrag={change,delta->change.consume();state.position+=delta},
-                                onDragEnd={if(state.slot.contains(state.position))currentChoice(index);state.dragged=-1},onDragCancel={state.dragged=-1})
+                                onDragEnd={if(state.slot.contains(state.position)){currentChoice(index);feedbackController?.event(FeedbackCue.SNAP)};state.dragged=-1},onDragCancel={state.dragged=-1})
                         }) {
                     MorseAwareText(word,Modifier.padding(horizontal=17.dp,vertical=13.dp),fontSize=16.sp,fontWeight=FontWeight.Bold,color=if(choice==index)Color.White else Purple)
                 }
@@ -114,7 +115,7 @@ class ClozeDragState {
 @Composable fun TrueFalseBoard(q: Question, choice: Int, feedback: Boolean?, onChoice: (Int) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         q.choices.forEachIndexed { index, text ->
-            Surface(onClick = { onChoice(index) }, enabled = feedback == null, modifier = Modifier.weight(1f).height(108.dp), shape = RoundedCornerShape(18.dp),
+            Surface(onClick=feedbackAction(FeedbackCue.SELECT) { onChoice(index) }, enabled = feedback == null, modifier = Modifier.weight(1f).height(108.dp), shape = RoundedCornerShape(18.dp),
                 color = if (feedback != null && index == q.answer) Mist else if (choice == index) Gold.copy(alpha = .35f) else Color.White,
                 border = BorderStroke(if (choice == index) 2.dp else 1.dp, if (choice == index) Teal else Color(0xFFD5DEDA))) {
                 // Center the icon and label as a single group in the complete tile, not at its top.
@@ -142,11 +143,11 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
         else MorseSymbols(code)
         MorseSignalInput(enabled) { onChange(code + it) }
         Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-            OutlinedButton({if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
-            OutlinedButton({if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}
-            IconButton({onChange(code.dropLast(1))},enabled=enabled&&code.isNotBlank()){Icon(Icons.Rounded.Backspace,"Effacer le dernier symbole")}
+            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
+            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}
+            IconButton(feedbackClick {onChange(code.dropLast(1))},enabled=enabled&&code.isNotBlank()){Icon(Icons.Rounded.Backspace,"Effacer le dernier symbole")}
         }
-        OutlinedButton({playMorse(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Icon(Icons.Rounded.VolumeUp,null);Spacer(Modifier.width(8.dp));Text("Écouter ma transmission")}
+        OutlinedButton(feedbackClick {playMorse(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Icon(Icons.Rounded.VolumeUp,null);Spacer(Modifier.width(8.dp));Text("Écouter ma transmission")}
     }
 }
 
@@ -157,7 +158,7 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
             (bits-1 downTo 0).forEach{bit -> val active=value and (1 shl bit)!=0
                 Column(Modifier.weight(1f),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(5.dp)) {
                     Text("${1 shl bit}",fontSize=11.sp,color=Muted)
-                    Surface(onClick={onChange(value xor (1 shl bit))},enabled=enabled,shape=RoundedCornerShape(10.dp),color=if(active)Purple else Color.White,
+                    Surface(onClick=feedbackClick {onChange(value xor (1 shl bit))},enabled=enabled,shape=RoundedCornerShape(10.dp),color=if(active)Purple else Color.White,
                         border=BorderStroke(1.dp,Purple.copy(alpha=.4f)),modifier=Modifier.fillMaxWidth().height(52.dp).semantics {contentDescription="Bit de poids ${1 shl bit} : ${if(active)1 else 0}"}) {
                         Box(contentAlignment=Alignment.Center){Text(if(active)"1"else"0",color=if(active)Color.White else Purple,fontWeight=FontWeight.ExtraBold,fontSize=22.sp)}
                     }

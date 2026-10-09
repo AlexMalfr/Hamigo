@@ -48,7 +48,7 @@ internal data class MorsePreviewState(val code: String="", val releasedAt: Long?
     Column(Modifier.fillMaxWidth().padding(12.dp).testTag("morse-settings-preview"),verticalArrangement=Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
             Text("Essaie ici",fontWeight=FontWeight.Bold,fontSize=13.sp,modifier=Modifier.weight(1f))
-            IconButton({ example=MorsePreviewState() },Modifier.size(32.dp),enabled=example.code.isNotEmpty()) {
+            IconButton(feedbackClick { example=MorsePreviewState() },Modifier.size(32.dp),enabled=example.code.isNotEmpty()) {
                 Icon(Icons.Rounded.DeleteSweep,"Effacer l’essai Morse",Modifier.size(20.dp))
             }
         }

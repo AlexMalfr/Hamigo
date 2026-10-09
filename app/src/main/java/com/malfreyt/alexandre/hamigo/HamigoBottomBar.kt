@@ -158,7 +158,7 @@ fun HamigoBottomBar(
                                 interactionSource = interactionSource,
                                 indication = null,
                                 role = Role.Tab,
-                                onClick = { onDestination(destination.route) },
+                                onClick = feedbackClick { onDestination(destination.route) },
                             )
                             .semantics(mergeDescendants = true) {}
                             .padding(bottom = 8.dp),

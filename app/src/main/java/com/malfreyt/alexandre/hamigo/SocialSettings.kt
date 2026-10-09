@@ -123,10 +123,10 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
             GitHubDeviceCode(model)
         } else if (model.authSession != null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton({ model.openGitHubBrowser() }, contentPadding = PaddingValues(0.dp)) {
+                TextButton(feedbackClick { model.openGitHubBrowser() }, contentPadding = PaddingValues(0.dp)) {
                     Icon(Icons.Rounded.OpenInBrowser, null); Spacer(Modifier.width(6.dp)); Text("Rouvrir GitHub")
                 }
-                TextButton({ model.cancelTask() }, contentPadding = PaddingValues(0.dp)) { Text("Annuler") }
+                TextButton(feedbackClick { model.cancelTask() }, contentPadding = PaddingValues(0.dp)) { Text("Annuler") }
             }
         } else {
             Text("Connecte ton compte pour sauvegarder tes leçons, ton XP et tes révisions, et partager ta progression avec ton équipe.",
@@ -137,7 +137,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
             Text("Le compte GitHub est facultatif. Ton apprentissage reste enregistré sur ce téléphone.",
                 color = Muted, fontSize = 11.sp, lineHeight = 16.sp)
         }
-        TextButton({ details = !details }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(0.dp)) {
+        TextButton(feedbackClick { details = !details }, modifier = Modifier.height(32.dp), contentPadding = PaddingValues(0.dp)) {
             Icon(if (details) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, null)
             Spacer(Modifier.width(6.dp))
             Text("Données sauvegardées et fréquence", fontSize = 12.sp)
@@ -152,17 +152,17 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
             if (connected && showGistLinks && (backupGist != null || socialGist != null)) {
                 Text("Mes Gists sur GitHub", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
                 Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    if (backupGist != null) TextButton({ openLink(context, backupGist) }, contentPadding = PaddingValues(0.dp)) {
+                    if (backupGist != null) TextButton(feedbackClick { openLink(context, backupGist) }, contentPadding = PaddingValues(0.dp)) {
                         Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp)); Text("Gist de sauvegarde", fontSize = 12.sp)
                     }
-                    if (socialGist != null) TextButton({ openLink(context, socialGist) }, contentPadding = PaddingValues(0.dp)) {
+                    if (socialGist != null) TextButton(feedbackClick { openLink(context, socialGist) }, contentPadding = PaddingValues(0.dp)) {
                         Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp)); Text("Gist social", fontSize = 12.sp)
                     }
                 }
             }
-            if (connected) TextButton({ model.disconnectGitHub() }, enabled = !model.busy, contentPadding = PaddingValues(0.dp)) {
+            if (connected) TextButton(feedbackClick { model.disconnectGitHub() }, enabled = !model.busy, contentPadding = PaddingValues(0.dp)) {
                 Text("Déconnecter GitHub")
             }
         }
@@ -213,7 +213,7 @@ fun FriendsScreen(model: AppModel) {
                     Column(Modifier.weight(1f)) {
                         Text("Connecté · ${accountLogin ?: "GitHub"}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
-                    IconButton({ syncExpanded = !syncExpanded },Modifier.size(36.dp)) {
+                    IconButton(feedbackClick { syncExpanded = !syncExpanded },Modifier.size(36.dp)) {
                         Icon(if (syncExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
                             if (syncExpanded) "Masquer les réglages de synchronisation" else "Afficher les réglages de synchronisation", tint = Teal)
                     }
@@ -222,7 +222,7 @@ fun FriendsScreen(model: AppModel) {
                     Text("Dernière synchro : ${syncDate(lastSync)}",
                         color = if (lastSyncError != null) MaterialTheme.colorScheme.error else Muted,
                         fontSize = 11.sp,lineHeight=15.sp, modifier = Modifier.weight(1f).testTag("team-last-sync"))
-                    TextButton({ model.refreshSocial(manual = true) }, enabled = !model.busy,modifier=Modifier.height(32.dp),
+                    TextButton(feedbackClick { model.refreshSocial(manual = true) }, enabled = !model.busy,modifier=Modifier.height(32.dp),
                         contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp)) {
                         Icon(Icons.Rounded.Refresh, null, Modifier.size(17.dp))
                         Spacer(Modifier.width(4.dp))
@@ -242,11 +242,11 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button({ showQr = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = invitation != null && !model.busy) {
+                    Button(feedbackClick { showQr = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = invitation != null && !model.busy) {
                         Icon(Icons.Rounded.QrCode2, null, Modifier.size(19.dp))
                         Spacer(Modifier.width(6.dp)); Text("Inviter")
                     }
-                    OutlinedButton({ addOpen = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = !model.busy) {
+                    OutlinedButton(feedbackClick { addOpen = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = !model.busy) {
                         Icon(Icons.Rounded.PersonAdd, null, Modifier.size(19.dp))
                         Spacer(Modifier.width(6.dp)); Text("Ajouter")
                     }
@@ -277,7 +277,7 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 if (model.friends.isEmpty()) Text("Invite un équipier pour suivre vos progrès et vous encourager.", fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
-                OutlinedButton({ NativeShare.teamImage(context, own, model.friends.map { it.progress }) },
+                OutlinedButton(feedbackClick { NativeShare.teamImage(context, own, model.friends.map { it.progress }) },
                     Modifier.fillMaxWidth().heightIn(min = 44.dp)) {
                     Icon(Icons.Rounded.Share, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp)); Text("Partager le classement")
@@ -305,7 +305,7 @@ fun FriendsScreen(model: AppModel) {
                         Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons", color = Muted, fontSize = 12.sp)
                     }
                     Box {
-                        IconButton({ menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
+                        IconButton(feedbackClick { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             if(model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null) {
                                 val sent=model.outgoingRequests.firstOrNull { it.request.recipientGistId==runCatching { GitHubSync.gistId(friend.gist) }.getOrNull() }
@@ -335,7 +335,7 @@ fun FriendsScreen(model: AppModel) {
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Mis à jour le ${syncDate(friend.progress.updatedAt)}", fontSize = 11.sp, color = Muted, modifier = Modifier.weight(1f))
-                    TextButton({ NativeShare.nudge(context, friend.progress.name) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    TextButton(feedbackClick { NativeShare.nudge(context, friend.progress.name) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
                         Icon(Icons.Rounded.WavingHand, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Encourager", fontSize = 12.sp)
                     }
                 }
@@ -343,17 +343,17 @@ fun FriendsScreen(model: AppModel) {
             if(confirmRemoval) AlertDialog(onDismissRequest={confirmRemoval=false},
                 title={Text("Retirer ${friend.progress.name} ?")},
                 text={Text("Sa progression n’apparaîtra plus dans ton équipe. Tu pourras l’ajouter à nouveau avec son lien d’invitation.")},
-                confirmButton={TextButton({confirmRemoval=false;model.removeFriend(friend)},
+                confirmButton={TextButton(feedbackClick {confirmRemoval=false;model.removeFriend(friend)},
                     colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)) {Text("Retirer")}},
-                dismissButton={TextButton({confirmRemoval=false}){Text("Annuler")}})
+                dismissButton={TextButton(feedbackClick {confirmRemoval=false}){Text("Annuler")}})
             if(confirmRequest) AlertDialog(onDismissRequest={confirmRequest=false},
                 title={Text("Demander l’ajout en retour ?")},
                 text={Text("${friend.progress.name} recevra une demande à accepter dans Hamigo. Elle sera publiée sous ton compte GitHub dans les commentaires de son Gist social, lisibles avec son lien.")},
-                confirmButton={TextButton({confirmRequest=false;model.sendFriendRequest(friend)},enabled=!model.busy) {Text("Envoyer")}},
-                dismissButton={TextButton({confirmRequest=false}){Text("Annuler")}})
+                confirmButton={TextButton(feedbackClick {confirmRequest=false;model.sendFriendRequest(friend)},enabled=!model.busy) {Text("Envoyer")}},
+                dismissButton={TextButton(feedbackClick {confirmRequest=false}){Text("Annuler")}})
         }
         if (!connected) item {
-            OutlinedButton({ model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
+            OutlinedButton(feedbackClick { model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
                 Icon(Icons.Rounded.Refresh, null, Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
                 Text(if (model.busy) "Actualisation…" else "Actualiser l’équipe")
             }
@@ -369,19 +369,19 @@ fun FriendsScreen(model: AppModel) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(qr, "QR code d’invitation Hamigo", Modifier.size(224.dp))
                 Text("Ton ami ouvre ce lien ou scanne le QR avec l’appareil photo. Hamigo proposera de t’ajouter à son équipe.", fontSize = 13.sp, lineHeight = 19.sp)
-                OutlinedButton({ NativeShare.text(context, invitation, "Mon invitation Hamigo") }, Modifier.fillMaxWidth()) {
+                OutlinedButton(feedbackClick { NativeShare.text(context, invitation, "Mon invitation Hamigo") }, Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Link, null); Spacer(Modifier.width(8.dp)); Text("Partager le lien")
                 }
-                OutlinedButton({ NativeShare.inviteImage(context, invitation) }, Modifier.fillMaxWidth()) {
+                OutlinedButton(feedbackClick { NativeShare.inviteImage(context, invitation) }, Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Share, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
                 }
             }
-        }, confirmButton = { TextButton({ showQr = false }) { Text("Fermer") } })
+        }, confirmButton = { TextButton(feedbackClick { showQr = false }) { Text("Fermer") } })
     }
     if (addOpen && !scanOpen) {
         AlertDialog(onDismissRequest = { addOpen = false }, title = { Text("Ajouter un équipier") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Button({
+                Button(feedbackClick {
                     inviteError=null;cameraDenied=false
                     if(context.checkSelfPermission(Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED)scanOpen=true
                     else cameraPermission.launch(Manifest.permission.CAMERA)
@@ -393,18 +393,18 @@ fun FriendsScreen(model: AppModel) {
                     label = { Text("Lien d’invitation Hamigo") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
                     isError = inviteError != null && !cameraDenied, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                 inviteError?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp) }
-                if(cameraDenied)TextButton({
+                if(cameraDenied)TextButton(feedbackClick {
                     context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:${context.packageName}")))
                 },contentPadding=PaddingValues(0.dp)) {Text("Autoriser la caméra dans les réglages",fontSize=12.sp)}
             }
         }, confirmButton = {
-            TextButton({
+            TextButton(feedbackClick {
                 cameraDenied=false
                 val parsed = FriendInvite.parse(receivedLink.trim())
                 if (parsed == null) inviteError = "Ce lien n’est pas une invitation Hamigo valide."
                 else { model.pendingInvite = parsed; addOpen = false; receivedLink = "" }
             }, enabled = receivedLink.isNotBlank() && !model.busy) { Text("Continuer") }
-        }, dismissButton = { TextButton({ addOpen = false }) { Text("Annuler") } })
+        }, dismissButton = { TextButton(feedbackClick { addOpen = false }) { Text("Annuler") } })
     }
 }
 
@@ -432,17 +432,17 @@ private fun FriendRequestsPanel(model: AppModel) {
                             }
                         }
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                            Button({model.acceptFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy,
+                            Button(feedbackClick {model.acceptFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy,
                                 contentPadding=PaddingValues(horizontal=14.dp,vertical=6.dp)) { Text("Accepter") }
-                            TextButton({model.ignoreFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy) { Text("Ignorer") }
+                            TextButton(feedbackClick {model.ignoreFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy) { Text("Ignorer") }
                         }
                     }
                 }
             } }
-            if(!allIncoming && model.friendRequests.size>5) TextButton({allIncoming=true}) { Text("Voir les autres demandes") }
+            if(!allIncoming && model.friendRequests.size>5) TextButton(feedbackClick {allIncoming=true}) { Text("Voir les autres demandes") }
         }
         if(pendingOutgoing.isNotEmpty()) Panel {
-            TextButton({outgoingOpen=!outgoingOpen},Modifier.fillMaxWidth(),contentPadding=PaddingValues(0.dp)) {
+            TextButton(feedbackClick {outgoingOpen=!outgoingOpen},Modifier.fillMaxWidth(),contentPadding=PaddingValues(0.dp)) {
                 Icon(Icons.Rounded.Send,null,modifier=Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Demandes envoyées · ${pendingOutgoing.size}",modifier=Modifier.weight(1f),fontWeight=FontWeight.Bold,fontSize=16.sp)
@@ -458,7 +458,7 @@ private fun FriendRequestsPanel(model: AppModel) {
                             else -> "Envoi non confirmé"
                         },fontSize=12.sp,color=Muted)
                     }
-                    if(outgoing.status in setOf("pending","failed")) TextButton({model.retryFriendRequest(outgoing)},enabled=!model.busy) {Text("Réessayer")}
+                    if(outgoing.status in setOf("pending","failed")) TextButton(feedbackClick {model.retryFriendRequest(outgoing)},enabled=!model.busy) {Text("Réessayer")}
                 }
             }
         }
@@ -523,7 +523,7 @@ fun SettingsScreen(model: AppModel) {
                 Text("Objectif quotidien", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     DailyGoals.values.forEachIndexed { index,goal ->
-                        FilterChip(p.dailyGoalChoice == index, { p.setDailyGoalChoice(index); model.refresh(); model.refreshSocial() }, label = { Text("$goal XP", fontSize = 12.sp) })
+                        FilterChip(p.dailyGoalChoice == index, feedbackClick { p.setDailyGoalChoice(index); model.refresh(); model.refreshSocial() }, label = { Text("$goal XP", fontSize = 12.sp) })
                     }
                 }
                 Text("Une leçon de huit réponses justes rapporte environ 30 XP à sa première validation.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
@@ -542,16 +542,16 @@ fun SettingsScreen(model: AppModel) {
                         } else configure(on)
                     })
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
-                    OutlinedButton({TimePickerDialog(context,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
+                FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(feedbackClick {TimePickerDialog(context,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.widthIn(min=(128*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
                         Icon(Icons.Rounded.Schedule,null,Modifier.size(22.dp));Spacer(Modifier.width(8.dp))
-                        Text("${hour.padStart(2,'0')}:${minute.padStart(2,'0')}",fontSize=20.sp,fontWeight=FontWeight.Bold)
+                        Text("${hour.padStart(2,'0')}:${minute.padStart(2,'0')}",fontSize=20.sp,fontWeight=FontWeight.Bold,maxLines=1,softWrap=false)
                     }
-                    OutlinedButton({
+                    OutlinedButton(feedbackClick {
                         if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                             permissionForTest = true; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else DailyReminder.showTest(context)
-                    }, Modifier.heightIn(min = 48.dp).testTag("test-reminder")) { Text("Tester le rappel", fontSize = 12.sp) }
+                    }, Modifier.widthIn(min=(120*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min = 48.dp).testTag("test-reminder")) { Text("Tester le rappel", fontSize = 12.sp,maxLines=1,softWrap=false) }
                 }
                 Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.Top) {
                     Icon(Icons.Rounded.Info,null,Modifier.size(16.dp).testTag("reminder-information"),tint=Muted)
@@ -560,6 +560,7 @@ fun SettingsScreen(model: AppModel) {
             }
         }
         item { SettingsCategory("Gameplay", Icons.Rounded.SportsEsports) }
+        item { FeedbackSettings(model) }
         item { GameplaySettings(model, p) }
         item { SettingsCategory("Sauvegarde & Synchronisation", Icons.Rounded.CloudSync) }
         item { GitHubConnection(model, showGistLinks = true) }
@@ -570,15 +571,15 @@ fun SettingsScreen(model: AppModel) {
                         Text("Sauvegarde manuelle", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         Text("Importer ou exporter une copie locale.", fontSize = 12.sp, color = Muted)
                     }
-                    IconButton({ backupExpanded = !backupExpanded }) {
+                    IconButton(feedbackClick { backupExpanded = !backupExpanded }) {
                         Icon(if (backupExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
                             if (backupExpanded) "Masquer les options de sauvegarde" else "Afficher les options de sauvegarde")
                     }
                 }
                 if (backupExpanded) {
                     Text("La copie contient tout ton apprentissage. Tes identifiants GitHub n’y figurent jamais.", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
-                    OutlinedButton({ NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
-                    TextButton({ picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
+                    OutlinedButton(feedbackClick { NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
+                    TextButton(feedbackClick { picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
                 }
             }
         }
@@ -586,9 +587,9 @@ fun SettingsScreen(model: AppModel) {
         item {
             Panel {
                 Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp)) {
-                    TextButton({ openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
-                    TextButton({ openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
-                    TextButton({ openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
+                    TextButton(feedbackClick { openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
+                    TextButton(feedbackClick { openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
+                    TextButton(feedbackClick { openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
                 }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
@@ -600,7 +601,7 @@ fun SettingsScreen(model: AppModel) {
                         val now = SystemClock.uptimeMillis()
                         versionTaps = if (now - lastVersionTap > 1500) 1 else versionTaps + 1
                         lastVersionTap = now
-                        if (versionTaps >= 7) { versionTaps = 0; picoDismissing = false; picoVisible = true; versionMoment++ }
+                        if (versionTaps >= 7) { model.interactionFeedback.event(FeedbackCue.PICO);versionTaps = 0; picoDismissing = false; picoVisible = true; versionMoment++ }
                 }) {
                 Text("Hamigo ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
                 val lessonCount = model.content?.lessons?.size ?: 0
@@ -610,8 +611,7 @@ fun SettingsScreen(model: AppModel) {
         }
         item { SettingsCategory("Contact & Projet", Icons.Rounded.Forum) }
         item {
-            OutlinedButton(
-                { openLink(context, ContentFeedback.FORM_URL) },
+            OutlinedButton(feedbackClick { openLink(context, ContentFeedback.FORM_URL) },
                 Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Rounded.MailOutline, null, Modifier.size(18.dp))
@@ -620,7 +620,7 @@ fun SettingsScreen(model: AppModel) {
             }
         }
         item {
-            OutlinedButton({ openLink(context, "https://github.com/AlexMalfr/Hamigo") }, Modifier.fillMaxWidth()) {
+            OutlinedButton(feedbackClick { openLink(context, "https://github.com/AlexMalfr/Hamigo") }, Modifier.fillMaxWidth()) {
                 Icon(Icons.Rounded.Code, null, Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Code source de Hamigo · GitHub", fontSize = 14.sp)
@@ -686,9 +686,9 @@ fun SettingsScreen(model: AppModel) {
         Text("Saisie du Morse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Text("Dans les questions et le traducteur.", fontSize = 12.sp, color = Muted)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!settings.singleKey, { save(settings.copy(singleKey = false)) },
+            FilterChip(!settings.singleKey, feedbackClick { save(settings.copy(singleKey = false)) },
                 label = { Text("Deux boutons") }, modifier = Modifier.weight(1f))
-            FilterChip(settings.singleKey, { save(settings.copy(singleKey = true)) },
+            FilterChip(settings.singleKey, feedbackClick { save(settings.copy(singleKey = true)) },
                 label = { Text("Un bouton") }, modifier = Modifier.weight(1f))
         }
         if (settings.singleKey) {

@@ -17,11 +17,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.font.FontWeight
@@ -47,15 +45,17 @@ private val wrongWireColors=listOf(Color(0xFFB65049),Color(0xFFC56557),Color(0xF
     var finger by remember(key) {mutableStateOf(Offset.Zero)}
     val currentMatches by rememberUpdatedState(matches)
     val currentChange by rememberUpdatedState(onChange)
+    val tactile=LocalAppFeedback.current
     fun join(a:Pair<Boolean,Int>,b:Pair<Boolean,Int>) {
         if(a.first==b.first)return
         val l=if(a.first)a.second else b.second;val r=if(a.first)b.second else a.second
         currentChange(currentMatches.filterKeys {it!=l}.filterValues {it!=r}+(l to r));selected=null
+        tactile?.event(FeedbackCue.SNAP)
     }
     fun tap(side:Pair<Boolean,Int>) {
         val old=selected
         if(old!=null && old.first!=side.first)join(old,side)
-        else selected=if(old==side)null else side
+        else {selected=if(old==side)null else side;tactile?.event(FeedbackCue.SELECT)}
     }
     fun accent(source:Int):Color=if(feedback==null)wireColors[source%wireColors.size]
         else if(matches[source]==source)correctWireColors[source%correctWireColors.size]
@@ -71,12 +71,12 @@ private val wrongWireColors=listOf(Color(0xFFB65049),Color(0xFFC56557),Color(0xF
                         val source=if(leftSide)index.takeIf {it in matches} else matches.entries.firstOrNull {it.value==index}?.key
                         val active=selected==side || dragging==side || source!=null
                         val color=source?.let(::accent) ?: Purple
-                        Surface(onClick={tap(side)},enabled=enabled,
+                        Surface(onClick=feedbackClick {tap(side)},enabled=enabled,
                             modifier=Modifier.fillMaxWidth().heightIn(min=64.dp).testTag("match-${if(leftSide)"left" else "right"}-$index")
                                 .onGloballyPositioned {rects[side]=it.boundsInRoot()}
                                 .pointerInput(key,index,leftSide,enabled) {
                                     if(enabled)detectDragGestures(
-                                        onDragStart={point->dragging=side;selected=null;finger=(rects[side]?.topLeft ?: Offset.Zero)+point},
+                                        onDragStart={point->tactile?.event(FeedbackCue.DRAG);dragging=side;selected=null;finger=(rects[side]?.topLeft ?: Offset.Zero)+point},
                                         onDrag={change,_->change.consume();finger=(rects[side]?.topLeft ?: Offset.Zero)+change.position},
                                         onDragEnd={
                                             val target=rects.entries.firstOrNull {it.key.first!=leftSide && it.value.contains(finger)}?.key
@@ -129,17 +129,17 @@ private val wrongWireColors=listOf(Color(0xFFB65049),Color(0xFFC56557),Color(0xF
     val currentOrder by rememberUpdatedState(order)
     val currentEnabled by rememberUpdatedState(enabled)
     val currentChange by rememberUpdatedState(onOrder)
-    val haptic=LocalHapticFeedback.current
-    fun begin(item:Int,y:Float) {original=currentOrder;dragged=item;pointerY=y;grabOffset=y-(bounds[item]?.center?.y ?: y);haptic.performHapticFeedback(HapticFeedbackType.LongPress)}
+    val haptic=LocalAppFeedback.current
+    fun begin(item:Int,y:Float) {original=currentOrder;dragged=item;pointerY=y;grabOffset=y-(bounds[item]?.center?.y ?: y);haptic?.event(FeedbackCue.DRAG)}
     fun move(item:Int,y:Float) {
         pointerY=y
         val target=bounds.filterKeys {it in currentOrder}.minByOrNull {abs(it.value.center.y-(y-grabOffset))}?.key ?: return
         if(target!=item) {
             val next=currentOrder.toMutableList();val to=next.indexOf(target);next.remove(item);next.add(to,item)
-            currentChange(next);haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+            currentChange(next);haptic?.event(FeedbackCue.SELECT)
         }
     }
-    fun finish(){dragged=null}
+    fun finish(){if(currentOrder!=original)haptic?.event(FeedbackCue.SNAP);dragged=null}
     fun cancel(){if(currentEnabled)currentChange(original);dragged=null}
     Column(Modifier.fillMaxWidth().testTag("order-board"),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         order.forEachIndexed {position,item->key(item) {

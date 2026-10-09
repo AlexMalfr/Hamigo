@@ -27,6 +27,7 @@ internal class PicoNarrationTap {
 
 @Composable internal fun rememberPicoNarrationTap(key:String):PicoNarrationTap {
     val state=remember(key){PicoNarrationTap()}
-    LaunchedEffect(state.burst) {if(state.playful){delay(2800);state.reset()}}
+    val feedback=LocalAppFeedback.current
+    LaunchedEffect(state.burst) {if(state.playful){feedback?.event(FeedbackCue.PICO);delay(2800);state.reset()}}
     return state
 }

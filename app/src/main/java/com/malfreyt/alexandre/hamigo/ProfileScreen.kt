@@ -77,7 +77,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                         .onSizeChanged { headerSurfaceHeight=it.height }.padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Spacer(Modifier.width(72.dp))
                         Column(Modifier.weight(1f)) { BigTitle(p.name, "Ta progression au fil des jours.") }
-                        IconButton({ model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
+                        IconButton(feedbackClick { model.route = "settings" },Modifier.onGloballyPositioned { backAnchors?.settings=it.boundsInWindow() }) { Icon(Icons.Rounded.Settings, "Réglages") }
                     }
                     // The header's surface ends above the avatar, which stays in the same layout position.
                     Spacer(Modifier.height(8.dp))
@@ -156,17 +156,17 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
     Panel {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Calendrier d’activité", Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            IconButton({ scope.launch { history.animateScrollToPage(0) } }, enabled=history.currentPage!=0) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(0) } }, enabled=history.currentPage!=0) {
                 Icon(Icons.Rounded.CalendarToday,"Revenir au mois en cours")
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton({ scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < months - 1) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < months - 1) {
                 Icon(Icons.Rounded.ChevronLeft, "Voir le mois précédent")
             }
             val monthLabel = currentMonth.minusMonths(history.currentPage.toLong()).format(DateTimeFormatter.ofPattern("MMMM yyyy", French))
             Text(monthLabel.replaceFirstChar { it.titlecase(French) }, Modifier.weight(1f), textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
-            IconButton({ scope.launch { history.animateScrollToPage(history.currentPage - 1) } }, enabled = history.currentPage > 0) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage - 1) } }, enabled = history.currentPage > 0) {
                 Icon(Icons.Rounded.ChevronRight, "Voir le mois suivant")
             }
         }
@@ -231,10 +231,10 @@ private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
                 Text(if (history.currentPage == 0) "Cette semaine" else "Ton historique", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text("$visibleWeekXp XP",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
             }
-            IconButton({ scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < weeks - 1) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < weeks - 1) {
                 Icon(Icons.Rounded.History, "Voir la semaine précédente")
             }
-            IconButton({ scope.launch { history.animateScrollToPage(history.currentPage - 1) } }, enabled = history.currentPage > 0) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage - 1) } }, enabled = history.currentPage > 0) {
                 Icon(Icons.Rounded.Update, "Voir la semaine suivante")
             }
         }

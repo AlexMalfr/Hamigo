@@ -32,7 +32,7 @@ fun bandRowsForRegion(rows: List<RefRow>, region: String): List<RefRow> {
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         Text("Région UIT", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
         Box {
-            OutlinedButton({ expanded = true }, Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 9.dp)) {
+            OutlinedButton(feedbackClick { expanded = true }, Modifier.fillMaxWidth(), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 9.dp)) {
                 Text(names[region] ?: names.getValue("1"), Modifier.weight(1f), fontSize = 13.sp)
                 Icon(Icons.Rounded.ExpandMore, "Choisir la région UIT", Modifier.size(20.dp))
             }

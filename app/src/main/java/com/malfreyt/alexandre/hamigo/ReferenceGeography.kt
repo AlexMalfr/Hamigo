@@ -39,10 +39,10 @@ fun callsignMapQuery(term: String): String? = callsignPlaces[term]
     var expanded by remember { mutableStateOf(false) }
     Panel {
         Text("Les trois régions UIT", color = Teal)
-        Image(bitmap, "Carte officielle du monde : frontières des régions UIT 1, 2 et 3", Modifier.fillMaxWidth().aspectRatio(bitmap.width.toFloat() / bitmap.height).clickable { expanded = true }, contentScale = ContentScale.Fit)
+        Image(bitmap, "Carte officielle du monde : frontières des régions UIT 1, 2 et 3", Modifier.fillMaxWidth().aspectRatio(bitmap.width.toFloat() / bitmap.height).clickable(onClick=feedbackClick { expanded = true }), contentScale = ContentScale.Fit)
         Text("La France métropolitaine est en région 1. Les limites suivent des lignes définies par le Règlement des radiocommunications : elles ne sont pas de simples méridiens.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
         Text("Touche la carte pour agrandir ; pince pour zoomer.", fontSize = 11.sp, lineHeight = 16.sp, color = Muted)
-        TextButton({ openLink(context, "https://www.itu.int/ITU-R/information/docs/emergency-regions.jpg") }, contentPadding = PaddingValues(0.dp)) {
+        TextButton(feedbackClick { openLink(context, "https://www.itu.int/ITU-R/information/docs/emergency-regions.jpg") }, contentPadding = PaddingValues(0.dp)) {
             Text("Source : UIT · régions de radiocommunication", fontSize = 11.sp)
         }
     }

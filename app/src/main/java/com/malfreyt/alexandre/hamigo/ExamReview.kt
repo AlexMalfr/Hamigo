@@ -53,7 +53,7 @@ fun examDuration(milliseconds:Long):String {
         Text(s.examPartLabel,fontSize=26.sp,fontWeight=FontWeight.ExtraBold,color=if(technique)Teal else Purple)
         Text("${s.examPartEnd-s.examPartStart} questions · ${s.examMinutes} minutes · objectif 10/20",fontSize=14.sp,color=Muted,modifier=Modifier.padding(top=5.dp,bottom=20.dp))
         Action("Commencer ${if(technique)"la technique" else "la réglementation"}"){model.beginExamPart()}
-        TextButton({model.leaveSession();model.route="practice"}) {Text("Revenir aux défis")}
+        TextButton(feedbackClick {model.leaveSession();model.route="practice"}) {Text("Revenir aux défis")}
     }
 }
 
@@ -76,7 +76,7 @@ fun examDuration(milliseconds:Long):String {
                 row.forEach {index ->
                     val response=s.responses[index]
                     val selected=response!=null && !response.omitted
-                    Surface(onClick={model.revisitExamQuestion(index)},color=if(selected)Mist else Color.White,
+                    Surface(onClick=feedbackClick {model.revisitExamQuestion(index)},color=if(selected)Mist else Color.White,
                         shape=RoundedCornerShape(13.dp),border=BorderStroke(1.dp,if(selected)Teal.copy(alpha=.3f) else Color(0xFFD5DEDA)),
                         modifier=Modifier.weight(1f).height(60.dp)) {
                         Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center) {
@@ -91,10 +91,10 @@ fun examDuration(milliseconds:Long):String {
         Text("Vert : réponse enregistrée · — : sans réponse",fontSize=12.sp,color=Muted)
         Spacer(Modifier.height(5.dp))
         Action("Finaliser ${if(s.examPart==0)"la réglementation" else "la technique"}"){confirm=true}
-        TextButton({model.revisitExamQuestion(s.examPartStart)},Modifier.fillMaxWidth()) {Text("Relire depuis le début")}
+        TextButton(feedbackClick {model.revisitExamQuestion(s.examPartStart)},Modifier.fillMaxWidth()) {Text("Relire depuis le début")}
     }
     if(confirm) AlertDialog(onDismissRequest={confirm=false},title={Text("Valider cette épreuve ?")},
         text={Text("${s.examPartEnd-s.examPartStart-answered} question(s) sans réponse. Les réponses seront ensuite définitives.")},
-        confirmButton={TextButton({confirm=false;model.finishExamPart()}) {Text("Finaliser")}},
-        dismissButton={TextButton({confirm=false}) {Text("Continuer à relire")}})
+        confirmButton={TextButton(feedbackClick {confirm=false;model.finishExamPart()}) {Text("Finaliser")}},
+        dismissButton={TextButton(feedbackClick {confirm=false}) {Text("Continuer à relire")}})
 }

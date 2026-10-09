@@ -62,7 +62,7 @@ object ContentFeedback {
 fun QuestionFeedbackButton(q: Question, index: Int, count: Int, lessonId: String?, sessionTitle: String? = null) {
     val context = LocalContext.current
     var explainSource by remember(q.id, index) { mutableStateOf(false) }
-    IconButton({
+    IconButton(feedbackClick {
         if (ContentFeedback.isExam1(q)) explainSource = true
         else openLink(context, ContentFeedback.question(q, index, count, lessonId, sessionTitle))
     }, Modifier.testTag("question-feedback")) {
@@ -74,9 +74,9 @@ fun QuestionFeedbackButton(q: Question, index: Int, count: Int, lessonId: String
         text = { Text("Cette question vient d’Exam1 et n’a pas été écrite pour Hamigo. Pour une erreur d’énoncé ou de réponse, contacte Jean-Luc F6GPX, responsable de la banque.\n\nPour un problème d’affichage ou d’interaction dans l’app, fais un retour à Hamigo.",Modifier.verticalScroll(rememberScrollState())) },
         confirmButton = {
             Column(Modifier.fillMaxWidth()) {
-                Button({ explainSource = false; ContentFeedback.openExam1Contact(context, q,index,count,lessonId,sessionTitle) }, Modifier.fillMaxWidth()) { Text("Contacter Exam1") }
-                TextButton({ explainSource = false; openLink(context, ContentFeedback.question(q, index, count, lessonId,sessionTitle)) }, Modifier.fillMaxWidth()) { Text("Signaler à Hamigo") }
-                TextButton({ explainSource = false }, Modifier.fillMaxWidth()) { Text("Annuler") }
+                Button(feedbackClick { explainSource = false; ContentFeedback.openExam1Contact(context, q,index,count,lessonId,sessionTitle) }, Modifier.fillMaxWidth()) { Text("Contacter Exam1") }
+                TextButton(feedbackClick { explainSource = false; openLink(context, ContentFeedback.question(q, index, count, lessonId,sessionTitle)) }, Modifier.fillMaxWidth()) { Text("Signaler à Hamigo") }
+                TextButton(feedbackClick { explainSource = false }, Modifier.fillMaxWidth()) { Text("Annuler") }
             }
         }
     )
@@ -85,7 +85,7 @@ fun QuestionFeedbackButton(q: Question, index: Int, count: Int, lessonId: String
 @Composable
 fun MemoFeedbackButton(cat: RefCategory) {
     val context = LocalContext.current
-    TextButton({ openLink(context, ContentFeedback.memo(cat)) },
+    TextButton(feedbackClick { openLink(context, ContentFeedback.memo(cat)) },
         Modifier.fillMaxWidth().testTag("memo-feedback")) {
         Icon(Icons.Rounded.Flag, null, Modifier.size(18.dp))
         Spacer(Modifier.width(8.dp))

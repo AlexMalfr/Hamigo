@@ -111,7 +111,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                 }
             }
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-                if(step>0)IconButton({moveTo(step-1)},Modifier.size(40.dp),enabled=!permissionPending) {
+                if(step>0)IconButton(feedbackClick {moveTo(step-1)},Modifier.size(40.dp),enabled=!permissionPending) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack,"Étape précédente")
                 } else Spacer(Modifier.width(8.dp))
                 Eyebrow("HAMIGO")
@@ -149,7 +149,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                             DailyGoals.values.zip(listOf("Léger","Régulier","Soutenu","Intensif")).chunked(2).forEach {row ->
                                 Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                                     row.forEach {(value,label)->
-                                        Surface(onClick={goal=value},modifier=Modifier.weight(1f).fillMaxHeight().testTag("onboarding-goal-$value").semantics {selected=goal==value},
+                                        Surface(onClick=feedbackClick {goal=value},modifier=Modifier.weight(1f).fillMaxHeight().testTag("onboarding-goal-$value").semantics {selected=goal==value},
                                             shape=RoundedCornerShape(20.dp),color=if(goal==value)Mist else Color.White,
                                             border=androidx.compose.foundation.BorderStroke(if(goal==value)2.dp else 1.dp,if(goal==value)Teal else Ink.copy(alpha=.1f))) {
                                             Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(5.dp)) {
@@ -166,7 +166,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                             }
                         }
                         2-> {
-                            OutlinedButton({TimePickerDialog(context,{_,h,m->
+                            OutlinedButton(feedbackClick {TimePickerDialog(context,{_,h,m->
                                 hour=h;minute=m
                                 prefs.edit().putInt("onboardingReminderHour",h).putInt("onboardingReminderMinute",m).apply()
                             },hour,minute,true).show()},Modifier.fillMaxWidth().heightIn(min=64.dp).testTag("onboarding-reminder-time")) {
@@ -176,7 +176,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                             }
                             if(permissionError) {
                                 Text("Les notifications restent désactivées. Tu peux continuer sans rappel.",color=MaterialTheme.colorScheme.error,fontSize=13.sp,lineHeight=18.sp,textAlign=TextAlign.Center)
-                                TextButton({context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName))}) {
+                                TextButton(feedbackClick {context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName))}) {
                                     Text("Ouvrir les réglages de notifications")
                                 }
                             } else Text("Un rappel par jour. Tu gardes la main dans les paramètres.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
@@ -197,12 +197,12 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
             }
         }
         Column(Modifier.fillMaxWidth().padding(horizontal=24.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-            Button({continueStep()},Modifier.fillMaxWidth().heightIn(min=54.dp).testTag("onboarding-continue"),
+            Button(feedbackClick {continueStep()},Modifier.fillMaxWidth().heightIn(min=54.dp).testTag("onboarding-continue"),
                 enabled=(step!=0 || name.isNotBlank()) && !permissionPending,shape=RoundedCornerShape(16.dp)) {
                 Text(when(step){2->if(permissionPending)"Autorisation…" else "Activer le rappel";3->if(model.sync.tokens.hasToken())"C’est parti !" else "Se connecter avec GitHub";else->"Continuer"},fontWeight=FontWeight.Bold,fontSize=16.sp)
                 Spacer(Modifier.width(8.dp));Icon(if(step==2)Icons.Rounded.NotificationsActive else Icons.AutoMirrored.Rounded.ArrowForward,null,Modifier.size(20.dp))
             }
-            if(step>=2)TextButton({if(step==2)confirmReminder(false) else finish(false)},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
+            if(step>=2)TextButton(feedbackClick {if(step==2)confirmReminder(false) else finish(false)},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
                 Text(if(step==2)"Pas maintenant" else "Commencer sans compte")
             }
         }

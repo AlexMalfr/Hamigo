@@ -34,6 +34,7 @@ class Session(val title: String, val questions: MutableList<Question>, val lesso
     var gain = 0
     var feedback: Boolean? = null
     var started = System.currentTimeMillis()
+    internal var resultPresented = false
     var regulationScore = 0
     var techniqueScore = 0
     var unanswered = 0
@@ -67,6 +68,7 @@ class AppModel internal constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var context: Context
     lateinit var progress: Progress
+    internal lateinit var interactionFeedback: AppFeedback
     var displayedProgress by mutableStateOf<Progress?>(null)
         private set
     lateinit var sync: GitHubSync
@@ -138,6 +140,7 @@ class AppModel internal constructor(
         if (::progress.isInitialized) return
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
+        interactionFeedback = AppFeedback(context)
         friendInbox = FriendInboxCoordinator(context,progress,sync,friendInboxGateway)
         pendingAuthorization = PendingGitHubAuthorization(context)
         val savedAuthorization = pendingAuthorization.restore()
@@ -183,6 +186,14 @@ class AppModel internal constructor(
             if(q.section == "regulation") s.regulationScore++ else s.techniqueScore++
         } else { s.missed[q.id]=q; s.unresolved.add(q.id); if(omitted) s.unanswered++ }
         s.feedback=correct; revision++
+        stopMorse()
+        interactionFeedback.silence()
+        // Exam answers above are drafts: never reveal their correctness through a sound.
+        // Let the prompt stop its narration before playing a verdict.
+        if(q.kind=="flash")interactionFeedback.event(FeedbackCue.SNAP) else scope.launch {
+            delay(60)
+            if(session===s&&s.current===q&&s.feedback!=null)interactionFeedback.event(if(correct)FeedbackCue.SUCCESS else FeedbackCue.ERROR)
+        }
         ProgressSyncScheduler.enqueue(context)
     }
     fun next() {
@@ -191,6 +202,7 @@ class AppModel internal constructor(
         if (!s.exam && s.feedback == false && q != null && s.questions.count { it.id == q.id } < 3) s.questions.add(q)
         s.index++; s.feedback=null
         if(s.done) {
+            interactionFeedback.silence()
             s.elapsedMillis=System.currentTimeMillis()-s.started
             if(s.lessonId != null && s.lessonPassed) { s.gain += progress.complete(s.lessonId) }
             refreshSocial()
@@ -239,7 +251,7 @@ class AppModel internal constructor(
         if(s.examPart==0 && s.questions.size>20) {
             s.examPart=1; s.index=20; s.examIntroPending=true
         } else {
-            s.index=s.questions.size; s.examIntroPending=false; refreshSocial()
+            interactionFeedback.silence();s.index=s.questions.size; s.examIntroPending=false; refreshSocial()
         }
         ProgressSyncScheduler.enqueue(context); revision++
     }
@@ -429,6 +441,7 @@ class AppModel internal constructor(
     fun cancelTask() { taskJob?.cancel() }
     fun restore(json: String) { runCatching { progress.import(json);revision++;message="Sauvegarde restaurée." }.onFailure {message=it.message} }
     override fun onCleared() {
+        if(::interactionFeedback.isInitialized)interactionFeedback.close()
         if(::progress.isInitialized) {
             progress.prefs.unregisterOnSharedPreferenceChangeListener(preferenceListener)
             context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(preferenceListener)

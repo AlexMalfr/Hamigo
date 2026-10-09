@@ -278,3 +278,17 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - La zone de présentation retrouve sa vraie hauteur indicative de 40 % du viewport des questions, sans réduction du pourcentage sur petit écran ou à l'ouverture du clavier. Pico et l'énoncé sont centrés comme un groupe ; un long énoncé peut toujours grandir librement et toute la page conserve un scroll unique.
 - Calculatrice et brouillon restent en colonne par défaut. Seule une fenêtre entière réellement courte les place en ligne : le clavier ne change plus leur orientation. Le fond derrière eux reste transparent, avec davantage d'espace sous leurs ombres et une réserve adaptée pour dégager les réponses et le champ numérique.
 - Aucun changement de contenu, notation, progression ou identifiant. Cette correction est destinée à l'amendement de la 0.43 ; validation visuelle, résultats Android et remplacement effectif de la release restent à confirmer avant livraison.
+
+## Sons, haptiques et fin de séance — 0.44
+
+- Une palette originale de déclics mécaniques, cordes pincées et ressort accompagne boutons/onglets, sélections, gestes, réponses et réactions volontaires de Pico. Six samples courts préchargés, sans banque tierce ni bip générique ; les clics sont nettement plus discrets que les verdicts.
+- Les vibrations varient en force et en durée : sélection douce, prise/pose d'une carte, réponse correcte/à corriger et petite progression de fin de séance. Pas de vibration sur chaque bouton ou scroll ; les événements rapprochés sont temporisés. Le volume média, le mute de l’app et les réglages tactiles Android sont respectés.
+- Sons et Vibrations se règlent séparément côte à côte dans Gameplay. Une icône à droite du drapeau des questions contrôle le même réglage Sons. Ces choix sont conservés localement, sans changer le schéma des Gists ; les écoutes pédagogiques restent disponibles.
+- Les bilans de toutes les séances partagent une explosion de confettis depuis le bas, avec un motif sonore/haptique de fin. Version plus sobre si la séance reste à consolider, présentation unique par séance, aucun blocage des boutons et respect des animations désactivées. Les brouillons d'examen ne révèlent pas leur justesse par le feedback.
+- Morse : souffle très léger dans le tampon audio, précédant le premier point/trait de 180 ms pour amorcer la sortie ; timings des signaux et espaces conservés. Les voix et le Morse ont priorité sur les effets d'interface.
+- Reprend aussi le centrage 40/60, la pile d’outils indépendante du clavier et les correctifs 20081/cartes d’ordre publiés dans la 0.43 amendée. Détails et limites : [INTERACTION-FEEDBACK.md](INTERACTION-FEEDBACK.md).
+- La ligne heure/test du rappel s'adapte aux écrans étroits et à une police agrandie, avec deux lignes si nécessaire plutôt qu'une heure coupée verticalement.
+
+### Confettis plus amples — amendement 0.44
+
+- Morceaux agrandis, gerbes plus hautes et plus larges ; vol et rotation ralentis, durée de 4,2 secondes avec extinction douce. Le lancement reste accompagné du même son et du même motif tactile.

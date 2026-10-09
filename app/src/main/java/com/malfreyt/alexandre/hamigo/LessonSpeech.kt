@@ -65,7 +65,7 @@ internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
                         ready=language>=TextToSpeech.LANG_AVAILABLE
                         val text=pending;pending=null
                         if(ready&&reading&&text!=null)start(text)
-                        else if(!ready){reading=false;engine?.shutdown();engine=null;notice("La voix française n’est pas disponible sur cet appareil.")}
+                        else if(!ready){reading=false;FeedbackAudioGate.release(this@LessonSpeech);engine?.shutdown();engine=null;notice("La voix française n’est pas disponible sur cet appareil.")}
                     }
                 }
             }}
@@ -80,20 +80,21 @@ internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
     private fun toggleSegments(texts:List<String>) {
         if(reading){stop();return}
         if(closed||texts.isEmpty())return
-        if(!ready){pending=texts;reading=true;prepare();return}
+        if(!ready){pending=texts;reading=true;FeedbackAudioGate.reserve(this);prepare();return}
         start(texts)
     }
     private fun start(texts:List<String>) {
         stopMorse();stop()
         if(manager.requestAudioFocus(focus)!=AudioManager.AUDIOFOCUS_REQUEST_GRANTED){notice("La lecture audio n’est pas disponible pour le moment.");return}
         prefix=UUID.randomUUID().toString();lastId="$prefix:${texts.lastIndex}";reading=true
+        FeedbackAudioGate.reserve(this)
         texts.forEachIndexed {index,text ->
             if(engine?.speak(text,if(index==0)TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD,null,"$prefix:$index")==TextToSpeech.ERROR) {
                 stop();notice("La lecture audio n’a pas pu démarrer.");return
             }
         }
     }
-    fun stop() {pending=null;prefix=null;lastId=null;reading=false;speaking=false;if(ready)engine?.stop();manager.abandonAudioFocusRequest(focus)}
+    fun stop() {pending=null;prefix=null;lastId=null;reading=false;speaking=false;FeedbackAudioGate.release(this);if(ready)engine?.stop();manager.abandonAudioFocusRequest(focus)}
     fun close() {closed=true;stop();setup.shutdownNow();engine?.shutdown();engine=null}
     private fun notice(text:String) {Toast.makeText(context,text,Toast.LENGTH_SHORT).show()}
 }

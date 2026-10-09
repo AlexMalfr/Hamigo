@@ -89,7 +89,7 @@ private object LessonIntroNavigation {
                         mood=if(touch.playful)touch.mood else if(speech?.reading==true)MascotMood.HAPPY else companion.mood,pose=if(touch.playful)MascotPose.HUG else companion.pose,mirrored=true,pointLeft=true,eyesClosed=touch.closedEyes,idleMotion=companion.active,reaction=if(touch.playful)touch.burst else 0)
                     Spacer(Modifier.width(12.dp))
                     Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f).alignBy {it.measuredHeight/2},fontWeight=FontWeight.Bold,color=Teal)
-                    IconButton({touch.audio {speech?.toggle(lesson)}},Modifier.size(48.dp).alignBy {it.measuredHeight/2}.testTag("lesson-listen"),enabled=speech!=null) {
+                    IconButton(feedbackClick {touch.audio {speech?.toggle(lesson)}},Modifier.size(48.dp).alignBy {it.measuredHeight/2}.testTag("lesson-listen"),enabled=speech!=null) {
                         Icon(if(speech?.reading==true)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,if(speech?.reading==true)"Arrêter la lecture du cours" else "Écouter le cours",tint=Teal)
                     }
                 }
@@ -103,7 +103,7 @@ private object LessonIntroNavigation {
             } }
             if(lesson.formula.isNotBlank()) item {Panel(color=Mist){Eyebrow("À RETENIR");MorseAwareText(lesson.formula,fontSize=21.sp,fontWeight=FontWeight.Bold)}}
             items(references,key={it.id}) { category ->
-                Surface(onClick={if(returnTarget==null)model.resource=category},modifier=Modifier.testTag("lesson-memo-${category.id}").onGloballyPositioned {
+                Surface(onClick=feedbackClick {if(returnTarget==null)model.resource=category},modifier=Modifier.testTag("lesson-memo-${category.id}").onGloballyPositioned {
                     if(returnTarget?.categoryId==category.id) {returnTarget.rowBounds=it.boundsInWindow();returnTarget.fullRowHeight=it.size.height}
                 },color=Color.White,shape=RoundedCornerShape(18.dp)) {MemoMorphRow(category)}
             }

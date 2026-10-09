@@ -182,6 +182,10 @@ private data class BackScreenSnapshot(
 }
 
 @Composable fun HamigoApp(model: AppModel) {
+    FeedbackHost(model.interactionFeedback) {HamigoAppContent(model)}
+}
+
+@Composable private fun HamigoAppContent(model:AppModel) {
     val content=model.content
     val tick=model.revision
     val context=LocalContext.current
@@ -425,12 +429,12 @@ private data class BackScreenSnapshot(
         }
     }
     if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text(if(model.session?.exam==true)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},
-        confirmButton={TextButton({quit=false;model.leaveSession()}){Text("Quitter la séance")}},dismissButton={TextButton({quit=false}){Text("Continuer")}})
+        confirmButton={TextButton(feedbackClick {quit=false;model.leaveSession()}){Text("Quitter la séance")}},dismissButton={TextButton(feedbackClick {quit=false}){Text("Continuer")}})
     model.incoming?.let { json ->
         AlertDialog(onDismissRequest={model.incoming=null},title={Text("Restaurer la sauvegarde ?")},
             text={Text("La sauvegarde remplacera ta progression locale actuelle. Ton compte GitHub reste connecté.")},
-            confirmButton={TextButton({model.restore(json);model.incoming=null}){Text("Restaurer")}},
-            dismissButton={TextButton({model.incoming=null}){Text("Annuler")}})
+            confirmButton={TextButton(feedbackClick {model.restore(json);model.incoming=null}){Text("Restaurer")}},
+            dismissButton={TextButton(feedbackClick {model.incoming=null}){Text("Annuler")}})
     }
     if(!model.showWelcome && model.oauthSession==null && model.authSession==null) model.pendingInvite?.let {
         val canRequest=model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null
@@ -439,14 +443,14 @@ private data class BackScreenSnapshot(
                 "Ajoute cet équipier et envoie-lui une demande pour qu’il puisse aussi t’ajouter. La demande sera visible dans les commentaires de son Gist social."
                 else "Hamigo va récupérer le résumé de progression de cet équipier et l’ajouter à ton équipe. Connecte GitHub pour demander l’ajout en retour.")},
             confirmButton={Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(8.dp),horizontalAlignment=Alignment.CenterHorizontally) {
-                Button(onClick={model.acceptInvite(sendReciprocal=canRequest)},enabled=!model.busy,
+                Button(onClick=feedbackClick {model.acceptInvite(sendReciprocal=canRequest)},enabled=!model.busy,
                     modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(15.dp),
                     colors=ButtonDefaults.buttonColors(containerColor=Teal,contentColor=Color.White)) {
                     Text(if(canRequest) "Ajouter et envoyer la demande" else "Ajouter l’équipier",textAlign=TextAlign.Center,fontWeight=FontWeight.Bold)
                 }
-                if(canRequest) OutlinedButton(onClick={model.acceptInvite()},enabled=!model.busy,
+                if(canRequest) OutlinedButton(onClick=feedbackClick {model.acceptInvite()},enabled=!model.busy,
                     modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(15.dp)) {Text("Ajouter seulement")}
-                TextButton({model.pendingInvite=null}) {Text("Annuler")}
+                TextButton(feedbackClick {model.pendingInvite=null}) {Text("Annuler")}
             }})
     }
 }
@@ -479,7 +483,7 @@ private data class BackScreenSnapshot(
             Row(Modifier.fillMaxWidth().stickyHeaderShadow(listState).background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}
                 Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Mist.copy(alpha=.6f))
-                    .clickable(role=Role.Button) {model.route="profile"}
+                    .clickable(role=Role.Button,onClick=feedbackClick {model.route="profile"})
                     .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${dayCount(p.streak)} de série, ${p.xp} XP"}
                     .padding(horizontal=10.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,
                     horizontalArrangement=Arrangement.spacedBy(5.dp)) {
@@ -501,7 +505,7 @@ private data class BackScreenSnapshot(
             }
         }
         if(due.isNotEmpty()) item {
-            Surface(onClick={if(due.isNotEmpty())model.startQuestions("Les ondes reviennent",due.take(12)) else model.route="resources"},shape=RoundedCornerShape(20.dp),color=Color(0xFFFFEDDC)) {
+            Surface(onClick=feedbackClick {if(due.isNotEmpty())model.startQuestions("Les ondes reviennent",due.take(12)) else model.route="resources"},shape=RoundedCornerShape(20.dp),color=Color(0xFFFFEDDC)) {
                 Row(Modifier.fillMaxWidth().padding(18.dp),verticalAlignment=Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Refresh,"Réviser",tint=Color(0xFFB76D36));Spacer(Modifier.width(14.dp))
                     Column(Modifier.weight(1f)) {Text(if(due.isEmpty())"Ta mémoire prend de l'avance" else "${due.size} notions à revoir",fontWeight=FontWeight.Bold);Text(if(due.isEmpty())"Découvre les fiches mémo" else "Une révision au bon moment, ça reste.",fontSize=12.sp,color=Muted)}
@@ -514,7 +518,7 @@ private data class BackScreenSnapshot(
             val c=content.chapters[index];val color=ChapterColors[index%ChapterColors.size]
             val finished=c.lessons.count {it.id in completed}
             Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                Surface(onClick={expanded=if(expanded==index)-1 else index},modifier=Modifier.testTag("chapter-${c.id}")
+                Surface(onClick=feedbackClick {expanded=if(expanded==index)-1 else index},modifier=Modifier.testTag("chapter-${c.id}")
                     .semantics {stateDescription=if(expanded==index)"Déplié" else "Replié"},shape=RoundedCornerShape(22.dp),color=color) {
                     Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
                         Text("%02d".format(index+1),Modifier.background(Color.White.copy(alpha=.18f),RoundedCornerShape(14.dp)).padding(12.dp),fontSize=21.sp,fontWeight=FontWeight.ExtraBold,color=Color.White)
@@ -540,18 +544,18 @@ private data class BackScreenSnapshot(
                     val done=l.id in completed;val active=l.id==next?.id
                     Row(Modifier.fillMaxWidth().padding(end=12.dp),verticalAlignment=Alignment.CenterVertically) {
                         Row(Modifier.weight(1f).padding(start=if(i%2==0)12.dp else 34.dp,end=if(i%2==0)22.dp else 0.dp),verticalAlignment=Alignment.CenterVertically) {
-                        Surface(onClick={model.startLesson(l)},modifier=Modifier.size(54.dp),shape=CircleShape,color=if(done)color else if(active)Gold else Color.White,shadowElevation=if(active)5.dp else 1.dp) {
+                        Surface(onClick=feedbackClick {model.startLesson(l)},modifier=Modifier.size(54.dp),shape=CircleShape,color=if(done)color else if(active)Gold else Color.White,shadowElevation=if(active)5.dp else 1.dp) {
                             Box(contentAlignment=Alignment.Center) {Icon(if(done)Icons.Rounded.Replay else if(active)Icons.Rounded.PlayArrow else Icons.Rounded.RadioButtonUnchecked,l.title,tint=if(done)Color.White else color)}
                         }
                         Spacer(Modifier.width(15.dp))
-                        Column(Modifier.weight(1f).testTag("lesson-copy-${l.id}").clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button) {model.startLesson(l)}.padding(vertical=13.dp)) {
+                        Column(Modifier.weight(1f).testTag("lesson-copy-${l.id}").clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button,onClick=feedbackClick {model.startLesson(l)}).padding(vertical=13.dp)) {
                             Text(l.title+if(done)" ✅" else "",fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
                             Text(l.summary,maxLines=2,overflow=TextOverflow.Ellipsis,fontSize=12.sp,lineHeight=16.sp,color=Muted)
                         }
                         }
                         var menu by remember(l.id) {mutableStateOf(false)}
                         Box {
-                            IconButton({menu=true},Modifier.size(40.dp).testTag("lesson-menu-${l.id}")) {Icon(Icons.Rounded.MoreVert,"Options du cours ${l.title}",tint=Muted)}
+                            IconButton(feedbackClick {menu=true},Modifier.size(40.dp).testTag("lesson-menu-${l.id}")) {Icon(Icons.Rounded.MoreVert,"Options du cours ${l.title}",tint=Muted)}
                             DropdownMenu(menu,{menu=false}) {DropdownMenuItem(text={Text("Lire le cours")},leadingIcon={Icon(Icons.Rounded.MenuBook,null)},onClick={menu=false;model.previewLesson(l)})}
                         }
                     }

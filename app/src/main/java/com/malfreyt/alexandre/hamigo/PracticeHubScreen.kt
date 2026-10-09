@@ -64,9 +64,9 @@ import kotlin.random.Random
             Action("Lancer mon mix",enabled=count in 1..available) {
                 model.startQuestions("Mix radio · $count questions",index.questions(selected,count))
             }
-            TextButton({themesOpen=!themesOpen},Modifier.fillMaxWidth()) {Icon(if(themesOpen)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null);Spacer(Modifier.width(8.dp));Text("Choisir les thèmes · ${selected.size}/${keys.size}")}
+            TextButton(feedbackClick {themesOpen=!themesOpen},Modifier.fillMaxWidth()) {Icon(if(themesOpen)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null);Spacer(Modifier.width(8.dp));Text("Choisir les thèmes · ${selected.size}/${keys.size}")}
             if(themesOpen) {
-                TextButton({selected=if(selected==keys)emptySet() else keys},contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Text(if(selected==keys)"Tout désélectionner" else "Tout sélectionner",fontSize=12.sp)}
+                TextButton(feedbackClick {selected=if(selected==keys)emptySet() else keys},contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Text(if(selected==keys)"Tout désélectionner" else "Tout sélectionner",fontSize=12.sp)}
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 40.dp) {
                 listOf("regulation" to "Réglementation","technique" to "Technique").forEach {(section,label) ->
                     val topics=groups[section].orEmpty()
@@ -79,7 +79,7 @@ import kotlin.random.Random
                     }
                     FlowRow(Modifier.padding(start=30.dp),horizontalArrangement=Arrangement.spacedBy(4.dp),verticalArrangement=Arrangement.spacedBy(0.dp)) {
                         topics.keys.forEach {topic ->val key="$section|$topic"
-                            FilterChip(key in selected,{selected=if(key in selected)selected-key else selected+key},label={Text(topic,fontSize=11.sp)})
+                            FilterChip(key in selected, feedbackClick {selected=if(key in selected)selected-key else selected+key},label={Text(topic,fontSize=11.sp)})
                         }
                     }
                 }

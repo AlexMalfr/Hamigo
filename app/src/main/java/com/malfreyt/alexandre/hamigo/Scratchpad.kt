@@ -213,11 +213,11 @@ internal class ScratchpadInkView(context: Context, val state: ScratchpadState) :
                     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                         Icon(Icons.Rounded.EditNote,null,tint=Teal)
                         Text("Brouillon",Modifier.weight(1f).padding(start=8.dp),color=Ink,fontSize=21.sp,fontWeight=FontWeight.ExtraBold)
-                        IconButton({focus.clearFocus();keyboard?.hide();dismiss()}) { Icon(Icons.Rounded.Close,"Fermer le brouillon") }
+                        IconButton(feedbackClick {focus.clearFocus();keyboard?.hide();dismiss()}) { Icon(Icons.Rounded.Close,"Fermer le brouillon") }
                     }
                     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        FilterChip(!state.typing,{state.typing=false},{Text("Dessin")},leadingIcon={Icon(Icons.Rounded.Draw,null,Modifier.size(18.dp))},modifier=Modifier.weight(1f))
-                        FilterChip(state.typing,{state.typing=true},{Text("Texte")},leadingIcon={Icon(Icons.Rounded.Keyboard,null,Modifier.size(18.dp))},modifier=Modifier.weight(1f))
+                        FilterChip(!state.typing, feedbackClick {state.typing=false},{Text("Dessin")},leadingIcon={Icon(Icons.Rounded.Draw,null,Modifier.size(18.dp))},modifier=Modifier.weight(1f))
+                        FilterChip(state.typing, feedbackClick {state.typing=true},{Text("Texte")},leadingIcon={Icon(Icons.Rounded.Keyboard,null,Modifier.size(18.dp))},modifier=Modifier.weight(1f))
                     }
                     if(state.typing) {
                         OutlinedTextField(state.text,{state.text=it},Modifier.fillMaxWidth().weight(1f).focusRequester(textFocus).testTag("scratchpad-text"),
@@ -230,11 +230,11 @@ internal class ScratchpadInkView(context: Context, val state: ScratchpadState) :
                     }
                     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                         if(!state.typing) {
-                            IconButton({state.undoInk()},enabled=state.canUndo) { Icon(Icons.Rounded.Undo,"Annuler le dernier trait") }
-                            FilterChip(state.stylusOnly,{state.stylusOnly=!state.stylusOnly},{Text("Stylet seul",fontSize=12.sp)})
+                            IconButton(feedbackClick {state.undoInk()},enabled=state.canUndo) { Icon(Icons.Rounded.Undo,"Annuler le dernier trait") }
+                            FilterChip(state.stylusOnly, feedbackClick {state.stylusOnly=!state.stylusOnly},{Text("Stylet seul",fontSize=12.sp)})
                         }
                         Spacer(Modifier.weight(1f))
-                        IconButton({state.clear()},enabled=state.text.text.isNotEmpty() || state.hasInk) {
+                        IconButton(feedbackClick {state.clear()},enabled=state.text.text.isNotEmpty() || state.hasInk) {
                             Icon(Icons.Rounded.DeleteSweep,"Effacer le brouillon",tint=Color(0xFF963E54))
                         }
                     }

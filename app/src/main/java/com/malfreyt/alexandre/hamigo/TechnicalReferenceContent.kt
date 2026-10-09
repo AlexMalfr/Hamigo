@@ -33,8 +33,8 @@ import kotlin.math.sin
             Text("Lire les anneaux", fontSize = 17.sp, fontWeight = FontWeight.Bold, color = Ink)
             Text("Place la bande de tolérance, souvent un peu isolée, à droite. Lis la valeur de gauche à droite.", fontSize = 13.sp, lineHeight = 18.sp, color = Muted)
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(!five, { five = false }, { Text("4 anneaux") })
-                FilterChip(five, { five = true }, { Text("5 anneaux") })
+                FilterChip(!five, feedbackClick { five = false }, { Text("4 anneaux") })
+                FilterChip(five, feedbackClick { five = true }, { Text("5 anneaux") })
             }
             val bands = if (five) listOf("Brun", "Rouge", "Orange", "Brun", "Brun") else listOf("Jaune", "Violet", "Rouge", "Or")
             val captions = if (five) listOf("Chiffre\n1", "Chiffre\n2", "Chiffre\n3", "Facteur\n×10", "Tolérance\n±1 %") else listOf("Chiffre\n4", "Chiffre\n7", "Facteur\n×100", "Tolérance\n±5 %")
