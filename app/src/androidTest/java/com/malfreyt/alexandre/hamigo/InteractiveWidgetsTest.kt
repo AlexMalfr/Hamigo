@@ -21,25 +21,23 @@ class InteractiveWidgetsTest {
     @get:Rule val ui = createComposeRule()
 
     @Test fun aConnectionCanStartOnTheRightHandSide() {
+        var result=emptyMap<Int,Int>()
         val q = Question("test-match", "Associe", emptyList(), 0, "", kind = "match",
             pairs = listOf(PairItem("Fréquence", "Hertz"), PairItem("Résistance", "Ohm")))
         ui.setContent {
             MaterialTheme {
                 var matches by remember { mutableStateOf(emptyMap<Int, Int>()) }
-                var left by remember { mutableStateOf<Int?>(null) }
                 Column(Modifier.fillMaxWidth().padding(16.dp)) {
-                    MatchBoard(q, q.id, matches, left, true, onSelect = { left = it; matches = matches - it }, onConnect = { target ->
-                        left?.let { selected -> matches = matches.filterValues { it != target } + (selected to target); left = null }
-                    })
+                    MatchBoard(q,q.id,matches,true,onChange={matches=it;result=it})
                 }
             }
         }
         ui.onNodeWithText("Hertz").assertIsEnabled().performClick()
         ui.onNodeWithText("Fréquence").performClick()
-        ui.onNodeWithText("1/2 liens créés").assertExists()
+        ui.runOnIdle {assertEquals(mapOf(0 to 0),result)}
         ui.onNodeWithText("Ohm").performClick()
         ui.onNodeWithText("Résistance").performClick()
-        ui.onNodeWithText("2/2 liens créés").assertExists()
+        ui.runOnIdle {assertEquals(mapOf(0 to 0,1 to 1),result)}
     }
 
     @Test fun draggingAWordIntoTheStandardSlotSelectsIt() {

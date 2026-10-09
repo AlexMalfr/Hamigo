@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.input.pointer.pointerInput
@@ -37,105 +38,74 @@ import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.random.Random
 
-data class QuestionPresentation(val label: String, val instruction: String, val color: Color)
-fun questionPresentation(kind: String): QuestionPresentation = when(kind) {
-    "match" -> QuestionPresentation("Les bonnes connexions", "Relier · choisis deux partenaires, dans le sens que tu veux.", Purple)
-    "order", "sort" -> QuestionPresentation("Remets le signal en ordre", "Ordonner · touche les éléments dans le bon ordre.", Purple)
-    "number" -> QuestionPresentation("À toi de calculer", "Calculer · saisis le nombre dans l'unité demandée.", Teal)
-    "resistor" -> QuestionPresentation("Décode les couleurs", "Lire les anneaux · repère le sens avant de choisir.", Color(0xFFAA6743))
-    "flash" -> QuestionPresentation("Flashcard · rappel actif", "Mémoriser · cherche la réponse avant de retourner la carte.", Teal)
-    "frequency" -> QuestionPresentation("Accorde la fréquence", "Régler · glisse l'aiguille, puis ajuste avec les boutons.", Teal)
-    "truefalse" -> QuestionPresentation("Vrai ou faux ?", "Décider · une affirmation, deux possibilités.", Color(0xFF547FCD))
-    "cloze" -> QuestionPresentation("Complète la transmission", "Compléter · glisse une pastille dans la case, ou touche-la.", Purple)
-    "multiselect" -> QuestionPresentation("La chasse aux bons signaux", "Sélection multiple · plusieurs réponses peuvent être justes.", Color(0xFFAA6743))
-    "morseListen" -> QuestionPresentation("À l'écoute du morse", "Écouter · lance le son, puis reconnais le message.", Color(0xFF547FCD))
-    "morseEncode" -> QuestionPresentation("À toi de transmettre", "Composer · construis le code avec les points et les traits.", Teal)
-    "binary" -> QuestionPresentation("Les interrupteurs binaires", "Manipuler · allume ou éteins les bits pour former le nombre.", Purple)
-    "waveform" -> QuestionPresentation("Les signaux prennent forme", "Observer · choisis le tracé qui répond à la question.", Color(0xFF547FCD))
-    "estimate" -> QuestionPresentation("Vise la bonne valeur", "Estimer · déplace le curseur jusqu'à la valeur demandée.", Color(0xFFAA6743))
-    else -> QuestionPresentation("Capte la bonne réponse", "Choisir · une seule réponse est juste.", Teal)
+class ClozeDragState {
+    var slot by mutableStateOf(Rect.Zero)
+    val chips=mutableStateMapOf<Int,Rect>()
+    var dragged by mutableIntStateOf(-1)
+    var position by mutableStateOf(Offset.Zero)
 }
+@Composable fun rememberClozeDragState(key:String)=remember(key) {ClozeDragState()}
 
-@Composable fun QuestionGuide(kind: String, mood: MascotMood, pose: MascotPose, message: String) {
-    val type = questionPresentation(kind)
-    Surface(color=type.color.copy(alpha=.10f),shape=RoundedCornerShape(18.dp),modifier=Modifier.fillMaxWidth()) {
-        Row(Modifier.padding(start=12.dp,end=8.dp,top=7.dp,bottom=7.dp),verticalAlignment=Alignment.CenterVertically) {
-            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) {
-                Eyebrow(type.label,type.color)
-                Text(type.instruction,color=Ink,fontWeight=FontWeight.SemiBold,fontSize=13.sp,lineHeight=18.sp)
-                Text(message,color=Muted,fontSize=11.sp,lineHeight=15.sp)
+@Composable fun ClozeSentence(q:Question,choice:Int,enabled:Boolean,feedback:Boolean?,state:ClozeDragState,textAlign:androidx.compose.ui.text.style.TextAlign=androidx.compose.ui.text.style.TextAlign.Start,onChoice:(Int)->Unit) {
+    val sentence=remember(q.prompt) {buildAnnotatedString {
+        val parts=q.prompt.split("___",limit=2)
+        append(parts.firstOrNull().orEmpty());appendInlineContent("answer","[mot à compléter]")
+        if(parts.size>1)append(parts[1])
+    }}
+    val hover=state.dragged>=0&&state.slot.contains(state.position)
+    val accent=if(feedback==null)Purple else if(choice==q.answer)Teal else Color(0xFFB65049)
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+    val start=q.prompt.substringBefore("___").length
+    val font=questionTextSize(sentence,constraints.maxWidth,listOf(androidx.compose.ui.text.AnnotatedString.Range(
+        Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center),start,start+"[mot à compléter]".length)))
+    Text(sentence,color=Ink,fontWeight=FontWeight.ExtraBold,fontSize=font,lineHeight=(font.value*1.32f).sp,textAlign=textAlign,
+        inlineContent=mapOf("answer" to InlineTextContent(Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center)) {
+            Surface(onClick={onChoice(-1)},enabled=enabled&&choice>=0,shape=RoundedCornerShape(10.dp),
+                modifier=Modifier.fillMaxSize().padding(2.dp).onGloballyPositioned {state.slot=it.boundsInWindow()}
+                    .semantics {contentDescription=if(choice<0)"Emplacement pour le mot à compléter" else "Mot choisi : ${q.choices.getOrNull(choice).orEmpty()}. Toucher pour enlever."},
+                color=if(hover)Gold.copy(alpha=.4f) else accent.copy(alpha=.10f),border=BorderStroke(2.dp,accent)) {
+                Box(contentAlignment=Alignment.Center) {
+                    if(choice>=0)MorseAwareText(q.choices[choice],Modifier.padding(horizontal=3.dp),fontSize=14.sp,fontWeight=FontWeight.Bold,color=accent,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    else Icon(Icons.Rounded.Add,null,tint=accent,modifier=Modifier.size(22.dp))
+                }
             }
-            Pico(Modifier.size(74.dp),mood=mood,pose=pose)
-        }
+        }))
     }
 }
-
-private val linkColors=listOf(Teal,Purple,Color(0xFF547FCD),Color(0xFFAA6743),Color(0xFFAC5377),Color(0xFF548345))
 
 @OptIn(ExperimentalLayoutApi::class)
-@Composable fun ClozeBoard(q: Question, choice: Int, enabled: Boolean, feedback: Boolean? = null, onChoice: (Int) -> Unit) {
-    var rootOrigin by remember(q.id) { mutableStateOf(Offset.Zero) }
-    var slotBounds by remember(q.id) { mutableStateOf(Rect.Zero) }
-    val chipBounds = remember(q.id) { mutableStateMapOf<Int, Rect>() }
-    var dragged by remember(q.id) { mutableIntStateOf(-1) }
-    var dragPosition by remember(q.id) { mutableStateOf(Offset.Zero) }
-    val currentOnChoice by rememberUpdatedState(onChoice)
-    val hovering = dragged >= 0 && slotBounds.contains(dragPosition)
-    val parts = q.prompt.split("___", limit = 2)
-    val sentence = remember(q.prompt) {
-        buildAnnotatedString {
-            append(parts.firstOrNull().orEmpty())
-            appendInlineContent("answer", "[mot à compléter]")
-            if (parts.size > 1) append(parts[1])
+@Composable fun ClozeBoard(q:Question,choice:Int,enabled:Boolean,feedback:Boolean?=null,
+    showPrompt:Boolean=true,state:ClozeDragState=rememberClozeDragState(q.id),onChoice:(Int)->Unit) {
+    val currentChoice by rememberUpdatedState(onChoice)
+    Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        if(showPrompt)ClozeSentence(q,choice,enabled,feedback,state,onChoice=onChoice)
+        FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp,Alignment.CenterHorizontally),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+            q.choices.forEachIndexed {index,word->
+                Surface(onClick={currentChoice(index)},enabled=enabled,shape=RoundedCornerShape(10.dp),
+                    color=if(choice==index)Purple else Color.White,border=BorderStroke(1.dp,Purple.copy(alpha=.4f)),
+                    modifier=Modifier.onGloballyPositioned {state.chips[index]=it.boundsInWindow()}
+                        .graphicsLayer {alpha=if(state.dragged==index).35f else 1f}
+                        .pointerInput(q.id,index,enabled) {
+                            if(enabled)detectDragGestures(onDragStart={state.dragged=index;state.position=(state.chips[index]?.topLeft ?: Offset.Zero)+it},
+                                onDrag={change,delta->change.consume();state.position+=delta},
+                                onDragEnd={if(state.slot.contains(state.position))currentChoice(index);state.dragged=-1},onDragCancel={state.dragged=-1})
+                        }) {
+                    MorseAwareText(word,Modifier.padding(horizontal=17.dp,vertical=13.dp),fontSize=16.sp,fontWeight=FontWeight.Bold,color=if(choice==index)Color.White else Purple)
+                }
+            }
         }
     }
-    Box(Modifier.fillMaxWidth().onGloballyPositioned { rootOrigin = it.positionInRoot() }) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Surface(shape = RoundedCornerShape(18.dp), color = Purple.copy(alpha = .08f), modifier = Modifier.fillMaxWidth()) {
-                Text(sentence, Modifier.padding(14.dp), color = Ink, fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 27.sp,
-                    inlineContent = mapOf("answer" to InlineTextContent(Placeholder(132.sp, 46.sp, PlaceholderVerticalAlign.Center)) {
-                        Surface(onClick = { currentOnChoice(-1) }, enabled = enabled && choice >= 0,
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 3.dp, vertical = 3.dp).onGloballyPositioned { slotBounds = it.boundsInRoot() }
-                                .semantics { contentDescription = if (choice < 0) "Emplacement pour le mot à compléter" else "Mot choisi : ${q.choices.getOrNull(choice).orEmpty()}. Toucher pour enlever." },
-                            shape = RoundedCornerShape(11.dp), color = if (hovering) Gold.copy(alpha = .5f) else Color.White,
-                            border = BorderStroke(if (hovering || choice >= 0) 2.dp else 1.dp, if (feedback == true) Teal else Purple)) {
-                            Box(contentAlignment = Alignment.Center) {
-                                if (choice >= 0) MorseAwareText(q.choices.getOrNull(choice).orEmpty(), modifier = Modifier.padding(horizontal = 5.dp), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Purple)
-                                else Icon(Icons.Rounded.Add, null, tint = Purple.copy(alpha = .6f), modifier = Modifier.size(22.dp))
-                            }
-                        }
-                    }))
-            }
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                q.choices.forEachIndexed { index, word ->
-                    Surface(onClick = { currentOnChoice(index) }, enabled = enabled, shape = RoundedCornerShape(50),
-                        color = if (choice == index) Purple else Color.White, border = BorderStroke(1.dp, Purple.copy(alpha = .45f)),
-                        modifier = Modifier.onGloballyPositioned { chipBounds[index] = it.boundsInRoot() }
-                            .graphicsLayer { alpha = if (dragged == index) .35f else 1f }
-                            .pointerInput(q.id, index, enabled) {
-                                if (enabled) detectDragGestures(
-                                    onDragStart = { point -> dragged = index; dragPosition = (chipBounds[index]?.topLeft ?: Offset.Zero) + point },
-                                    onDrag = { change, delta -> change.consume(); dragPosition += delta },
-                                    onDragEnd = { if (slotBounds.contains(dragPosition)) currentOnChoice(index); dragged = -1 },
-                                    onDragCancel = { dragged = -1 }
-                                )
-                            }) {
-                        MorseAwareText(word, Modifier.padding(horizontal = 15.dp, vertical = 11.dp), fontSize = 14.sp, fontWeight = FontWeight.Bold,
-                            color = if (choice == index) Color.White else Purple)
-                    }
-                }
-            }
-            if (enabled) Text("Glisse une pastille dans la case. Tu peux aussi la toucher.", color = Muted, fontSize = 11.sp, lineHeight = 15.sp)
-        }
-        if (dragged >= 0) {
-            Surface(shape = RoundedCornerShape(50), color = Purple, shadowElevation = 6.dp,
-                modifier = Modifier.width(132.dp).graphicsLayer {
-                    translationX = dragPosition.x - rootOrigin.x - 66.dp.toPx()
-                    translationY = dragPosition.y - rootOrigin.y - 22.dp.toPx()
-                }) {
-                Box(Modifier.height(44.dp), contentAlignment = Alignment.Center) {
-                    MorseAwareText(q.choices.getOrNull(dragged).orEmpty(), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
+    val draggedWord=q.choices.getOrNull(state.dragged)
+    if(draggedWord!=null) {
+        val density=androidx.compose.ui.platform.LocalDensity.current
+        val position=state.position
+        val provider=remember(position,density) {object:androidx.compose.ui.window.PopupPositionProvider {
+            override fun calculatePosition(anchorBounds:androidx.compose.ui.unit.IntRect,windowSize:androidx.compose.ui.unit.IntSize,layoutDirection:androidx.compose.ui.unit.LayoutDirection,popupContentSize:androidx.compose.ui.unit.IntSize)=
+                androidx.compose.ui.unit.IntOffset((position.x-popupContentSize.width/2).toInt(),(position.y-popupContentSize.height/2).toInt())
+        }}
+        androidx.compose.ui.window.Popup(popupPositionProvider=provider,properties=androidx.compose.ui.window.PopupProperties(focusable=false,clippingEnabled=false)) {
+            Surface(shape=RoundedCornerShape(10.dp),color=Purple,shadowElevation=6.dp) {
+                MorseAwareText(draggedWord,Modifier.padding(horizontal=17.dp,vertical=13.dp),fontSize=16.sp,fontWeight=FontWeight.Bold,color=Color.White)
             }
         }
     }
@@ -155,70 +125,6 @@ private val linkColors=listOf(Teal,Purple,Color(0xFF547FCD),Color(0xFFAA6743),Co
                     Text(text, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = Ink)
                 }
             }
-        }
-    }
-}
-
-@Composable fun MatchBoard(q: Question, key: String, matches: Map<Int,Int>, left: Int?, enabled: Boolean,
-                          onSelect: (Int)->Unit, onConnect: (Int)->Unit) {
-    val shuffled=remember(key){q.pairs.indices.shuffled(Random(q.id.hashCode()))}
-    val leftCenters=remember(key){mutableStateMapOf<Int,Float>()}
-    val rightCenters=remember(key){mutableStateMapOf<Int,Float>()}
-    var selectedRight by remember(key){mutableStateOf<Int?>(null)}
-    var canvasTop by remember(key){mutableFloatStateOf(0f)}
-    val complete=matches.size==q.pairs.size
-    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-        Text("${matches.size}/${q.pairs.size} liens créés",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Purple)
-        Text(if(complete)"Tout est relié !" else if(left!=null)"Choisis à droite →" else if(selectedRight!=null)"← Choisis à gauche" else "Commence d'un côté ou de l'autre",fontSize=11.sp,color=Muted)
-    }
-    Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min),verticalAlignment=Alignment.Top) {
-        Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-            q.pairs.forEachIndexed{i,pair -> LinkTile(pair.left,i,left==i || i in matches,enabled,if(i in matches)linkColors[i%linkColors.size]else null,
-                Modifier.onGloballyPositioned{leftCenters[i]=it.positionInRoot().y+it.size.height/2f}){
-                    onSelect(i)
-                    selectedRight?.let{onConnect(it);selectedRight=null}
-                } }
-        }
-        Canvas(Modifier.width(30.dp).fillMaxHeight().onGloballyPositioned{canvasTop=it.positionInRoot().y}) {
-            // Anchors are present before the first connection: the task is visibly a linking task.
-            leftCenters.forEach{(index,center)->
-                drawCircle(if(index==left)Purple else Muted.copy(alpha=.6f),3.5.dp.toPx(),Offset(2.dp.toPx(),center-canvasTop))
-            }
-            rightCenters.forEach{(index,center)->
-                drawCircle(if(index==selectedRight)Purple else Muted.copy(alpha=.6f),3.5.dp.toPx(),Offset(size.width-2.dp.toPx(),center-canvasTop))
-            }
-            matches.forEach{(source,target)->
-                val sourceY=leftCenters[source];val targetY=rightCenters[target]
-                if(sourceY!=null&&targetY!=null) {
-                    val startY=sourceY-canvasTop;val endY=targetY-canvasTop
-                    val path=Path().apply{moveTo(0f,startY);cubicTo(size.width*.45f,startY,size.width*.55f,endY,size.width,endY)}
-                    drawPath(path,linkColors[source%linkColors.size].copy(alpha=.7f),style=Stroke(2.dp.toPx(),cap=StrokeCap.Round))
-                    drawCircle(linkColors[source%linkColors.size],3.dp.toPx(),Offset(2.dp.toPx(),startY))
-                    drawCircle(linkColors[source%linkColors.size],3.dp.toPx(),Offset(size.width-2.dp.toPx(),endY))
-                }
-            }
-            left?.let{leftCenters[it]}?.let{center->drawLine(Purple,Offset(0f,center-canvasTop),Offset(size.width*.4f,center-canvasTop),3.dp.toPx(),StrokeCap.Round)}
-            selectedRight?.let{rightCenters[it]}?.let{center->drawLine(Purple,Offset(size.width*.6f,center-canvasTop),Offset(size.width,center-canvasTop),3.dp.toPx(),StrokeCap.Round)}
-        }
-        Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-            shuffled.forEach{i -> val source=matches.entries.firstOrNull{it.value==i}?.key
-                LinkTile(q.pairs[i].right,source,source!=null||selectedRight==i,enabled,source?.let{linkColors[it%linkColors.size]},
-                    Modifier.onGloballyPositioned{rightCenters[i]=it.positionInRoot().y+it.size.height/2f}){
-                        if(left!=null){onConnect(i);selectedRight=null}
-                        else selectedRight=if(selectedRight==i)null else i
-                    }
-            }
-        }
-    }
-}
-
-@Composable private fun LinkTile(text:String,index:Int?,selected:Boolean,enabled:Boolean,color:Color?,modifier:Modifier=Modifier,onClick:()->Unit) {
-    val accent=color ?: Purple
-    Surface(onClick=onClick,enabled=enabled,modifier=modifier.fillMaxWidth().heightIn(min=64.dp),shape=RoundedCornerShape(14.dp),
-        color=if(selected)accent.copy(alpha=.12f)else Color.White,border=BorderStroke(if(selected)2.dp else 1.dp,if(selected)accent else Color(0xFFD5DEDA))) {
-        Row(Modifier.padding(horizontal=7.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-            if(index!=null&&selected)Surface(color=accent,shape=RoundedCornerShape(6.dp)){Text("${index+1}",Modifier.padding(horizontal=5.dp,vertical=3.dp),color=Color.White,fontSize=11.sp,fontWeight=FontWeight.Bold)}
-            MorseAwareText(text,fontSize=13.sp,lineHeight=17.sp,fontWeight=if(selected)FontWeight.Bold else FontWeight.Medium,color=Ink)
         }
     }
 }

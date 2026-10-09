@@ -183,15 +183,24 @@ class QuestionWorkspaceInstrumentedTest {
     }
 
     @Test fun bothFloatingButtonsAndTextNotesStayAccessibleAboveTheKeyboard() {
+        val beforeScratch=ui.onNodeWithContentDescription("Ouvrir le brouillon").fetchSemanticsNode().boundsInRoot
+        val beforeCalculator=ui.onNodeWithContentDescription("Ouvrir la calculatrice").fetchSemanticsNode().boundsInRoot
+        val stackedBeforeIme=beforeScratch.bottom<beforeCalculator.top
         ui.onNode(hasSetTextAction()).performClick()
+        ui.onNode(hasSetTextAction()).assertIsFocused()
         awaitIme()
+        ui.waitUntil(10_000) {
+            val field=ui.onNodeWithTag("question-number-input").fetchSemanticsNode().boundsInRoot
+            val tools=listOf("Ouvrir la calculatrice","Ouvrir le brouillon").map {ui.onNodeWithContentDescription(it).fetchSemanticsNode().boundsInRoot}
+            field.bottom<=tools.minOf {it.top}
+        }
         ui.onNodeWithContentDescription("Ouvrir la calculatrice").assertIsDisplayed()
         ui.onNodeWithContentDescription("Ouvrir le brouillon").assertIsDisplayed()
         val calculator=ui.onNodeWithContentDescription("Ouvrir la calculatrice").fetchSemanticsNode().boundsInRoot
         val scratch=ui.onNodeWithContentDescription("Ouvrir le brouillon").fetchSemanticsNode().boundsInRoot
-        assertTrue("The scratchpad button belongs above the calculator",scratch.bottom<calculator.top)
+        assertEquals("Opening the keyboard preserves the tools' window-based arrangement",stackedBeforeIme,scratch.bottom<calculator.top)
         val answer=ui.onNodeWithTag("question-number-input").fetchSemanticsNode().boundsInRoot
-        assertTrue("Floating tools must not cover the focused answer field",answer.right<=scratch.left)
+        assertTrue("Floating tools must not cover the focused answer field",answer.bottom<=minOf(scratch.top,calculator.top))
         capture("question-keyboard-tools")
         Espresso.closeSoftKeyboard()
         openNotes();ui.onNodeWithText("Texte",substring=false).performClick()
@@ -202,7 +211,7 @@ class QuestionWorkspaceInstrumentedTest {
         closeNotes()
     }
     private fun awaitIme() {
-        ui.waitUntil(10_000) { WindowInspector.getGlobalWindowViews().any {it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true} }
+        ui.waitUntil(30_000) { WindowInspector.getGlobalWindowViews().any {it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true} }
     }
     private fun awaitNoIme() {
         ui.waitUntil(10_000) { WindowInspector.getGlobalWindowViews().none {it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true} }

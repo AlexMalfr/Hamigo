@@ -7,6 +7,10 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -52,13 +56,25 @@ import kotlin.random.Random
     val focus=LocalFocusManager.current
     val density=LocalDensity.current
     val imeVisible=WindowInsets.ime.getBottom(density)>0
-    var footerHeight by remember {mutableIntStateOf(0)}
+    val horizontalTools=questionToolsHorizontal()
     val scroll=rememberScrollState()
+    val answerVisibility=remember(key){BringIntoViewRequester()}
+    var answerFocused by remember(key){mutableStateOf(false)}
+    var answerSize by remember(key){mutableStateOf(androidx.compose.ui.unit.IntSize.Zero)}
+    LaunchedEffect(key,imeVisible,answerFocused,answerSize,horizontalTools) {
+        if(imeVisible&&answerFocused&&answerSize.height>0) {
+            delay(180)
+            // Automatic focus scrolling knows the keyboard, but not the transparent floating tools.
+            val clearance=with(density){(if(horizontalTools)96.dp else 160.dp).toPx()}
+            answerVisibility.bringIntoView(Rect(0f,0f,answerSize.width.toFloat(),answerSize.height+clearance))
+        }
+    }
     var choice by rememberSaveable(key){mutableIntStateOf(s.responses[s.index]?.choiceIndex ?: -1)}
     var numeric by rememberSaveable(key){mutableStateOf(s.responses[s.index]?.display?.substringBeforeLast(" ").orEmpty())}
-    var ordered by remember(key){mutableStateOf(emptyList<Int>())}
+    var ordered by remember(key){mutableStateOf(q.choices.indices.shuffled(Random(q.id.hashCode())).let {list->
+        if(list.size>1&&list==q.choices.indices.toList())list.drop(1)+list.first() else list
+    })}
     var matches by remember(key){mutableStateOf(emptyMap<Int,Int>())}
-    var left by remember(key){mutableStateOf<Int?>(null)}
     var flipped by rememberSaveable(key){mutableStateOf(false)}
     var revealed by rememberSaveable(key){mutableStateOf(false)}
     var frequency by rememberSaveable(key){mutableFloatStateOf(144f)}
@@ -82,11 +98,12 @@ import kotlin.random.Random
         if(feedback!=null) {
             // Once answer widgets have laid out their feedback, make the explanation visible.
             delay(120)
-            scroll.animateScrollTo(scroll.maxValue)
+            if(q.kind in setOf("match","order","sort"))scroll.scrollTo(0) else scroll.animateScrollTo(scroll.maxValue)
         }
     }
     DisposableEffect(key){onDispose{stopMorse()}}
     val artwork=rememberExamArtwork(q.image)
+    val clozeDrag=rememberClozeDragState(key)
     val canAnswer=when(q.kind) {
         "number"->numeric.isNotBlank();"order","sort"->ordered.size==q.choices.size
         "match"->matches.size==q.pairs.size;"frequency","binary","estimate"->true
@@ -129,25 +146,34 @@ import kotlin.random.Random
             }
             QuestionFeedbackButton(q,s.index,s.questions.size,s.lessonId,s.title)
         }
-        Column(Modifier.weight(1f).verticalScroll(scroll).padding(horizontal=16.dp,vertical=8.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            if(s.exam)Eyebrow("${s.examPartLabel.uppercase()} · ${s.examMinutes} MIN")
-            QuestionGuide(q.kind,
-                when{feedback==true->MascotMood.CELEBRATE;feedback==false->MascotMood.THINKING;s.index%5==3->MascotMood.GOOFY;q.kind in listOf("morseListen","binary","number")->MascotMood.DETERMINED;else->MascotMood.HAPPY},
-                when{feedback==true->MascotPose.JUMP;feedback==false->MascotPose.HUG;s.index%5==3->MascotPose.DANCE;else->MascotPose.POINT},
-                when{feedback==true->listOf("Ton signal passe cinq sur cinq !","Pico sort sa danse de victoire.","Bien joué, on garde le rythme !")[s.index%3];feedback==false->"On prend le temps de comprendre, puis on réessaie.";else->listOf("Pico est avec toi. À toi de jouer !","Un défi à la fois, on capte les bons réflexes.","Branche tes neurones, la radio attend !")[s.index%3]})
-            if(q.image==null && q.kind!in listOf("cloze","flash"))MorseAwareText(q.prompt,fontSize=21.sp,lineHeight=28.sp,fontWeight=FontWeight.ExtraBold)
-            if(q.visual.isNotBlank() && q.kind!="flash") LogicLearningVisual(q.visual, showNames=false, showCaption=false)
-            if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
-            if(q.kind=="resistor") Resistor(q.bands)
-            when(q.kind) {
-                "flash" -> {
-                    FlippingFlashcard(q,flipped){flipped=!flipped;revealed=true}
+        if(q.kind=="flash")BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp)) {
+            val preferred=maxHeight
+            Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
+                CompositionLocalProvider(LocalQuestionPromptMinimumHeight provides preferred) {
+                    QuestionPrompt(q,key,feedback,stacked=true,flashFlipped=flipped) {Box(Modifier.padding(10.dp)) {FlippingFlashcard(q,flipped){flipped=!flipped;revealed=true}}}
                 }
+            }
+        } else QuestionStage(Modifier.weight(1f).fillMaxWidth(),scroll,compact=imeVisible,illustrated=q.image!=null,
+            prompt={QuestionPrompt(q,key,feedback,stacked=q.image!=null) {picoOnLeft ->
+                if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
+                else if(q.kind=="cloze")ClozeSentence(q,choice,feedback==null,feedback,clozeDrag,textAlign=if(picoOnLeft)androidx.compose.ui.text.style.TextAlign.Start else androidx.compose.ui.text.style.TextAlign.End){choice=it}
+                else QuestionText(q.prompt,towardsLeft=picoOnLeft)
+            }},
+            tools=if(q.kind!="flash"&&feedback==null)({
+                FloatingActionButton({focus.clearFocus();scratchpadOpen=true},Modifier.onGloballyPositioned{scratchpadAnchor=it.screenBounds(view)},containerColor=Mist,contentColor=Teal) {
+                    Icon(Icons.Rounded.EditNote,"Ouvrir le brouillon",Modifier.size(28.dp))
+                }
+                FloatingActionButton({focus.clearFocus();calculatorOpen=true},Modifier.onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
+                    Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",Modifier.size(28.dp))
+                }
+            })else null) {
+            if(q.visual.isNotBlank() && q.kind!="flash")LogicLearningVisual(q.visual,showNames=false,showCaption=false)
+            if(q.kind=="resistor")Resistor(q.bands,showLabels=false)
+            when(q.kind) {
                 "number" -> {
-                    OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth().padding(end=if(imeVisible)76.dp else 0.dp).testTag("question-number-input"),enabled=feedback==null)
+                    OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth().testTag("question-number-input").bringIntoViewRequester(answerVisibility).onSizeChanged {answerSize=it}.onFocusChanged {answerFocused=it.isFocused},enabled=feedback==null)
                     if((q.value ?: 0.0)<0) OutlinedButton({numeric=if(numeric.startsWith("-"))numeric.drop(1) else "-$numeric"},enabled=feedback==null){Text("± Changer le signe")}
                     Text(toleranceLabel(q.tolerance,q.unit),fontSize=12.sp,color=Muted)
-                    Text("La virgule ou le point sont acceptés.",fontSize=11.sp,color=Muted)
                 }
                 "frequency" -> {
                     Panel(color=Mist){Text("${formatMeasuredNumber(frequency.toDouble(),q.tolerance)} MHz",fontSize=38.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
@@ -174,18 +200,16 @@ import kotlin.random.Random
                     Panel(color=Color(0xFFE9EFFB)) {
                         Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                             Icon(Icons.Rounded.Hearing,null,tint=Color(0xFF547FCD),modifier=Modifier.size(30.dp))
-                            Text("Écoute les points courts et les traits longs.",fontSize=14.sp,fontWeight=FontWeight.Bold)
+                            Text("Signal Morse",fontSize=14.sp,fontWeight=FontWeight.Bold)
                         }
                         Action("Écouter le signal"){playMorse(q.bands.firstOrNull().orEmpty())}
-                        Text("Tu peux le réécouter autant que nécessaire.",fontSize=11.sp,color=Muted)
                         if(feedback!=null)MorseSymbols(q.bands.firstOrNull().orEmpty())
                     }
                     q.choices.forEachIndexed{i,text->AnswerTile(text,choice==i,feedback==null,feedback!=null&&i==q.answer){choice=i}}
                 }
                 "truefalse" -> TrueFalseBoard(q,choice,feedback){choice=it}
-                "cloze" -> ClozeBoard(q,choice,feedback==null,feedback){choice=it}
+                "cloze" -> ClozeBoard(q,choice,feedback==null,feedback,showPrompt=false,state=clozeDrag){choice=it}
                 "multiselect" -> {
-                    Text("${selectedMany.size} réponse${if(selectedMany.size>1)"s"else""} cochée${if(selectedMany.size>1)"s"else""} · retouche pour décocher",fontSize=12.sp,color=Muted)
                     q.choices.forEachIndexed{i,text->val correctIndices=q.bands.mapNotNull{it.toIntOrNull()}.toSet()
                         Surface(onClick={selectedMany=if(i in selectedMany)selectedMany-i else selectedMany+i},enabled=feedback==null,modifier=Modifier.fillMaxWidth(),shape=RoundedCornerShape(14.dp),
                             color=if(feedback!=null&&i in correctIndices)Mist else if(i in selectedMany)Gold.copy(alpha=.25f)else Color.White,
@@ -204,15 +228,8 @@ import kotlin.random.Random
                         Column(Modifier.padding(horizontal=12.dp,vertical=8.dp)) {MorseAwareText(text,fontSize=14.sp,fontWeight=FontWeight.Bold,color=Ink);WaveformPreview(q.bands.getOrNull(i) ?: "sine")}
                     }
                 }
-                "order","sort" -> {
-                    Text("Retouche une étape choisie pour l'enlever.",fontSize=12.sp,color=Muted)
-                    val shuffled=remember(key){q.choices.indices.shuffled(Random(q.id.hashCode()))}
-                    if(ordered.isNotEmpty()) Panel(color=Mist){ordered.forEachIndexed{i,item->MorseAwareText("${i+1}. ${q.choices[item]}",Modifier.fillMaxWidth().clickable(enabled=feedback==null){ordered=ordered-item},fontWeight=FontWeight.Bold,fontSize=15.sp)}}
-                    shuffled.filter{it !in ordered}.forEach{index->AnswerTile(q.choices[index],false,feedback==null){ordered=ordered+index}}
-                }
-                "match" -> {
-                    MatchBoard(q,key,matches,left,feedback==null,{i->left=i;matches=matches-i},{i->val selected=left;if(selected!=null){matches=matches.filterValues{it!=i}+(selected to i);left=null}})
-                }
+                "order","sort" -> OrderBoard(q,ordered,feedback==null,feedback){ordered=it}
+                "match" -> MatchBoard(q,key,matches,feedback==null,feedback){matches=it}
                 else -> q.choices.forEachIndexed {i,text->
                     val good=feedback!=null && i==q.answer
                     AnswerTile(text,choice==i,feedback==null,good){choice=i}
@@ -223,15 +240,13 @@ import kotlin.random.Random
                     Row(verticalAlignment=Alignment.CenterVertically){Icon(if(feedback)Icons.Rounded.CheckCircle else Icons.Rounded.Lightbulb,null,tint=if(feedback)Teal else Color(0xFFBA5546));Spacer(Modifier.width(10.dp));Text(if(feedback)"Signal reçu !" else "Une occasion de retenir",fontSize=20.sp,fontWeight=FontWeight.Bold)}
                     if(!feedback && q.kind!="morseEncode")MorseAwareText(solution(q),fontWeight=FontWeight.Bold,fontSize=16.sp,lineHeight=23.sp)
                     if(!feedback&&q.kind=="morseEncode")MorseSymbols(q.bands.firstOrNull().orEmpty())
-                    MorseAwareText(q.explanation.ifBlank {"La banque Exam1 ne fournit pas de commentaire pour cette question. La réponse de référence est conservée ci-dessus."},fontSize=14.sp,lineHeight=21.sp)
+                    if(q.explanation.isNotBlank())MorseAwareText(q.explanation,fontSize=14.sp,lineHeight=21.sp)
                     if(q.source.startsWith("http"))TextButton({openLink(context,q.source)}){Text("Consulter la question source")}
                 }
             }
-            // Keep the last answer/explanation scrollable above the floating calculator.
-            Spacer(Modifier.height(if(q.kind=="flash")6.dp else 136.dp))
         }
-        Surface(modifier=Modifier.onSizeChanged {footerHeight=it.height},color=Cream,shadowElevation=5.dp) {
-            Column(Modifier.padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
+        Surface(color=Cream,modifier=Modifier.questionFooterShadow()) {
+            Column(Modifier.navigationBarsPadding().padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
                 if(q.kind=="flash") {
                     if(!revealed)Action("Retourner la carte"){flipped=true;revealed=true}
                     else {
@@ -256,14 +271,6 @@ import kotlin.random.Random
             }
         }
     }
-    if(q.kind!="flash" && feedback==null)Column(Modifier.align(Alignment.BottomEnd).padding(end=18.dp,bottom=with(density){footerHeight.toDp()}+12.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        FloatingActionButton({focus.clearFocus();scratchpadOpen=true},Modifier.onGloballyPositioned{scratchpadAnchor=it.screenBounds(view)},containerColor=Mist,contentColor=Teal) {
-            Icon(Icons.Rounded.EditNote,"Ouvrir le brouillon",Modifier.size(28.dp))
-        }
-        FloatingActionButton({focus.clearFocus();calculatorOpen=true},Modifier.onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
-            Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",modifier=Modifier.size(28.dp))
-        }
-    }
     }
     FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor,resetKey=s to key)
     key(s,key) { FloatingScratchpad(scratchpadOpen,{scratchpadOpen=false},scratchpad,scratchpadAnchor) }
@@ -284,10 +291,10 @@ fun solution(q:Question):String=when(q.kind){
     Surface(onClick=onClick,enabled=enabled,modifier=Modifier.fillMaxWidth(),shape=RoundedCornerShape(17.dp),
         color=if(good)Mist else if(selected)Color(0xFFFFE9CC) else Color.White,
         border=BorderStroke(if(selected||good)2.dp else 1.dp,if(good)Teal else if(selected)Color(0xFFE5A246) else Color(0xFFD5DEDA))) {
-        MorseAwareText(text,Modifier.padding(horizontal=14.dp,vertical=12.dp).heightIn(min=24.dp),fontSize=15.sp,lineHeight=21.sp,fontWeight=if(selected||good)FontWeight.Bold else FontWeight.Medium,color=Ink)
+        FormulaAwareAnswer(text,Modifier.padding(horizontal=14.dp,vertical=12.dp).heightIn(min=24.dp),bold=selected||good)
     }
 }
-@Composable fun Resistor(bands:List<String>) {
+@Composable fun Resistor(bands:List<String>,showLabels:Boolean=true) {
     val colors=mapOf("noir" to Color.Black,"brun" to Color(0xFF865239),"marron" to Color(0xFF865239),"rouge" to Color(0xFFE54546),"orange" to Color(0xFFFF953E),"jaune" to Color(0xFFF7D345),"vert" to Color(0xFF43A77B),"bleu" to Color(0xFF4276CA),"violet" to Purple,"gris" to Color.Gray,"blanc" to Color.White,"or" to Gold,"argent" to Color.LightGray)
     Column(horizontalAlignment=Alignment.CenterHorizontally,modifier=Modifier.fillMaxWidth()) {
         Canvas(Modifier.fillMaxWidth().height(115.dp)) {
@@ -296,7 +303,7 @@ fun solution(q:Question):String=when(q.kind){
             drawRoundRect(Color(0xFFF0D3A5),Offset(w*.14f,h*.2f),Size(w*.72f,h*.6f),CornerRadius(25f))
             bands.forEachIndexed{i,color->val x=if(i==bands.size-1)w*.74f else w*(.25f+i*.12f);drawRect(colors[color.lowercase()]?:Teal,Offset(x,h*.2f),Size(w*.045f,h*.6f))}
         }
-        Text(bands.joinToString(" · "),fontSize=12.sp,color=Muted)
+        if(showLabels)Text(bands.joinToString(" · "),fontSize=12.sp,color=Muted)
     }
 }
 @Composable fun FrequencyDial(frequency:Float) {

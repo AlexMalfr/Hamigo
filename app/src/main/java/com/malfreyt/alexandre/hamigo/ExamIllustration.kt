@@ -4,8 +4,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
@@ -14,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -21,10 +25,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
@@ -45,6 +55,10 @@ object ExamImageProcessor {
         output.indices.forEach { i ->
             val value=if(paper!=null) removePaper(output[i],paper) else output[i]
             output[i]=value
+        }
+        if(paper!=null)removeIsolatedSpecks(output,width,height)
+        output.indices.forEach {i ->
+            val value=output[i]
             if(android.graphics.Color.alpha(value)>20 && (paper!=null || !near(value,output[0],8))) {
                 val x=i%width; val y=i/width
                 left=minOf(left,x); right=maxOf(right,x); top=minOf(top,y); bottom=maxOf(bottom,y)
@@ -62,6 +76,35 @@ object ExamImageProcessor {
         return cropped
     }
 
+    /** Only 1–9 neutral pixels, at most 3×3, with no other ink within 12 source pixels.
+     * Punctuation, dotted lines and circuit junctions remain attached to their nearby ink. */
+    private fun removeIsolatedSpecks(pixels:IntArray,width:Int,height:Int) {
+        val visited=BooleanArray(pixels.size);val queue=IntArray(pixels.size)
+        fun ink(index:Int)=android.graphics.Color.alpha(pixels[index])>20
+        for(seed in pixels.indices) {
+            if(visited[seed]||!ink(seed))continue
+            var count=1;var cursor=0;queue[0]=seed;visited[seed]=true
+            var left=seed%width;var right=left;var top=seed/width;var bottom=top
+            while(cursor<count) {
+                val at=queue[cursor++];val x=at%width;val y=at/width
+                left=minOf(left,x);right=maxOf(right,x);top=minOf(top,y);bottom=maxOf(bottom,y)
+                for(ny in maxOf(0,y-1)..minOf(height-1,y+1))for(nx in maxOf(0,x-1)..minOf(width-1,x+1)) {
+                    val next=ny*width+nx
+                    if(!visited[next]&&ink(next)){visited[next]=true;queue[count++]=next}
+                }
+            }
+            if(count>9||right-left>2||bottom-top>2)continue
+            val dots=(0 until count).map {queue[it]}
+            if(dots.any {val rgb=listOf(android.graphics.Color.red(pixels[it]),android.graphics.Color.green(pixels[it]),android.graphics.Color.blue(pixels[it]));rgb.max()-rgb.min()>15})continue
+            var nearby=false
+            for(y in maxOf(0,top-12)..minOf(height-1,bottom+12))for(x in maxOf(0,left-12)..minOf(width-1,right+12)) {
+                val at=y*width+x
+                if(at !in dots && ink(at))nearby=true
+            }
+            if(!nearby)dots.forEach {pixels[it]=android.graphics.Color.TRANSPARENT}
+        }
+    }
+
     private fun paperColour(pixels:IntArray,width:Int,height:Int):Int? {
         val samples=ArrayList<Int>()
         for(x in 0 until width step max(1,width/40)) {samples+=pixels[x];samples+=pixels[(height-1)*width+x]}
@@ -77,7 +120,10 @@ object ExamImageProcessor {
 
     /** Reverse matte compositing to preserve crisp antialiased text and coloured circuit elements. */
     private fun removePaper(pixel:Int,paper:Int):Int {
-        if(near(pixel,paper,2)) return android.graphics.Color.TRANSPARENT
+        // PNG palette rounding/dithering can vary the same pale paper by a few levels.
+        // Test it before inverse compositing: a +1 on a nearly saturated channel
+        // (e.g. green 254 -> 255) otherwise gives alpha=1 and falsely defines the crop.
+        if(near(pixel,paper,6)) return android.graphics.Color.TRANSPARENT
         val channels=intArrayOf(android.graphics.Color.red(pixel),android.graphics.Color.green(pixel),android.graphics.Color.blue(pixel))
         val background=intArrayOf(android.graphics.Color.red(paper),android.graphics.Color.green(paper),android.graphics.Color.blue(paper))
         var alpha=0.0
@@ -117,25 +163,58 @@ object ExamImageProcessor {
     }
 }
 
-/** Image only: pinch and pan, double-tap to reset; Android back dismisses the full-screen view. */
+/** Original image above the current page; pinch/pan, double-tap reset, tap outside or back closes. */
 @Composable fun FullscreenExamIllustration(original:ImageBitmap,onDismiss:()->Unit) {
-    Dialog(onDismissRequest=onDismiss,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
-        var zoom by remember {mutableFloatStateOf(1f)}
-        var offset by remember {mutableStateOf(Offset.Zero)}
-        Box(Modifier.fillMaxSize().background(Color.Black)) {
+    Dialog(onDismissRequest=onDismiss,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false,dismissOnClickOutside=false)) {
+        val view=LocalView.current
+        SideEffect {
+            (view.parent as? DialogWindowProvider)?.window?.let {window->
+                window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+            }
+        }
+        val state=remember(original){ExamImageViewport()}
+        val dismiss by rememberUpdatedState(onDismiss)
+        val padding=with(LocalDensity.current){24.dp.toPx()}
+        BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.64f)).testTag("exam-image-overlay")
+            .pointerInput(original,padding) {
+                var lastTap=0L;var lastPoint=Offset.Zero
+                awaitEachGesture {
+                    val first=awaitFirstDown(requireUnconsumed=false);first.consume()
+                    val viewport=Size(size.width.toFloat(),size.height.toFloat())
+                    val image=fitExamImage(Size(original.width.toFloat(),original.height.toFloat()),viewport,padding)
+                    val beganInside=state.bounds(viewport,image).contains(first.position)
+                    var fingers=1;var moved=false;var lastPosition=first.position
+                    do {
+                        val event=awaitPointerEvent()
+                        fingers=max(fingers,event.changes.count {it.pressed})
+                        val pan=event.calculatePan();val change=event.calculateZoom()
+                        val position=event.changes.firstOrNull {it.id==first.id}?.position ?: lastPosition
+                        if((position-first.position).getDistance()>viewConfiguration.touchSlop)moved=true
+                        lastPosition=position
+                        if(fingers>1||moved) {
+                            val centroid=event.calculateCentroid(useCurrent=false)
+                            if(centroid!=Offset.Unspecified)state.transform(centroid,pan,change,viewport,image)
+                        }
+                        event.changes.forEach {it.consume()}
+                    } while(event.changes.any {it.pressed})
+                    if(fingers==1&&!moved) {
+                        if(!beganInside&&!state.bounds(viewport,image).contains(lastPosition))dismiss()
+                        else {
+                            val now=first.uptimeMillis
+                            if(lastTap>0&&now-lastTap<=viewConfiguration.doubleTapTimeoutMillis&&(first.position-lastPoint).getDistance()<viewConfiguration.touchSlop*3) {
+                                state.doubleTap(first.position,viewport,image);lastTap=0
+                            } else {lastTap=now;lastPoint=first.position}
+                        }
+                    } else lastTap=0
+                }
+            },contentAlignment=Alignment.Center) {
+            val fitted=fitExamImage(Size(original.width.toFloat(),original.height.toFloat()),Size(constraints.maxWidth.toFloat(),constraints.maxHeight.toFloat()),padding)
+            val density=LocalDensity.current
             Image(original,"Illustration originale : pincer pour zoomer",contentScale=ContentScale.Fit,
-                modifier=Modifier.fillMaxSize()
-                    .pointerInput(original) {detectTransformGestures {centroid,pan,change,_ ->
-                        val old=zoom; val next=(old*change).coerceIn(1f,8f)
-                        val center=Offset(size.width/2f,size.height/2f)
-                        val focal=centroid-center
-                        val nextOffset=(offset-focal)*(next/old)+focal+pan
-                        zoom=next
-                        offset=Offset(nextOffset.x.coerceIn(-size.width*(next-1)/2f,size.width*(next-1)/2f),
-                            nextOffset.y.coerceIn(-size.height*(next-1)/2f,size.height*(next-1)/2f))
-                    }}
-                    .pointerInput(original) {detectTapGestures(onDoubleTap={zoom=1f;offset=Offset.Zero})}
-                    .graphicsLayer {scaleX=zoom;scaleY=zoom;translationX=offset.x;translationY=offset.y})
+                modifier=Modifier.width(with(density){fitted.width.toDp()}).height(with(density){fitted.height.toDp()})
+                    .testTag("exam-image-original").semantics {stateDescription="Zoom ${(state.zoom*100).roundToInt()} %"}
+                    .graphicsLayer {scaleX=state.zoom;scaleY=state.zoom;translationX=state.offset.x;translationY=state.offset.y})
         }
     }
 }

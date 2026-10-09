@@ -1,6 +1,8 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -17,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.Lifecycle
@@ -45,6 +48,8 @@ private object LessonIntroNavigation {
     val context=LocalContext.current
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context,lesson.id,returnTarget) {if(returnTarget==null)LessonSpeech(context) else null}
+    val companion=rememberPicoCompanion("lesson-${lesson.id}-${model.lessonOpening}",enabled=returnTarget==null)
+    val touch=rememberPicoNarrationTap("lesson-${lesson.id}-${model.lessonOpening}")
     DisposableEffect(speech,lifecycle) {
         val observer=LifecycleEventObserver {_,event->if(event==Lifecycle.Event.ON_STOP)speech?.stop()}
         lifecycle.addObserver(observer)
@@ -75,13 +80,19 @@ private object LessonIntroNavigation {
         LazyColumn(Modifier.weight(1f).testTag("lesson-introduction-list").onGloballyPositioned {viewport=it.boundsInWindow()},state=list,contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             item {PageHeader(lesson.title,lesson.summary){model.lesson=null}}
             item {
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val picoSize=if(maxWidth<340.dp)108.dp else 124.dp
                 Row(verticalAlignment=Alignment.CenterVertically) {
-                    Pico(Modifier.size(64.dp),mood=MascotMood.THINKING,pose=MascotPose.POINT)
+                    TalkingPico(Modifier.size(picoSize).alignBy(PicoBodyCenter).testTag("lesson-pico")
+                        .semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours avec Pico" else "Écouter le cours avec Pico";stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(speech?.speaking==true)"Pico parle" else companion.mood.description}
+                        .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},talking=speech?.speaking==true,
+                        mood=if(touch.playful)touch.mood else if(speech?.reading==true)MascotMood.HAPPY else companion.mood,pose=if(touch.playful)MascotPose.HUG else companion.pose,mirrored=true,pointLeft=true,eyesClosed=touch.closedEyes,idleMotion=companion.active,reaction=if(touch.playful)touch.burst else 0)
                     Spacer(Modifier.width(12.dp))
-                    Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f),fontWeight=FontWeight.Bold,color=Teal)
-                    IconButton({speech?.toggle(lesson)},Modifier.size(48.dp).testTag("lesson-listen"),enabled=speech!=null) {
+                    Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f).alignBy {it.measuredHeight/2},fontWeight=FontWeight.Bold,color=Teal)
+                    IconButton({touch.audio {speech?.toggle(lesson)}},Modifier.size(48.dp).alignBy {it.measuredHeight/2}.testTag("lesson-listen"),enabled=speech!=null) {
                         Icon(if(speech?.reading==true)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,if(speech?.reading==true)"Arrêter la lecture du cours" else "Écouter le cours",tint=Teal)
                     }
+                }
                 }
             }
             lesson.body.forEachIndexed { index,paragraph -> item {

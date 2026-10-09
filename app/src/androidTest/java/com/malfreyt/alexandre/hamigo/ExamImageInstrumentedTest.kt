@@ -13,6 +13,25 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ExamImageInstrumentedTest {
+    @Test fun isolatedExamSpecksAreRemovedButNearbyPunctuationAndDiagramMarksStay() {
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        for(id in listOf("20978","20003")) {
+            val original=context.assets.open("exam1/images/$id.png").use(BitmapFactory::decodeStream)!!
+            val untouched=original.copy(Bitmap.Config.ARGB_8888,false)
+            val preview=ExamImageProcessor.preview(original)
+            try {assertTrue(original.sameAs(untouched));assertTrue("Only the text should define the crop for $id",preview.height<130)}
+            finally {original.recycle();untouched.recycle();preview.recycle()}
+        }
+        val original=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888)
+        Canvas(original).drawColor(Color.rgb(255,254,206))
+        val black=Paint().apply {color=Color.BLACK}
+        Canvas(original).drawRect(40f,40f,70f,55f,black)
+        original.setPixel(75,53,Color.BLACK) // A punctuation mark near text.
+        original.setPixel(160,85,Color.BLACK) // Isolated scan noise.
+        val preview=ExamImageProcessor.preview(original)
+        try {assertEquals(68,preview.width);assertEquals(47,preview.height);assertEquals(Color.BLACK,preview.getPixel(51,29))}
+        finally {original.recycle();preview.recycle()}
+    }
     @Test fun yellowPaperBecomesTransparentAndInkIsCroppedWithoutChangingTheOriginal() {
         val original=Bitmap.createBitmap(770,350,Bitmap.Config.ARGB_8888)
         val paper=Color.rgb(255,254,206)

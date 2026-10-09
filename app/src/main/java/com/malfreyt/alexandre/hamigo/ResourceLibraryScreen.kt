@@ -256,6 +256,11 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             if (rows.isEmpty()) item { Text("Aucun repère trouvé dans cette fiche.", color = Muted, fontSize = 14.sp) }
             item { CompleteCourseLink(cat.source,model.content?.courseSources?.get(cat.id).orEmpty()) }
             item { MemoFeedbackButton(cat) }
+            item {
+                Box(Modifier.fillMaxWidth().padding(top=12.dp,bottom=8.dp),contentAlignment=Alignment.Center) {
+                    Pico(Modifier.size(84.dp).testTag("memo-footer-pico"),pose=MascotPose.WAVE)
+                }
+            }
         }
     }
 }

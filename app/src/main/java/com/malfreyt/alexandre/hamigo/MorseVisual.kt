@@ -59,12 +59,13 @@ fun morseTextParts(text: String): List<MorseTextPart> {
 
 /** Font-independent signals, including the word divider, with an accessible spoken equivalent. */
 @OptIn(ExperimentalLayoutApi::class)
-@Composable fun MorseVisual(code: String, modifier: Modifier = Modifier, compact: Boolean = false, color: Color = Teal) {
+@Composable fun MorseVisual(code: String, modifier: Modifier = Modifier, compact: Boolean = false, color: Color = Teal,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start) {
     val normalized = normalizedMorse(code)
     val tokens = Regex("[.-]+|/|[^.\\-/\\s]+").findAll(normalized).map { it.value }.toList()
     val unit = if (compact) 4.dp else 6.dp
     val height = if (compact) 21.dp else 28.dp
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp,horizontalAlignment), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         tokens.forEach { token ->
             if (token.all { it == '.' || it == '-' }) {
                 val units = token.sumOf { if (it == '.') 2 else 4 } - 1
@@ -91,17 +92,24 @@ fun morseTextParts(text: String): List<MorseTextPart> {
 /** Use for legacy course prose as well as flashcard backs; ASCII stays a storage/audio format. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable fun MorseAwareText(text: String, modifier: Modifier = Modifier, fontSize: TextUnit = 14.sp,
-    color: Color = Ink, fontWeight: FontWeight? = null, lineHeight: TextUnit = TextUnit.Unspecified) {
+    color: Color = Ink, fontWeight: FontWeight? = null, lineHeight: TextUnit = TextUnit.Unspecified,
+    textAlign: androidx.compose.ui.text.style.TextAlign? = null,maxLines:Int=Int.MAX_VALUE,
+    overflow:androidx.compose.ui.text.style.TextOverflow=androidx.compose.ui.text.style.TextOverflow.Clip) {
+    val alignment=when(textAlign) {
+        androidx.compose.ui.text.style.TextAlign.End,androidx.compose.ui.text.style.TextAlign.Right -> Alignment.End
+        androidx.compose.ui.text.style.TextAlign.Center -> Alignment.CenterHorizontally
+        else -> Alignment.Start
+    }
     if (isMorseNotation(text)) {
-        MorseVisual(text, modifier, compact = fontSize.value <= 16, color = color)
+        MorseVisual(text, modifier, compact = fontSize.value <= 16, color = color,horizontalAlignment=alignment)
         return
     }
     val parts = morseTextParts(text)
     if (parts.none { it.code }) {
-        Text(text, modifier, fontSize = fontSize, color = color, fontWeight = fontWeight, lineHeight = lineHeight)
+        Text(text, modifier, fontSize = fontSize, color = color, fontWeight = fontWeight, lineHeight = lineHeight, textAlign = textAlign,maxLines=maxLines,overflow=overflow)
         return
     }
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(3.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(3.dp,alignment), verticalArrangement = Arrangement.spacedBy(3.dp)) {
         fun plain(value: String): List<String> = value.trim().split(Regex("\\s+")).filter { it.isNotBlank() }
         parts.forEach { part ->
             if (part.code) Box(Modifier.align(Alignment.CenterVertically)) { MorseVisual(part.text, compact = true, color = color) }

@@ -344,7 +344,13 @@ private data class BackScreenSnapshot(
             },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds},friendRequestCount=model.friendRequests.size)
         }
     }) { padding ->
-        val contentPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
+        val regularPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
+        // An active question paints its footer behind the system navigation area.
+        // The footer owns that inset, so its controls retain their previous safe position.
+        val contentPadding=if(model.session?.done==false)PaddingValues(
+            start=regularPadding.calculateStartPadding(layoutDirection),top=regularPadding.calculateTopPadding(),
+            end=regularPadding.calculateEndPadding(layoutDirection),bottom=0.dp
+        )else regularPadding
         CompositionLocalProvider(LocalNavigationContentOverlap provides if(raisedBarVisible)HamigoNavigationContentOverlap else 0.dp, LocalBackMotionAnchors provides backAnchors,
             LocalAnimatedBack provides { (context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed() }) {
         Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)
