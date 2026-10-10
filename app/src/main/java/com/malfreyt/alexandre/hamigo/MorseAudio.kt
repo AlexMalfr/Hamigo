@@ -43,7 +43,8 @@ internal object MorseSignalAudio {
 
 private val morseAudioScope=CoroutineScope(SupervisorJob()+Dispatchers.Default)
 private var morseAudioJob:Job?=null
-fun stopMorse(){morseAudioJob?.cancel();morseAudioJob=null}
+internal fun stopMorsePlayback(){morseAudioJob?.cancel();morseAudioJob=null}
+fun stopMorse(){stopMorsePlayback();MorseSidetone.stopOthers()}
 fun playMorse(code:String) {
     stopMorse()
     val owner=Any();FeedbackAudioGate.reserve(owner)

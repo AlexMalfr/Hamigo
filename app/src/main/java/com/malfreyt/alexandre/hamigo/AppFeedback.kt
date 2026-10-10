@@ -27,7 +27,8 @@ internal object FeedbackPreferences {
 internal object FeedbackAudioGate {
     private val owners=java.util.Collections.synchronizedSet(mutableSetOf<Any>())
     val busy get()=owners.isNotEmpty()
-    fun reserve(owner:Any){owners.add(owner);AppFeedback.active?.silence()}
+    fun ownedBy(owner:Any)=owners.contains(owner)
+    fun reserve(owner:Any){MorseSidetone.stopOthers(owner);owners.add(owner);AppFeedback.active?.silence()}
     fun release(owner:Any){owners.remove(owner)}
 }
 

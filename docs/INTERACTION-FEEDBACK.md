@@ -46,6 +46,14 @@ Deux gerbes de papier partent du bas, dans la palette turquoise/corail/doré, av
 
 ## Démarrage du Morse
 
-Toutes les écoutes (questions, Mémo, traducteur et composition) utilisent le même tampon : **180 ms de souffle avant le premier signal**, souffle très bas pendant les pauses/tons et extinction douce. La durée d'un point reste 90 ms, celle d'un trait trois points, les espaces un/trois/sept points. Le début ne dépend pas de l'arrivée tardive d'un premier buffer tonal.
+Les lectures explicitement lancées (questions, Mémo, traducteur et relecture d'une composition) utilisent le même tampon : **180 ms de souffle avant le premier signal**, souffle très bas pendant les pauses/tons et extinction douce. La durée d'un point reste 90 ms, celle d'un trait trois points, les espaces un/trois/sept points. Le début ne dépend pas de l'arrivée tardive d'un premier buffer tonal.
 
 Ce préambule réduit le risque de perdre le premier point sur un chemin audio qui s'ouvre lentement. Il ne constitue pas une mesure de latence ni une garantie sur tous les haut-parleurs et accessoires Bluetooth ; ces derniers nécessitent une écoute physique sur le matériel concerné.
+
+## Écoute pendant la saisie — 0.46
+
+Dans Gameplay → Saisie du Morse, « Écoute pendant la saisie » est activée par défaut. Elle suit aussi **Sons** (y compris le bouton de mute des questions) et le volume média. Deux boutons : chaque point/trait saisi joue 90/270 ms, avec une pause entre les signaux si les saisies sont rapprochées. Un bouton : le son commence au toucher et suit la durée réelle de l'appui, sans attendre sa classification en point/trait au relâchement. Les actions TalkBack jouent le signal choisi. Cela fonctionne aussi dans le traducteur et l'essai des paramètres, ainsi que dans les questions diagnostiques qui copient le réglage local.
+
+Un AudioTrack en streaming mono 48 kHz prépare la sortie pendant que le contrôle est disponible au premier plan ; il reste silencieux hors transmission. Blocs de 5 ms, demande du mode faible latence et enveloppe de 6 ms autour du signal à 700 Hz. Aucun préambule de 180 ms par appui, aucune nouvelle piste créée à chaque point. La latence réelle dépend toujours de la sortie et du matériel, en particulier du Bluetooth : les tests logiciels ne la mesurent pas. Référence : [AudioTrack.Builder](https://developer.android.com/reference/android/media/AudioTrack.Builder).
+
+Relâchement ou annulation du geste arrêtent le manipulateur. Le mute, la désactivation du contrôle, sa disparition et le passage en arrière-plan ferment la piste ; les écoutes pédagogiques et les voix ont priorité. Les clics d'interface sont suspendus pendant le signal, les retours tactiles restent disponibles. Un échec audio ne bloque pas la composition. Le nouveau choix sonore reste local à l'appareil comme Sons/Vibrations : il n'ajoute aucun champ au Gist, ne modifie pas son schéma ni l'horodatage des préférences cloud à lui seul, et ne requiert aucune migration.

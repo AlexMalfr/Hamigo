@@ -40,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -682,9 +684,17 @@ fun SettingsScreen(model: AppModel) {
         GameplayPreferences.save(progress.prefs, value)
         model.refresh(); model.refreshSocial()
     }
-    Panel {
+    Panel(Modifier.testTag("morse-gameplay")) {
         Text("Saisie du Morse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Text("Dans les questions et le traducteur.", fontSize = 12.sp, color = Muted)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("Écoute pendant la saisie", fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 19.sp)
+                Text("Quand les sons sont activés.", fontSize = 12.sp, lineHeight = 16.sp, color = Muted)
+            }
+            Switch(settings.liveSound, { save(settings.copy(liveSound = it)) },
+                Modifier.testTag("morse-live-sound").semantics { contentDescription = "Écoute pendant la saisie" })
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             FilterChip(!settings.singleKey, feedbackClick { save(settings.copy(singleKey = false)) },
                 label = { Text("Deux boutons") }, modifier = Modifier.weight(1f))

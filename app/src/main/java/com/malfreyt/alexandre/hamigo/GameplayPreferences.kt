@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class MorseInputSettings(val singleKey: Boolean = false, val thresholdMs: Int = 300) {
+data class MorseInputSettings(val singleKey: Boolean = false, val thresholdMs: Int = 300, val liveSound: Boolean = true) {
     fun symbolFor(durationMs: Long): Char = if (durationMs >= thresholdMs.coerceIn(150, 600)) '-' else '.'
     // The point/trait decision sits midway between one-unit dots and three-unit dashes.
     val letterPauseMs get()=thresholdMs.coerceIn(150,600)*3L/2
@@ -30,12 +30,18 @@ data class MorseInputSettings(val singleKey: Boolean = false, val thresholdMs: I
 object GameplayPreferences {
     const val SINGLE_KEY = "morseSingleKey"
     const val THRESHOLD = "morseThresholdMs"
+    const val LIVE_SOUND = "morseLiveSound"
     fun read(prefs: SharedPreferences) = MorseInputSettings(
-        prefs.getBoolean(SINGLE_KEY, false), prefs.getInt(THRESHOLD, 300).coerceIn(150, 600))
+        prefs.getBoolean(SINGLE_KEY, false), prefs.getInt(THRESHOLD, 300).coerceIn(150, 600), prefs.getBoolean(LIVE_SOUND, true))
     fun save(prefs: SharedPreferences, settings: MorseInputSettings) = synchronized(Progress.CLOUD_LOCK) {
+        val previous = read(prefs)
         prefs.edit().putBoolean(SINGLE_KEY, settings.singleKey)
             .putInt(THRESHOLD, settings.thresholdMs.coerceIn(150, 600))
-            .putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
+            .putBoolean(LIVE_SOUND, settings.liveSound) // Like Sons: a local audio choice, excluded from Gists.
+            .apply {
+                if (previous.singleKey != settings.singleKey || previous.thresholdMs != settings.thresholdMs.coerceIn(150, 600))
+                    putLong("preferencesUpdatedAt", System.currentTimeMillis())
+            }.apply()
     }
 }
 
@@ -45,7 +51,7 @@ object GameplayPreferences {
     var settings by remember(prefs) { mutableStateOf(GameplayPreferences.read(prefs)) }
     DisposableEffect(prefs) {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == GameplayPreferences.SINGLE_KEY || key == GameplayPreferences.THRESHOLD) settings = GameplayPreferences.read(prefs)
+            if (key == GameplayPreferences.SINGLE_KEY || key == GameplayPreferences.THRESHOLD || key == GameplayPreferences.LIVE_SOUND) settings = GameplayPreferences.read(prefs)
         }
         prefs.registerOnSharedPreferenceChangeListener(listener)
         onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
@@ -59,17 +65,19 @@ object GameplayPreferences {
     onPressChanged: ((Boolean) -> Unit)? = null,
     onSignal: (Char) -> Unit) {
     val settings = rememberMorseInputSettings()
+    val live by rememberUpdatedState(rememberMorseLiveOutput(enabled && settings.liveSound))
     val send by rememberUpdatedState(onSignal)
     val timedSend by rememberUpdatedState(onTimedSignal)
     val pressChanged by rememberUpdatedState(onPressChanged)
     fun accessibleSignal(symbol: Char) {
+        live?.signal(symbol)
         val now=android.os.SystemClock.uptimeMillis()
         timedSend?.invoke(symbol,now,now) ?: send(symbol)
     }
     if (!settings.singleKey) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf('.' to "Point", '-' to "Trait").forEach { (symbol, label) ->
-                Button(feedbackClick { send(symbol) }, Modifier.weight(1f).height(52.dp), enabled = enabled) {
+                Button(feedbackClick { live?.signal(symbol); send(symbol) }, Modifier.weight(1f).height(52.dp), enabled = enabled) {
                     MorseVisual(symbol.toString(), compact = true, color = Color.White)
                     Spacer(Modifier.width(8.dp)); Text(label, fontWeight = FontWeight.Bold)
                 }
@@ -89,7 +97,7 @@ object GameplayPreferences {
                     }
                 }.pointerInput(enabled, settings.thresholdMs) {
                     if (enabled) awaitEachGesture {
-                        val down = awaitFirstDown(); down.consume(); pressed = true;pressChanged?.invoke(true)
+                        val down = awaitFirstDown(); down.consume(); pressed = true;pressChanged?.invoke(true);live?.key(true)
                         try {
                             val up = waitForUpOrCancellation()
                             if (up != null) {
@@ -97,7 +105,7 @@ object GameplayPreferences {
                                 val symbol=settings.symbolFor(up.uptimeMillis-down.uptimeMillis)
                                 timedSend?.invoke(symbol,down.uptimeMillis,up.uptimeMillis) ?: send(symbol)
                             }
-                        } finally { pressed = false;pressChanged?.invoke(false) }
+                        } finally { live?.key(false);pressed = false;pressChanged?.invoke(false) }
                     }
                 }) {
             Column(Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally,

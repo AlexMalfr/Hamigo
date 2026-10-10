@@ -305,3 +305,10 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 
 - Les questions de test et le bac à sable héritent aussi des préférences Gameplay, dont le mode Morse et son timing. Ces copies restent isolées des paramètres réels.
 - L'aperçu « Équipe · deux amis » n'avait pas de registre de résultats Android pour son launcher de permission caméra et plantait à sa création. Le contexte diagnostic fournit désormais un registre local qui annule tous les lancements ; Équipe et les paramètres peuvent s'afficher sans activer les permissions ou les actions externes.
+
+## Morse entendu pendant la composition — 0.46
+
+- Le point/trait saisi est audible, et le manipulateur à un bouton sonne pendant l'appui : plus besoin de relire toute la transmission pour l'entendre. S'applique aux questions, aux diagnostics, au traducteur et à l'essai de Gameplay.
+- Réglage « Écoute pendant la saisie » dans Gameplay → Saisie du Morse, activé par défaut et soumis au réglage Sons. Les écoutes pédagogiques explicitement demandées restent disponibles indépendamment de ces deux réglages.
+- Une piste préparée, silencieuse au repos, évite de recréer la sortie à chaque appui. Arrêt au relâchement/annulation, au mute, à la sortie de l'écran et en arrière-plan ; priorité aux lectures et aux voix.
+- Choix sonore local, aucune migration ni modification du schéma des Gists. Détails : [INTERACTION-FEEDBACK.md](INTERACTION-FEEDBACK.md).

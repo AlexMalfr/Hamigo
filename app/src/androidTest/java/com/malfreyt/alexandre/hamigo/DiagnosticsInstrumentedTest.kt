@@ -48,12 +48,36 @@ class DiagnosticsInstrumentedTest {
     private lateinit var model:AppModel
     @Before fun load(){model=ViewModelProvider(ui.activity)[AppModel::class.java];ui.waitUntil(60_000){model.content!=null&&!model.socialRefreshing};ui.runOnIdle {model.showWelcome=false}}
     private fun q()=Question("debug-fixture","Quelle commande ouvre le contact ?",listOf("Le manipulateur","Le fusible"),0,"Le manipulateur commande le signal.")
+    @Test fun morseSettingsExposeLiveAudioAndDiagnosticCopiesKeepItLocal() {
+        val before=raw()
+        ui.runOnIdle {model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("morse-gameplay"))
+        ui.onNodeWithTag("morse-gameplay").performScrollTo()
+        ui.onNodeWithTag("morse-live-sound").assertIsOn().performClick().assertIsOff()
+        assertFalse(GameplayPreferences.read(model.progress.prefs).liveSound)
+        assertFalse(model.progress.export().contains(GameplayPreferences.LIVE_SOUND))
+        ui.onNodeWithText("Un bouton").performClick()
+        ui.onNodeWithTag("morse-live-sound").assertIsOff()
+        ui.onNodeWithTag("morse-gameplay").performScrollTo()
+        capture("morse-live-settings-off")
+        ui.onNodeWithTag("morse-live-sound").performClick().assertIsOn()
+        capture("morse-live-settings-on")
+        ui.onNodeWithTag("morse-single-key").performScrollTo().assertIsDisplayed()
+        capture("morse-live-settings-key")
+        val demo=AppModel().apply {initializeDiagnostics(context,model,model.content!!)}
+        try {
+            assertTrue(GameplayPreferences.read(demo.progress.prefs).liveSound)
+            GameplayPreferences.save(demo.progress.prefs,GameplayPreferences.read(demo.progress.prefs).copy(liveSound=false))
+            assertTrue(GameplayPreferences.read(model.progress.prefs).liveSound)
+        } finally {demo.disposeDiagnostics()}
+        assertEquals(before,raw())
+    }
     private fun inside(matcher:SemanticsMatcher)=ui.onNode(matcher and hasAnyAncestor(hasTestTag("diagnostics-screen")))
     private fun text(value:String)=inside(hasText(value))
     private fun raw()=model.progress.prefs.getString("progress",null)
     private fun capture(name:String) {
         ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}};assertTrue(latch.await(5,TimeUnit.SECONDS))}
-        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),"ui-0.45").apply {mkdirs()}
+        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),if(name.startsWith("morse-live-"))"ui-0.46" else "ui-0.45").apply {mkdirs()}
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }
 
