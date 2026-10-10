@@ -63,15 +63,15 @@ object LearningRules {
     fun lessonPassed(correct: Int, count: Int) = count > 0 && correct * 5 >= count * 4
 }
 
-class Content(private val context: Context) {
-    private val resourceLinks=JSONObject(json("lesson-resources.json"))
+class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=ExamBankStore.forContext(context).snapshot(), base:Content?=null) {
+    private val resourceLinks:JSONObject=base?.resourceLinks ?: JSONObject(json("lesson-resources.json"))
     val courseSources: Map<String,String> = resourceLinks.getJSONObject("courseSources").let { sources -> sources.keys().asSequence().associateWith(sources::getString) }
     private val lessonReferenceIds=resourceLinks.getJSONObject("lessonReferences")
     fun referencesFor(lesson:Lesson):List<RefCategory> = lessonReferenceIds.optJSONArray(lesson.id)?.strings().orEmpty().mapNotNull { id->references.firstOrNull { it.id==id } }
     private fun json(path: String) = context.assets.open(path).bufferedReader().use { it.readText() }
-    val courseQuestions:List<Question> = JSONObject(json("course-questions.json")).getJSONArray("questions").objects().map {parseQuestion(it)}
+    val courseQuestions:List<Question> = base?.courseQuestions ?: JSONObject(json("course-questions.json")).getJSONArray("questions").objects().map {parseQuestion(it)}
     private val courseBank=courseQuestions.associateBy {it.id}
-    val chapters: List<Chapter> = JSONObject(json("curriculum.json")).getJSONArray("chapters").objects().map { c ->
+    val chapters: List<Chapter> = base?.chapters ?: JSONObject(json("curriculum.json")).getJSONArray("chapters").objects().map { c ->
         Chapter(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("lessons").objects().map { l ->
             val topic = l.optString("topic")
             Lesson(l.getString("id"), l.getString("title"), l.optString("summary"), l.getJSONArray("body").strings(),
@@ -80,30 +80,27 @@ class Content(private val context: Context) {
         })
     }
     val lessons = chapters.flatMap { it.lessons }
-    val references = JSONObject(json("reference.json")).getJSONArray("categories").objects().map { c ->
+    val references:List<RefCategory> = base?.references ?: JSONObject(json("reference.json")).getJSONArray("categories").objects().map { c ->
         RefCategory(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("rows").objects().map {
             RefRow(it.getString("term"), it.getString("description"), it.optString("extra"),
                 it.optString("group"), it.optString("kind", "fact"), it.optString("visual"),
                 it.optString("source"), it.optString("region"), it.optString("cardId")) }, c.optBoolean("flashcards", true),
             c.optString("group"), c.optInt("order"), c.optString("intro"), c.optString("source").let { source -> if(source.startsWith("http://f6kgl.free.fr/COURS.html")) courseSources[c.getString("id")] ?: source else source })
     }
-    val exam: List<Question> = run {
-        val raw = json("exam1/questions.json").trim()
-        val array = if (raw.startsWith("[")) JSONArray(raw) else JSONObject(raw).getJSONArray("questions")
-        array.objects().map { parseQuestion(it) }
-    }
-    val excluded = runCatching { JSONArray(json("exam1/excluded.json")).strings().toSet() }.getOrDefault(emptySet())
+    val exam: List<Question> = examSnapshot?.questions.orEmpty()
+    val excluded = examSnapshot?.excluded.orEmpty()
     val activeExam = exam.filter { it.id !in excluded }
-    val flashcards = references.filter { it.flashcards }.flatMap { cat -> cat.rows.mapIndexedNotNull { i, row ->
+    val flashcards:List<Question> = base?.flashcards ?: references.filter { it.flashcards }.flatMap { cat -> cat.rows.mapIndexedNotNull { i, row ->
         val preservedExample = row.kind == "example" && row.cardId.matches(Regex("flash-.+-\\d{1,3}"))
         if ((!preservedExample && row.kind in setOf("tip", "example")) || row.region in setOf("2", "3")) return@mapIndexedNotNull null
         Question(row.cardId.ifBlank { "flash-${cat.id}-$i" }, row.term, listOf(row.description), 0, row.extra,
             topic = cat.id, kind = "flash", source = cat.title, visual = row.visual.takeIf { it.startsWith("logic:") }.orEmpty())
     } }
-    val procedural = ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
+    val procedural:List<Question> = base?.procedural ?: ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
     val mixIndex = PracticeMixIndex(activeExam, procedural)
     val allQuestions = (lessons.flatMap { it.questions } + exam + flashcards + procedural).associateBy { it.id }
     val topics = activeExam.groupBy { it.topic }.toSortedMap()
+    fun withExam(snapshot:ExamBankSnapshot?)=Content(context,snapshot,this)
     fun nextLesson(completed: Set<String>) = lessons.firstOrNull { it.id !in completed }
     private fun parseQuestion(q: JSONObject, fallbackTopic: String = ""): Question {
         val pairs = q.optJSONArray("pairs")?.objects()?.map { PairItem(it.getString("left"), it.getString("right")) } ?: emptyList()

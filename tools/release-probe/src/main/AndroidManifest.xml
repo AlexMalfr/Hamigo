@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:label="Hamigo release probe" android:testOnly="true" />
+    <instrumentation android:name=".ReleaseProbe" android:targetPackage="com.malfreyt.alexandre.hamigo" android:functionalTest="true" />
+</manifest>

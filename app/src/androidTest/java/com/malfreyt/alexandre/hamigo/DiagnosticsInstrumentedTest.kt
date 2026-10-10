@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -158,6 +160,78 @@ class DiagnosticsInstrumentedTest {
         capture("content47-exam1-test")
         assertEquals(before,raw())
     }
+    @Test fun diagnosticImagesEnlargeAndZoomWithoutChangingTheFilteredPage() {
+        val before=raw();val target=model.content!!.exam.first {it.id=="20081"}
+        val matches=DiagnosticData.search(model.content!!.allQuestions.values.toList(),"2008","","Exam1",DiagnosticData.courseLocations(model.content!!))
+        val initial=matches.indexOfFirst {it.id==target.id};assertTrue(initial>=0);assertTrue(matches.size>1)
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
+        ui.onNodeWithTag("diagnostic-bank-Exam1").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput("2008")
+        ui.waitUntil(10000){ui.onAllNodesWithText("${matches.size} résultats").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("diagnostic-catalog").performScrollToNode(hasTestTag("diagnostic-question-${target.id}"))
+        ui.onNodeWithTag("diagnostic-question-${target.id}").performClick()
+        ui.onNodeWithTag("diagnostic-question-position").assertTextEquals("${initial+1} / ${matches.size}")
+        ui.waitUntil(15000){ui.onAllNodesWithText("Toucher pour agrandir").fetchSemanticsNodes().isNotEmpty()}
+        capture("catalog48-exam-detail")
+        text("Toucher pour agrandir").performScrollTo().performClick()
+        val original=ui.onNodeWithTag("exam-image-original");val overlay=ui.onNodeWithTag("exam-image-overlay")
+        original.assertIsDisplayed();capture("catalog48-exam-original")
+        fun zoomPercent()=original.fetchSemanticsNode().config[SemanticsProperties.StateDescription].removePrefix("Zoom ").removeSuffix(" %").toInt()
+        val fittedHeight=original.fetchSemanticsNode().boundsInRoot.height
+        overlay.performTouchInput {
+            down(0,center-Offset(50f,0f));down(1,center+Offset(50f,0f))
+            for(i in 1..10){moveTo(0,center-Offset(50f+i*6f,0f));moveTo(1,center+Offset(50f+i*6f,0f));advanceEventTime(20);move()}
+            up(0);up(1)
+        }
+        val enlarged=zoomPercent();assertTrue(enlarged>100)
+        overlay.performTouchInput {click(center+Offset(0f,fittedHeight*.8f))}
+        overlay.assertIsDisplayed();capture("catalog48-exam-zoom")
+        overlay.performTouchInput {
+            down(0,center-Offset(110f,0f));down(1,center+Offset(110f,0f))
+            for(i in 1..10){moveTo(0,center-Offset(110f-i*6f,0f));moveTo(1,center+Offset(110f-i*6f,0f));advanceEventTime(20);move()}
+            up(0);up(1)
+        }
+        assertTrue(zoomPercent()<enlarged)
+        overlay.performTouchInput {click(Offset(8f,8f))};overlay.assertDoesNotExist()
+        ui.onNodeWithTag("diagnostic-question-position").assertTextEquals("${initial+1} / ${matches.size}")
+        text("Toucher pour agrandir").performClick();androidx.test.espresso.Espresso.pressBack()
+        overlay.assertDoesNotExist()
+        val next=if(initial<matches.lastIndex)initial+1 else initial-1
+        ui.onNodeWithTag("diagnostic-question-pager").performTouchInput {if(next>initial)swipeLeft() else swipeRight()}
+        ui.onNodeWithTag("diagnostic-detail-${matches[next].id}").assertIsDisplayed()
+        ui.onNodeWithTag("diagnostic-question-position").assertTextEquals("${next+1} / ${matches.size}")
+        capture("catalog48-exam-next")
+        ui.onNodeWithTag("diagnostic-question-detail").performTouchInput {swipeUp()}
+        ui.onNodeWithTag("diagnostic-question-position").assertTextEquals("${next+1} / ${matches.size}")
+        assertEquals(before,raw())
+    }
+    @Test fun diagnosticPagingRespectsFilteredOrderEdgesAndTestsTheVisibleQuestion() {
+        val before=raw()
+        val matches=DiagnosticData.search(model.content!!.allQuestions.values.toList(),"proc-band-","","Variante",DiagnosticData.courseLocations(model.content!!))
+        assertTrue(matches.size>=3)
+        ui.runOnIdle {model.debugToolsOpen=true;model.diagnostics.enable(true)}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
+        ui.onNodeWithTag("diagnostic-bank-Variante").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput("proc-band-")
+        ui.waitUntil(10000){ui.onAllNodesWithText("${matches.size} résultats").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("diagnostic-catalog").performScrollToNode(hasTestTag("diagnostic-question-${matches[1].id}"))
+        ui.onNodeWithTag("diagnostic-question-${matches[1].id}").performClick()
+        ui.onNodeWithTag("diagnostic-question-pager").performTouchInput {swipeRight()}
+        ui.onNodeWithTag("diagnostic-detail-${matches[0].id}").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Question précédente").assertIsNotEnabled()
+        ui.onNodeWithTag("diagnostic-question-pager").performTouchInput {swipeRight()}
+        ui.onNodeWithTag("diagnostic-question-position").assertTextEquals("1 / ${matches.size}")
+        ui.onNodeWithContentDescription("Question suivante").performClick()
+        ui.onNodeWithTag("diagnostic-detail-${matches[1].id}").assertIsDisplayed()
+        capture("catalog48-native-next")
+        text("Tester cette question").performScrollTo().performClick()
+        inside(hasText("${matches[1].id} · ${matches[1].kind} · 1/1")).assertIsDisplayed()
+        inside(hasContentDescription("Quitter la séance")).performClick()
+        assertEquals(before,raw())
+    }
     @Test fun morseOrderingShowsPlainLabelsWithoutGivingAwayTheDurations() {
         val before=raw()
         val question=model.content!!.lessons.first {it.id=="c15-l09"}.questions.first {it.kind=="order"}
@@ -199,7 +273,7 @@ class DiagnosticsInstrumentedTest {
     private fun raw()=model.progress.prefs.getString("progress",null)
     private fun capture(name:String) {
         ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}};assertTrue(latch.await(5,TimeUnit.SECONDS))}
-        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),when {name.startsWith("content47-")->"ui-0.47";name.startsWith("morse-live-")->"ui-0.46";else->"ui-0.45"}).apply {mkdirs()}
+        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),when {name.startsWith("catalog48-")->"ui-0.48";name.startsWith("content47-")->"ui-0.47";name.startsWith("morse-live-")->"ui-0.46";else->"ui-0.45"}).apply {mkdirs()}
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }
 

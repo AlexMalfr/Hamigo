@@ -2,6 +2,7 @@ package com.malfreyt.alexandre.hamigo
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -140,15 +141,24 @@ object ExamImageProcessor {
     }
 }
 
+/** Bounded derived image cache: back/next/review do not decode and recrop the same PNG. */
+internal object ExamArtworkCache {
+    private val cache=object:LruCache<String,ExamArtwork>(8*1024*1024) {
+        override fun sizeOf(key:String,value:ExamArtwork)=4*(value.original.width*value.original.height+value.preview.width*value.preview.height)
+    }
+    fun peek(path:String?)=path?.let {cache.get(it)}
+    fun load(context:android.content.Context,path:String):ExamArtwork?=cache.get(path) ?: runCatching {
+        val original=ExamBankStore.forContext(context).openImage(path).use(BitmapFactory::decodeStream)
+        requireNotNull(original)
+        ExamArtwork(original.asImageBitmap(),ExamImageProcessor.preview(original).asImageBitmap()).also {cache.put(path,it)}
+    }.getOrNull()
+}
+
 @Composable fun rememberExamArtwork(path:String?):ExamArtwork? {
     val context=LocalContext.current
-    val result by produceState<ExamArtwork?>(null,path) {
+    val result by produceState<ExamArtwork?>(ExamArtworkCache.peek(path),path) {
         value=withContext(Dispatchers.Default) {
-            path?.let {runCatching {
-                val original=context.assets.open(it).use(BitmapFactory::decodeStream)
-                requireNotNull(original)
-                ExamArtwork(original.asImageBitmap(),ExamImageProcessor.preview(original).asImageBitmap())
-            }.getOrNull()}
+            path?.let {ExamArtworkCache.load(context,it)}
         }
     }
     return result

@@ -1,7 +1,7 @@
 param([switch]$Download)
 $ErrorActionPreference = 'Stop'
 $examRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$examSources = Join-Path $examRoot 'data/sources/exam1'
+$examSources = Join-Path $examRoot '.tools/exam1-sources'
 $examImages = Join-Path $examSources 'images'
 New-Item -ItemType Directory -Force -Path $examSources,$examImages | Out-Null
 if ($Download) {

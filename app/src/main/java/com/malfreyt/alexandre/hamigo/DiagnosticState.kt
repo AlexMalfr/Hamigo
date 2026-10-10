@@ -133,7 +133,7 @@ internal object DiagnosticData {
         model.refresh()
         model.friends=listOf(Friend(ShareProgress("Léa · Démo",960,5,6,180)),Friend(ShareProgress("Sam · Démo",1720,12,11,240)))
     }
-    fun origin(q:Question)=when {q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
+    fun origin(q:Question)=when {q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.image?.startsWith("exam-bank/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
     fun typeName(kind:String)=when(kind) {
         "choice"->"Choix unique";"truefalse"->"Vrai / faux";"match"->"Associations";"order"->"Ordre";"sort"->"Classement"
         "number"->"Calcul numérique";"frequency"->"Fréquence";"estimate"->"Estimation";"binary"->"Binaire"

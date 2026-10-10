@@ -5,6 +5,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
@@ -32,7 +34,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+private data class DiagnosticSelection(val questions:List<Question>,val initialPage:Int)
 
 @Composable internal fun DiagnosticHud(owner:AppModel,shown:AppModel,modifier:Modifier=Modifier) {
     val state=owner.diagnostics
@@ -65,7 +70,7 @@ import kotlinx.coroutines.withContext
     val inspector=remember(owner,content){AppModel().apply {initializeDiagnostics(context,owner,content)}}
     DisposableEffect(inspector){onDispose {inspector.disposeDiagnostics()}}
     var tab by remember {mutableStateOf("Outils")}
-    var selected by remember {mutableStateOf<Question?>(null)}
+    var selected by remember {mutableStateOf<DiagnosticSelection?>(null)}
     var mock by remember {mutableStateOf<String?>(null)}
     fun back(){when {inspector.session!=null->inspector.leaveSession();selected!=null->selected=null;mock!=null->mock=null;else->owner.debugToolsOpen=false}}
     Dialog(onDismissRequest=::back,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
@@ -87,9 +92,9 @@ import kotlinx.coroutines.withContext
                             // The real session underneath stays covered; this visible test is not.
                             CompositionLocalProvider(LocalDiagnosticsCovered provides false,LocalContext provides inspector.diagnosticContext,LocalAnimatedBack provides {inspector.leaveSession()},LocalNavigationContentOverlap provides 0.dp) {QuizScreen(inspector)}
                         }
-                        selected!=null->DiagnosticQuestionDetail(selected!!,content,courseLocations) {inspector.startQuestions("Test · ${selected!!.id}",listOf(selected!!));selected=null}
+                        selected!=null->DiagnosticQuestionPager(selected!!,content,courseLocations) {q->inspector.startQuestions("Test · ${q.id}",listOf(q));selected=null}
                         mock!=null->DiagnosticMock(owner,content,mock!!)
-                        tab=="Questions"->DiagnosticCatalog(content,courseLocations) {selected=it}
+                        tab=="Questions"->DiagnosticCatalog(content,courseLocations) {q,matches->selected=DiagnosticSelection(matches,matches.indexOfFirst {it.id==q.id})}
                         tab=="Types"->LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                             item {Action("Tester tous les types"){inspector.startQuestions("Tour des types",DiagnosticData.representatives(content))}}
                             items(DiagnosticData.representatives(content),key={it.kind}) {q->Panel {
@@ -189,7 +194,7 @@ import kotlinx.coroutines.withContext
 }
 
 @OptIn(ExperimentalLayoutApi::class,ExperimentalMaterial3Api::class)
-@Composable private fun DiagnosticCatalog(content:Content,courseLocations:Map<String,List<String>>,choose:(Question)->Unit) {
+@Composable private fun DiagnosticCatalog(content:Content,courseLocations:Map<String,List<String>>,choose:(Question,List<Question>)->Unit) {
     val all=remember(content){content.allQuestions.values.toList()}
     var query by remember {mutableStateOf("")};var kind by remember {mutableStateOf("")};var menu by remember {mutableStateOf(false)}
     var bank by remember {mutableStateOf("")}
@@ -211,7 +216,7 @@ import kotlinx.coroutines.withContext
             Spacer(Modifier.weight(1f));Text("${matches.size} résultat${if(matches.size!=1)"s" else ""}",fontSize=12.sp,color=Muted)
         }
         LazyColumn(Modifier.weight(1f).testTag("diagnostic-catalog"),verticalArrangement=Arrangement.spacedBy(7.dp),contentPadding=PaddingValues(bottom=18.dp)) {
-            items(matches,key={it.id}) {q->Surface(onClick={choose(q)},modifier=Modifier.testTag("diagnostic-question-${q.id}"),shape=RoundedCornerShape(15.dp),color=Color.White) {
+            items(matches,key={it.id}) {q->Surface(onClick={choose(q,matches)},modifier=Modifier.testTag("diagnostic-question-${q.id}"),shape=RoundedCornerShape(15.dp),color=Color.White) {
                 Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(3.dp)) {
                     Text(q.id,fontFamily=FontFamily.Monospace,fontSize=12.sp,color=Teal,fontWeight=FontWeight.Bold)
                     MorseAwareText(q.prompt.take(180)+(if(q.prompt.length>180)"…" else ""),fontSize=14.sp,lineHeight=19.sp)
@@ -224,11 +229,29 @@ import kotlinx.coroutines.withContext
     }
 }
 
-@Composable private fun DiagnosticQuestionDetail(q:Question,content:Content,courseLocations:Map<String,List<String>>,test:()->Unit) {
+@Composable private fun DiagnosticQuestionPager(selection:DiagnosticSelection,content:Content,courseLocations:Map<String,List<String>>,test:(Question)->Unit) {
+    val pager=rememberPagerState(initialPage=selection.initialPage,pageCount={selection.questions.size})
+    val scope=rememberCoroutineScope()
+    Column(Modifier.fillMaxSize()) {
+        Row(Modifier.fillMaxWidth().padding(horizontal=14.dp),verticalAlignment=Alignment.CenterVertically) {
+            IconButton({scope.launch {pager.animateScrollToPage(pager.currentPage-1)}},enabled=pager.currentPage>0&&!pager.isScrollInProgress) {Icon(Icons.Rounded.ChevronLeft,"Question précédente")}
+            Text("${pager.currentPage+1} / ${selection.questions.size}",Modifier.weight(1f).testTag("diagnostic-question-position"),color=Muted,fontSize=12.sp,textAlign=androidx.compose.ui.text.style.TextAlign.Center)
+            IconButton({scope.launch {pager.animateScrollToPage(pager.currentPage+1)}},enabled=pager.currentPage<selection.questions.lastIndex&&!pager.isScrollInProgress) {Icon(Icons.Rounded.ChevronRight,"Question suivante")}
+        }
+        HorizontalPager(pager,Modifier.weight(1f).fillMaxWidth().testTag("diagnostic-question-pager"),key={selection.questions[it].id},verticalAlignment=Alignment.Top) {page->
+            val q=selection.questions[page]
+            DiagnosticQuestionDetail(q,content,courseLocations,active=page==pager.currentPage) {test(q)}
+        }
+    }
+}
+
+@Composable private fun DiagnosticQuestionDetail(q:Question,content:Content,courseLocations:Map<String,List<String>>,active:Boolean,test:()->Unit) {
     var reveal by remember(q.id){mutableStateOf(false)}
+    var enlarged by remember(q.id){mutableStateOf(false)}
     val illustration=rememberExamArtwork(q.image)
-    LazyColumn(Modifier.testTag("diagnostic-question-detail"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        item {Panel {Text(q.id,fontFamily=FontFamily.Monospace,color=Teal,fontWeight=FontWeight.Bold);Text("${q.kind} · ${q.section} · ${q.topic}",fontSize=12.sp,color=Muted);MorseAwareText(q.prompt,fontWeight=FontWeight.Bold);illustration?.let {ExamIllustration(it,{})}}}
+    if(enlarged&&active)illustration?.let {FullscreenExamIllustration(it.original){enlarged=false}}
+    LazyColumn(Modifier.fillMaxSize().then(if(active)Modifier.testTag("diagnostic-question-detail") else Modifier),contentPadding=PaddingValues(start=14.dp,end=14.dp,bottom=14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+        item {Panel {Text(q.id,Modifier.testTag("diagnostic-detail-${q.id}"),fontFamily=FontFamily.Monospace,color=Teal,fontWeight=FontWeight.Bold);Text("${q.kind} · ${q.section} · ${q.topic}",fontSize=12.sp,color=Muted);MorseAwareText(q.prompt,fontWeight=FontWeight.Bold);illustration?.let {ExamIllustration(it,{enlarged=true})}}}
         item {Action("Tester cette question",onClick=test)}
         item {Panel {
             Text("Origine : ${q.source}",fontSize=12.sp,color=Muted)

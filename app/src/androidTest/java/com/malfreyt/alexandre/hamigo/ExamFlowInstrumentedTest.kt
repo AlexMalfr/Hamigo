@@ -32,7 +32,7 @@ class ExamFlowInstrumentedTest {
             model=ViewModelProvider(store,object:ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST") override fun <T:ViewModel> create(modelClass:Class<T>):T=AppModel() as T
             })[AppModel::class.java]
-            model.initialize(isolated)
+            model.initialize(isolated,startExamUpdates=false)
             model.startQuestions("Examen témoin",List(40) {index->Question("exam-flow-$index","Question $index",listOf("Oui","Non"),0,"Une explication",section=if(index<20)"regulation" else "technique")},exam=true)
         }
     }

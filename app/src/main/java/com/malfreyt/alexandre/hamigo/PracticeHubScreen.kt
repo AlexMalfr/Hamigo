@@ -25,6 +25,12 @@ import kotlin.random.Random
     val groups=index.groups
     val keys=index.keys
     var selected by remember {mutableStateOf(keys)}
+    var previousKeys by remember {mutableStateOf(keys)}
+    LaunchedEffect(keys) {
+        selected=if(selected==previousKeys)keys else selected.intersect(keys)
+        previousKeys=keys
+    }
+    val bankReady=content.examSnapshot!=null
     var count by remember {mutableIntStateOf(20)}
     var themesOpen by remember {mutableStateOf(false)}
     var customSelected by remember {mutableStateOf(false)}
@@ -49,10 +55,11 @@ import kotlin.random.Random
     }
     LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
+        if(!bankReady)item {Panel(color=Mist) {ExamBankLoading(model)}}
         item {Panel(color=Color(0xFFFFE8E0)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.School,null,tint=Coral);Spacer(Modifier.width(8.dp));Eyebrow("EXAMEN BLANC",Color(0xFFAC493B))}
             Text("20 questions réglementation en 15 min, puis 20 technique en 30 min. Il faut 10/20 dans chaque partie.",fontSize=13.sp,lineHeight=19.sp)
-            Action("Lancer un examen blanc") {
+            Action("Lancer un examen blanc",enabled=bankReady) {
                 val questions=content.activeExam.filter {it.section=="regulation"}.shuffled().take(20)+content.activeExam.filter {it.section=="technique"}.shuffled().take(20)
                 model.startQuestions("Examen blanc",questions,exam=true)
             }
@@ -60,11 +67,11 @@ import kotlin.random.Random
         item {Panel {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.Shuffle,null,tint=Purple);Spacer(Modifier.width(8.dp));Eyebrow("MIX SUR MESURE",Purple)}
             QuestionCountSelector(count,customSelected,{n,isCustom ->count=n;customSelected=isCustom},"mix-question-count","custom-question-count")
-            if(count>available)Text("Choisis plus de thèmes ou réduis la longueur du mix.",fontSize=12.sp,color=Coral)
-            Action("Lancer mon mix",enabled=count in 1..available) {
+            if(bankReady&&count>available)Text("Choisis plus de thèmes ou réduis la longueur du mix.",fontSize=12.sp,color=Coral)
+            Action("Lancer mon mix",enabled=bankReady&&count in 1..available) {
                 model.startQuestions("Mix radio · $count questions",index.questions(selected,count))
             }
-            TextButton(feedbackClick {themesOpen=!themesOpen},Modifier.fillMaxWidth()) {Icon(if(themesOpen)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null);Spacer(Modifier.width(8.dp));Text("Choisir les thèmes · ${selected.size}/${keys.size}")}
+            if(bankReady)TextButton(feedbackClick {themesOpen=!themesOpen},Modifier.fillMaxWidth()) {Icon(if(themesOpen)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null);Spacer(Modifier.width(8.dp));Text("Choisir les thèmes · ${selected.size}/${keys.size}")}
             if(themesOpen) {
                 TextButton(feedbackClick {selected=if(selected==keys)emptySet() else keys},contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Text(if(selected==keys)"Tout désélectionner" else "Tout sélectionner",fontSize=12.sp)}
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 40.dp) {

@@ -586,6 +586,7 @@ fun SettingsScreen(model: AppModel) {
             }
         }
         item { SettingsCategory("Sources", Icons.Rounded.MenuBook) }
+        item { ExamBankSettings(model) }
         item {
             Panel {
                 Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp)) {
@@ -607,7 +608,7 @@ fun SettingsScreen(model: AppModel) {
                 }) {
                 Text("Hamigo ${BuildConfig.VERSION_NAME}", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
                 val lessonCount = model.content?.lessons?.size ?: 0
-                Text("$lessonCount leçons · banque Exam1 REF hors ligne\nVérification pédagogique : 3 octobre 2026",
+                Text("$lessonCount leçons · ${model.content?.references?.size ?: 0} fiches Mémo\nVérification pédagogique : 3 octobre 2026",
                     fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
             }
         }
