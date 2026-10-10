@@ -16,7 +16,7 @@ class ExamImageInstrumentedTest {
     @Test fun isolatedExamSpecksAreRemovedButNearbyPunctuationAndDiagramMarksStay() {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
         for(id in listOf("20978","20003")) {
-            val original=context.assets.open("exam1/images/$id.png").use(BitmapFactory::decodeStream)!!
+            val original=ExamBankTestFixtures.open(context,id).use(BitmapFactory::decodeStream)!!
             val untouched=original.copy(Bitmap.Config.ARGB_8888,false)
             val preview=ExamImageProcessor.preview(original)
             try {assertTrue(original.sameAs(untouched));assertTrue("Only the text should define the crop for $id",preview.height<130)}
@@ -53,7 +53,7 @@ class ExamImageInstrumentedTest {
 
     @Test fun bundledImageKeepsAnOriginalYellowVersionAndHasAnUnmattedReadablePreview() {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
-        val original=context.assets.open("exam1/images/10001.png").use {BitmapFactory.decodeStream(it)}!!
+        val original=ExamBankTestFixtures.open(context,"10001").use {BitmapFactory.decodeStream(it)}!!
         val untouched=original.copy(Bitmap.Config.ARGB_8888,false)
         val preview=ExamImageProcessor.preview(original)
         try {

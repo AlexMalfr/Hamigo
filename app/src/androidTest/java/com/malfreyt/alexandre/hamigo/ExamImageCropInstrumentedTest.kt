@@ -17,7 +17,7 @@ import java.io.File
 class ExamImageCropInstrumentedTest {
     @Test fun paperPaletteNoiseDoesNotDecentreQuestion20081() {
         val context=InstrumentationRegistry.getInstrumentation().targetContext
-        val original=context.assets.open("exam1/images/20081.png").use(BitmapFactory::decodeStream)!!
+        val original=ExamBankTestFixtures.open(context,"20081").use(BitmapFactory::decodeStream)!!
         val untouched=original.copy(Bitmap.Config.ARGB_8888,false)
         val preview=ExamImageProcessor.preview(original)
         try {

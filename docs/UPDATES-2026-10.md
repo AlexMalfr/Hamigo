@@ -341,3 +341,11 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - La réception reste active après le premier réglage, sans arrêt temporisé au relâchement. Une lecture de Pico ou de Morse la suspend puis elle reprend seule ; validation, mute, sortie et arrière-plan arrêtent la piste.
 - Le message français est allongé et bouclé avec une courte pause. La voix est progressivement filtrée, saturée et modulée lorsqu'on s'éloigne, en plus du souffle.
 - Le rééchantillonnage des longues synthèses ne déborde plus un entier lors du calcul des positions. Les samples restent bornés, et la boucle ne dépend plus d'un compteur qui pourrait déborder après une longue écoute.
+
+## Stockage optimisé et banque Exam1 téléchargée — 0.48
+
+- Les releases restent signées, non débogables, et activent maintenant R8 ainsi que la réduction des ressources. Les icônes et dépendances inutilisées sont retirées ; les points d’entrée Android persistants sont préservés.
+- Exam1 n’est plus distribué dans les nouveaux APK ou dans les fichiers actuels du dépôt. Le JSON et les PNG bruts viennent directement du serveur officiel, avec téléchargement durable dès l’accueil, vérification quotidienne et contrôle manuel/version dans les paramètres. Les vérifications sans changement et les corrections du JSON seules évitent de retélécharger les images. Les anciens commits et anciennes releases restent conservés comme demandé.
+- Tant que la banque manque, seuls l’examen et le mix Exam1 sont désactivés, avec progression affichée dans Défis ; les autres modes restent disponibles. Une mise à jour invalide garde la banque précédente et les séances conservent leur génération d’images.
+- Une seule archive compressée est conservée par génération, avec vérification du JSON, des images, CRC et empreintes ; les anciens dossiers sont nettoyés au prochain démarrage. Transparence, recadrage et nettoyage des images restent dynamiques et locaux, avec un cache mémoire limité.
+- Le contenu Hamigo déjà chargé est réutilisé quand la banque change. Aucun changement des identifiants, de la progression, des amis ou du format des Gists ; les téléchargements ne nécessitent pas GitHub. Détails : [EXAM1-DOWNLOAD.md](EXAM1-DOWNLOAD.md).

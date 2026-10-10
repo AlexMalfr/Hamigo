@@ -42,7 +42,7 @@ class AppModelStateTest {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T = AppModel() as T
             })[AppModel::class.java]
-            model.initialize(isolated)
+            model.initialize(isolated,startExamUpdates=false)
         }
         ui.setContent { HamigoTheme { HamigoApp(model) } }
         ui.waitUntil(60_000) { model.content != null }

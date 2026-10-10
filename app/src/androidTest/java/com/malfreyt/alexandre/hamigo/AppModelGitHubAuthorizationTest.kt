@@ -208,7 +208,7 @@ class AppModelGitHubAuthorizationTest {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T = AppModel(fake) as T
         })[AppModel::class.java]
-        model.initialize(isolated)
+        model.initialize(isolated,startExamUpdates=false)
         afterInitialize(model)
         model
     }

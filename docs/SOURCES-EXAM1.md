@@ -1,4 +1,8 @@
-# Banque Exam1 hors ligne
+# Banque Exam1 téléchargée et disponible hors ligne
+
+Depuis la **0.48**, aucun JSON, ZIP ou PNG de la banque n’est distribué dans les nouveaux APK ou dans l’état actuel du dépôt. L’application télécharge directement les fichiers officiels, en conservant les crédits ci-dessous. Les anciens commits et anciennes releases restent conservés à la demande de l’utilisateur. [Fonctionnement du téléchargement](EXAM1-DOWNLOAD.md).
+
+Les décomptes suivants documentent la capture initiale, et ne figent pas les futures versions :
 
 Snapshot téléchargé le **3 octobre 2026** depuis [Exam1 Web, hébergé par le REF](https://exam1.r-e-f.org/). La version déclarée dans le JSON est `2026-09-30T08:08:12+00:00`.
 
@@ -11,7 +15,7 @@ Snapshot téléchargé le **3 octobre 2026** depuis [Exam1 Web, hébergé par le
 | Technique | 1 340 |
 | Thèmes | 20 |
 | Images dans l'archive source complète | 3 092 |
-| Images associées aux questions actives, intégrées à l'application | 2 961 |
+| Images associées aux questions actives, associées à la capture initiale | 2 961 |
 | Images source supplémentaires, conservées dans les originaux | 131 |
 | Images nécessaires manquantes | 0 |
 | Séries prédéfinies source | 397 |
@@ -25,7 +29,7 @@ Les PNG sont essentiels. Certains contiennent seulement le texte de la question,
 
 ## Fichiers
 
-`data/sources/exam1/` conserve les téléchargements d'origine :
+La capture initiale est conservée localement sous `.tools/exam1-source-0.47/` (ignoré). Les nouveaux téléchargements de développement vont sous `.tools/exam1-sources/` :
 
 - `questions.raw.json` : [JSON complet des questions et thèmes](https://exam1.r-e-f.org/assets/questions.json).
 - `questions.zip` : [archive officielle de tous les PNG](https://exam1.r-e-f.org/assets/questions.zip), 34 815 376 octets.
@@ -35,7 +39,7 @@ Les PNG sont essentiels. Certains contiennent seulement le texte de la question,
 - `DbPopulator.java`, `QuestionsDownload.java`, `README-upstream.md`, `LICENCE-Exam1RA.txt` : preuve du téléchargement groupé et de la licence du logiciel Android upstream ; ce code n'est pas intégré à l'application.
 - `download.json` : URLs et date de capture.
 
-`app/src/main/assets/exam1/` contient les fichiers utilisés hors ligne :
+L’ancien import normalisé est conservé localement sous `.tools/exam1-bundled-0.47/` (ignoré). Le script génère désormais `.tools/exam1-normalized/` pour les audits, sans l’embarquer :
 
 - `questions.json` : tableau de 2 961 objets normalisés.
 - `images/{id}.png` : image de chaque question.
@@ -68,7 +72,7 @@ Un commentaire absent devient `""`, sans explication inventée. Le lien de cours
 
 La [page Exam1 du radio-club F6KGL/F5KFF](https://f6kgl-f5kff.fr/exam1/) explique que les versions Windows, Web et Android partagent la même banque, les mêmes images et les mêmes corrigés. Jean-Luc Fortin **F6GPX** maintient la banque à partir des comptes rendus de candidats et des corrections des contributeurs. **René F5AXG** a créé le logiciel historique, **Valentin Saugnier F4HVV** la version Web, et le **Réseau des Émetteurs Français** héberge le site. Le radio-club **F6KGL/F5KFF de la Haute Île** fournit les ressources et suit les mises à jour.
 
-Le [dépôt public Android Exam1RA de Maxime Favier F4IQN](https://github.com/Maxime-Favier/Exam1RA) porte une [licence GPL-3.0](https://github.com/Maxime-Favier/Exam1RA/blob/master/LICENCE). Son importeur `DbPopulator.java` donne directement les quatre URLs JSON/ZIP utilisées ici. Cette licence est celle du logiciel de ce dépôt. Aucun texte de licence distinct pour la banque JSON/ZIP du site Web n'a été trouvé dans les fichiers et pages consultés ; son statut ne doit donc pas être présenté comme une licence libre vérifiée. Les originaux et crédits sont conservés pour l'usage personnel privé demandé.
+Le [dépôt public Android Exam1RA de Maxime Favier F4IQN](https://github.com/Maxime-Favier/Exam1RA) porte une [licence GPL-3.0](https://github.com/Maxime-Favier/Exam1RA/blob/master/LICENCE). Son importeur `DbPopulator.java` donne directement les quatre URLs JSON/ZIP utilisées ici. Cette licence est celle du logiciel de ce dépôt. Aucun texte de licence distinct pour la banque JSON/ZIP du site Web n'a été trouvé dans les fichiers et pages consultés ; son statut ne doit donc pas être présenté comme une licence libre vérifiée. Les crédits sont conservés ; les ressources sont désormais téléchargées directement sur le serveur officiel, sans redistribution dans les nouveaux APK.
 
 ## Revue des éléments historiques
 

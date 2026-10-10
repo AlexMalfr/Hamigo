@@ -79,6 +79,20 @@ class AppModel internal constructor(
     lateinit var sync: GitHubSync
     private lateinit var friendInbox: FriendInboxCoordinator
     var content by mutableStateOf<Content?>(null)
+    internal var examBank by mutableStateOf(ExamBankStatus())
+    private var examRepository:ExamBankRepository?=null
+    internal fun checkExamBank() {
+        if(diagnosticModel){message="La banque ne se télécharge pas dans un aperçu.";return}
+        scope.launch {
+            val repository=examRepository ?: return@launch
+            val previous=repository.status.value.snapshot
+            if(repository.refresh(force=true))message=when {
+                previous==null->"La banque Exam’1 est prête."
+                previous.generation!=repository.status.value.snapshot?.generation->"La banque Exam’1 a été mise à jour."
+                else->"La banque Exam’1 est à jour."
+            }
+        }
+    }
     var error by mutableStateOf<String?>(null)
     var message by mutableStateOf<String?>(null)
     var revision by mutableIntStateOf(0)
@@ -141,7 +155,7 @@ class AppModel internal constructor(
         else message = notice
     }
     var pendingInvite by mutableStateOf<String?>(null)
-    fun initialize(ctx: Context) {
+    fun initialize(ctx: Context, startExamUpdates:Boolean=true) {
         if (::progress.isInitialized) return
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
@@ -161,10 +175,24 @@ class AppModel internal constructor(
         HomeWidgets.progressChanged(context)
         showWelcome = !progress.prefs.getBoolean("welcomed", false)
         scope.launch {
-            runCatching { withContext(Dispatchers.IO) { Content(context) } }
-                .onSuccess { content = it; loadFriends(); loadFriendRequests(); ProgressSyncScheduler.schedule(context); refreshSocial() }
+            runCatching { withContext(Dispatchers.IO) {
+                val repository=ExamBankRepository.forContext(context);repository.initialize();examRepository=repository
+                Content(context,repository.status.value.snapshot)
+            } }
+                .onSuccess {
+                    content = it;examBank=examRepository!!.status.value
+                    loadFriends(); loadFriendRequests(); ProgressSyncScheduler.schedule(context); refreshSocial()
+                    scope.launch {examRepository!!.status.collect {state->
+                        examBank=state
+                        val previous=content
+                        if(previous!=null&&previous.examSnapshot?.generation!=state.snapshot?.generation)
+                            content=withContext(Dispatchers.Default){previous.withExam(state.snapshot)}
+                    }}
+                }
                 .onFailure { error = "Chargement impossible : ${it.message}" }
         }
+        // Scheduled immediately, including during onboarding; it survives closing the app.
+        if(startExamUpdates)ExamBankScheduler.schedule(context)
     }
     fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false; revision++ }
     internal fun initializeDiagnostics(base:Context,parent:AppModel,loaded:Content) {
@@ -172,7 +200,7 @@ class AppModel internal constructor(
         progress=Progress(context,sideEffects=false);displayedProgress=progress
         FeedbackPreferences.save(progress.prefs,FeedbackPreferences.read(parent.progress.prefs))
         GameplayPreferences.save(progress.prefs,GameplayPreferences.read(parent.progress.prefs))
-        interactionFeedback=parent.interactionFeedback;diagnostics=parent.diagnostics;content=loaded
+        interactionFeedback=parent.interactionFeedback;diagnostics=parent.diagnostics;content=loaded;examBank=parent.examBank
         sync=GitHubSync(context,object:GitHubGateway {
             override suspend fun api(method:String,path:String,token:String?,body:String?):String=error("Diagnostic hors réseau")
             override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String=error("Diagnostic hors réseau")

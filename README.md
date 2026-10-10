@@ -49,7 +49,7 @@ Captures de l’application sur émulateur, avec des profils de démonstration. 
 
 **Android 8.0 ou plus récent.** Télécharge le fichier `Hamigo-…apk` depuis la [dernière release](https://github.com/AlexMalfr/Hamigo/releases/latest), puis installe-le sur ton téléphone.
 
-Au premier lancement, tu choisis ton pseudo, ton objectif et l’heure de ton rappel. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**.
+Au premier lancement, tu choisis ton pseudo, ton objectif et l’heure de ton rappel. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. La banque Exam’1 se télécharge automatiquement pendant l’accueil, puis reste disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
 
 ## Sauvegarde et équipe
 

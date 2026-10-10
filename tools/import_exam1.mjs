@@ -6,8 +6,8 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const rawDir = path.join(root, 'data/sources/exam1');
-const outDir = path.join(root, 'app/src/main/assets/exam1');
+const rawDir = path.join(root, '.tools/exam1-sources');
+const outDir = path.join(root, '.tools/exam1-normalized');
 const input = JSON.parse(fs.readFileSync(path.join(rawDir, 'questions.raw.json'), 'utf8').replace(/^\uFEFF/, ''));
 const downloadFile = path.join(rawDir, 'download.json');
 const download = fs.existsSync(downloadFile) ? JSON.parse(fs.readFileSync(downloadFile, 'utf8').replace(/^\uFEFF/, '')) : { downloadedOn: '2026-10-03' };

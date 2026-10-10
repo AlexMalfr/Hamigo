@@ -24,7 +24,7 @@ class ContentProgressTest {
     }
 
     @Test
-    fun packagedCurriculumReferencesAndExamAreCompleteAndUsable() {
+    fun packagedCurriculumAndDownloadedExamAreCompleteAndUsable() {
         val content = Content(context)
         assertTrue(content.lessons.size >= 90)
         assertTrue(content.lessons.sumOf { it.questions.size } >= 800)
@@ -47,7 +47,7 @@ class ContentProgressTest {
             assertTrue("Missing prompt: ${question.id}", question.prompt.isNotBlank())
             if (question.choices.isNotEmpty())
                 assertTrue("Answer out of bounds: ${question.id}", question.answer in question.choices.indices)
-            question.image?.let { path -> context.assets.open(path).use { assertTrue(it.read() >= 0) } }
+            question.image?.let { path -> ExamBankStore.forContext(context).openImage(path).use { assertTrue(it.read() >= 0) } }
         }
         assertEquals(content.lessons.first(), content.nextLesson(emptySet()))
         assertEquals(content.lessons[1], content.nextLesson(setOf(content.lessons.first().id)))
