@@ -116,7 +116,8 @@ export function splitDigitalReferences(categories) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === fs.realpathSync(process.argv[1])) {
     const curriculum=splitDigitalCurriculum(JSON.parse(fs.readFileSync('data/curriculum.json','utf8')));
-    for(const path of ['data/curriculum.json','app/src/main/assets/curriculum.json']) fs.writeFileSync(path,JSON.stringify(curriculum,null,2)+'\n');
+    const {persistCourseQuestions}=await import('./question_identities.mjs');
+    persistCourseQuestions(curriculum);
     const refs=JSON.parse(fs.readFileSync('data/reference-additions.json','utf8'));
     refs.categories=splitDigitalReferences(refs.categories);
     fs.writeFileSync('data/reference-additions.json',JSON.stringify(refs,null,2)+'\n');

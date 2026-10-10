@@ -45,4 +45,12 @@ class DiagnosticLogicTest {
         assertEquals(listOf(other),DiagnosticData.search(listOf(q,other),"","number"))
         assertEquals("exam1-20081",q.id)
     }
+    @Test fun catalogSearchIncludesEveryQuestionFieldAndCombinesWordsAcrossFields() {
+        val q=Question("q-opaque","Question sans indice",listOf("Mégahertz","Kilohertz"),0,"Une correction utile",topic="Radio",
+            section="regulation",kind="match",image="diagram.png",value=147.0,unit="MHz",tolerance=.05,
+            pairs=listOf(PairItem("Lampe","Récepteur")),source="Une source",bands=listOf("jaune"),visual="logic:and")
+        for(query in listOf("kilohertz correction","récepteur radio","diagram.png","147.0","0.05","MHz","logic:and","jaune","regulation match"))
+            assertEquals(query,listOf(q),DiagnosticData.search(listOf(q),query))
+        assertTrue(DiagnosticData.search(listOf(q),"kilohertz","number").isEmpty())
+    }
 }

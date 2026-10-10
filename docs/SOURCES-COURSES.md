@@ -1,10 +1,10 @@
 # Sources pédagogiques et vérifications
 
-Contenu préparé le 3 octobre 2026 et ressources Mémo complétées les 5 et 7 octobre pour Hamigo. Le parcours comporte **22 chapitres, 97 leçons et 850 exercices originaux**. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **40 catégories, 1 093 entrées et 970 flashcards**, dont les identifiants des 390 anciennes cartes sont conservés. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application ; ils ne recopient pas les paragraphes du cours. Les connaissances et tableaux des ressources sont suivis dans [la matrice Mémo](MEMO-COVERAGE-2026-10.md), [les sources radio](MEMO-RADIO-SOURCES.md) et [les sources techniques](MEMO-TECHNICAL-SOURCES.md). L'audit antérieur du parcours demeure dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
+Contenu préparé le 3 octobre 2026 et ressources Mémo complétées les 5 et 7 octobre pour Hamigo. Le parcours comporte **22 chapitres, 97 leçons et 842 exercices originaux actifs**. Huit rappels Morse répétitifs ont été retirés des 850 exercices historiques en 0.47. Les 56 leçons initiales ont chacune huit exercices, avec un paragraphe supplémentaire pour les pièges et le transfert. Les fiches de référence contiennent **40 catégories, 1 093 entrées et 970 flashcards**, dont les identifiants des 390 anciennes cartes sont conservés. Les paragraphes, exemples chiffrés et exercices du parcours sont rédigés pour l’application ; ils ne recopient pas les paragraphes du cours. Les connaissances et tableaux des ressources sont suivis dans [la matrice Mémo](MEMO-COVERAGE-2026-10.md), [les sources radio](MEMO-RADIO-SOURCES.md) et [les sources techniques](MEMO-TECHNICAL-SOURCES.md). L'audit antérieur du parcours demeure dans [CONTENT-AUDIT-2026-10.md](CONTENT-AUDIT-2026-10.md).
 
 ## Approfondissements du parcours
 
-Les identifiants des 14 chapitres, 56 leçons et 224 questions initiales sont conservés. Sept chapitres supplémentaires sont placés après les notions nécessaires :
+Les identifiants des chapitres et leçons initiaux sont conservés. Les anciennes clés de questions du Parcours sont associées à des UUID en 0.47, avec une migration temporaire préservant leur historique : [identités et retrait prévu en 0.52](QUESTION-IDENTITIES.md). Les approfondissements suivants sont placés après les notions nécessaires :
 
 - **c15 — Le Morse, de A à Z** : 14 leçons; les 26 lettres, les dix chiffres, la ponctuation courante, la temporisation, l’écoute, la composition, les mots et les groupes d’indicatif. Cette compétence reste facultative pour le certificat français, qui ne comporte pas d’épreuve Morse actuelle.
 - **c16 — Les maths du poste** : conversions, isolation d’inconnues, carrés et racines, rapports et lecture d’oscilloscope.
@@ -55,7 +55,7 @@ Le contenu utilise la **France métropolitaine, région 1 UIT**, pour les limite
 
 ## Format des données
 
-`data/curriculum.json` contient `chapters[].lessons[]`, avec un identifiant stable, un thème, des paragraphes explicatifs et au moins huit exercices par leçon. `app/src/main/assets/curriculum.json` est sa copie distribuée identique. Les types sont :
+`data/curriculum.json` contient `chapters[].lessons[]`, avec un identifiant stable, un thème, des paragraphes explicatifs et au moins huit exercices par leçon. La version distribuée référence leurs UUID dans la banque séparée `course-questions.json` ; elle n'est donc plus une copie identique du fichier d'édition. Les types sont :
 
 - `choice` : `choices` et `answer`, indice **commençant à zéro**.
 - `number` : `value`, `unit`, `tolerance` absolue. La liste de choix est vide.
@@ -79,7 +79,7 @@ Les choix des QCM sont distribués de manière déterministe : la réponse corre
 
 Les contrôles structurels vérifient les identifiants uniques, les paragraphes, les indices de réponses, les valeurs finies, les tolérances, les séquences et les paires sans ambiguïté. Les exercices de calcul ont été recalculés à partir des relations exposées : loi d’Ohm, puissance, série/parallèle, pont, RC, sinusoïde, transformateur, mélangeur, décibels, longueur d’onde et bilan de liaison. Les règles datées ont été comparées aux sources officielles ci-dessus. Les nouvelles notions de spectre, échantillonnage et lignes s’appuient aussi sur les sections correspondantes du cours F6KGL/F5KFF déjà archivé.
 
-`node tools/expand_curriculum.mjs` produit l’extension à partir des données actuelles et contrôle les contrats des types. Le script est idempotent : il remplace ses propres questions `q05` à `q08`, conserve les quatre questions initiales et régénère ses sept nouveaux chapitres à IDs fixes. Il ne télécharge aucune donnée et ne génère pas de question arbitraire en substituant des mots. Les variations numériques en séance appartiennent au générateur de l’application.
+`node tools/expand_curriculum.mjs` produit l’extension à partir des données actuelles et contrôle les contrats des types. Le script est idempotent : ses repères internes d'édition résolvent les UUID déjà attribués, tandis que les chapitres et leçons gardent leurs IDs. Il ne télécharge aucune donnée et ne génère pas de question arbitraire en substituant des mots. Les variations numériques en séance appartiennent au générateur de l’application. Les contrôles d'identité et de séparation du contenu sont décrits dans [QUESTION-IDENTITIES.md](QUESTION-IDENTITIES.md).
 
 Pour le Morse, la table factuelle et les durées ont été recoupées avec la **recommandation UIT-R M.1677-1 en vigueur** ([PDF français](https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-F.pdf)). Les explications pédagogiques et les activités sont originales; les tableaux et paragraphes du PDF ne sont pas reproduits comme document.
 

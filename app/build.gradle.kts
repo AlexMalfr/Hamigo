@@ -12,6 +12,10 @@ fun git(vararg args: String): String = runCatching {
     check(process.waitFor() == 0) { output }; output
 }.getOrDefault("")
 val commitCount = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
+// User-requested cleanup after five versions: block delivery until temporary 0.47 code is removed.
+check(commitCount < 52 || !rootProject.file("app/src/main/java/com/malfreyt/alexandre/hamigo/CourseQuestionMigration47.kt").exists()) {
+    "0.52: remove CourseQuestionMigration47, CourseQuestionAliases47 and their calls. Keep shipped UUIDs and the authoring registry."
+}
 // Explicitly requested revisions of an existing release keep its number; normal builds follow Git.
 val versionCommit = providers.gradleProperty("hamigoVersionCommit").orNull?.let {
     it.toInt().also { value -> require(value > 0) { "hamigoVersionCommit must be positive." } }

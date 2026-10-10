@@ -12,11 +12,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.util.concurrent.CopyOnWriteArraySet
 
-internal interface MorseLiveOutput {
+internal interface MorseLiveOutput : AutoCloseable {
     fun key(down: Boolean)
     fun signal(symbol: Char)
     fun stop()
-    fun close()
+    override fun close()
 }
 
 /** One prepared, silent stream while a visible key is usable. No new track per press. */
@@ -96,8 +96,13 @@ internal class MorseSidetone : MorseLiveOutput {
 internal val LocalMorseLiveFactory = staticCompositionLocalOf<() -> MorseLiveOutput> { { MorseSidetone() } }
 
 @Composable internal fun rememberMorseLiveOutput(enabled: Boolean): MorseLiveOutput? {
+    return rememberInteractiveAudio(enabled,LocalMorseLiveFactory.current)
+}
+
+/** Shared mute/lifecycle ownership for short, gesture-driven audio. */
+@Composable internal fun <T:AutoCloseable> rememberInteractiveAudio(enabled:Boolean,factory:()->T):T? {
     val context = LocalContext.current
-    var output by remember { mutableStateOf<MorseLiveOutput?>(null) }
+    var output by remember { mutableStateOf<T?>(null) }
     val prefs = remember(context) { context.getSharedPreferences("hamigo", Context.MODE_PRIVATE) }
     var sound by remember(prefs) { mutableStateOf(FeedbackPreferences.read(prefs).sound) }
     DisposableEffect(prefs) {
@@ -125,7 +130,6 @@ internal val LocalMorseLiveFactory = staticCompositionLocalOf<() -> MorseLiveOut
         lifecycle.addObserver(observer)
         onDispose { lifecycle.removeObserver(observer) }
     }
-    val factory = LocalMorseLiveFactory.current
     DisposableEffect(enabled && sound && resumed, lifecycleGeneration, factory) {
         val current = if (enabled && sound && resumed) factory() else null
         output = current

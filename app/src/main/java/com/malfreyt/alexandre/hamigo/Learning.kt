@@ -46,6 +46,9 @@ object SpacedRepetition {
 }
 
 object LearningRules {
+    /** Validate the quantized value the player sees, not the Float's binary approximation. */
+    fun sliderCorrect(input:Float,expected:Double,tolerance:Double,step:Double)=
+        numericCorrect(formatMeasuredNumber(input.toDouble(),step),expected,tolerance)
     fun streak(activeDays: Set<String>, today: LocalDate): Int {
         var cursor = if (today.toString() in activeDays) today else today.minusDays(1)
         var count = 0
@@ -66,11 +69,13 @@ class Content(private val context: Context) {
     private val lessonReferenceIds=resourceLinks.getJSONObject("lessonReferences")
     fun referencesFor(lesson:Lesson):List<RefCategory> = lessonReferenceIds.optJSONArray(lesson.id)?.strings().orEmpty().mapNotNull { id->references.firstOrNull { it.id==id } }
     private fun json(path: String) = context.assets.open(path).bufferedReader().use { it.readText() }
+    val courseQuestions:List<Question> = JSONObject(json("course-questions.json")).getJSONArray("questions").objects().map {parseQuestion(it)}
+    private val courseBank=courseQuestions.associateBy {it.id}
     val chapters: List<Chapter> = JSONObject(json("curriculum.json")).getJSONArray("chapters").objects().map { c ->
         Chapter(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("lessons").objects().map { l ->
             val topic = l.optString("topic")
             Lesson(l.getString("id"), l.getString("title"), l.optString("summary"), l.getJSONArray("body").strings(),
-                l.optString("formula"), topic, l.getJSONArray("questions").objects().map { parseQuestion(it, topic) },
+                l.optString("formula"), topic, l.getJSONArray("questionIds").strings().map {courseBank.getValue(it)},
                 l.optJSONArray("visuals")?.strings() ?: emptyList())
         })
     }
@@ -116,7 +121,14 @@ fun JSONArray.strings() = (0 until length()).map { getString(it) }
 class Progress(private val context: Context, private val sideEffects:Boolean=true) {
     companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
-    private var root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
+    private var root = loadState()
+    // Finish the identity conversion before another reader can load the old keys.
+    @android.annotation.SuppressLint("ApplySharedPref")
+    private fun loadState():JSONObject = synchronized(CLOUD_LOCK) {
+        val state=runCatching {JSONObject(prefs.getString("progress","{}")!!)}.getOrElse {JSONObject()}
+        if(CourseQuestionMigration47.apply(state))check(prefs.edit().putString("progress",state.toString()).commit())
+        state
+    }
     var name: String
         get() = prefs.getString("name", "Pilote des ondes")!!
         set(value) {
@@ -186,7 +198,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         if(sideEffects)DailyReminder.progressChanged(context)
     }
     fun reload() = synchronized(CLOUD_LOCK) {
-        root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
+        root = loadState()
     }
     fun setDailyGoal(goal:Int) {
         require(goal in 1..1000)
@@ -278,10 +290,9 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     }
     fun export() = cloudExport()
     fun import(json: String) {
-        val candidate = JSONObject(json)
+        val candidate = JSONObject(CloudProgress.validate(json))
         require(candidate.optString("app") == "hamigo" && candidate.optInt("schema") == 2) { "Ce fichier n'est pas une sauvegarde Hamigo actuelle." }
         val state = candidate.getJSONObject("progress")
-        CloudProgress.validate(json)
         require(state.optInt("xp") >= 0 && state.optInt("answers") >= 0) { "Sauvegarde invalide." }
         val importedReviews = state.optJSONObject("reviews") ?: JSONObject()
         require(importedReviews.length() <= 20_000) { "Sauvegarde trop volumineuse." }

@@ -42,4 +42,13 @@ class MorseVisualTest {
         assertEquals("Guyane française", callsignMapQuery("FY"))
         assertNull(callsignMapQuery("/P"))
     }
+    @Test fun literalPunctuationAndAssignmentLabelsAreNotWordDividers() {
+        assertFalse(isMorseNotation("/"))
+        assertTrue(morseTextParts("Cette étape travaille ?, /, ., =, ,, @.").none {it.code})
+        val table="? : ••━━•• · / : ━••━• · . : •━•━•━"
+        assertEquals(listOf("?","/","."),MorseExamples.table(table).map {it.label})
+        assertEquals(listOf("..--..","-..-.",".-.-.-"),morseTextParts(table).filter {it.code}.map {normalizedMorse(it.text)})
+        assertTrue(MorseExamples.table("Une explication. E : •").isEmpty())
+        assertTrue(MorseExamples.find("T = - I").isEmpty())
+    }
 }

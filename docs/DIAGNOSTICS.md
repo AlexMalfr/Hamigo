@@ -6,7 +6,7 @@ Depuis une calculatrice Hamigo, saisir **73887388 suivi de l’année courante**
 
 - **Outils** : mode debug persistant, gel de progression, bac à sable client, essais des vibrations.
 - **Types** : ouvrir un exemple de chacun des formats d'exercice, ou une séance qui les parcourt tous.
-- **Questions** : catalogue des identifiants uniques embarqués, recherche par ID/énoncé/thème/source, filtre par format. Le détail présente cours associés, source, asset, valeur/tolérance et correction masquable. « Tester cette question » ouvre l'écran natif de réponse.
+- **Questions** : catalogue des identifiants uniques, avec filtres Toutes / Hamigo / Exam’1 / Variantes / Mémo et nombre de questions par banque. Exam’1 inclut ses questions illustrées, également testables. Recherche dans tous les champs (ID, énoncé, réponses possibles, explication, paires, valeurs, unités, thème, source, asset et emplacement dans le Parcours), filtre par format. Les mots peuvent correspondre à des champs différents. Chaque question du Parcours indique chapitre → leçon → position dans la leçon, dans la liste et le détail ; une question présente dans plusieurs cours indique chaque emplacement. Les positions sont des repères de lecture, jamais des identifiants. Le détail présente aussi source, asset, valeur/tolérance et correction masquable. « Tester cette question » ouvre l'écran natif de réponse. Pendant la migration 0.47–0.51, les anciens IDs du Parcours restent aussi recherchables. Les filtres défilent horizontalement sur petit écran et les résultats restent au-dessus du clavier.
 - **Aperçus** : pages Moi avec différents états d'activité, équipe fictive, chapitres terminés et bilans de cours/examen. Les pages restent défilables ; les actions sont bloquées.
 - **Infos** : version, appareil, API Android, dimensions/densité/police de la fenêtre, heap et inventaire du contenu par banque/type.
 
@@ -21,6 +21,8 @@ Les séances ouvertes dans le menu sont toujours isolées. Elles utilisent les c
 Mode debug et gel sont des préférences **locales persistantes**. Aucune modification du schéma des sauvegardes GitHub.
 
 Les préférences Sons/Vibrations des séances isolées et du bac à sable sont également séparées. Leur réglage initial reprend celui de l'appareil ; le contrôleur retrouve le réglage réel en quittant le test, sans enregistrer ses modifications dans les préférences personnelles.
+
+La question visible dans le diagnostic conserve ses écoutes pédagogiques, y compris le récepteur Fréquence : souffle et voix en continu après la première manipulation, selon Sons, avec reprise après une lecture de Pico. La séance réelle derrière le menu reste couverte et silencieuse. Fermer le test, valider la réponse, couper ses sons ou passer en arrière-plan arrête sa piste ; aucun XP ni SRS réel n'est ajouté. La simulation reste désactivée dans un véritable examen.
 
 Les paramètres Gameplay sont repris à l'ouverture du modèle isolé : mode Morse à un/deux boutons et timing, avec les espaces de lettre/mot qui en découlent. La copie reste en mémoire ; la changer dans le bac à sable ne modifie pas les préférences personnelles. Les aperçus possèdent aussi un registre Android de résultats isolé pour les écrans qui enregistrent un sélecteur ou une demande de permission. Toute tentative de lancement reçoit une annulation, sans ouvrir d'application ni demander d'autorisation réelle.
 

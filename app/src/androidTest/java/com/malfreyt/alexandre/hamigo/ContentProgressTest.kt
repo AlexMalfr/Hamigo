@@ -161,7 +161,7 @@ class ContentProgressTest {
         val document = JSONObject(exported)
         assertEquals("hamigo", document.getString("app"))
         assertEquals(2, document.getInt("schema"))
-        assertEquals(setOf("app", "schema", "name", "progress", "profileUpdatedAt", "preferencesUpdatedAt", "preferences"), document.keys().asSequence().toSet())
+        assertEquals(setOf("app", "schema", "name", "progress", "profileUpdatedAt", "preferencesUpdatedAt", "preferences", "friends", "socialInbox"), document.keys().asSequence().toSet())
 
         val target = Progress(isolated())
         target.import(exported)

@@ -28,7 +28,13 @@ internal object FeedbackAudioGate {
     private val owners=java.util.Collections.synchronizedSet(mutableSetOf<Any>())
     val busy get()=owners.isNotEmpty()
     fun ownedBy(owner:Any)=owners.contains(owner)
-    fun reserve(owner:Any){MorseSidetone.stopOthers(owner);owners.add(owner);AppFeedback.active?.silence()}
+    fun reserve(owner:Any){owners.add(owner);MorseSidetone.stopOthers(owner);FrequencyReceiverFeedback.stopOthers(owner);AppFeedback.active?.silence()}
+    /** The receiver may resume only when no educational playback owns the audio. */
+    fun tryReserveReceiver(owner:Any):Boolean {
+        synchronized(owners) {if(owners.any {it!==owner})return false;owners.add(owner)}
+        AppFeedback.active?.silence()
+        return true
+    }
     fun release(owner:Any){owners.remove(owner)}
 }
 
@@ -111,7 +117,10 @@ internal class AppFeedback(context:Context) {
             else @Suppress("DEPRECATION") vibrator.vibrate(effect,attributes)
         }
     }
-    fun silence(){pendingClick?.let(main::removeCallbacks);pendingClick=null;streams.forEach(pool::stop);streams.clear()}
+    fun silence(){
+        if(Looper.myLooper()!=main.looper){main.post {silence()};return}
+        pendingClick?.let(main::removeCallbacks);pendingClick=null;streams.forEach(pool::stop);streams.clear()
+    }
     fun close(){if(closed)return;foreground(false);closed=true;main.removeCallbacksAndMessages(null);prefs.unregisterOnSharedPreferenceChangeListener(listener);pool.release()}
     companion object {internal var active:AppFeedback?=null;private set}
 }

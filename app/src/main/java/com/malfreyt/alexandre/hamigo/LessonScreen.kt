@@ -49,13 +49,13 @@ private object LessonIntroNavigation {
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context,lesson.id,returnTarget) {if(returnTarget==null)LessonSpeech(context) else null}
     val diagnosticsCovered=LocalDiagnosticsCovered.current
-    LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered)speech?.stop()}
+    LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered){speech?.stop();stopMorsePlayback()}}
     val companion=rememberPicoCompanion("lesson-${lesson.id}-${model.lessonOpening}",enabled=returnTarget==null)
     val touch=rememberPicoNarrationTap("lesson-${lesson.id}-${model.lessonOpening}")
     DisposableEffect(speech,lifecycle) {
-        val observer=LifecycleEventObserver {_,event->if(event==Lifecycle.Event.ON_STOP)speech?.stop()}
+        val observer=LifecycleEventObserver {_,event->if(event==Lifecycle.Event.ON_STOP){speech?.stop();stopMorsePlayback()}}
         lifecycle.addObserver(observer)
-        onDispose {lifecycle.removeObserver(observer);speech?.close()}
+        onDispose {lifecycle.removeObserver(observer);speech?.close();stopMorsePlayback()}
     }
     val saved=remember(model,lesson.id,model.lessonOpening) {LessonIntroNavigation.state(model,lesson)}
     val list=remember(saved,returnTarget) {if(returnTarget==null)saved else LazyListState(saved.firstVisibleItemIndex,saved.firstVisibleItemScrollOffset)}
@@ -99,7 +99,9 @@ private object LessonIntroNavigation {
             }
             lesson.body.forEachIndexed { index,paragraph -> item {
                 Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                    MorseAwareText(paragraph,fontSize=16.sp,lineHeight=24.sp)
+                    val examples=remember(paragraph) {MorseExamples.table(paragraph)}
+                    if(examples.isNotEmpty() && examples.all {it.label.length==1})MorseLessonExamples(examples,enabled=returnTarget==null) {code->speech?.stop();playMorse(code)}
+                    else MorseAwareText(paragraph,fontSize=16.sp,lineHeight=24.sp)
                     lesson.visuals.getOrNull(index)?.takeIf {it.isNotBlank()}?.let {visual -> Panel(color=Color.White) {LogicLearningVisual(visual,showNames=false,showCaption=false)} }
                 }
             } }
@@ -112,6 +114,25 @@ private object LessonIntroNavigation {
         }
         if(!model.lessonPreviewOnly) Action("À toi de jouer",Modifier.padding(16.dp)) {
             model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)
+        }
+    }
+}
+
+@Composable private fun MorseLessonExamples(examples:List<MorseExample>,enabled:Boolean,onListen:(String)->Unit) {
+    Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp)) {
+        examples.forEach {example->
+            val name=MorseReference.characterName(example.label)
+            val listen=feedbackClick {onListen(example.code)}
+            Surface(onClick=listen,enabled=enabled,color=Color.White,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth().testTag("lesson-morse-row-${example.label}")) {
+                Row(Modifier.padding(start=12.dp,end=4.dp,top=2.dp,bottom=2.dp),verticalAlignment=Alignment.CenterVertically) {
+                    Text(example.label,Modifier.width(32.dp).semantics {contentDescription=name},fontSize=22.sp,fontWeight=FontWeight.Bold,color=Ink)
+                    Spacer(Modifier.width(10.dp))
+                    MorseVisual(example.code,Modifier.weight(1f),compact=true)
+                    IconButton(listen,Modifier.size(48.dp).testTag("lesson-morse-listen-${example.label}"),enabled=enabled) {
+                        Icon(Icons.Rounded.VolumeUp,"Écouter $name en Morse",tint=Teal)
+                    }
+                }
+            }
         }
     }
 }

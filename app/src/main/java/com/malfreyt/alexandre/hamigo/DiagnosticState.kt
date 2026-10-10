@@ -141,10 +141,24 @@ internal object DiagnosticData {
         "cloze"->"Texte à trou";"resistor"->"Résistance";"waveform"->"Signal";"flash"->"Flashcard";else->kind
     }
     fun representatives(content:Content)=content.allQuestions.values.groupBy {it.kind}.toSortedMap().map {(_,items)->items.firstOrNull {it.image==null} ?: items.first()}
-    fun search(all:List<Question>,query:String,kind:String=""):List<Question> {
-        val words=query.trim().lowercase().split(Regex("\\s+")).filter(String::isNotBlank)
-        return all.filter {q->(kind.isBlank()||q.kind==kind)&&words.all {word->
-            q.id.lowercase().contains(word)||q.prompt.lowercase().contains(word)||q.topic.lowercase().contains(word)||q.source.lowercase().contains(word)
+    fun courseLocations(content:Content):Map<String,List<String>> {
+        val locations=linkedMapOf<String,MutableList<String>>()
+        content.chapters.forEachIndexed {chapterIndex,chapter->chapter.lessons.forEachIndexed {lessonIndex,lesson->
+            lesson.questions.forEachIndexed {questionIndex,q->
+                locations.getOrPut(q.id){mutableListOf()}.add("Parcours · ${chapterIndex+1}. ${chapter.title} → ${lessonIndex+1}. ${lesson.title} · question ${questionIndex+1}")
+            }
         }}
+        return locations
+    }
+    fun search(all:List<Question>,query:String,kind:String="",bank:String="",courseLocations:Map<String,List<String>> = emptyMap()):List<Question> {
+        val words=query.trim().lowercase().split(Regex("\\s+")).filter(String::isNotBlank)
+        return all.filter {q->
+            if(kind.isNotBlank()&&q.kind!=kind)return@filter false
+            if(bank.isNotBlank()&&origin(q)!=bank)return@filter false
+            val corpus=(listOf(q.id,q.prompt,q.explanation,q.topic,q.section,q.kind,q.source,q.image.orEmpty(),q.unit,
+                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString(),CourseQuestionMigration47.legacyId(q.id))+
+                q.choices+q.bands+q.pairs.flatMap {listOf(it.left,it.right)}+courseLocations[q.id].orEmpty()).joinToString(" ").lowercase()
+            words.all(corpus::contains)
+        }
     }
 }

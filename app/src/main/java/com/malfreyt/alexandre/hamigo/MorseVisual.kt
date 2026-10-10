@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 fun normalizedMorse(code: String): String = code.replace('·', '.').replace('•', '.').replace('●', '.')
     .replace('━', '-').replace('−', '-').replace('–', '-').replace('—', '-')
 
-fun isMorseNotation(text: String): Boolean = text.isNotBlank() && normalizedMorse(text).all { it in ".-/" || it.isWhitespace() }
+fun isMorseNotation(text: String): Boolean = normalizedMorse(text).let {code->code.any {it in ".-"} && code.all { it in ".-/" || it.isWhitespace() }}
 
 data class MorseTextPart(val text: String, val code: Boolean)
 
@@ -28,16 +28,18 @@ fun morseTextParts(text: String): List<MorseTextPart> {
     if (isMorseNotation(text)) return listOf(MorseTextPart(text, true))
     val signals = Regex("(?<![\\p{L}\\p{N}])(?:[•●━]+(?:[ \\t]+[•●━]+|[ \\t]*/[ \\t]*[•●━]+)*|[.·−–—-]+(?:[ \\t]+[.·−–—-]+|[ \\t]*/[ \\t]*[.·−–—-]+)*|/)(?![\\p{L}\\p{N}])")
     val explicitSingle = Regex("(?:[A-Z0-9]\\s*[=:]|(?i:réponses?|code|signal|point|trait)\\s*[=:]|\\d+[.)])\\s*$")
-    val context = Regex("(?i)\\b(?:morse|mots?|lettres?|caractères?|signaux|signal)\\b")
+    val wordSeparator = Regex("(?i)\\b(?:mots?\\s+sépar[ée]s?|séparateur(?:\\s+de)?\\s+mots?|séparation\\s+(?:entre|des)\\s+mots?)\\b")
+    val labels=MorseExamples.find(text).map {it.labelRange}
     val parts = mutableListOf<MorseTextPart>()
     var cursor = 0
     signals.findAll(text).forEach { match ->
+        if(labels.any {match.range.first<=it.last && match.range.last>=it.first})return@forEach
         val prefix = text.substring(0, match.range.first)
         val raw = match.value
         val canonical = normalizedMorse(raw)
         val unicode = raw.any { it in "•●━" }
         val accepted = unicode || canonical.count { it in ".-" } >= 2 || explicitSingle.containsMatchIn(prefix) ||
-            (raw == "/" && (context.containsMatchIn(text) || (parts.lastOrNull()?.code == true && text.substring(cursor, match.range.first).isBlank()))) ||
+            (raw == "/" && (wordSeparator.containsMatchIn(text) || (parts.lastOrNull()?.code == true && text.substring(cursor, match.range.first).isBlank()))) ||
             (match.range.first > 0 && text[match.range.first - 1] in "(«\"'")
         if (!accepted) return@forEach
         var displayed = raw

@@ -312,3 +312,32 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Réglage « Écoute pendant la saisie » dans Gameplay → Saisie du Morse, activé par défaut et soumis au réglage Sons. Les écoutes pédagogiques explicitement demandées restent disponibles indépendamment de ces deux réglages.
 - Une piste préparée, silencieuse au repos, évite de recréer la sortie à chaque appui. Arrêt au relâchement/annulation, au mute, à la sortie de l'écran et en arrière-plan ; priorité aux lectures et aux voix.
 - Choix sonore local, aucune migration ni modification du schéma des Gists. Détails : [INTERACTION-FEEDBACK.md](INTERACTION-FEEDBACK.md).
+
+## Identités, Morse et lecture vocale — 0.47
+
+- Le rappel vrai/faux sur la pause entre lettres reste seulement dans la première leçon de groupes de lettres. Huit doublons sont retirés : 842 questions originales actives, avec leur historique conservé. L'ordre Point / Trait / Pause entre les mots ne révèle plus les durées dans les choix ; la correction les explique toujours.
+- Chaque question originale du Parcours possède maintenant un UUID attribué une seule fois, et la banque est séparée des listes d'appartenance aux leçons. Réordonner ou déplacer du contenu ne change pas l'ID. Chapitres, leçons, Exam1, flashcards et variantes procédurales existantes gardent leurs identifiants.
+- Migration des anciens IDs en local, à l'import et avant fusion GitHub : SRS et clés de récompense traduits, XP/événements/amis/préférences préservés. Schéma global 2 conservé, marqueur `questionIdsVersion: 1`. **Retrait demandé à la 0.52**, consigné dans AGENTS et protégé par Gradle ; UUID et registre permanent restent conservés. Détails : [QUESTION-IDENTITIES.md](QUESTION-IDENTITIES.md).
+- TTS : préparation commune des points/traits, équations, fractions, racines, indices, puissances, lettres grecques, unités/préfixes et abréviations radio, avant découpage de la voix. Les distracteurs et le texte affiché ne sont pas corrigés. Pas de reprise manuelle par question ni d'OCR des images ; [règles et limites](SPEECH.md).
+- Diagnostics : recherche dans tous les champs, dont choix, explications, paires, valeurs et unités. Un résultat peut combiner des mots venant de champs différents ; les anciens IDs du Parcours restent recherchables pendant la migration.
+- Fréquence : une valeur affichée à la limite de tolérance est acceptée, notamment 147,05 MHz pour 147 ±0,05 MHz. Manipuler le réglage déclenche du souffle, puis une vraie voix TTS de plus en plus intelligible à l'approche de la fréquence demandée. Respect de Sons, du premier plan et de la priorité pédagogique ; aucune simulation en examen blanc.
+
+### Introductions et correspondances Morse — amendement 0.47
+
+- « Ponctuer sans confusion » distingue les signes littéraux des séparateurs transmis : `/` désignant une barre oblique reste un caractère normal, et les codes gardent leur représentation graphique. La même distinction est appliquée au composant commun, y compris hors de cette introduction.
+- Les correspondances deviennent des phrases naturelles pour la voix : « Le caractère arobase se lit point trait trait point trait point ». Lettres, chiffres et groupes sont nommés ; tableaux de durée, préfixes SI et listes d'équations partagent les règles de préparation, sans correction des distracteurs.
+- Chaque nouveau caractère présenté dans une introduction possède son bouton d'écoute Morse. Toute la ligne est également touchable ; l'écoute prend la place de la voix du cours et s'arrête à la sortie ou en arrière-plan. Disponible aussi quand on relit l'introduction seule et lorsque les sons d'interface sont désactivés.
+- Aucun contenu de question, UUID, sauvegarde ou règle de progression changé. Commit, tag, APK et notes de la 0.47 remplacés au même numéro ; retrait de la migration toujours prévu à la 0.52.
+
+### Récepteur et catalogue Diagnostics — amendement 0.47, 11 octobre
+
+- La question de test visible n'hérite plus du silence réservé à la séance située derrière le menu Diagnostics. La simulation Fréquence fonctionne dans le catalogue et le tour des types, avec Sons, arrêt à la sortie et priorité aux lectures pédagogiques conservés.
+- Le catalogue affiche le chemin chapitre → leçon → position de chaque question du Parcours, dans la liste et son détail. Ces repères sont recherchables ; les UUID restent inchangés.
+- Filtres explicites par banque avec effectifs, dont Exam’1 et ses illustrations. Sur petit écran, les filtres défilent horizontalement et le clavier ne masque plus la zone de résultats.
+- Commit et APK 0.47 amendés ; la 0.48 est rebasée pour conserver ses optimisations et le téléchargement séparé d'Exam1.
+
+### Réception continue — complément du 11 octobre
+
+- La réception reste active après le premier réglage, sans arrêt temporisé au relâchement. Une lecture de Pico ou de Morse la suspend puis elle reprend seule ; validation, mute, sortie et arrière-plan arrêtent la piste.
+- Le message français est allongé et bouclé avec une courte pause. La voix est progressivement filtrée, saturée et modulée lorsqu'on s'éloigne, en plus du souffle.
+- Le rééchantillonnage des longues synthèses ne déborde plus un entier lors du calcul des positions. Les samples restent bornés, et la boucle ne dépend plus d'un compteur qui pourrait déborder après une longue écoute.

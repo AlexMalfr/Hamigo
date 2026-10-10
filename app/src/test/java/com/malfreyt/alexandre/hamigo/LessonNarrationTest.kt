@@ -6,7 +6,7 @@ import org.junit.Test
 class LessonNarrationTest {
     @Test fun narrationIncludesTheCourseInOrderWithoutItsQuestionAnswers() {
         val l=Lesson("course","Titre","Résumé",listOf("Un paragraphe","Un autre"),"U = R × I","",listOf(Question("q","Question",listOf("Solution"),0,"Correction")))
-        assertEquals(listOf("Titre","Résumé","Un paragraphe","Un autre","U = R × I"),LessonNarration.segments(l,4000))
+        assertEquals(listOf("Titre","Résumé","Un paragraphe","Un autre","u égale ère fois i"),LessonNarration.segments(l,4000))
     }
     @Test fun longParagraphsStayWithinTheEngineLimitWithoutLosingWordsOrSplittingEmoji() {
         val text=(1..100).joinToString(" ") {"mot$it 📻"}

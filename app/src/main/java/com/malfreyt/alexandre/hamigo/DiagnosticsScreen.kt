@@ -61,6 +61,7 @@ import kotlinx.coroutines.withContext
 @Composable internal fun DiagnosticsScreen(owner:AppModel) {
     val content=owner.content ?: return
     val context=LocalContext.current
+    val courseLocations=remember(content){DiagnosticData.courseLocations(content)}
     val inspector=remember(owner,content){AppModel().apply {initializeDiagnostics(context,owner,content)}}
     DisposableEffect(inspector){onDispose {inspector.disposeDiagnostics()}}
     var tab by remember {mutableStateOf("Outils")}
@@ -76,18 +77,19 @@ import kotlinx.coroutines.withContext
                     Icon(Icons.Rounded.BugReport,null,tint=Teal,modifier=Modifier.padding(end=12.dp))
                 }
                 if(inspector.session==null&&selected==null&&mock==null) {
-                    FlowRow(Modifier.fillMaxWidth().padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                    Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                         listOf("Outils","Types","Questions","Aperçus","Infos").forEach {label->FilterChip(tab==label,{tab=label},label={Text(label,fontSize=12.sp)},modifier=Modifier.testTag("diagnostic-tab-$label"))}
                     }
                 }
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     when {
                         inspector.session!=null->FeedbackPreferenceScope(owner.interactionFeedback,inspector.progress.prefs) {
-                            CompositionLocalProvider(LocalContext provides inspector.diagnosticContext,LocalAnimatedBack provides {inspector.leaveSession()},LocalNavigationContentOverlap provides 0.dp) {QuizScreen(inspector)}
+                            // The real session underneath stays covered; this visible test is not.
+                            CompositionLocalProvider(LocalDiagnosticsCovered provides false,LocalContext provides inspector.diagnosticContext,LocalAnimatedBack provides {inspector.leaveSession()},LocalNavigationContentOverlap provides 0.dp) {QuizScreen(inspector)}
                         }
-                        selected!=null->DiagnosticQuestionDetail(selected!!,content) {inspector.startQuestions("Test · ${selected!!.id}",listOf(selected!!));selected=null}
+                        selected!=null->DiagnosticQuestionDetail(selected!!,content,courseLocations) {inspector.startQuestions("Test · ${selected!!.id}",listOf(selected!!));selected=null}
                         mock!=null->DiagnosticMock(owner,content,mock!!)
-                        tab=="Questions"->DiagnosticCatalog(content) {selected=it}
+                        tab=="Questions"->DiagnosticCatalog(content,courseLocations) {selected=it}
                         tab=="Types"->LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                             item {Action("Tester tous les types"){inspector.startQuestions("Tour des types",DiagnosticData.representatives(content))}}
                             items(DiagnosticData.representatives(content),key={it.kind}) {q->Panel {
@@ -187,12 +189,19 @@ import kotlinx.coroutines.withContext
 }
 
 @OptIn(ExperimentalLayoutApi::class,ExperimentalMaterial3Api::class)
-@Composable private fun DiagnosticCatalog(content:Content,choose:(Question)->Unit) {
+@Composable private fun DiagnosticCatalog(content:Content,courseLocations:Map<String,List<String>>,choose:(Question)->Unit) {
     val all=remember(content){content.allQuestions.values.toList()}
     var query by remember {mutableStateOf("")};var kind by remember {mutableStateOf("")};var menu by remember {mutableStateOf(false)}
-    val matches by produceState(all,query,kind) {delay(150);value=withContext(Dispatchers.Default){DiagnosticData.search(all,query,kind)}}
-    Column(Modifier.fillMaxSize().padding(horizontal=14.dp)) {
-        OutlinedTextField(query,{query=it},label={Text("ID, énoncé, thème…")},leadingIcon={Icon(Icons.Rounded.Search,null)},singleLine=true,modifier=Modifier.fillMaxWidth().testTag("diagnostic-search"))
+    var bank by remember {mutableStateOf("")}
+    val counts=remember(all){all.groupingBy(DiagnosticData::origin).eachCount()}
+    val matches by produceState(emptyList<Question>(),all,query,kind,bank) {delay(150);value=withContext(Dispatchers.Default){DiagnosticData.search(all,query,kind,bank,courseLocations)}}
+    Column(Modifier.fillMaxSize().imePadding().padding(horizontal=14.dp)) {
+        OutlinedTextField(query,{query=it},label={Text("Tous les champs")},leadingIcon={Icon(Icons.Rounded.Search,null)},singleLine=true,modifier=Modifier.fillMaxWidth().testTag("diagnostic-search"))
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+            listOf("" to "Toutes", "Hamigo" to "Hamigo", "Exam1" to "Exam’1", "Variante" to "Variantes", "Mémo" to "Mémo").forEach {(value,label)->
+                FilterChip(bank==value,{bank=value},label={Text("$label · ${if(value.isBlank())all.size else counts[value] ?: 0}",fontSize=11.sp)},modifier=Modifier.testTag("diagnostic-bank-${value.ifBlank {"all"}}"))
+            }
+        }
         Row(verticalAlignment=Alignment.CenterVertically) {
             Box {TextButton({menu=true}){Text(if(kind.isBlank())"Tous les types" else DiagnosticData.typeName(kind));Icon(Icons.Rounded.ExpandMore,null)}
                 DropdownMenu(menu,{menu=false}) {
@@ -207,22 +216,24 @@ import kotlinx.coroutines.withContext
                     Text(q.id,fontFamily=FontFamily.Monospace,fontSize=12.sp,color=Teal,fontWeight=FontWeight.Bold)
                     MorseAwareText(q.prompt.take(180)+(if(q.prompt.length>180)"…" else ""),fontSize=14.sp,lineHeight=19.sp)
                     Text("${DiagnosticData.typeName(q.kind)} · ${q.topic} · ${DiagnosticData.origin(q)}${if(q.image!=null)" · image" else ""}",fontSize=10.sp,color=Muted,maxLines=2,overflow=TextOverflow.Ellipsis)
+                    courseLocations[q.id]?.let {locations->Text(locations.joinToString("\n"),fontSize=11.sp,lineHeight=15.sp,color=Teal)}
                 }
             }}
-            if(matches.isEmpty())item {Text("Aucune question trouvée.",Modifier.padding(16.dp),color=Muted)}
+            if(matches.isEmpty())item {Text(if(bank=="Exam1"&&content.exam.isEmpty())"La banque Exam’1 n’est pas encore disponible. Son téléchargement se fait en arrière-plan ; son état est visible dans les paramètres." else "Aucune question trouvée.",Modifier.padding(vertical=12.dp),color=Muted)}
         }
     }
 }
 
-@Composable private fun DiagnosticQuestionDetail(q:Question,content:Content,test:()->Unit) {
+@Composable private fun DiagnosticQuestionDetail(q:Question,content:Content,courseLocations:Map<String,List<String>>,test:()->Unit) {
     var reveal by remember(q.id){mutableStateOf(false)}
     val illustration=rememberExamArtwork(q.image)
-    LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+    LazyColumn(Modifier.testTag("diagnostic-question-detail"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         item {Panel {Text(q.id,fontFamily=FontFamily.Monospace,color=Teal,fontWeight=FontWeight.Bold);Text("${q.kind} · ${q.section} · ${q.topic}",fontSize=12.sp,color=Muted);MorseAwareText(q.prompt,fontWeight=FontWeight.Bold);illustration?.let {ExamIllustration(it,{})}}}
         item {Action("Tester cette question",onClick=test)}
         item {Panel {
             Text("Origine : ${q.source}",fontSize=12.sp,color=Muted)
-            Text("Cours : "+content.lessons.filter {l->l.questions.any {it.id==q.id}}.joinToString {it.title}.ifBlank {"—"},fontSize=12.sp,color=Muted)
+            val locations=courseLocations[q.id].orEmpty()
+            Text(if(locations.isEmpty())"Hors Parcours · ${DiagnosticData.origin(q)}" else locations.joinToString("\n"),fontSize=12.sp,lineHeight=17.sp,color=Teal)
             if(q.value!=null)Text("Valeur : ${q.value} ${q.unit} · tolérance ${q.tolerance}",fontSize=12.sp,color=Muted)
             if(q.image!=null)Text("Asset : ${q.image}",fontFamily=FontFamily.Monospace,fontSize=11.sp,color=Muted)
             if(q.id in content.excluded)Text("Exclue de l’examen standard",color=Coral,fontSize=12.sp)

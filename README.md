@@ -15,7 +15,7 @@ Hamigo est une application Android en français pour préparer le **certificat d
 ## Ce qu’on peut faire
 
 - **Apprendre** avec un parcours de 22 chapitres et 97 leçons : réglementation, électricité, radio, Morse et binaire/portes logiques. Le menu de chaque leçon permet de relire le cours et ses fiches mémo sans lancer les questions.
-- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse. Pico présente l’énoncé et peut le lire à voix haute. Les formules reconnues affichent leurs fractions, racines et indices.
+- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse. Pico lit les énoncés avec une préparation des signaux Morse, formules et unités. Les formules reconnues affichent leurs fractions, racines et indices. Le réglage de fréquence peut mêler souffle et voix, comme un petit récepteur.
 - **Préparer ses réponses** avec une calculatrice scientifique et un brouillon au clavier, au doigt ou au stylet, remis à zéro à chaque question.
 - **Réviser** avec 40 fiches mémo, des flashcards et des outils interactifs : calculatrice, résistances, décibels, traducteur Morse, portes logiques… Pico accompagne les cours et les flashcards avec des expressions et des réactions discrètes.
 - **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions aléatoires des notions étudiées, qui mélangent les rappels de la répétition espacée.
@@ -72,6 +72,8 @@ Sous Windows, utilise `gradlew.bat`. L’APK debug est généré dans `app/build
 La signature, la configuration OAuth, les versions et les vérifications Android sont expliquées dans [les notes techniques](docs/APP-DETAILS.md) et [la documentation OAuth](docs/GITHUB-PKCE.md).
 
 Pour tester directement un identifiant de question, parcourir les formats ou inspecter des données fictives sans modifier sa progression : [outils de diagnostics sur appareil](docs/DIAGNOSTICS.md). Pour personnaliser le fond des widgets : [configuration des widgets](docs/WIDGET-CONFIGURATION.md).
+
+Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; les sauvegardes antérieures sont converties pendant la fenêtre 0.47–0.51.
 
 ## Sources et documentation
 

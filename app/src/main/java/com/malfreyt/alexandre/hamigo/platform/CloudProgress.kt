@@ -4,6 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 import java.util.UUID
+import com.malfreyt.alexandre.hamigo.CourseQuestionMigration47
 
 /** A mergeable backup: historical totals form a baseline, subsequent attempts are immutable events. */
 object CloudProgress {
@@ -216,7 +217,7 @@ object CloudProgress {
                 if (day > awarded.optString(key)) awarded.put(key, day)
             }
         }
-        val state = JSONObject().put("schema", 1).put("xp", capped(xp))
+        val state = JSONObject().put("schema", 2).put("questionIdsVersion",1).put("xp", capped(xp))
             .put("answers", capped(answers)).put("correct", capped(correct))
             .put("dailyXp", days).put("completed", JSONArray(completed.sorted()))
             .put("reviews", reviews).put("awarded", awarded).put("syncBase", base).put("syncEvents", events)
@@ -292,6 +293,8 @@ object CloudProgress {
         if (preferences.has("reminderEnabled")) require(preferences.opt("reminderEnabled") is Boolean)
         if (preferences.has("morseSingleKey")) require(preferences.opt("morseSingleKey") is Boolean)
         if (preferences.has("morseThresholdMs")) require(int(preferences,"morseThresholdMs") in 150..600)
+        if(state.has("questionIdsVersion"))require(int(state,"questionIdsVersion")==1) {"Version des identifiants de questions non reconnue."}
+        CourseQuestionMigration47.apply(state)
         return wrapper
     }
 
@@ -348,6 +351,6 @@ object CloudProgress {
     private fun strings(array: JSONArray?): Set<String> = if (array == null) emptySet() else (0 until array.length()).map { array.getString(it) }.toSet()
     private fun capped(value: Long) = value.coerceIn(0, Int.MAX_VALUE.toLong()).toInt()
     private fun copy(value: JSONObject) = JSONObject(value.toString())
-    private fun canonical(value: JSONObject): String = value.keys().asSequence().sorted().joinToString(prefix = "{", postfix = "}") { "$it:${canonicalValue(value.opt(it))}" }
+    internal fun canonical(value: JSONObject): String = value.keys().asSequence().sorted().joinToString(prefix = "{", postfix = "}") { "$it:${canonicalValue(value.opt(it))}" }
     private fun canonicalValue(value: Any?): String = when (value) { is JSONObject -> canonical(value); is JSONArray -> (0 until value.length()).joinToString(prefix = "[", postfix = "]") { canonicalValue(value.opt(it)) }; else -> value.toString() }
 }

@@ -273,6 +273,40 @@ class QuestionDesignInstrumentedTest {
         assertTrue("The final answer clears the floating buttons after scrolling",bottom<=toolsTop+1f)
     }
 
+    @Test fun morseIntroductionShowsLiteralSlashAndEachPunctuationHasAnIndependentListeningButton() {
+        val lesson=model.content!!.lessons.first {it.id=="c15-l10"}
+        val before=model.progress.prefs.getString("progress",null)
+        ui.runOnIdle {model.route="path";model.startLesson(lesson);FeedbackPreferences.save(model.progress.prefs,FeedbackSettings(sound=false))}
+        capture("intro47-punctuation-top")
+        ui.onNodeWithTag("lesson-listen").performClick()
+        ui.waitUntil(30_000) {ui.onNodeWithTag("lesson-pico").fetchSemanticsNode().config[SemanticsProperties.StateDescription]=="Pico parle"}
+        ui.onNodeWithTag("lesson-introduction-list").performScrollToNode(hasTestTag("lesson-morse-row-/"))
+        ui.onNodeWithText("/",useUnmergedTree=true).assertExists()
+        ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).assertCountEquals(0)
+        ui.onNodeWithTag("lesson-morse-listen-/").performClick()
+        ui.waitUntil {FeedbackAudioGate.busy}
+        capture("intro47-punctuation-rows")
+        ui.onNodeWithTag("lesson-introduction-list").performScrollToNode(hasTestTag("lesson-morse-row-@"))
+        ui.onNodeWithTag("lesson-morse-listen-@").assertIsDisplayed().performClick()
+        capture("intro47-punctuation-last")
+        ui.runOnIdle {model.lesson=null}
+        ui.waitUntil { !FeedbackAudioGate.busy }
+        assertEquals(before,model.progress.prefs.getString("progress",null))
+    }
+    @Test fun letterAndDigitIntroductionsOfferPlayableRowsWithoutStartingTheQuestions() {
+        val before=model.progress.prefs.getString("progress",null)
+        for((id,symbol) in listOf("c15-l01" to "T","c15-l07" to "5")) {
+            ui.runOnIdle {model.previewLesson(model.content!!.lessons.first {it.id==id})}
+            ui.onNodeWithTag("lesson-introduction-list").performScrollToNode(hasTestTag("lesson-morse-row-$symbol"))
+            ui.onNodeWithTag("lesson-morse-listen-$symbol").assertIsDisplayed().performClick()
+            capture("intro47-$id-rows")
+            ui.onNodeWithText("À toi de jouer").assertDoesNotExist()
+            assertNull(model.session)
+            ui.runOnIdle {model.lesson=null}
+            ui.waitUntil { !FeedbackAudioGate.busy }
+        }
+        assertEquals(before,model.progress.prefs.getString("progress",null))
+    }
     @Test fun courseIntroductionHasLargerPicoAndUsesTheSameSpeechMotion() {
         ui.runOnIdle {model.route="path";model.startLesson(model.content!!.lessons.first())}
         val pico=ui.onNodeWithTag("lesson-pico");pico.assertIsDisplayed()
@@ -473,7 +507,7 @@ class QuestionDesignInstrumentedTest {
             instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {frame.countDown()};v.invalidate()} }
             assertTrue(frame.await(5,TimeUnit.SECONDS))
         }
-        val dir=File(context.getExternalFilesDir(null),"ui-0.43").apply {mkdirs()}
+        val dir=File(context.getExternalFilesDir(null),if(name.startsWith("intro47-"))"ui-0.47-intro" else "ui-0.43").apply {mkdirs()}
         val bitmap=instrumentation.uiAutomation.takeScreenshot()
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }

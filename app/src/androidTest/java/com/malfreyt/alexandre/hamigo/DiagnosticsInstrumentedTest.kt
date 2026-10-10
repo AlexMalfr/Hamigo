@@ -48,6 +48,128 @@ class DiagnosticsInstrumentedTest {
     private lateinit var model:AppModel
     @Before fun load(){model=ViewModelProvider(ui.activity)[AppModel::class.java];ui.waitUntil(60_000){model.content!=null&&!model.socialRefreshing};ui.runOnIdle {model.showWelcome=false}}
     private fun q()=Question("debug-fixture","Quelle commande ouvre le contact ?",listOf("Le manipulateur","Le fusible"),0,"Le manipulateur commande le signal.")
+    @Test fun catalogFindsChoiceTextAndTestsTheOpaqueIdWithoutTouchingRealProgress() {
+        val before=raw()
+        val target=model.content!!.courseQuestions.first {"Vendre des communications" in it.choices}
+        assertFalse(target.prompt.contains("vendre",true))
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput("vendre communications")
+        ui.waitUntil(10000) {ui.onAllNodesWithTag("diagnostic-question-${target.id}").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack() // Browse the full result after typing, keeping the query.
+        val location=DiagnosticData.courseLocations(model.content!!).getValue(target.id).first()
+        text(location).performScrollTo().assertIsDisplayed()
+        capture("content47-catalog-choice")
+        ui.onNodeWithTag("diagnostic-question-${target.id}").performClick()
+        ui.onNodeWithTag("diagnostic-question-detail").performScrollToNode(hasText(location))
+        text(location).assertIsDisplayed()
+        text("Tester cette question").performScrollTo()
+        text("Tester cette question").performClick()
+        inside(hasText(target.choices[target.answer])).performScrollTo().performClick()
+        text("Vérifier").performClick();text("Continuer").performClick()
+        assertEquals(before,raw())
+    }
+    @Test fun frequencyToleranceAcceptsTheDisplayedEndpointAndReceiverUsesAnActualFrenchVoice() {
+        val before=raw();val question=model.content!!.allQuestions.getValue("proc-band-147.0")
+        ui.runOnIdle {model.diagnostics.freeze(true);model.startQuestions("Réception",listOf(question))}
+        ui.onNodeWithTag("question-slider").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(147.05f)}
+        capture("content47-frequency-14705")
+        ui.onNodeWithText("147,05 MHz").assertExists()
+        ui.onNodeWithTag("question-answers").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.ScrollBy) {it(0f,100_000f)}
+        val precision=ui.onNodeWithText("Précision acceptée",substring=true)
+        precision.assertIsDisplayed()
+        assertTrue(precision.fetchSemanticsNode().boundsInRoot.bottom<=ui.onNodeWithTag("question-tools").fetchSemanticsNode().boundsInRoot.top+1f)
+        capture("content47-frequency-bottom")
+        ui.onNodeWithText("Vérifier").performClick()
+        assertEquals(true,model.session!!.feedback);assertEquals(before,raw())
+        val receiver=FrequencyReceiverFeedback(context,147.0)
+        try {
+            ui.waitUntil(20000){receiver.voiceReady||receiver.voiceFailure!=null}
+            assertNull(receiver.voiceFailure,receiver.voiceFailure)
+            assertTrue(receiver.voiceDurationMillis>=10000)
+            receiver.tune(147f);ui.waitUntil(5000){receiver.playing}
+            assertTrue(FeedbackAudioGate.ownedBy(receiver))
+            Thread.sleep(2600);assertTrue(receiver.playing)
+            receiver.tune(146.95f);ui.waitUntil(5000){receiver.playing}
+            assertTrue(FeedbackAudioGate.ownedBy(receiver))
+            val narration=Any();FeedbackAudioGate.reserve(narration)
+            receiver.tune(147f);assertFalse(FeedbackAudioGate.ownedBy(receiver))
+            FeedbackAudioGate.release(narration)
+            ui.waitUntil(5000){receiver.playing}
+            receiver.close();ui.waitUntil { !receiver.playing }
+            assertFalse(FeedbackAudioGate.busy)
+        } finally {receiver.close()}
+        ui.runOnIdle {FeedbackPreferences.save(model.progress.prefs,FeedbackSettings(sound=false));model.leaveSession();model.startQuestions("Sans sons",listOf(question))}
+        ui.onNodeWithTag("question-slider").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(146.9f)}
+        assertFalse(FeedbackAudioGate.busy)
+        ui.onNodeWithText("Vérifier").performClick();assertEquals(false,model.session!!.feedback)
+        assertEquals(before,raw())
+    }
+    @Test fun diagnosticFrequencyGesturesPlayOnlyTheVisibleSessionAndRespectItsMute() {
+        val before=raw();val question=model.content!!.allQuestions.getValue("proc-band-147.0")
+        ui.runOnIdle {model.diagnostics.freeze(true);model.startQuestions("Séance derrière le diagnostic",listOf(question))}
+        ui.onNodeWithTag("question-slider").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(147f)}
+        ui.waitUntil(5000){FeedbackAudioGate.busy}
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.waitUntil(5000){!FeedbackAudioGate.busy}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput(question.id)
+        ui.waitUntil(10000){ui.onAllNodesWithTag("diagnostic-question-${question.id}").fetchSemanticsNodes().isNotEmpty()}
+        ui.onNodeWithTag("diagnostic-question-${question.id}").performClick()
+        text("Tester cette question").performClick()
+        inside(hasTestTag("question-slider")).performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(147f)}
+        ui.waitUntil(5000){FeedbackAudioGate.busy}
+        capture("frequency-diagnostic-playing")
+        Thread.sleep(2600);assertTrue(FeedbackAudioGate.busy)
+        inside(hasText("+ 0,05")).performScrollTo().performClick()
+        ui.waitUntil(5000){FeedbackAudioGate.busy}
+        inside(hasContentDescription("Couper les sons")).performClick()
+        ui.waitUntil(5000){!FeedbackAudioGate.busy}
+        inside(hasText("− 0,05")).performClick()
+        ui.waitForIdle();assertFalse(FeedbackAudioGate.busy)
+        assertTrue(FeedbackPreferences.read(model.progress.prefs).sound)
+        inside(hasContentDescription("Activer les sons")).performClick()
+        inside(hasText("+ 0,05")).performClick()
+        ui.waitUntil(5000){FeedbackAudioGate.busy}
+        inside(hasContentDescription("Quitter la séance")).performClick()
+        ui.waitUntil(5000){!FeedbackAudioGate.busy}
+        assertEquals(before,raw())
+        ui.runOnIdle {model.debugToolsOpen=false}
+        ui.onNodeWithTag("question-slider").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(146.95f)}
+        ui.waitUntil(5000){FeedbackAudioGate.busy}
+        ui.runOnIdle {model.leaveSession()}
+        ui.waitUntil(5000){!FeedbackAudioGate.busy}
+        assertEquals(before,raw())
+    }
+    @Test fun diagnosticExamBankFilterListsAndOpensTheActualImportedQuestions() {
+        val before=raw();val target=model.content!!.exam.first {it.image!=null}
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
+        ui.onNodeWithTag("diagnostic-bank-Exam1").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput(target.id)
+        ui.waitUntil(10000){ui.onAllNodesWithTag("diagnostic-question-${target.id}").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack()
+        capture("content47-catalog-exam1")
+        ui.onNodeWithTag("diagnostic-question-${target.id}").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-question-detail").performScrollToNode(hasText("Hors Parcours · Exam1"))
+        text("Hors Parcours · Exam1").assertIsDisplayed()
+        text("Tester cette question").performScrollTo().performClick()
+        inside(hasText(target.choices.first())).performScrollTo().assertIsDisplayed()
+        capture("content47-exam1-test")
+        assertEquals(before,raw())
+    }
+    @Test fun morseOrderingShowsPlainLabelsWithoutGivingAwayTheDurations() {
+        val before=raw()
+        val question=model.content!!.lessons.first {it.id=="c15-l09"}.questions.first {it.kind=="order"}
+        ui.runOnIdle {model.diagnostics.freeze(true);model.startQuestions("Temporisation Morse",listOf(question))}
+        listOf("Point","Trait","Pause entre les mots").forEach {ui.onNodeWithText(it).assertExists()}
+        ui.onNodeWithText("1 unité",substring=true).assertDoesNotExist()
+        capture("content47-morse-order")
+        ui.onNodeWithTag("question-answers").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.ScrollBy) {it(0f,100_000f)}
+        assertTrue(ui.onNodeWithTag("order-board").fetchSemanticsNode().boundsInRoot.bottom<=ui.onNodeWithTag("question-tools").fetchSemanticsNode().boundsInRoot.top+1f)
+        capture("content47-morse-order-bottom")
+        assertEquals(before,raw())
+    }
     @Test fun morseSettingsExposeLiveAudioAndDiagnosticCopiesKeepItLocal() {
         val before=raw()
         ui.runOnIdle {model.route="settings"}
@@ -77,7 +199,7 @@ class DiagnosticsInstrumentedTest {
     private fun raw()=model.progress.prefs.getString("progress",null)
     private fun capture(name:String) {
         ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}};assertTrue(latch.await(5,TimeUnit.SECONDS))}
-        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),if(name.startsWith("morse-live-"))"ui-0.46" else "ui-0.45").apply {mkdirs()}
+        val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),when {name.startsWith("content47-")->"ui-0.47";name.startsWith("morse-live-")->"ui-0.46";else->"ui-0.45"}).apply {mkdirs()}
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }
 

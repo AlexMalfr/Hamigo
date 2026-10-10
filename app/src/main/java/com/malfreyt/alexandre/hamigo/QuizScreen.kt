@@ -89,6 +89,7 @@ import kotlin.random.Random
     val scratchpad = remember(s,key) { s.scratchpadFor(key) }
     val view=LocalView.current
     val feedback=s.feedback
+    val receiver=rememberFrequencyReceiver(q.kind=="frequency" && feedback==null && !s.exam && !LocalDiagnosticsCovered.current,key,q.value ?: 0.0)
     LaunchedEffect(key){scroll.scrollTo(0);focus.clearFocus()}
     LaunchedEffect(key,feedback) {
         if(feedback!=null) {
@@ -107,7 +108,7 @@ import kotlin.random.Random
     }
     fun check()=when(q.kind) {
         "number"->LearningRules.numericCorrect(numeric,q.value ?: 0.0,q.tolerance)
-        "frequency"->kotlin.math.abs(frequency-(q.value ?: 0.0)) <= q.tolerance
+        "frequency"->LearningRules.sliderCorrect(frequency,q.value ?: 0.0,q.tolerance,.05)
         "estimate"->kotlin.math.abs(estimate-(q.value ?: 0.0)) <= q.tolerance
         "binary"->binary==(q.value ?: 0.0).toInt()
         "multiselect"->selectedMany==q.bands.mapNotNull{it.toIntOrNull()}.toSet()
@@ -175,9 +176,9 @@ import kotlin.random.Random
                 "frequency" -> {
                     Panel(color=Mist){Text("${formatMeasuredNumber(frequency.toDouble(),q.tolerance)} MHz",fontSize=38.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
                         FrequencyDial(frequency)
-                        HapticQuestionSlider(frequency,{frequency=it},143f..148f,feedback==null,key,steps=99,quantize={snapSliderValue(it,143f,148f,.05f)})
+                        HapticQuestionSlider(frequency,{frequency=it;receiver?.tune(it)},143f..148f,feedback==null,key,steps=99,quantize={snapSliderValue(it,143f,148f,.05f)})
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("143 MHz",fontSize=11.sp);Text("148 MHz",fontSize=11.sp)}
-                        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){OutlinedButton(feedbackClick {frequency=(frequency-.05f).coerceAtLeast(143f)},enabled=feedback==null){Text("− 0,05")};OutlinedButton(feedbackClick {frequency=(frequency+.05f).coerceAtMost(148f)},enabled=feedback==null){Text("+ 0,05")}}
+                        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){OutlinedButton(feedbackClick {frequency=snapSliderValue(frequency-.05f,143f,148f,.05f);receiver?.tune(frequency)},enabled=feedback==null){Text("− 0,05")};OutlinedButton(feedbackClick {frequency=snapSliderValue(frequency+.05f,143f,148f,.05f);receiver?.tune(frequency)},enabled=feedback==null){Text("+ 0,05")}}
                         Text(toleranceLabel(q.tolerance,"MHz"),fontSize=12.sp,color=Muted)
                     }
                 }

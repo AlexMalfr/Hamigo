@@ -1,6 +1,7 @@
 // Original Hamigo exercises. Run with Node.js; stable original IDs are preserved.
 import fs from 'node:fs';
 import {splitDigitalCurriculum} from './split_logic_content.mjs';
+import {authoredIdFor,persistCourseQuestions} from './question_identities.mjs';
 const file = 'data/curriculum.json';
 const data = JSON.parse(fs.readFileSync(file, 'utf8'));
 const Q = (prompt, correct, distractors, explanation) => ({kind:'choice',prompt,choices:[correct,...distractors],answer:0,explanation});
@@ -427,7 +428,7 @@ for(const chapter of data.chapters.filter(c=>Number(c.id.slice(1))<=14)) {
     const section=lesson.questions[0]?.section || 'technique';
     for(let i=0;i<questions.length;i++) {
       const id=`${lesson.id}-q${String(i+5).padStart(2,'0')}`;
-      const existing=lesson.questions.findIndex(q=>q.id===id);
+      const existing=lesson.questions.findIndex(q=>q.id===id || q.id===authoredIdFor(id));
       const question=finishQuestion(questions[i],id,section,lesson.topic);
       if(existing>=0) lesson.questions[existing]=question; else lesson.questions.push(question);
     }
@@ -461,7 +462,7 @@ const group=(title,letters,hint)=>L(title,letters.join(' · ')+' : entendre, rec
     compose(letter)
   ]),
   M('Relie les caractères à leurs signaux Morse.',letters.slice(0,5).map(letter=>[letter,visual(morse[letter])]),'Reconnais chaque signal comme un rythme complet.'),
-  TF('Une lettre se termine avec une pause plus longue que la pause entre ses points et traits.',true,'La pause interne vaut une unité; la pause entre lettres en vaut trois.')
+  ...(letters[0]==='E'?[TF('Une lettre se termine avec une pause plus longue que la pause entre ses points et traits.',true,'La pause interne vaut une unité; la pause entre lettres en vaut trois.')]:[])
 ]);
 chapter('c15','Le Morse, de A à Z','Un vrai atelier : tout l’alphabet, chiffres, écoute et manipulation','#FFB75C','morse',[
   group('Points, traits et premiers rythmes',['E','T','I','M'],'Compare le point E au trait T, puis les deux points I aux deux traits M.'),
@@ -483,7 +484,7 @@ chapter('c15','Le Morse, de A à Z','Un vrai atelier : tout l’alphabet, chiffr
     N('Un point dure 80 ms. Pause entre deux éléments d’une lettre ?',80,'ms','La pause interne vaut une unité.',0),
     Q('Deux points séparés par une pause de lettre représentent…','EE',['I','S','M'],'La pause de lettre termine chaque E; I possède deux points avec seulement une pause interne.'),
     Q('Deux points réunis avec une pause interne représentent…','I',['EE','T','N'],'I est un seul caractère formé de deux points.'),
-    O('Classe les durées du plus court au plus long.',['Point : 1 unité','Trait : 3 unités','Pause de mot : 7 unités'],'Les durées sont 1, 3 et 7 unités.'),
+    O('Classe les durées du plus court au plus long.',['Point','Trait','Pause entre les mots'],'Le point vaut une unité, le trait trois et la pause entre mots sept.'),
     TF('Accélérer le Morse de référence change les proportions point/trait.',false,'On raccourcit l’unité de base; les proportions restent les mêmes.')
   ]),
   group('Ponctuer sans confusion',['?','/','.','=',',','@'],'Ces signes servent aux groupes usuels et aux messages. La barre de fraction est elle-même un caractère; elle n’est pas la pause entre mots.'),
@@ -907,7 +908,7 @@ const sequence=['c01','c02','c15','c16','c03','c04','c05','c06','c07','c17','c08
 data.chapters=sequence.map(id=>byId.get(id));
 splitDigitalCurriculum(data);
 const lessons=data.chapters.flatMap(c=>c.lessons);
-data.description=`${lessons.length} leçons originales, des premiers contacts aux calculs radio approfondis. Chapitre Morse complet et révisions par notion.`;
+data.description=`${lessons.length} leçons originales, des premiers contacts aux calculs radio approfondis. Chapitres Morse et logique numérique, révisions par notion.`;
 const all=lessons.flatMap(l=>l.questions);
 const seen=new Set();
 for(const lesson of lessons) {
@@ -926,8 +927,6 @@ for(const lesson of lessons) {
     if(q.kind==='match' && (new Set(q.pairs.map(p=>p.left)).size!==q.pairs.length || new Set(q.pairs.map(p=>p.right)).size!==q.pairs.length)) throw Error('Ambiguous match '+q.id);
   }
 }
-const serialized=JSON.stringify(data,null,2)+'\n';
-fs.writeFileSync(file,serialized,'utf8');
-fs.writeFileSync('app/src/main/assets/curriculum.json',serialized,'utf8');
+persistCourseQuestions(data);
 console.log(`${data.chapters.length} chapters, ${lessons.length} lessons, ${all.length} questions.`);
 console.log(JSON.stringify(Object.fromEntries([...new Set(all.map(q=>q.kind))].sort().map(kind=>[kind,all.filter(q=>q.kind===kind).length]))));

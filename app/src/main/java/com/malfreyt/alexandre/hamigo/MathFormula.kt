@@ -14,7 +14,7 @@ internal sealed interface Formula {
 internal object MathFormula {
     data class Fragment(val source:String,val formula:Formula?=null)
     private val equality=Regex("(?<![\\p{L}\\d])[UIRPWELSCZVAFXYTQHufrtlsωΩπλρτ](?:eff|max|min|moy)?\\d*\\s*=")
-    private val proseBoundary=Regex("\\n|[?!;:]|(?<!\\d)[.,]|[.,](?!\\d)|\\s+(?:et|puis|pour|soit|avec|donne|alors|quelle|quel|calculer|calcule|en|est|vaut|à)\\b",RegexOption.IGNORE_CASE)
+    private val proseBoundary=Regex("\\n|[?!;:]|(?<!\\d)[.,]|[.,](?!\\d)|\\s+·\\s+(?=[UIRPWELSCZVAFXYTQHufrtlsωΩπλρτ](?:eff|max|min|moy)?\\d*\\s*=)|\\s+(?:et|puis|pour|soit|avec|donne|alors|quelle|quel|calculer|calcule|en|est|vaut|à)\\b",RegexOption.IGNORE_CASE)
     fun hasPossibleEquality(text:String)=equality.containsMatchIn(text)
     fun fragments(text:String):List<Fragment> {
         val result=mutableListOf<Fragment>();var end=0

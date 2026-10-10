@@ -4,12 +4,18 @@ La 0.44 ajoute une palette courte de feedback, centralisée dans `AppFeedback` e
 
 ## Moments retenus
 
+Depuis la 0.47 amendée, manipuler le slider de fréquence ou ses boutons de pas démarre une réception **continue**, qui persiste après le relâchement. Le message français, plus long, tourne en boucle avec une pause de 350 ms entre les transmissions. Plus on approche de la fréquence demandée, plus la voix devient intelligible : en s'éloignant, elle perd ses détails, se sature et fluctue progressivement sous le souffle. Ce traitement sonore ludique ne produit aucun verdict binaire. La limite de 1,3 seconde est supprimée. Aucun son spontané à l'ouverture et aucune simulation pendant un examen blanc.
+
+Cette écoute automatique dépend du réglage **Sons**. Valider ou changer de question, masquer le diagnostic, quitter l'écran, passer en arrière-plan ou couper Sons libère la sortie. Une lecture pédagogique de Pico ou du Morse prend priorité ; la réception reprend seule à la fin de cette lecture, à la fréquence choisie, sans réclamer un autre geste. La voix fixe est préparée localement puis gardée en mémoire ; aucune requête serveur ni permission ajoutée. Sans moteur français disponible, le souffle peut rester seul. L'écart accepté utilise la valeur arrondie affichée, afin que les deux bornes annoncées soient réellement acceptées malgré l'approximation des nombres flottants.
+
+Les contrôles vérifient le PCM synthétisé, le mixage et les ressources Android ; ils ne mesurent pas la latence acoustique sur chaque téléphone/Bluetooth. La préparation commune des énoncés est décrite dans [SPEECH.md](SPEECH.md).
+
 | Interaction | Son | Vibration |
 |---|---|---|
 | Bouton, onglet, petit réglage | Déclic très discret | Aucune par défaut |
 | Sélection d'une réponse | Déclic atténué | Impulsion douce |
 | Prise/déplacement/assemblage d'une carte | Déclic borné en fréquence | Prise, petit cran, puis pose |
-| Slider de fréquence ou estimation | Aucun | Crans fins, repères plus fermes, butée et fin de geste |
+| Slider de fréquence ou estimation | Souffle et voix pour la fréquence depuis la 0.47 ; aucun pour l'estimation | Crans fins, repères plus fermes, butée et fin de geste |
 | Retournement d'une flashcard | Déclic discret | Départ puis milieu du flip |
 | Bit binaire, vrai/faux, composition Morse | Déclic discret | Impulsions selon la manipulation |
 | Réponse juste | Deux cordes pincées ascendantes | Deux impulsions, seconde plus ferme |
