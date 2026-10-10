@@ -46,6 +46,11 @@
                 <data android:mimeType="application/json" />
             </intent-filter>
         </activity>
+        <activity android:name=".platform.WidgetConfigurationActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
         <receiver android:name=".platform.ReminderReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

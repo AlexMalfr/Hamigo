@@ -136,7 +136,7 @@ private val wrongWireColors=listOf(Color(0xFFB65049),Color(0xFFC56557),Color(0xF
         val target=bounds.filterKeys {it in currentOrder}.minByOrNull {abs(it.value.center.y-(y-grabOffset))}?.key ?: return
         if(target!=item) {
             val next=currentOrder.toMutableList();val to=next.indexOf(target);next.remove(item);next.add(to,item)
-            currentChange(next);haptic?.event(FeedbackCue.SELECT)
+            currentChange(next);haptic?.event(FeedbackCue.ORDER_STEP)
         }
     }
     fun finish(){if(currentOrder!=original)haptic?.event(FeedbackCue.SNAP);dragged=null}

@@ -36,6 +36,7 @@ internal data class WidgetComposition(val size: SizeF, val texts: List<WidgetTex
     val pico: RectF?, val compact: Boolean, val column: Boolean)
 
 internal object WidgetPresentation {
+    private class WidgetPaint(val transparent: Boolean, val lightText: Boolean) : Paint(ANTI_ALIAS_FLAG)
     private val ink = Color.rgb(7, 61, 64)
     private val teal = Color.rgb(8, 127, 130)
     private val gold = Color.rgb(186, 99, 32)
@@ -172,11 +173,12 @@ internal object WidgetPresentation {
         return WidgetComposition(SizeF(w, h), texts, chart, pico, short, column)
     }
 
-    fun views(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF, pixelBudget: Float = 520_000f): RemoteViews {
+    fun views(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF, pixelBudget: Float = 520_000f,
+        transparent: Boolean = false, lightText: Boolean = true): RemoteViews {
         val layout = composition(kind, snapshot, size)
         val density = context.resources.displayMetrics.density
         fun px(dp: Float) = (dp * density).roundToInt()
-        return RemoteViews(context.packageName, R.layout.widget_responsive).apply {
+        return RemoteViews(context.packageName, if(transparent&&lightText)R.layout.widget_responsive_transparent else R.layout.widget_responsive).apply {
             // Named, clipped background tells conforming launchers that we already round the tile.
             // The transparent outline owns the clip; the illustration supplies its colour.
             val corner = minOf(layout.size.width,layout.size.height)*.21f
@@ -188,12 +190,21 @@ internal object WidgetPresentation {
                 corner>=12f -> R.drawable.widget_outline_12
                 else -> R.drawable.widget_outline_8
             })
-            setImageViewBitmap(R.id.widget_art, artwork(context, kind, snapshot, layout, pixelBudget))
+            setImageViewBitmap(R.id.widget_art, artwork(context, kind, snapshot, layout, pixelBudget, transparent, lightText))
             listOf(R.id.widget_title, R.id.widget_metric, R.id.widget_status, R.id.widget_badge, R.id.widget_review).forEach { id ->
                 val slot = layout.texts.firstOrNull { it.id == id }
                 setViewVisibility(id, if (slot == null) View.GONE else View.VISIBLE)
                 if (slot != null) {
-                    setTextViewText(id, slot.text); setTextColor(id, slot.color)
+                    setTextViewText(id, slot.text)
+                    setTextColor(id,if(!transparent)slot.color else if(!lightText)when(id) {
+                        R.id.widget_title -> if(kind==HomeWidgetKind.STREAK)gold else teal
+                        R.id.widget_status,R.id.widget_badge -> Color.rgb(69,103,106)
+                        else -> ink
+                    } else when(id) {
+                        R.id.widget_title -> if(kind==HomeWidgetKind.STREAK)coral else mint
+                        R.id.widget_status,R.id.widget_badge -> Color.rgb(215,237,232)
+                        else -> Color.WHITE
+                    })
                     setViewPadding(id, px(slot.bounds.left), px(slot.bounds.top), px(layout.size.width - slot.bounds.right), px(layout.size.height - slot.bounds.bottom))
                     setInt(id, "setGravity", Gravity.CENTER_VERTICAL or if (slot.centered) Gravity.CENTER_HORIZONTAL else Gravity.START)
                     // TextView auto-size with ellipsize may accept an ellipsized candidate. Fit the
@@ -221,25 +232,28 @@ internal object WidgetPresentation {
         }
     }
 
-    private fun artwork(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, layout: WidgetComposition, pixelBudget: Float): Bitmap {
+    private fun artwork(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, layout: WidgetComposition, pixelBudget: Float,
+        transparent: Boolean, lightText: Boolean): Bitmap {
         val w = layout.size.width; val h = layout.size.height
         // One bitmap per actual host orientation; bounded memory even on tablets and huge test shapes.
         val scale = minOf(context.resources.displayMetrics.density, 2.5f, 1400f / maxOf(w, h), sqrt(pixelBudget / (w * h)))
         val bitmap = Bitmap.createBitmap((w * scale).roundToInt().coerceAtLeast(1), (h * scale).roundToInt().coerceAtLeast(1), Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap).apply { scale(scale, scale) }
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        val paint = WidgetPaint(transparent, lightText)
         val dark = kind == HomeWidgetKind.WEEK
         val bg = when (kind) { HomeWidgetKind.STREAK -> Color.rgb(255, 241, 214); HomeWidgetKind.GOAL -> Color.rgb(219, 244, 238); HomeWidgetKind.WEEK -> Color.rgb(18, 63, 67) }
         val end = when (kind) { HomeWidgetKind.STREAK -> Color.rgb(255, 225, 178); HomeWidgetKind.GOAL -> Color.rgb(195, 232, 224); HomeWidgetKind.WEEK -> Color.rgb(27, 81, 83) }
         val corner = (minOf(w, h) * .21f).coerceAtMost(28f)
         val outline = Path().apply { addRoundRect(RectF(0f, 0f, w, h), corner, corner, Path.Direction.CW) }
         canvas.clipPath(outline)
-        paint.shader = LinearGradient(0f, 0f, w, h, bg, end, Shader.TileMode.CLAMP)
-        canvas.drawRect(0f, 0f, w, h, paint); paint.shader = null
-        // Soft radio waves make every proportion recognisably Hamigo, without covering the numbers.
-        paint.style = Paint.Style.STROKE; paint.strokeWidth = 1.3f; paint.color = if (dark) Color.argb(9, 255, 255, 255) else Color.argb(8, 8, 127, 130)
-        val radius = minOf(w, h) * .35f
-        (1..3).forEach { canvas.drawCircle(w, 0f, radius * it, paint) }
+        if (!transparent) {
+            paint.shader = LinearGradient(0f, 0f, w, h, bg, end, Shader.TileMode.CLAMP)
+            canvas.drawRect(0f, 0f, w, h, paint); paint.shader = null
+            // Soft radio waves belong to the background, not the data illustration.
+            paint.style = Paint.Style.STROKE; paint.strokeWidth = 1.3f; paint.color = if (dark) Color.argb(9, 255, 255, 255) else Color.argb(8, 8, 127, 130)
+            val radius = minOf(w, h) * .35f
+            (1..3).forEach { canvas.drawCircle(w, 0f, radius * it, paint) }
+        }
         paint.style = Paint.Style.FILL
         layout.pico?.let { drawPico(canvas, it, snapshot) }
         val chart = layout.chart
@@ -484,12 +498,23 @@ internal object WidgetPresentation {
     /** Canvas labels get real font metrics; they cannot overflow their reserved rectangle. */
     private fun fitted(c: Canvas, p: Paint, text: String, rect: RectF, size: Float, color: Int, center: Boolean = true) {
         if (rect.width() <= 0 || rect.height() <= 0) return
-        p.style = Paint.Style.FILL; p.color = color; p.typeface = Typeface.DEFAULT_BOLD; p.textSize = size
+        val theme = p as? WidgetPaint
+        val light = theme?.transparent == true && theme.lightText
+        p.style = Paint.Style.FILL
+        p.color = if(theme?.transparent==true)when(color) {
+            ink,Color.WHITE -> if(light)Color.WHITE else ink
+            teal,mint -> if(light)mint else teal
+            gold,coral -> if(light)coral else gold
+            else -> color
+        } else color
+        p.typeface = Typeface.DEFAULT_BOLD; p.textSize = size
+        if(light)p.setShadowLayer(1.5f,0f,.6f,Color.argb(160,0,0,0))
         val fm = p.fontMetrics
         p.textSize *= minOf(1f, rect.width() / p.measureText(text).coerceAtLeast(1f), rect.height() / (fm.descent - fm.ascent).coerceAtLeast(1f))
         p.textAlign = if (center) Paint.Align.CENTER else Paint.Align.LEFT
         val baseline = rect.centerY() - (p.fontMetrics.ascent + p.fontMetrics.descent) / 2
         c.drawText(text, if (center) rect.centerX() else rect.left, baseline, p)
+        p.clearShadowLayer()
     }
     internal fun number(value: Int, compact: Boolean): String {
         if (!compact || value < 10_000) return value.toString()

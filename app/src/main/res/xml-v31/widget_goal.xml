@@ -2,4 +2,6 @@
     android:minWidth="220dp" android:minHeight="150dp" android:minResizeWidth="40dp" android:minResizeHeight="40dp"
     android:targetCellWidth="3" android:targetCellHeight="2" android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000" android:initialLayout="@layout/widget_goal_preview" android:previewLayout="@layout/widget_goal_preview"
+    android:configure="com.malfreyt.alexandre.hamigo.platform.WidgetConfigurationActivity"
+    android:widgetFeatures="reconfigurable|configuration_optional"
     android:description="@string/widget_goal_description" android:widgetCategory="home_screen" />

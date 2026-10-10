@@ -33,7 +33,9 @@ internal object FeedbackAudioGate {
 
 internal class AppFeedback(context:Context) {
     private val app=context.applicationContext
-    private val prefs=app.getSharedPreferences("hamigo",Context.MODE_PRIVATE)
+    private val originalPrefs=app.getSharedPreferences("hamigo",Context.MODE_PRIVATE)
+    private var prefs=originalPrefs
+    private val preferenceOwners=linkedMapOf<Any,SharedPreferences>()
     var settings by mutableStateOf(FeedbackPreferences.read(prefs));private set
     private val manager=app.getSystemService(AudioManager::class.java)
     private val vibrator=if(Build.VERSION.SDK_INT>=31)app.getSystemService(VibratorManager::class.java).defaultVibrator else app.getSystemService(Vibrator::class.java)
@@ -63,9 +65,19 @@ internal class AppFeedback(context:Context) {
         val resources=mapOf("ui_click" to R.raw.ui_click,"ui_success" to R.raw.ui_success,"ui_error" to R.raw.ui_error,
             "ui_complete" to R.raw.ui_complete,"ui_finish" to R.raw.ui_finish,"ui_pico" to R.raw.ui_pico)
         val samples=resources.mapValues {pool.load(app,it.value,1)}
-        FeedbackCue.entries.forEach {ids[it]=samples.getValue(FeedbackDesign.sound(it))}
+        FeedbackCue.entries.forEach {cue->FeedbackDesign.sound(cue)?.let {ids[cue]=samples.getValue(it)}}
     }
     fun foreground(value:Boolean) {foreground=value;if(value)active=this else {if(active===this)active=null;silence();vibrator?.cancel()}}
+    /** Diagnostic screens can exercise mute without persisting changes to the real device preferences. */
+    fun selectPreferences(owner:Any,value:SharedPreferences?) {
+        if(closed)return
+        if(value==null)preferenceOwners.remove(owner) else preferenceOwners[owner]=value
+        val next=preferenceOwners.values.lastOrNull() ?: originalPrefs
+        if(next===prefs)return
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);prefs=next
+        prefs.registerOnSharedPreferenceChangeListener(listener);settings=FeedbackPreferences.read(prefs)
+        if(!settings.sound)silence();if(!settings.haptics)vibrator?.cancel()
+    }
     fun click() {
         pendingClick?.let(main::removeCallbacks)
         val task=Runnable {pendingClick=null;emit(FeedbackCue.CLICK)}
@@ -77,7 +89,7 @@ internal class AppFeedback(context:Context) {
     }
     private fun emit(cue:FeedbackCue) {
         if(closed||!foreground||!throttle.allow(cue,SystemClock.uptimeMillis()))return
-        val audible=settings.sound&&!FeedbackAudioGate.busy&&manager.getStreamVolume(AudioManager.STREAM_MUSIC)>0
+        val audible=settings.sound&&FeedbackDesign.sound(cue)!=null&&!FeedbackAudioGate.busy&&manager.getStreamVolume(AudioManager.STREAM_MUSIC)>0
         val tactile=settings.haptics&&vibrator?.hasVibrator()==true&&
             Settings.System.getInt(app.contentResolver,Settings.System.HAPTIC_FEEDBACK_ENABLED,1)!=0&&FeedbackDesign.haptic(cue)!=null
         observer?.invoke(cue,audible,tactile)
@@ -104,6 +116,11 @@ internal class AppFeedback(context:Context) {
 }
 
 internal val LocalAppFeedback=staticCompositionLocalOf<AppFeedback?> {null}
+@Composable internal fun FeedbackPreferenceScope(feedback:AppFeedback,prefs:SharedPreferences,content:@Composable ()->Unit) {
+    val owner=remember {Any()}
+    DisposableEffect(feedback,prefs){feedback.selectPreferences(owner,prefs);onDispose {feedback.selectPreferences(owner,null)}}
+    content()
+}
 @Composable internal fun FeedbackHost(feedback:AppFeedback,content:@Composable ()->Unit) {
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     DisposableEffect(feedback,lifecycle) {

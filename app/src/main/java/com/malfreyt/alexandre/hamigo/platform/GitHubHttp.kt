@@ -26,9 +26,10 @@ import kotlin.coroutines.resumeWithException
 /** Fixed production origins. Neither invitations nor browser navigation choose a token's destination. */
 internal object GitHubHttp : GitHubGateway {
     private val transport = GitHubHttpClient()
-    override suspend fun api(method: String, path: String, token: String?, body: String?) = transport.api(method,path,token,body)
-    override suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String) = transport.rawBackup(rawUrl,owner,gist,fileName)
-    suspend fun oauth(path: String, form: String) = transport.oauth(path,form)
+    private fun checkDiagnostics(){if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.networkPaused)throw kotlinx.coroutines.CancellationException("Bac à sable actif")}
+    override suspend fun api(method: String, path: String, token: String?, body: String?):String {checkDiagnostics();return transport.api(method,path,token,body)}
+    override suspend fun rawBackup(rawUrl: String, owner: String, gist: String, fileName: String):String {checkDiagnostics();return transport.rawBackup(rawUrl,owner,gist,fileName)}
+    suspend fun oauth(path: String, form: String):JSONObject {checkDiagnostics();return transport.oauth(path,form)}
 }
 
 /** Injectable origins are internal and used only by local transport tests. Release uses the defaults. */

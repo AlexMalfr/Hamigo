@@ -62,6 +62,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
     val currentOpen by rememberUpdatedState(isOpen)
     val currentDismiss by rememberUpdatedState(onDismiss)
     val currentInsert by rememberUpdatedState(onInsertResult)
+    val openDiagnostics=LocalOpenDiagnostics.current
     LaunchedEffect(isOpen) {
         if (isOpen) {
             rendered = true
@@ -79,6 +80,9 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
         }
     }
     fun calculate(): Double? {
+        if(openDiagnostics!=null&&DiagnosticAccess.matches(expression)) {
+            requestDismiss();openDiagnostics();input=TextFieldValue("");result=null;error=null;return null
+        }
         return runCatching {
             CalculatorEngine.evaluate(expression, if (degrees) CalculatorAngleMode.DEGREES else CalculatorAngleMode.RADIANS, previousAnswer)
         }.fold(onSuccess = { value -> result = value; previousAnswer = value; error = null; value }, onFailure = {

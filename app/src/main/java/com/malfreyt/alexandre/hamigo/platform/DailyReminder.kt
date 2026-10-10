@@ -33,6 +33,7 @@ object DailyReminder {
     internal const val SNOOZE_DAY = "reminderSnoozeDay"
 
     fun configure(context: Context, enabled: Boolean, hour: Int = 20, minute: Int = 0) {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
         require(hour in 0..23 && minute in 0..59)
         synchronized(Progress.CLOUD_LOCK) {
             val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
@@ -57,6 +58,7 @@ object DailyReminder {
 
     /** Schedule one inexact alarm, then recalculate the next local day after each delivery. */
     fun schedule(context: Context) {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
         createChannel(context)
         val manager = context.getSystemService(AlarmManager::class.java)
         val pending = PendingIntent.getBroadcast(
@@ -155,6 +157,7 @@ object DailyReminder {
 
     /** Also used by visual QA: the same artwork and Android template as a scheduled reminder. */
     fun showPreview(context: Context, reminder: ReminderMessage): Boolean {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return false
         createChannel(context)
         val manager = context.getSystemService(NotificationManager::class.java)
         if (!manager.areNotificationsEnabled()) return false

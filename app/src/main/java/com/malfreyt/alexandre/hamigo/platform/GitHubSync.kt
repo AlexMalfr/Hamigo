@@ -26,8 +26,14 @@ data class GistSnapshot(val id: String, val url: String, val progress: ShareProg
 data class SyncReport(val social: GistSnapshot, val restored: Boolean, val lastSyncedAt: String)
 
 /** Opt-in snapshot publishing. A secret Gist is unlisted, and readable by anyone with its link. */
-class GitHubSync(context: Context, private val gateway: GitHubGateway = GitHubHttp) {
+class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp) {
     private val appContext = context.applicationContext
+    private val transport=gateway
+    private val gateway=object:GitHubGateway {
+        private fun checkPaused(){if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(appContext))throw kotlinx.coroutines.CancellationException("Bac à sable actif")}
+        override suspend fun api(method:String,path:String,token:String?,body:String?):String {checkPaused();return transport.api(method,path,token,body)}
+        override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String {checkPaused();return transport.rawBackup(rawUrl,owner,gist,fileName)}
+    }
     private val prefs = appContext.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
     val tokens = SecureTokenStore(context)
     /** Local, canonical browser links only; reading these never discovers or creates a Gist. */

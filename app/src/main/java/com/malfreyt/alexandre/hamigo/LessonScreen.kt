@@ -48,6 +48,8 @@ private object LessonIntroNavigation {
     val context=LocalContext.current
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context,lesson.id,returnTarget) {if(returnTarget==null)LessonSpeech(context) else null}
+    val diagnosticsCovered=LocalDiagnosticsCovered.current
+    LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered)speech?.stop()}
     val companion=rememberPicoCompanion("lesson-${lesson.id}-${model.lessonOpening}",enabled=returnTarget==null)
     val touch=rememberPicoNarrationTap("lesson-${lesson.id}-${model.lessonOpening}")
     DisposableEffect(speech,lifecycle) {

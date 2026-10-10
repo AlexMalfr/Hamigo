@@ -113,7 +113,7 @@ class Content(private val context: Context) {
 fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
 fun JSONArray.strings() = (0 until length()).map { getString(it) }
 
-class Progress(private val context: Context) {
+class Progress(private val context: Context, private val sideEffects:Boolean=true) {
     companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
@@ -121,7 +121,7 @@ class Progress(private val context: Context) {
         get() = prefs.getString("name", "Pilote des ondes")!!
         set(value) {
             synchronized(CLOUD_LOCK) { prefs.edit().putString("name", value.take(40).ifBlank { "Pilote des ondes" }).putLong("profileUpdatedAt",System.currentTimeMillis()).apply() }
-            ProgressSyncScheduler.enqueue(context)
+            if(sideEffects)ProgressSyncScheduler.enqueue(context)
         }
     val completed: Set<String> get() = (root.optJSONArray("completed") ?: JSONArray()).strings().toSet()
     val reviews: Map<String, Review> get() {
@@ -182,8 +182,8 @@ class Progress(private val context: Context) {
     }
     private fun save(editor: android.content.SharedPreferences.Editor = prefs.edit()) {
         root.put("schema", 2); editor.putString("progress", root.toString()).apply()
-        com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
-        DailyReminder.progressChanged(context)
+        if(sideEffects)com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
+        if(sideEffects)DailyReminder.progressChanged(context)
     }
     fun reload() = synchronized(CLOUD_LOCK) {
         root = runCatching { JSONObject(prefs.getString("progress", "{}")!!) }.getOrElse { JSONObject() }
@@ -191,9 +191,9 @@ class Progress(private val context: Context) {
     fun setDailyGoal(goal:Int) {
         require(goal in 1..1000)
         prefs.edit().putInt("dailyGoal",goal).putLong("preferencesUpdatedAt",System.currentTimeMillis()).apply()
-        com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
-        DailyReminder.progressChanged(context)
-        ProgressSyncScheduler.enqueue(context)
+        if(sideEffects)com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
+        if(sideEffects)DailyReminder.progressChanged(context)
+        if(sideEffects)ProgressSyncScheduler.enqueue(context)
     }
     fun cloudExport():String = synchronized(CLOUD_LOCK) {
         reload(); CloudProgress.ensureLedger(root); save()
@@ -273,7 +273,7 @@ class Progress(private val context: Context) {
         }
         candidate.optJSONObject("socialInbox")?.let { editor.putString("socialInbox",it.toString()) }
         save(editor)
-        if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
+        if(previousReminder!=reminderSettings()) if(sideEffects)DailyReminder.schedule(context)
         before != cloudExport()
     }
     fun export() = cloudExport()
@@ -311,9 +311,9 @@ class Progress(private val context: Context) {
                     .putLong("preferencesUpdatedAt",System.currentTimeMillis())
             }
             save(editor)
-            if(previousReminder!=reminderSettings()) DailyReminder.schedule(context)
+            if(previousReminder!=reminderSettings()) if(sideEffects)DailyReminder.schedule(context)
         }
-        ProgressSyncScheduler.enqueue(context)
+        if(sideEffects)ProgressSyncScheduler.enqueue(context)
     }
     private fun reminderSettings() = Triple(prefs.getBoolean("reminderEnabled",false),prefs.getInt("reminderHour",20),prefs.getInt("reminderMinute",0))
     fun snapshot() = com.malfreyt.alexandre.hamigo.platform.ShareProgress(name, xp, streak, completed.size, weeklyXp,

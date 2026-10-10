@@ -2,4 +2,6 @@
     android:minWidth="130dp" android:minHeight="130dp" android:minResizeWidth="40dp" android:minResizeHeight="40dp"
     android:targetCellWidth="2" android:targetCellHeight="2" android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="1800000" android:initialLayout="@layout/widget_compact" android:previewLayout="@layout/widget_streak_preview"
+    android:configure="com.malfreyt.alexandre.hamigo.platform.WidgetConfigurationActivity"
+    android:widgetFeatures="reconfigurable|configuration_optional"
     android:description="@string/widget_streak_description" android:widgetCategory="home_screen" />

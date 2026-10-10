@@ -182,10 +182,16 @@ private data class BackScreenSnapshot(
 }
 
 @Composable fun HamigoApp(model: AppModel) {
-    FeedbackHost(model.interactionFeedback) {HamigoAppContent(model)}
+    FeedbackHost(model.interactionFeedback) {
+        CompositionLocalProvider(LocalOpenDiagnostics provides {model.debugToolsOpen=true},LocalDiagnosticsCovered provides model.debugToolsOpen) {
+            val shown=model.diagnostics.sandbox ?: model
+            FeedbackPreferenceScope(model.interactionFeedback,shown.progress.prefs) {key(shown){HamigoAppContent(shown,model)}}
+            if(model.debugToolsOpen)DiagnosticsScreen(model)
+        }
+    }
 }
 
-@Composable private fun HamigoAppContent(model:AppModel) {
+@Composable private fun HamigoAppContent(model:AppModel,diagnosticOwner:AppModel) {
     val content=model.content
     val tick=model.revision
     val context=LocalContext.current
@@ -415,16 +421,17 @@ private data class BackScreenSnapshot(
             Box(frameModifier.background(if(memoMorph)Color.White else Cream).testTag("back-foreground")) {
             Box(if(memoMorph)Modifier.wrapContentSize(Alignment.TopStart,unbounded=true)
                 .requiredSize(with(density){backWidth.toDp()},with(density){backHeight.toDp()}).graphicsLayer {alpha=(1f-dock/.65f).coerceIn(0f,1f)} else Modifier.fillMaxSize()) {
-            when {
+            CompositionLocalProvider(LocalContext provides if(model.diagnosticModel)model.diagnosticContext else context) {when {
                 model.session!=null -> QuizScreen(model)
                 model.resource!=null -> ReferenceDetailScreen(model,model.resource!!)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)
-                model.route=="settings" -> SettingsScreen(model)
+                model.route=="settings" -> if(model.diagnosticModel)ReadOnlyDiagnosticPreview {SettingsScreen(model)} else SettingsScreen(model)
                 else -> MainDestination(model,content)
-            }
+            }}
             }
             if(memoMorph)MemoMorphRow(backSource!!.resource!!,Modifier.fillMaxWidth().graphicsLayer { alpha=((dock-.18f)/.5f).coerceIn(0f,1f) },titleSize=(21f-5f*dock).sp)
             }
+            DiagnosticHud(diagnosticOwner,model,Modifier.align(Alignment.TopStart).padding(start=8.dp,top=82.dp))
         }
         }
     }

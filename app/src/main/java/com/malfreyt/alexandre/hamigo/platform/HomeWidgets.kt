@@ -60,7 +60,7 @@ internal object HomeWidgets {
         if(installed.any { it.second.isNotEmpty() }) {
             val snapshot = WidgetSnapshot.read(context)
             installed.forEach { (kind,ids) -> ids.forEach { id ->
-                manager.updateAppWidget(id,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(id)))
+                manager.updateAppWidget(id,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(id),id))
             } }
         }
         scheduleMidnight(context,installed.any { it.second.isNotEmpty() })
@@ -68,11 +68,14 @@ internal object HomeWidgets {
 
     fun update(context: Context, manager: AppWidgetManager, ids: IntArray, kind: HomeWidgetKind) {
         val snapshot = WidgetSnapshot.read(context)
-        ids.forEach { manager.updateAppWidget(it,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(it))) }
+        ids.forEach { manager.updateAppWidget(it,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(it),it)) }
         scheduleMidnight(context,true)
     }
 
-    internal fun responsiveViews(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, options: Bundle): RemoteViews {
+    internal fun responsiveViews(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, options: Bundle,
+        appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID): RemoteViews {
+        val transparent = WidgetSettings.transparent(context,appWidgetId)
+        val lightText = WidgetSettings.lightText(context,appWidgetId)
         val defaults = when (kind) {
             HomeWidgetKind.STREAK -> SizeF(130f,130f)
             HomeWidgetKind.GOAL -> SizeF(220f,150f)
@@ -90,13 +93,13 @@ internal object HomeWidgets {
                 .ifEmpty { listOf(portrait,landscape) }.distinct().take(16)
             val metrics = context.resources.displayMetrics
             val perSizeBudget = minOf(520_000f, minOf(1_000_000f, metrics.widthPixels.toFloat() * metrics.heightPixels * .75f) / sizes.size)
-            RemoteViews(sizes.associateWith { WidgetPresentation.views(context,kind,snapshot,it,perSizeBudget) })
+            RemoteViews(sizes.associateWith { WidgetPresentation.views(context,kind,snapshot,it,perSizeBudget,transparent,lightText) })
         } else {
             val metrics = context.resources.displayMetrics
             val count = if (portrait == landscape) 1 else 2
             val perSizeBudget = minOf(520_000f, minOf(1_000_000f, metrics.widthPixels.toFloat() * metrics.heightPixels * .75f) / count)
-            val portraitViews = WidgetPresentation.views(context,kind,snapshot,portrait,perSizeBudget)
-            if (count == 1) portraitViews else RemoteViews(WidgetPresentation.views(context,kind,snapshot,landscape,perSizeBudget), portraitViews)
+            val portraitViews = WidgetPresentation.views(context,kind,snapshot,portrait,perSizeBudget,transparent,lightText)
+            if (count == 1) portraitViews else RemoteViews(WidgetPresentation.views(context,kind,snapshot,landscape,perSizeBudget,transparent,lightText), portraitViews)
         }
     }
 
@@ -123,6 +126,7 @@ abstract class HamigoWidgetProvider : AppWidgetProvider() {
     override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) =
         HomeWidgets.update(context,appWidgetManager,intArrayOf(appWidgetId),kind)
     override fun onDisabled(context: Context) = HomeWidgets.refresh(context)
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) = WidgetSettings.delete(context,appWidgetIds)
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context,intent)
         HomeWidgets.received(context,intent)

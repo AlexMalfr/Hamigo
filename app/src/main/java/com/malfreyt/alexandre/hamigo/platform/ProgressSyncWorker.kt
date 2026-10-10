@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit
 /** Durable hourly refresh. Android may defer it for battery, Doze, or a missing connection. */
 class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     override suspend fun doWork(): Result {
+        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(applicationContext))return Result.success()
         val progress = Progress(applicationContext)
         val sync = GitHubSync(applicationContext)
         if (!progress.prefs.getBoolean("autoSync", true) || !sync.tokens.hasToken()) return Result.success()
@@ -81,6 +82,8 @@ object ProgressSyncScheduler {
         .setRequiresBatteryNotLow(true).build()
 
     fun schedule(context: Context) {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
+        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context)){cancel(context);return}
         val progress = Progress(context.applicationContext)
         if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken()) {
             cancel(context); return
@@ -95,6 +98,8 @@ object ProgressSyncScheduler {
 
     /** Debounced answer/save events persist even if the app closes before the connection returns. */
     fun enqueue(context: Context, delaySeconds: Long = 8) {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
+        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context))return
         val progress = Progress(context.applicationContext)
         if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken()) return
         val request = OneTimeWorkRequestBuilder<ProgressSyncWorker>().setConstraints(constraints)

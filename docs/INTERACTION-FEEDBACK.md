@@ -9,6 +9,9 @@ La 0.44 ajoute une palette courte de feedback, centralisée dans `AppFeedback` e
 | Bouton, onglet, petit réglage | Déclic très discret | Aucune par défaut |
 | Sélection d'une réponse | Déclic atténué | Impulsion douce |
 | Prise/déplacement/assemblage d'une carte | Déclic borné en fréquence | Prise, petit cran, puis pose |
+| Slider de fréquence ou estimation | Aucun | Crans fins, repères plus fermes, butée et fin de geste |
+| Retournement d'une flashcard | Déclic discret | Départ puis milieu du flip |
+| Bit binaire, vrai/faux, composition Morse | Déclic discret | Impulsions selon la manipulation |
 | Réponse juste | Deux cordes pincées ascendantes | Deux impulsions, seconde plus ferme |
 | Réponse à corriger | Deux frappes sourdes | Deux impulsions légères |
 | Fin de séance validée | Courte résonance ascendante | Trois impulsions alignées sur les attaques |
@@ -16,6 +19,8 @@ La 0.44 ajoute une palette courte de feedback, centralisée dans `AppFeedback` e
 | Grimace de Pico et surprise de Version | Petit ressort élastique | Rebond doux, temporisé |
 
 Les évaluations de flashcards ont un feedback de pose, sans verdict sonore de justesse. Les brouillons d'examen ne produisent **aucun indice sonore/haptique de bonne ou mauvaise réponse**. Le bilan conserve les règles de réussite existantes.
+
+La 0.45 distingue les gestes des formats : cran à chaque changement de position logique sur un slider, repère par dixième de son échelle, double impulsion aux extrémités, puis pose au relâchement. La cadence des crans est bornée à 36 ms et aucune vibration ne dépend de la proximité de la bonne réponse. Les sliders restent silencieux. Le flip de 360 ms a une impulsion de départ puis une autre autour du passage de tranche ; aucune vibration à la recomposition. Binaire actif/inactif, point/trait Morse, vrai/faux et franchissement d'une position dans un classement ont leurs impulsions distinctes. Les contrôles du menu [Diagnostics](DIAGNOSTICS.md) permettent d'essayer les principaux motifs.
 
 Les actions ordinaires passent par `feedbackClick`, les gestes utiles par `feedbackAction` ou un événement explicite. Un verdict remplace le déclic de son bouton. Les petits événements sont espacés d'au moins 90 ms et les réactions de Pico de 600 ms ; aucun son n'est émis par ses expressions automatiques, par le scroll ou par chaque mouvement du stylet. Les relectures/recompositions n'émettent pas de nouveau verdict.
 

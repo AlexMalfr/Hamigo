@@ -91,6 +91,8 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
     val touch=rememberPicoNarrationTap(questionKey)
     LaunchedEffect(feedback) {if(feedback!=null)speech.stop()}
     LaunchedEffect(questionKey) {speech.stop()}
+    val diagnosticsCovered=LocalDiagnosticsCovered.current
+    LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered)speech.stop()}
     DisposableEffect(speech,lifecycle) {
         val observer=LifecycleEventObserver {_,event->if(event==Lifecycle.Event.ON_STOP)speech.stop()}
         lifecycle.addObserver(observer)

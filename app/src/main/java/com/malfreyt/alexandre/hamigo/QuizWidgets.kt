@@ -115,7 +115,7 @@ class ClozeDragState {
 @Composable fun TrueFalseBoard(q: Question, choice: Int, feedback: Boolean?, onChoice: (Int) -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         q.choices.forEachIndexed { index, text ->
-            Surface(onClick=feedbackAction(FeedbackCue.SELECT) { onChoice(index) }, enabled = feedback == null, modifier = Modifier.weight(1f).height(108.dp), shape = RoundedCornerShape(18.dp),
+            Surface(onClick=feedbackAction(FeedbackCue.TRUE_FALSE) { onChoice(index) }, enabled = feedback == null, modifier = Modifier.weight(1f).height(108.dp), shape = RoundedCornerShape(18.dp),
                 color = if (feedback != null && index == q.answer) Mist else if (choice == index) Gold.copy(alpha = .35f) else Color.White,
                 border = BorderStroke(if (choice == index) 2.dp else 1.dp, if (choice == index) Teal else Color(0xFFD5DEDA))) {
                 // Center the icon and label as a single group in the complete tile, not at its top.
@@ -141,7 +141,8 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
     Panel(color=Mist) {
         if(code.isBlank())Text("Ton message attend son premier point…",fontSize=13.sp,color=Muted)
         else MorseSymbols(code)
-        MorseSignalInput(enabled) { onChange(code + it) }
+        val feedback=LocalAppFeedback.current
+        MorseSignalInput(enabled) { feedback?.event(if(it=='.')FeedbackCue.MORSE_DOT else if(it=='-')FeedbackCue.MORSE_DASH else FeedbackCue.SNAP);onChange(code + it) }
         Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
             OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
             OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}
@@ -158,7 +159,7 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
             (bits-1 downTo 0).forEach{bit -> val active=value and (1 shl bit)!=0
                 Column(Modifier.weight(1f),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(5.dp)) {
                     Text("${1 shl bit}",fontSize=11.sp,color=Muted)
-                    Surface(onClick=feedbackClick {onChange(value xor (1 shl bit))},enabled=enabled,shape=RoundedCornerShape(10.dp),color=if(active)Purple else Color.White,
+                    Surface(onClick=feedbackAction(if(active)FeedbackCue.BINARY_OFF else FeedbackCue.BINARY_ON) {onChange(value xor (1 shl bit))},enabled=enabled,shape=RoundedCornerShape(10.dp),color=if(active)Purple else Color.White,
                         border=BorderStroke(1.dp,Purple.copy(alpha=.4f)),modifier=Modifier.fillMaxWidth().height(52.dp).semantics {contentDescription="Bit de poids ${1 shl bit} : ${if(active)1 else 0}"}) {
                         Box(contentAlignment=Alignment.Center){Text(if(active)"1"else"0",color=if(active)Color.White else Purple,fontWeight=FontWeight.ExtraBold,fontSize=22.sp)}
                     }

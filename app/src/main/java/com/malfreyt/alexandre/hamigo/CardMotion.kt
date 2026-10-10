@@ -69,7 +69,7 @@ internal val LocalAnimatedBack = staticCompositionLocalOf<(() -> Unit)?> { null 
     val backVisible = rotation > 90f
     val density = LocalDensity.current
     Surface(
-        onClick=onFlip,
+        onClick=feedbackAction(FeedbackCue.FLASH_FLIP,onFlip),
         modifier=Modifier.fillMaxWidth().heightIn(min=260.dp).testTag("flashcard")
             .semantics { stateDescription=if(backVisible) "Réponse" else "Question" }
             .graphicsLayer { rotationY=rotation; cameraDistance=14f*density.density; clip=false },

@@ -134,7 +134,7 @@ import kotlin.random.Random
     Box(Modifier.fillMaxSize().imePadding()) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth().padding(horizontal=14.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically) {
-            IconButton(feedbackClick {quit=true}){Icon(Icons.Rounded.Close,"Quitter la séance")}
+            IconButton(feedbackClick {if(model.diagnosticModel&&s.testing)model.leaveSession() else quit=true}){Icon(Icons.Rounded.Close,"Quitter la séance")}
             Column(Modifier.weight(1f)) {Text(s.title,maxLines=1,fontSize=13.sp,fontWeight=FontWeight.Bold,color=Muted);Spacer(Modifier.height(7.dp));LinearProgressIndicator(progress={(s.index.toFloat()/s.questions.size).coerceIn(0f,1f)},modifier=Modifier.fillMaxWidth().height(8.dp),color=Teal,trackColor=Mist)}
             Spacer(Modifier.width(10.dp));Column(horizontalAlignment=Alignment.End) {
                 Text("${s.index+1}/${s.questions.size}",fontSize=13.sp,fontWeight=FontWeight.Bold,color=Teal)
@@ -175,7 +175,7 @@ import kotlin.random.Random
                 "frequency" -> {
                     Panel(color=Mist){Text("${formatMeasuredNumber(frequency.toDouble(),q.tolerance)} MHz",fontSize=38.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
                         FrequencyDial(frequency)
-                        Slider(frequency,{frequency=snapSliderValue(it,143f,148f,.05f)},valueRange=143f..148f,steps=99,enabled=feedback==null)
+                        HapticQuestionSlider(frequency,{frequency=it},143f..148f,feedback==null,key,steps=99,quantize={snapSliderValue(it,143f,148f,.05f)})
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("143 MHz",fontSize=11.sp);Text("148 MHz",fontSize=11.sp)}
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){OutlinedButton(feedbackClick {frequency=(frequency-.05f).coerceAtLeast(143f)},enabled=feedback==null){Text("− 0,05")};OutlinedButton(feedbackClick {frequency=(frequency+.05f).coerceAtMost(148f)},enabled=feedback==null){Text("+ 0,05")}}
                         Text(toleranceLabel(q.tolerance,"MHz"),fontSize=12.sp,color=Muted)
@@ -185,7 +185,8 @@ import kotlin.random.Random
                     Panel(color=Gold.copy(alpha=.16f)) {
                         val step=q.bands.getOrNull(2)?.toFloatOrNull()?.takeIf{it>0f} ?: 1f
                         Text("${formatMeasuredNumber(estimate.toDouble(),q.tolerance)} ${q.unit}",fontSize=32.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
-                        Slider(estimate,{estimate=snapSliderValue(it,estimateMin,estimateMax,step)},valueRange=estimateMin..estimateMax,enabled=feedback==null)
+                        HapticQuestionSlider(estimate,{estimate=it},estimateMin..estimateMax,feedback==null,key,
+                            intervals=((estimateMax-estimateMin)/step).toInt().coerceIn(10,100),quantize={snapSliderValue(it,estimateMin,estimateMax,step)})
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("${formatMeasuredNumber(estimateMin.toDouble(),q.tolerance)} ${q.unit}",fontSize=11.sp);Text("${formatMeasuredNumber(estimateMax.toDouble(),q.tolerance)} ${q.unit}",fontSize=11.sp)}
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){OutlinedButton(feedbackClick {estimate=(estimate-step).coerceAtLeast(estimateMin)},enabled=feedback==null){Text("− ${formatMeasuredNumber(step.toDouble(),q.tolerance)}")};OutlinedButton(feedbackClick {estimate=(estimate+step).coerceAtMost(estimateMax)},enabled=feedback==null){Text("+ ${formatMeasuredNumber(step.toDouble(),q.tolerance)}")}}
                         Text(toleranceLabel(q.tolerance,q.unit),fontSize=12.sp,color=Muted)
@@ -271,7 +272,7 @@ import kotlin.random.Random
     }
     FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor,resetKey=s to key)
     key(s,key) { FloatingScratchpad(scratchpadOpen,{scratchpadOpen=false},scratchpad,scratchpadAnchor) }
-    if(quit)AlertDialog(onDismissRequest={quit=false},title={Text("Faire une pause ?")},text={Text(if(s.exam)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},confirmButton={TextButton(feedbackClick {model.leaveSession();quit=false}){Text("Quitter")}},dismissButton={TextButton(feedbackClick {quit=false}){Text("Revenir au défi")}})
+    if(quit)AlertDialog(onDismissRequest={quit=false},title={Text("Faire une pause ?")},text={Text(if(s.testing)"Cette séance de test ne modifie pas la progression." else if(s.exam)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},confirmButton={TextButton(feedbackClick {model.leaveSession();quit=false}){Text("Quitter")}},dismissButton={TextButton(feedbackClick {quit=false}){Text("Revenir au défi")}})
     if(enlarged && artwork!=null)FullscreenExamIllustration(artwork.original){enlarged=false}
 }
 

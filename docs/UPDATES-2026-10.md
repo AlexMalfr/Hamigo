@@ -292,3 +292,16 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 ### Confettis plus amples — amendement 0.44
 
 - Morceaux agrandis, gerbes plus hautes et plus larges ; vol et rotation ralentis, durée de 4,2 secondes avec extinction douce. Le lancement reste accompagné du même son et du même motif tactile.
+
+## Diagnostics et personnalisation des widgets — 0.45
+
+- Les questions ont des retours tactiles adaptés à leurs gestes : crans/repères/butées et relâchement des sliders sans sons répétés, flip des flashcards, points/traits Morse, bits binaires et positions déplacées. Les indices ne dépendent jamais de la bonne réponse et les préférences tactiles sont respectées.
+- Un code saisi dans la calculatrice ouvre des outils de diagnostics sur appareil : catalogue complet avec IDs, recherche et filtres, test d'une question précise, tour des formats, aperçus natifs et statistiques. Le mode persistant affiche ID/type/version en surimpression.
+- Les séances du menu sont isolées ; une option persistante permet aussi de geler XP, validation et SRS des séances ordinaires. Un bac à sable client temporaire conserve ses données en mémoire, sans credentials personnels ni envoi GitHub. XP/série/cours peuvent être réglés, chaque cours coché arbitrairement ou tous marqués terminés. Le retour aux données réelles détruit les données fictives et reprend la synchro autorisée.
+- Les trois widgets sont reconfigurables depuis le launcher : fond transparent facultatif, aperçu, texte clair/sombre pour le fond d'écran. Réglages locaux par instance, conservés au redimensionnement ; aspect par défaut inchangé.
+- Aucun contenu pédagogique, identifiant ou schéma de sauvegarde modifié. Utilisation et limites : [DIAGNOSTICS.md](DIAGNOSTICS.md), [WIDGET-CONFIGURATION.md](WIDGET-CONFIGURATION.md), [INTERACTION-FEEDBACK.md](INTERACTION-FEEDBACK.md).
+
+### Gameplay et aperçus corrigés — même 0.45
+
+- Les questions de test et le bac à sable héritent aussi des préférences Gameplay, dont le mode Morse et son timing. Ces copies restent isolées des paramètres réels.
+- L'aperçu « Équipe · deux amis » n'avait pas de registre de résultats Android pour son launcher de permission caméra et plantait à sa création. Le contexte diagnostic fournit désormais un registre local qui annule tous les lancements ; Équipe et les paramètres peuvent s'afficher sans activer les permissions ou les actions externes.

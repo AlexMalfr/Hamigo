@@ -18,7 +18,7 @@ import java.time.Instant
 
 data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L,
     val githubIdentity: GitHubIdentity? = null, val githubIdentityCheckedAt: Long = 0L)
-class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path") {
+class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path", val testing:Boolean=false) {
     private var scratchpadKey: String? = null
     private var scratchpad = ScratchpadState()
     internal fun scratchpadFor(key: String): ScratchpadState {
@@ -69,6 +69,11 @@ class AppModel internal constructor(
     private lateinit var context: Context
     lateinit var progress: Progress
     internal lateinit var interactionFeedback: AppFeedback
+    internal lateinit var diagnostics:DiagnosticSettings
+    internal var diagnosticModel=false;private set
+    internal var diagnosticAwards=false
+    internal var debugToolsOpen by mutableStateOf(false)
+    private val recordsLearning get()=!diagnostics.frozen&&(!diagnosticModel||diagnosticAwards)&&session?.testing!=true
     var displayedProgress by mutableStateOf<Progress?>(null)
         private set
     lateinit var sync: GitHubSync
@@ -141,6 +146,7 @@ class AppModel internal constructor(
         context = ctx.applicationContext
         progress = Progress(context); sync = GitHubSync(context)
         interactionFeedback = AppFeedback(context)
+        diagnostics = DiagnosticSettings(context)
         friendInbox = FriendInboxCoordinator(context,progress,sync,friendInboxGateway)
         pendingAuthorization = PendingGitHubAuthorization(context)
         val savedAuthorization = pendingAuthorization.restore()
@@ -161,12 +167,39 @@ class AppModel internal constructor(
         }
     }
     fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false; revision++ }
+    internal fun initializeDiagnostics(base:Context,parent:AppModel,loaded:Content) {
+        diagnosticModel=true;context=DiagnosticContext(base.applicationContext)
+        progress=Progress(context,sideEffects=false);displayedProgress=progress
+        FeedbackPreferences.save(progress.prefs,FeedbackPreferences.read(parent.progress.prefs))
+        GameplayPreferences.save(progress.prefs,GameplayPreferences.read(parent.progress.prefs))
+        interactionFeedback=parent.interactionFeedback;diagnostics=parent.diagnostics;content=loaded
+        sync=GitHubSync(context,object:GitHubGateway {
+            override suspend fun api(method:String,path:String,token:String?,body:String?):String=error("Diagnostic hors réseau")
+            override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String=error("Diagnostic hors réseau")
+        })
+        DiagnosticData.seed(this)
+    }
+    internal val diagnosticContext get()=context
+    internal fun disposeDiagnostics(){check(diagnosticModel);onCleared()}
+    internal fun startClientSandbox() {
+        val loaded=content ?: return
+        diagnostics.pauseSync()
+        socialJob?.cancel();taskJob?.cancel();ProgressSyncScheduler.cancel(context)
+        val base=context
+        val demo=AppModel().apply {initializeDiagnostics(base,this@AppModel,loaded);diagnosticAwards=true}
+        diagnostics.useSandbox(demo)
+    }
+    internal fun stopClientSandbox() {
+        diagnostics.sandbox?.disposeDiagnostics();diagnostics.useSandbox(null)
+        ProgressSyncScheduler.schedule(context);ProgressSyncScheduler.enqueue(context);refresh()
+    }
     fun startLesson(l: Lesson) { lesson=l; resource=null; session=null; lessonPreviewOnly=false; lessonOpening++ }
     fun previewLesson(l: Lesson) { startLesson(l); lessonPreviewOnly=true }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
         require(questions.isNotEmpty())
         lesson=null; resource=null; lessonPreviewOnly=false; session=Session(title, questions.toMutableList(), lessonId, exam,
-            returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile") } ?: "path")
+            returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile") } ?: "path",
+            testing=diagnostics.frozen||(diagnosticModel&&!diagnosticAwards))
     }
     fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false,
                display: String = "", choiceIndex: Int = -1) {
@@ -179,7 +212,7 @@ class AppModel internal constructor(
             if(s.index+1 < s.examPartEnd) s.index++ else s.examReviewing=true
             revision++; return
         }
-        if (!omitted) s.gain += progress.answer(q.id, correct, quality)
+        if (!omitted&&recordsLearning) s.gain += progress.answer(q.id, correct, quality)
         if (correct) {
             if(s.index<s.firstCount) s.firstCorrect++
             s.correct++; s.unresolved.remove(q.id)
@@ -194,7 +227,7 @@ class AppModel internal constructor(
             delay(60)
             if(session===s&&s.current===q&&s.feedback!=null)interactionFeedback.event(if(correct)FeedbackCue.SUCCESS else FeedbackCue.ERROR)
         }
-        ProgressSyncScheduler.enqueue(context)
+        if(!diagnosticModel&&recordsLearning)ProgressSyncScheduler.enqueue(context)
     }
     fun next() {
         val s=session ?: return
@@ -204,7 +237,7 @@ class AppModel internal constructor(
         if(s.done) {
             interactionFeedback.silence()
             s.elapsedMillis=System.currentTimeMillis()-s.started
-            if(s.lessonId != null && s.lessonPassed) { s.gain += progress.complete(s.lessonId) }
+            if(s.lessonId != null && s.lessonPassed&&recordsLearning) { s.gain += progress.complete(s.lessonId) }
             refreshSocial()
         }
         revision++
@@ -238,7 +271,7 @@ class AppModel internal constructor(
             val q=s.questions[index]
             val response=s.responses[index] ?: SessionResponse(false,omitted=true)
             s.responses[index]=response
-            if(!response.omitted) s.gain+=progress.answer(q.id,response.correct,response.quality)
+            if(!response.omitted&&recordsLearning) s.gain+=progress.answer(q.id,response.correct,response.quality)
             if(response.correct) {
                 s.correct++; s.firstCorrect++
                 if(s.examPart==0) s.regulationScore++ else s.techniqueScore++
@@ -253,9 +286,10 @@ class AppModel internal constructor(
         } else {
             interactionFeedback.silence();s.index=s.questions.size; s.examIntroPending=false; refreshSocial()
         }
-        ProgressSyncScheduler.enqueue(context); revision++
+        if(!diagnosticModel&&recordsLearning)ProgressSyncScheduler.enqueue(context); revision++
     }
     fun refresh() {
+        if(diagnosticModel){progress.reload();displayedProgress=Progress(context,sideEffects=false);revision++;return}
         if(::progress.isInitialized) {
             progress.reload(); loadFriends(); loadFriendRequests()
             // Compose also needs a new display value, rather than a mutated cached Progress instance.
@@ -395,6 +429,8 @@ class AppModel internal constructor(
         finally {refresh()}
     }
     fun refreshSocial(manual: Boolean = false) {
+        if(diagnosticModel){refresh();return}
+        if(diagnostics.sandbox!=null)return
         if(busy || socialJob?.isActive==true) return
         // Foreground and finished sessions: network remains optional and never blocks learning.
         socialJob=scope.launch {
@@ -434,6 +470,7 @@ class AppModel internal constructor(
         }
     }
     fun task(action: suspend () -> Unit) {
+        if(diagnosticModel)return
         if(busy) return
         busy=true
         taskJob=scope.launch { try { action() } catch(e: CancellationException) {throw e} catch(e:Exception){message=e.message ?: "Opération impossible."} finally {busy=false;revision++} }
@@ -441,8 +478,9 @@ class AppModel internal constructor(
     fun cancelTask() { taskJob?.cancel() }
     fun restore(json: String) { runCatching { progress.import(json);revision++;message="Sauvegarde restaurée." }.onFailure {message=it.message} }
     override fun onCleared() {
-        if(::interactionFeedback.isInitialized)interactionFeedback.close()
-        if(::progress.isInitialized) {
+        if(::diagnostics.isInitialized&&!diagnosticModel)diagnostics.sandbox?.disposeDiagnostics()
+        if(::interactionFeedback.isInitialized&&!diagnosticModel)interactionFeedback.close()
+        if(::progress.isInitialized&&!diagnosticModel) {
             progress.prefs.unregisterOnSharedPreferenceChangeListener(preferenceListener)
             context.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(preferenceListener)
         }
