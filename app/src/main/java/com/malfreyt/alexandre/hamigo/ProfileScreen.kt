@@ -100,7 +100,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 LinearProgressIndicator(progress = { (p.xp % 250) / 250f }, modifier = Modifier.fillMaxWidth(), color = Teal, trackColor = Color.White)
                 Text("${250 - p.xp % 250} XP avant le prochain niveau", fontSize = 12.sp, color = Muted)
                 FilledTonalButton(
-                    onClick = { NativeShare.progressImage(context, p.snapshot()) },
+                    onClick = { NativeShare.progressImage(context, p.snapshot(),model.sync.accountIdentity) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color.White, contentColor = Teal)
                 ) {
@@ -110,6 +110,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 }
             }
         }
+        item(key = "profile-goal") { DailyGoalSummary(p.todayXp,p.dailyGoal,onEdit={model.settingsGoalFocusRequest=System.nanoTime();model.route="settings"}) }
         item(key = "profile-calendar") { ActivityCalendar(p, today, months) }
         item(key = "profile-weekly-chart") { WeeklyProgress(p, today, weeks) }
         item(key = "profile-learning-summary") {
@@ -134,6 +135,9 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 Text("Mieux retenir", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text("Après une bonne réponse, la notion revient après 1 jour, puis 6 jours. Les rappels s’espacent ensuite selon ta facilité.", fontSize = 14.sp, color = Ink, lineHeight = 21.sp)
                 Text("Une erreur ? Un nouveau rappel arrive après 10 minutes.\n\nAvec les flashcards, indique la difficulté pour adapter le prochain rappel.", fontSize = 14.sp, color = Ink, lineHeight = 21.sp)
+                TextButton(feedbackClick {model.practiceFocusRequest=System.nanoTime();model.route="practice"},contentPadding=PaddingValues(0.dp),modifier=Modifier.testTag("open-reviews-from-profile")) {
+                    Text("Retrouver mes révisions");Spacer(Modifier.width(5.dp));Icon(Icons.Rounded.ChevronRight,null,Modifier.size(18.dp))
+                }
             }
         }
     }
@@ -149,10 +153,14 @@ private fun LearningStat(value: String, label: String, modifier: Modifier) {
 
 @Composable
 private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
+    ActivityCalendar(today,months,p.dailyGoal,{p.dayXp(it)})
+}
+
+@Composable
+internal fun ActivityCalendar(today:LocalDate,months:Int,goal:Int?,xp:(LocalDate)->Int?,tag:String="activity-calendar") {
     val history = rememberPagerState(pageCount = { months })
     val scope = rememberCoroutineScope()
     val currentMonth = YearMonth.from(today)
-    val goal = p.dailyGoal.coerceAtLeast(1)
     Panel {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Calendrier d’activité", Modifier.weight(1f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
@@ -173,7 +181,7 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
         Row(Modifier.fillMaxWidth()) {
             listOf("L", "M", "M", "J", "V", "S", "D").forEach { Text(it, Modifier.weight(1f), textAlign = TextAlign.Center, color = Muted, fontSize = 11.sp) }
         }
-        HorizontalPager(history, Modifier.fillMaxWidth().testTag("activity-calendar"), reverseLayout = true) { offset ->
+        HorizontalPager(history, Modifier.fillMaxWidth().testTag(tag), reverseLayout = true) { offset ->
             val month = currentMonth.minusMonths(offset.toLong())
             val firstOffset = month.atDay(1).dayOfWeek.value - 1
             Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -181,9 +189,9 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
                     Row(Modifier.fillMaxWidth()) {
                         repeat(7) { column ->
                             val number = row * 7 + column - firstOffset + 1
-                            Box(Modifier.weight(1f).height(43.dp), contentAlignment = Alignment.Center) {
+                            Box(Modifier.weight(1f).heightIn(min=43.dp), contentAlignment = Alignment.Center) {
                                 if (number in 1..month.lengthOfMonth()) {
-                                    CalendarDay(month.atDay(number), today, p.dayXp(month.atDay(number)), goal)
+                                    CalendarDay(month.atDay(number), today, xp(month.atDay(number)), goal)
                                 }
                             }
                         }
@@ -195,27 +203,28 @@ private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
 }
 
 @Composable
-private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int, goal: Int) {
+private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int?, goal: Int?) {
     val future = date.isAfter(today)
-    val ratio = if (future) 0f else (xp.toFloat() / goal).coerceIn(0f, 1f)
+    val ratio = if (future||xp==null) 0f else if(goal==null)if(xp>0)1f else 0f else (xp.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
     val isToday = date == today
     val dateLabel = date.format(DateTimeFormatter.ofPattern("EEEE d MMMM yyyy", French))
     Column(Modifier.clearAndSetSemantics {
-        contentDescription = if (future) "$dateLabel, à venir" else "$dateLabel${if (isToday) ", aujourd’hui" else ""}, $xp XP, objectif actuel $goal XP${if (ratio >= 1f) " atteint" else ""}"
+        contentDescription = if (future) "$dateLabel, à venir" else if(xp==null)"$dateLabel, données non partagées" else "$dateLabel${if (isToday) ", aujourd’hui" else ""}, $xp XP${goal?.let {", objectif actuel $it XP${if(ratio>=1f)" atteint" else ""}"} ?: ", objectif non partagé"}"
     }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Canvas(Modifier.size(27.dp)) {
             val radius = size.minDimension / 2f - 2.dp.toPx()
             drawCircle(if (future) Color(0xFFF0F2F0) else Mist, radius = radius)
-            if (ratio >= 1f) drawCircle(Brush.linearGradient(GoalMetal), radius = radius)
+            if (ratio >= 1f&&goal!=null) drawCircle(Brush.linearGradient(GoalMetal), radius = radius)
             else if (ratio > 0f) drawCircle(Teal, radius = radius * sqrt(ratio))
-            if (ratio >= 1f) {
+            if(xp==null&&!future)drawLine(Muted.copy(alpha=.5f),Offset(center.x-3.dp.toPx(),center.y),Offset(center.x+3.dp.toPx(),center.y),strokeWidth=1.dp.toPx())
+            if (ratio >= 1f&&goal!=null) {
                 val c = center
                 drawLine(Ink, Offset(c.x-radius*.4f,c.y), Offset(c.x-radius*.1f,c.y+radius*.28f), strokeWidth=1.6.dp.toPx())
                 drawLine(Ink, Offset(c.x-radius*.1f,c.y+radius*.28f), Offset(c.x+radius*.43f,c.y-radius*.32f), strokeWidth=1.6.dp.toPx())
             }
             if (isToday) drawCircle(GoalOrange, radius = size.minDimension / 2f - 1.dp.toPx(), style = Stroke(1.5.dp.toPx()))
         }
-        Text("${date.dayOfMonth}", fontSize = 10.sp, fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.Normal,
+        Text("${date.dayOfMonth}", fontSize = 10.sp, lineHeight = 12.sp, fontWeight = if (isToday) FontWeight.ExtraBold else FontWeight.Normal,
             color = if (future) Muted.copy(alpha = .45f) else if (isToday) GoalOrange else Muted)
     }
 }

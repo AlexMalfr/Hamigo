@@ -25,6 +25,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -67,7 +72,7 @@ fun openLink(context: Context, url: String) {
     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
 }
 
-private fun syncDate(value: String?): String = value?.let {
+internal fun syncDate(value: String?): String = value?.let {
     runCatching {
         DateTimeFormatter.ofPattern("dd/MM à HH:mm")
             .withZone(ZoneId.systemDefault()).format(Instant.parse(it))
@@ -153,20 +158,12 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
                 fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
             if (connected && showGistLinks && (backupGist != null || socialGist != null)) {
                 Text("Mes Gists sur GitHub", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Muted)
-                Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    if (backupGist != null) TextButton(feedbackClick { openLink(context, backupGist) }, contentPadding = PaddingValues(0.dp)) {
-                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp)); Text("Gist de sauvegarde", fontSize = 12.sp)
-                    }
-                    if (socialGist != null) TextButton(feedbackClick { openLink(context, socialGist) }, contentPadding = PaddingValues(0.dp)) {
-                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, Modifier.size(16.dp))
-                        Spacer(Modifier.width(6.dp)); Text("Gist social", fontSize = 12.sp)
-                    }
+                ActionLinks(Modifier.testTag("settings-gist-links")) {
+                    if (backupGist != null) ActionLink("Gist de sauvegarde",icon=Icons.AutoMirrored.Rounded.OpenInNew){openLink(context,backupGist)}
+                    if (socialGist != null) ActionLink("Gist social",icon=Icons.AutoMirrored.Rounded.OpenInNew){openLink(context,socialGist)}
                 }
             }
-            if (connected) TextButton(feedbackClick { model.disconnectGitHub() }, enabled = !model.busy, contentPadding = PaddingValues(0.dp)) {
-                Text("Déconnecter GitHub")
-            }
+            if (connected) ActionLink("Déconnecter GitHub",enabled=!model.busy,color=MaterialTheme.colorScheme.error){model.disconnectGitHub()}
         }
     }
 }
@@ -182,6 +179,7 @@ fun FriendsScreen(model: AppModel) {
     val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
     val lastSyncError = remember(model.revision) { model.sync.lastSyncError }
     var syncExpanded by remember { mutableStateOf(false) }
+    var selectedFriend by remember {mutableStateOf<String?>(null)}
     var showQr by remember { mutableStateOf(false) }
     var addOpen by remember { mutableStateOf(false) }
     var receivedLink by remember { mutableStateOf("") }
@@ -195,7 +193,7 @@ fun FriendsScreen(model: AppModel) {
     }
     val listState = rememberLazyListState()
     val pullState=rememberPullToRefreshState()
-    val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending { it.weeklyXp }
+    val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending {com.malfreyt.alexandre.hamigo.platform.SocialActivity.weeklyXp(it)}
     PullToRefreshBox(isRefreshing=model.socialRefreshing,onRefresh={model.refreshSocial(manual=true)},
         state=pullState,modifier=Modifier.fillMaxSize().testTag("friends-refresh"),indicator={
             PullToRefreshDefaults.Indicator(state=pullState,isRefreshing=model.socialRefreshing,
@@ -265,7 +263,7 @@ fun FriendsScreen(model: AppModel) {
                 }
                 ranking.forEachIndexed { index, profile ->
                     val isOwn = profile === own
-                    Row(Modifier.fillMaxWidth().background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).padding(horizontal = 10.dp, vertical = 8.dp),
+                    Row(Modifier.fillMaxWidth().testTag("team-rank-${index+1}").background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).clickable(onClickLabel="Voir la progression de ${profile.name}",onClick=feedbackClick {if(isOwn)model.route="profile" else selectedFriend=model.friends.firstOrNull {it.progress===profile}?.gist}).padding(horizontal = 10.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text("${index + 1}", fontSize = 19.sp, fontWeight = FontWeight.ExtraBold,
                             color = if (index == 0) Coral else Teal, modifier = Modifier.width(22.dp))
@@ -273,13 +271,14 @@ fun FriendsScreen(model: AppModel) {
                             profile.name,Modifier.size(36.dp))
                         Column(Modifier.weight(1f)) {
                             Text(profile.name + if (isOwn) " · toi" else "", fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            Text("${dayCount(profile.streak)} de série · ${profile.lessons} leçons", fontSize = 11.sp, color = Muted)
+                            Text("${dayCount(profile.streak)} de série · ${profile.lessons} leçon${if(profile.lessons==1)"" else "s"}", fontSize = 11.sp, color = Muted)
                         }
-                        Text("${profile.weeklyXp} XP", fontWeight = FontWeight.ExtraBold, color = Teal, fontSize = 15.sp)
+                        Text("${com.malfreyt.alexandre.hamigo.platform.SocialActivity.weeklyXp(profile)} XP", fontWeight = FontWeight.ExtraBold, color = Teal, fontSize = 15.sp)
+                        Icon(Icons.Rounded.ChevronRight,null,tint=Muted,modifier=Modifier.size(16.dp))
                     }
                 }
                 if (model.friends.isEmpty()) Text("Invite un équipier pour suivre vos progrès et vous encourager.", fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
-                OutlinedButton(feedbackClick { NativeShare.teamImage(context, own, model.friends.map { it.progress }) },
+                OutlinedButton(feedbackClick { NativeShare.teamImage(context, own, model.friends.map { it.progress },model.sync.accountIdentity,model.friends.map {it.githubIdentity}) },
                     Modifier.fillMaxWidth().heightIn(min = 44.dp)) {
                     Icon(Icons.Rounded.Share, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp)); Text("Partager le classement")
@@ -294,65 +293,31 @@ fun FriendsScreen(model: AppModel) {
         }
         items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
             var menuOpen by remember { mutableStateOf(false) }
-            var confirmRemoval by remember { mutableStateOf(false) }
-            var confirmRequest by remember { mutableStateOf(false) }
-            val socialGist = remember(friend.gist) { runCatching { GitHubSync.gistPageUrl(friend.gist) }.getOrNull() }
-            val githubProfile = remember(friend.githubIdentity) { friend.githubIdentity?.let { runCatching { it.profileUrl }.getOrNull() } }
-            Panel {
+            val actions=remember(friend.gist){FriendActionState()}
+            Panel(Modifier.testTag("friend-card-${friend.gist}").clickable(onClickLabel="Voir la progression de ${friend.progress.name}",onClick=feedbackClick {selectedFriend=friend.gist})) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     GitHubAvatar(friend.githubIdentity,friend.progress.name,Modifier.size(44.dp))
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text(friend.progress.name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçons", color = Muted, fontSize = 12.sp)
+                        Text("${friend.progress.xp} XP · ${friend.progress.lessons} leçon${if(friend.progress.lessons==1)"" else "s"}", color = Muted, fontSize = 12.sp)
                     }
+                    Icon(Icons.Rounded.ChevronRight,null,tint=Muted,modifier=Modifier.size(18.dp))
                     Box {
                         IconButton(feedbackClick { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                            if(model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null) {
-                                val sent=model.outgoingRequests.firstOrNull { it.request.recipientGistId==runCatching { GitHubSync.gistId(friend.gist) }.getOrNull() }
-                                DropdownMenuItem(
-                                    text={Text(when(sent?.status) {"sent"->"Demande déjà envoyée";"accepted"->"Ajout réciproque confirmé";else->"Demander l’ajout en retour"})},
-                                    leadingIcon={Icon(Icons.Rounded.PersonAdd,null)},
-                                    enabled=!model.busy && sent?.status !in setOf("sent","accepted"),
-                                    onClick={menuOpen=false;confirmRequest=true})
-                            }
-                            if (githubProfile != null) DropdownMenuItem(
-                                text = { Text("Ouvrir le profil GitHub") },
-                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, null) },
-                                onClick = { menuOpen = false; openLink(context, githubProfile) }
-                            )
-                            if (socialGist != null) DropdownMenuItem(
-                                text = { Text("Ouvrir le Gist social") },
-                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, null) },
-                                onClick = { menuOpen = false; openLink(context, socialGist) }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Retirer cet équipier",color=MaterialTheme.colorScheme.error) },
-                                leadingIcon = { Icon(Icons.Rounded.PersonRemove, null,tint=MaterialTheme.colorScheme.error) },
-                                onClick = { menuOpen = false; confirmRemoval = true }
-                            )
+                            FriendActionItems(model,friend,actions,asMenu=true,onAction={menuOpen=false})
                         }
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Mis à jour le ${syncDate(friend.progress.updatedAt)}", fontSize = 11.sp, color = Muted, modifier = Modifier.weight(1f))
-                    TextButton(feedbackClick { NativeShare.nudge(context, friend.progress.name) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    TextButton(feedbackClick { NativeShare.nudge(context, friend.progress.name,own.name,model.sync.accountIdentity,friend.githubIdentity,friend.progress) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
                         Icon(Icons.Rounded.WavingHand, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Encourager", fontSize = 12.sp)
                     }
                 }
             }
-            if(confirmRemoval) AlertDialog(onDismissRequest={confirmRemoval=false},
-                title={Text("Retirer ${friend.progress.name} ?")},
-                text={Text("Sa progression n’apparaîtra plus dans ton équipe. Tu pourras l’ajouter à nouveau avec son lien d’invitation.")},
-                confirmButton={TextButton(feedbackClick {confirmRemoval=false;model.removeFriend(friend)},
-                    colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)) {Text("Retirer")}},
-                dismissButton={TextButton(feedbackClick {confirmRemoval=false}){Text("Annuler")}})
-            if(confirmRequest) AlertDialog(onDismissRequest={confirmRequest=false},
-                title={Text("Demander l’ajout en retour ?")},
-                text={Text("${friend.progress.name} recevra une demande à accepter dans Hamigo. Elle sera publiée sous ton compte GitHub dans les commentaires de son Gist social, lisibles avec son lien.")},
-                confirmButton={TextButton(feedbackClick {confirmRequest=false;model.sendFriendRequest(friend)},enabled=!model.busy) {Text("Envoyer")}},
-                dismissButton={TextButton(feedbackClick {confirmRequest=false}){Text("Annuler")}})
+            FriendActionDialogs(model,friend,actions)
         }
         if (!connected) item {
             OutlinedButton(feedbackClick { model.refreshSocial(manual = true) }, Modifier.fillMaxWidth().heightIn(min = 48.dp), enabled = !model.busy) {
@@ -362,6 +327,7 @@ fun FriendsScreen(model: AppModel) {
         }
     }
     }
+    selectedFriend?.let {gist->model.friends.firstOrNull {it.gist==gist}?.let {friend->FriendProgressScreen(model,friend){selectedFriend=null}}}
     if (scanOpen) FriendQrScanner(onDismiss={scanOpen=false},onInvite={id ->
         scanOpen=false;addOpen=false;receivedLink="";inviteError=null;model.pendingInvite=id
     })
@@ -374,7 +340,7 @@ fun FriendsScreen(model: AppModel) {
                 OutlinedButton(feedbackClick { NativeShare.text(context, invitation, "Mon invitation Hamigo") }, Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Link, null); Spacer(Modifier.width(8.dp)); Text("Partager le lien")
                 }
-                OutlinedButton(feedbackClick { NativeShare.inviteImage(context, invitation) }, Modifier.fillMaxWidth()) {
+                OutlinedButton(feedbackClick { NativeShare.inviteImage(context, invitation,own.name,model.sync.accountIdentity) }, Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Share, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
                 }
             }
@@ -473,6 +439,17 @@ fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
     val animatedBack = LocalAnimatedBack.current
     val p = model.displayedProgress ?: model.progress
+    val listState=rememberLazyListState()
+    val goalLocation=remember {BringIntoViewRequester()}
+    val goalHighlight=remember {Animatable(0f)}
+    val goalFocus=model.settingsGoalFocusRequest
+    LaunchedEffect(goalFocus) {
+        val request=goalFocus ?: return@LaunchedEffect
+        try {
+            listState.animateScrollToItem(4);withFrameNanos {};goalLocation.bringIntoView()
+            goalHighlight.animateTo(1f,tween(110));goalHighlight.animateTo(0f,tween(650))
+        } finally {if(model.settingsGoalFocusRequest==request)model.settingsGoalFocusRequest=null}
+    }
     var name by remember { mutableStateOf(p.name) }
     var hour by remember { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
     var minute by remember { mutableStateOf(p.prefs.getInt("reminderMinute", 0).toString().padStart(2, '0')) }
@@ -504,7 +481,7 @@ fun SettingsScreen(model: AppModel) {
         if (uri != null) model.task { model.incoming = withContext(Dispatchers.IO) { readImport(context.contentResolver, uri) } }
     }
     Box(Modifier.fillMaxSize()) {
-    LazyColumn(Modifier.fillMaxSize().testTag("settings-list"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("settings-list"),state=listState, contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { PageHeader("Paramètres", "Tes préférences et ton compte.") { if(animatedBack!=null)animatedBack() else model.route = "profile" } }
         item { SettingsCategory("Profil", Icons.Rounded.Person) }
         item {
@@ -520,8 +497,8 @@ fun SettingsScreen(model: AppModel) {
             }
         }
         item { SettingsCategory("Rappels & Objectif", Icons.Rounded.Notifications) }
-        item {
-            Panel {
+        item(key="settings-daily-goal") {
+            Panel(Modifier.bringIntoViewRequester(goalLocation).testTag("settings-daily-goal").drawWithContent {drawContent();if(goalHighlight.value>0)drawRoundRect(Teal.copy(alpha=.7f*goalHighlight.value),cornerRadius=CornerRadius(20.dp.toPx()),style=Stroke(3.dp.toPx()))}) {
                 Text("Objectif quotidien", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     DailyGoals.values.forEachIndexed { index,goal ->
@@ -580,8 +557,10 @@ fun SettingsScreen(model: AppModel) {
                 }
                 if (backupExpanded) {
                     Text("La copie contient tout ton apprentissage. Tes identifiants GitHub n’y figurent jamais.", fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
-                    OutlinedButton(feedbackClick { NativeShare.backup(context, p.export()) }, Modifier.fillMaxWidth()) { Text("Exporter une sauvegarde") }
-                    TextButton(feedbackClick { picker.launch(arrayOf("application/json", "text/plain", "application/octet-stream")) }) { Text("Restaurer une sauvegarde") }
+                    ActionLinks(Modifier.testTag("settings-backup-links")) {
+                        ActionLink("Exporter une sauvegarde",icon=Icons.Rounded.FileUpload){NativeShare.backup(context,p.export())}
+                        ActionLink("Restaurer une sauvegarde",icon=Icons.Rounded.FileDownload){picker.launch(arrayOf("application/json","text/plain","application/octet-stream"))}
+                    }
                 }
             }
         }
@@ -589,10 +568,10 @@ fun SettingsScreen(model: AppModel) {
         item { ExamBankSettings(model) }
         item {
             Panel {
-                Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp)) {
-                    TextButton(feedbackClick { openLink(context, "http://f6kgl.free.fr/COURS.html") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Cours F6KGL · CC BY-NC-SA 4.0",fontSize=12.sp)}}
-                    TextButton(feedbackClick { openLink(context, "https://exam1.r-e-f.org/") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Questions communautaires Exam1 · REF",fontSize=12.sp)}}
-                    TextButton(feedbackClick { openLink(context, "https://www.anfr.fr/gerer/radioamateurs/les-certificats") },Modifier.fillMaxWidth(),contentPadding=PaddingValues(horizontal=0.dp,vertical=0.dp)) {Box(Modifier.fillMaxWidth()){Text("Certificat · informations ANFR",fontSize=12.sp)}}
+                ActionLinks(Modifier.testTag("settings-source-links")) {
+                    ActionLink("Cours F6KGL · CC BY-NC-SA 4.0",icon=Icons.AutoMirrored.Rounded.OpenInNew){openLink(context,"http://f6kgl.free.fr/COURS.html")}
+                    ActionLink("Questions communautaires Exam1 · REF",icon=Icons.AutoMirrored.Rounded.OpenInNew){openLink(context,"https://exam1.r-e-f.org/")}
+                    ActionLink("Certificat · informations ANFR",icon=Icons.AutoMirrored.Rounded.OpenInNew){openLink(context,"https://www.anfr.fr/gerer/radioamateurs/les-certificats")}
                 }
                 Text("Entraînement indépendant de l’ANFR. Certaines formulations communautaires peuvent être anciennes ; leur source est consultable pendant les révisions.", fontSize = 11.sp, color = Muted, lineHeight = 16.sp)
             }
@@ -613,7 +592,10 @@ fun SettingsScreen(model: AppModel) {
             }
         }
         item { SettingsCategory("Contact & Projet", Icons.Rounded.Forum) }
-        item {
+        item {ActionLinks(Modifier.testTag("settings-project-links")) {
+            OutlinedButton(feedbackClick {NativeShare.application(context)},Modifier.fillMaxWidth().testTag("share-application")) {
+                Icon(Icons.Rounded.Share,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Partager Hamigo",fontSize=14.sp)
+            }
             OutlinedButton(feedbackClick { openLink(context, ContentFeedback.FORM_URL) },
                 Modifier.fillMaxWidth()
             ) {
@@ -621,14 +603,12 @@ fun SettingsScreen(model: AppModel) {
                 Spacer(Modifier.width(8.dp))
                 Text("Contacter / faire un retour", fontSize = 14.sp)
             }
-        }
-        item {
             OutlinedButton(feedbackClick { openLink(context, "https://github.com/AlexMalfr/Hamigo") }, Modifier.fillMaxWidth()) {
                 Icon(Icons.Rounded.Code, null, Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text("Code source de Hamigo · GitHub", fontSize = 14.sp)
             }
-        }
+        }}
     }
     }
     if (picoVisible) Dialog(onDismissRequest = { picoDismissing = true },

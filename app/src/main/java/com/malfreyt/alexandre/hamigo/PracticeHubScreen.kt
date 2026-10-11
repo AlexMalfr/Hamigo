@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -12,6 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import kotlinx.coroutines.delay
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +45,25 @@ import kotlin.random.Random
     var customSelected by remember {mutableStateOf(false)}
     val available=remember(index,selected) {index.available(selected)}
     val listState=rememberLazyListState()
+    var headerHeight by remember {mutableIntStateOf(0)}
+    val highlight=remember {Animatable(0f)}
+    val reviewLocation=remember {BringIntoViewRequester()}
+    val latestBankReady by rememberUpdatedState(bankReady)
+    val focusRequest=model.practiceFocusRequest
+    LaunchedEffect(focusRequest) {
+        val request=focusRequest ?: return@LaunchedEffect
+        try {
+            delay(80)
+            listState.animateScrollToItem(if(latestBankReady)3 else 4,scrollOffset=-headerHeight)
+            withFrameNanos {}
+            // A bank download can remove its loading row while we move. Locate the
+            // stable review item again after layout, then ensure its actions are visible.
+            listState.scrollToItem(if(latestBankReady)3 else 4,scrollOffset=-headerHeight)
+            withFrameNanos {}
+            reviewLocation.bringIntoView()
+            highlight.animateTo(1f,tween(110));highlight.animateTo(0f,tween(650))
+        } finally {if(model.practiceFocusRequest==request)model.practiceFocusRequest=null}
+    }
     var reviewCount by remember {mutableIntStateOf(10)}
     var reviewCustomSelected by remember {mutableStateOf(false)}
     val progress=model.displayedProgress ?: model.progress
@@ -54,7 +82,7 @@ import kotlin.random.Random
         }
     }
     LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        stickyHeader {Column(Modifier.fillMaxWidth().stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
+        stickyHeader {Column(Modifier.fillMaxWidth().onSizeChanged {headerHeight=it.height}.stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
         if(!bankReady)item {Panel(color=Mist) {ExamBankLoading(model)}}
         item {Panel(color=Color(0xFFFFE8E0)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.School,null,tint=Coral);Spacer(Modifier.width(8.dp));Eyebrow("EXAMEN BLANC",Color(0xFFAC493B))}
@@ -93,7 +121,7 @@ import kotlin.random.Random
                 }
             }
         }}
-        item {Panel(color=Color(0xFFFFF0CF)) {
+        item(key="practice-reviews") {Panel(Modifier.bringIntoViewRequester(reviewLocation).testTag("practice-reviews").drawWithContent {drawContent();if(highlight.value>0)drawRoundRect(Teal.copy(alpha=.7f*highlight.value),cornerRadius=CornerRadius(20.dp.toPx()),style=Stroke(3.dp.toPx()))},color=Color(0xFFFFF0CF)) {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.History,null,tint=Color(0xFF94651A));Spacer(Modifier.width(8.dp));Eyebrow("RÉVISIONS",Color(0xFF94651A))}
             val reviewSummary="($dueCount à revoir · ${reviewPool.size} question${if(reviewPool.size==1)"" else "s"} disponible${if(reviewPool.size==1)"" else "s"})."
             Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées $reviewSummary" else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance $reviewSummary",fontSize=13.sp,lineHeight=19.sp,color=Muted)

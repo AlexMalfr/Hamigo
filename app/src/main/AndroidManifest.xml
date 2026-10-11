@@ -72,6 +72,10 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_week" />
         </receiver>
+        <receiver android:name=".platform.SocialWidgetProvider" android:exported="false" android:label="@string/widget_social_name">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_social" />
+        </receiver>
         <provider android:name=".ShareFileProvider" android:authorities="${applicationId}.files"
             android:exported="false" android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />

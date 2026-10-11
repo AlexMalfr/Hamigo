@@ -2,7 +2,7 @@
 
 Ce petit APK d’instrumentation Java n’utilise que les API Android. Il reste indépendant du Kotlin et des classes Compose renommées par R8 dans la **vraie** release, contrairement à l’APK AndroidTest du debug. Il n’est pas une dépendance de Hamigo et n’est jamais publié avec elle.
 
-Il se signe avec la clé Hamigo locale existante. Il refuse un appareil physique ; les modes `flow`, `diagnostics` et `catalog` utilisent des fixtures sans compte et modifient seulement les préférences de l’émulateur. Le mode `storage` lit les tailles du package via StorageStatsManager, sans lire la progression.
+Il se signe avec la clé Hamigo locale existante. Il refuse un appareil physique ; les modes `flow`, `diagnostics`, `catalog` et `social` utilisent des fixtures sans compte et modifient seulement les préférences de l’émulateur. Le mode `storage` lit les tailles du package via StorageStatsManager, sans lire la progression.
 
 Depuis la racine, avec JDK et SDK Android configurés :
 
@@ -17,3 +17,5 @@ Pour une simple mesure, remplacer `flow` par `storage`. Le résultat doit conten
 Le scénario contrôle l’accueil sans barre de téléchargement, la banque réellement téléchargée et complète, l’examen et ses images originales/traitées, les fiches natives, la version et la vérification manuelle, ainsi que les constructeurs des workers persistés. Il ne connecte pas GitHub et n’envoie aucun signalement ni commentaire.
 
 `diagnostics` contrôle la réception Fréquence continue, sa priorité face au TTS et son mute. `catalog` contrôle le lecteur d'illustration, ses fermetures, le balayage horizontal et les flèches entre les résultats filtrés, sans modifier la progression. Pour rejouer un scénario, arrêter d'abord le processus Hamigo sur l'émulateur (`adb -s emulator-5554 shell am force-stop com.malfreyt.alexandre.hamigo`), sans effacer ses données. Les sélecteurs excluent les éléments hors écran ; le compteur visible identifie la page du pager, qui peut précomposer ses voisines.
+
+`social` contrôle une fiche d’ami depuis des données fictives mises en cache après le chargement initial, son historique quotidien/horaire, l’objectif personnel, le raccourci de révisions et l’ouverture de l’onglet Équipe par l’intent du widget. Il lie aussi le nouveau provider via AppWidgetManager et configure sa période sur la release optimisée. Aucun jeton, commentaire ou demande réelle ; le journal de progression reste inchangé pendant les consultations. Captures dans `social-0.49-release`.

@@ -235,6 +235,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         val checked=FriendInboxState.prune(state)
         check(prefs.edit().putString("friends",active.toString()).putString("friendTombstones",deleted.toString())
             .putString("socialInbox",checked.toString()).commit()) { "L’acceptation n’a pas pu être sauvegardée sur l’appareil." }
+        if(sideEffects)com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
     }
     private fun retainLocalFriendIdentities(records:JSONObject):JSONObject {
         val cached=friendRecords()
@@ -258,6 +259,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     fun saveFriendRecords(records: JSONObject) = synchronized(CLOUD_LOCK) {
         prefs.edit().putString("friends", CloudProgress.activeFriends(records).toString())
             .putString("friendTombstones", CloudProgress.friendTombstones(records).toString()).apply()
+        if(sideEffects)com.malfreyt.alexandre.hamigo.platform.HomeWidgets.progressChanged(context)
     }
     fun mergeCloud(json:String):Boolean = synchronized(CLOUD_LOCK) {
         val previousReminder=reminderSettings()
@@ -324,8 +326,14 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         if(sideEffects)ProgressSyncScheduler.enqueue(context)
     }
     private fun reminderSettings() = Triple(prefs.getBoolean("reminderEnabled",false),prefs.getInt("reminderHour",20),prefs.getInt("reminderMinute",0))
-    fun snapshot() = com.malfreyt.alexandre.hamigo.platform.ShareProgress(name, xp, streak, completed.size, weeklyXp,
-        dailyXp=(0L..13L).reversed().map { LocalDate.now().minusDays(it).let { day->DailyPoint(day.toString(),dayXp(day)) } })
+    fun snapshot() = synchronized(CLOUD_LOCK) {
+        val today=LocalDate.now();val hours=com.malfreyt.alexandre.hamigo.platform.SocialActivity.hours(root,today)
+        com.malfreyt.alexandre.hamigo.platform.ShareProgress(name,xp,streak,completed.size,weeklyXp,
+            dailyXp=(0L..13L).reversed().map {today.minusDays(it).let {day->DailyPoint(day.toString(),dayXp(day))}},
+            dailyGoal=dailyGoal,hourlyDay=today.toString(),hourlyXp=hours.points,hourlyComplete=hours.complete,zoneId=java.time.ZoneId.systemDefault().id,
+            activityHistory=com.malfreyt.alexandre.hamigo.platform.PublicActivityHistory.fromDailyXp(root.optJSONObject("dailyXp"),today),
+            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE)
+    }
 }
 
 object PracticeGenerator {

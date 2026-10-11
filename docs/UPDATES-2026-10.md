@@ -355,3 +355,28 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - L'action d'agrandissement du détail Diagnostics ouvre maintenant l'illustration originale dans le lecteur commun : zoom/dézoom au pincement, fermeture par appui extérieur ou retour.
 - Balayage horizontal entre les questions de la liste filtrée, avec flèches et compteur. Le scroll vertical reste indépendant ; le test isolé lance la question actuellement affichée.
 - Même numéro de version, sans changement d'identifiant ni de sauvegarde.
+
+## Objectifs et progression en équipe — 0.49
+
+- Les lignes du classement et les cartes d’amis ouvrent une progression en plein écran : objectif du jour, XP des sept derniers jours et XP par heure aujourd’hui. Un chevron indique l’action. Les anciens profils restent consultables ; les données absentes sont annoncées sans inventer d’activité.
+- Le résumé social de schéma 2 reçoit des champs facultatifs pour l’objectif et les heures d’aujourd’hui. Ils sont calculés depuis les événements déjà fusionnés, sans double récompense entre appareils, sans réponses ni identifiants de questions. Les anciens socles sans horodatages restent explicitement incomplets.
+- Moi et toutes les fins de séance montrent un anneau de progression vers l’objectif quotidien. Le lien de « Mieux retenir » ouvre Défis, révèle les révisions et les souligne brièvement, avec respect des animations désactivées.
+- Un quatrième widget, Équipe, compare les XP récents depuis le cache local. Pico reste présent dans ses compositions miniatures, verticales et horizontales ; textes natifs, marges adaptées, sélection incluant sa propre progression, configuration par instance pour sept jours/aujourd’hui, transparence et texte clair/sombre. Son toucher ouvre Équipe.
+- Les images de bilan, résultats, classement et invitation incluent les photos GitHub disponibles. Les avatars suivent leur propriétaire après tri ; le cache commun évite des requêtes répétées et les initiales assurent le repli hors ligne.
+- Toutes les séances proposent « Partager mes résultats ». Encourager joint une petite carte avec Pico au texte. « Partager Hamigo », dans Contact & Projet, propose une image promotionnelle, un texte et le lien des releases. Ces actions ouvrent le menu Android sans envoyer de message automatiquement.
+- Le chargement local de la banque Exam1 ne prend plus le verrou d’une mise à jour réseau en cours : le contenu natif reste accessible pendant ce téléchargement. Aucun contenu pédagogique, identifiant, règle de notation ou récompense modifié ; aucune migration ajoutée.
+
+### Historique des amis et aperçus — amendement 0.49
+
+- L’image du bilan personnel retire le slogan qui chevauchait la photo GitHub. Le crayon de l’objectif dans Moi ouvre le bon réglage, le révèle et le souligne brièvement.
+- Les profils d’amis ajoutent un calendrier et la navigation dans les semaines conservées, ainsi que les actions du menu Équipe en pied de page, avec les mêmes confirmations. Leur objectif vient de leur propre résumé GitHub.
+- Le résumé social conserve les totaux quotidiens dans un historique mensuel compact et borné, compatible avec les anciens lecteurs. Les jours inconnus ne sont pas transformés en zéro ; les heures restent celles d’aujourd’hui. L’historique antérieur apparaît après mise à jour et synchronisation de l’ami. Aucun événement détaillé, ID de question ou réponse supplémentaire n’est publié.
+- Les quatre aperçus du sélecteur de widgets sont régénérés par leurs vrais composants natifs, avec exemples déterministes et mention « Redimensionnable ». Les dimensions initiales sont plus petites ; la configuration affiche un aperçu dynamique aux mêmes proportions. Un widget déjà installé conserve sa taille.
+- La consultation réutilise le décodage des amis quand leurs données ne changent pas, pour éviter de relire l’historique après chaque réponse. Aucun changement d’XP, de notation, d’identifiant ou de migration.
+
+### Actions et informations sociales — même 0.49
+
+- Encourager passe directement sous l’objectif de l’ami. Le texte et la carte partagée reprennent ses XP du jour, son propre objectif, sa série, ses leçons et ses XP récents ; un objectif atteint donne une félicitation. Aucune statistique absente n’est inventée et le partage reste un choix dans le menu Android.
+- Les actions de sa fiche sont séparées en « Sur GitHub » et « Dans ton équipe ». La petite rubrique repliée « Infos techniques » indique la version ayant publié le résumé social ; les profils sans ce champ affichent `≤0.49+8ed1305d`.
+- Les listes de liens emploient un composant commun compact, sans additionner les marges du panneau à celles des boutons. Appliqué aux actions d’amis, aux Gists, aux sauvegardes, aux sources et à Contact & Projet ; zones de toucher conservées.
+- `appVersion` et `appVersionCode` sont facultatifs dans le résumé social existant. Aucune migration, modification d’ID ou nouvelle donnée de progression.

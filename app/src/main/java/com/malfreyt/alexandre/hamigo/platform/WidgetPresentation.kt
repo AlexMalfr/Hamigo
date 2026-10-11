@@ -396,7 +396,7 @@ internal object WidgetPresentation {
         } else {
             val step = box.width() / 7
             val labels = box.height() >= 25f
-            val labelH = if (labels) minOf(20f, box.height() * .28f) else 0f
+            val labelH = if (labels) minOf(20f, box.height() * .48f) else 0f
             val radius = minOf(step * .30f, (box.height() - labelH) * .36f, 24f)
             val contentH = 2 * radius + labelH + if (labels) 5f else 0f
             val cy = box.centerY() - contentH / 2 + radius
@@ -485,10 +485,10 @@ internal object WidgetPresentation {
 
     private fun horizontalDayLabel(c: Canvas, p: Paint, day: Int, rect: RectF, font: Float, color: Int) {
         // All main initials share one baseline; Tuesday/Wednesday have a smaller letter below.
-        val first = RectF(rect.left,rect.top,rect.right,rect.top+rect.height()*.64f)
+        val first = RectF(rect.left,rect.top,rect.right,rect.top+rect.height()*.56f)
         fitted(c,p,dayLabels[day].take(1),first,12f*font,color)
         if (day in 1..2) fitted(c,p,dayLabels[day].takeLast(1),
-            RectF(rect.left,rect.top+rect.height()*.64f,rect.right,rect.bottom),8f*font,color)
+            RectF(rect.left,rect.top+rect.height()*.56f,rect.right,rect.bottom),8f*font,color)
     }
     private fun dashed(c: Canvas, p: Paint, x1: Float, y1: Float, x2: Float, y2: Float, color: Int) {
         p.style = Paint.Style.STROKE; p.color = color; p.strokeWidth = 1.2f

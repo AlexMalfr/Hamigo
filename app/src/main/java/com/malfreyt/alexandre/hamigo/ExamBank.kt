@@ -146,11 +146,14 @@ internal class ExamBankRepository(
     private val mutable=MutableStateFlow(ExamBankStatus())
     val status=mutable.asStateFlow()
     private val mutex=Mutex()
+    private val initializationMutex=Mutex()
     private var initialized=false
     suspend fun initialize()=withContext(Dispatchers.IO) {
-        mutex.lock()
+        // Loading an already installed bank must not wait behind a background
+        // download, whose separate update lock can be held for several minutes.
+        initializationMutex.lock()
         try {if(!initialized){store.pruneAtStartup();mutable.value=ExamBankStatus(store.snapshot(),checkedAt=store.metadata()?.optLong("checkedAt")?:0);initialized=true}}
-        finally {mutex.unlock()}
+        finally {initializationMutex.unlock()}
     }
     suspend fun refresh(force:Boolean=false):Boolean=withContext(Dispatchers.IO) {
         initialize()

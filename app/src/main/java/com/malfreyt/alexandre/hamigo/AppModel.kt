@@ -155,6 +155,8 @@ class AppModel internal constructor(
         else message = notice
     }
     var pendingInvite by mutableStateOf<String?>(null)
+    var practiceFocusRequest by mutableStateOf<Long?>(null)
+    var settingsGoalFocusRequest by mutableStateOf<Long?>(null)
     fun initialize(ctx: Context, startExamUpdates:Boolean=true) {
         if (::progress.isInitialized) return
         context = ctx.applicationContext
@@ -326,10 +328,17 @@ class AppModel internal constructor(
         revision++
     }
     fun leaveSession() { session?.let { route=it.returnRoute }; session=null; lesson=null; refreshSocial() }
+    private var cachedFriendsJson:String?=null
+    private var cachedTombstonesJson:String?=null
+    private var cachedFriends:List<Friend>?=null
     private fun loadFriends() {
+        val raw=progress.prefs.getString("friends","[]")
+        val tombstones=progress.prefs.getString("friendTombstones","{}")
+        cachedFriends?.takeIf {raw==cachedFriendsJson&&tombstones==cachedTombstonesJson}?.let {friends=it;return}
         friends = CloudProgress.activeFriends(progress.friendRecords()).objects().map { f ->
             Friend(ShareProgress.fromJson(f.getJSONObject("progress").toString()), f.getString("gist"), f.getLong("modifiedAt"),
                 GitHubIdentity.fromApi(f.optJSONObject("githubIdentity")),f.optLong("githubIdentityCheckedAt")) }
+        cachedFriendsJson=raw;cachedTombstonesJson=tombstones;cachedFriends=friends
     }
     private fun loadFriendRequests() {
         if(::friendInbox.isInitialized) { friendRequests=friendInbox.pending();outgoingRequests=friendInbox.outgoing() }

@@ -1,0 +1,8 @@
+<resources>
+    <dimen name="widget_streak_width">120dp</dimen><dimen name="widget_streak_height">120dp</dimen>
+    <dimen name="widget_goal_width">160dp</dimen><dimen name="widget_goal_height">150dp</dimen>
+    <dimen name="widget_week_width">220dp</dimen><dimen name="widget_week_height">150dp</dimen>
+    <dimen name="widget_social_width">200dp</dimen><dimen name="widget_social_height">160dp</dimen>
+    <string name="widget_resize_hint">Redimensionnable</string>
+    <string name="widget_preview_loading">Hamigo</string>
+</resources>

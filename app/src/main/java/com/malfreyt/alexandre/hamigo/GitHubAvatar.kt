@@ -43,7 +43,7 @@ fun GitHubAvatar(identity: GitHubIdentity?, name: String, modifier: Modifier = M
 }
 
 /** Public avatars have their own unauthenticated transport and bounded private app cache. */
-private object GitHubAvatarImages {
+internal object GitHubAvatarImages {
     @Volatile private var images:AvatarImageCache?=null
     fun cache(context:Context):AvatarImageCache=images ?: synchronized(this) {
         images ?: AvatarImageCache.create(context.applicationContext).also {images=it}

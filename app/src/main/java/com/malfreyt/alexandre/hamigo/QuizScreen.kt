@@ -317,7 +317,7 @@ fun solution(q:Question):String=when(q.kind){
     val passed=if(s.exam)LearningRules.examPassed(s.regulationScore,s.techniqueScore) else if(s.lessonId!=null)s.lessonPassed else s.unresolved.isEmpty()
     val showRecap=s.exam || (s.lessonId==null && s.questions.any {it.kind!="flash"})
     Box(Modifier.fillMaxSize()) {
-    LazyColumn(Modifier.fillMaxSize(),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(9.dp),horizontalAlignment=Alignment.CenterHorizontally) {
+    LazyColumn(Modifier.fillMaxSize().testTag("results-list"),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(9.dp),horizontalAlignment=Alignment.CenterHorizontally) {
         item {
             Column(horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(7.dp)) {
                 Pico(Modifier.size(108.dp),happy=passed,mood=if(passed)MascotMood.CELEBRATE else MascotMood.DETERMINED,pose=if(passed)MascotPose.DANCE else MascotPose.HUG)
@@ -351,19 +351,19 @@ fun solution(q:Question):String=when(q.kind){
                 }
             }
         }
+        item(key="results-goal") {val p=model.displayedProgress ?: model.progress;DailyGoalSummary(p.todayXp,p.dailyGoal)}
         item {
             Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
                 Action(when(s.returnRoute) { "practice" -> "Revenir aux défis"; "resources" -> "Revenir aux mémos"; else -> "Revenir au parcours" }){model.leaveSession()}
                 if(!s.exam&&s.lessonId!=null&&!passed)model.content?.lessons?.firstOrNull{it.id==s.lessonId}?.let{lesson->Action("Reprendre le cours"){model.startLesson(lesson)}}
                 if(s.missed.isNotEmpty())OutlinedButton(feedbackClick {model.startQuestions("On consolide le signal",s.missed.values.toList())},Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)){Text("Revoir les ${s.missed.size} questions manquées")}
                 OutlinedButton(feedbackClick {
-                    if(showRecap)NativeShare.resultsImage(context,ShareResults(model.progress.name,s.title,s.firstCorrect,s.firstCount,s.elapsedMillis,s.unanswered,s.gain,
-                        if(s.exam)s.regulationScore else null,if(s.exam)s.techniqueScore else null))
-                    else NativeShare.progressImage(context,model.progress.snapshot())
+                    NativeShare.resultsImage(context,ShareResults(model.progress.name,s.title,s.firstCorrect,s.firstCount,s.elapsedMillis,s.unanswered,s.gain,
+                        if(s.exam)s.regulationScore else null,if(s.exam)s.techniqueScore else null),model.sync.accountIdentity)
                 },Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)) {
                     Icon(Icons.Rounded.Share,null,Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(if(showRecap)"Partager mes résultats" else "Partager mon parcours")
+                    Text("Partager mes résultats")
                 }
             }
         }

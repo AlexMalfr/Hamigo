@@ -73,10 +73,10 @@ fun QuestionFeedbackButton(q: Question, index: Int, count: Int, lessonId: String
         title = { Text("Question Exam1") },
         text = { Text("Cette question vient d’Exam1 et n’a pas été écrite pour Hamigo. Pour une erreur d’énoncé ou de réponse, contacte Jean-Luc F6GPX, responsable de la banque.\n\nPour un problème d’affichage ou d’interaction dans l’app, fais un retour à Hamigo.",Modifier.verticalScroll(rememberScrollState())) },
         confirmButton = {
-            Column(Modifier.fillMaxWidth()) {
+            ActionLinks {
                 Button(feedbackClick { explainSource = false; ContentFeedback.openExam1Contact(context, q,index,count,lessonId,sessionTitle) }, Modifier.fillMaxWidth()) { Text("Contacter Exam1") }
-                TextButton(feedbackClick { explainSource = false; openLink(context, ContentFeedback.question(q, index, count, lessonId,sessionTitle)) }, Modifier.fillMaxWidth()) { Text("Signaler à Hamigo") }
-                TextButton(feedbackClick { explainSource = false }, Modifier.fillMaxWidth()) { Text("Annuler") }
+                ActionLink("Signaler à Hamigo"){explainSource=false;openLink(context,ContentFeedback.question(q,index,count,lessonId,sessionTitle))}
+                ActionLink("Annuler"){explainSource=false}
             }
         }
     )

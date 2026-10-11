@@ -4,8 +4,10 @@ import org.json.JSONObject
 import org.json.JSONArray
 import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 
 data class DailyPoint(val day: String, val xp: Int)
+data class HourlyPoint(val hour: Int, val xp: Int)
 
 /** Publicly shareable statistics, deliberately separated from the complete learning backup. */
 data class ShareProgress(
@@ -15,9 +17,18 @@ data class ShareProgress(
     val lessons: Int,
     val weeklyXp: Int = 0,
     val updatedAt: String = Instant.now().toString(),
-    val dailyXp: List<DailyPoint> = emptyList()
+    val dailyXp: List<DailyPoint> = emptyList(),
+    val dailyGoal: Int? = null,
+    val hourlyDay: String? = null,
+    val hourlyXp: List<HourlyPoint> = emptyList(),
+    val hourlyComplete: Boolean = false,
+    val zoneId: String? = null,
+    val activityHistory:PublicActivityHistory? = null,
+    val appVersion:String?=null,
+    val appVersionCode:Int?=null
 ) {
-    fun toJson(): String = JSONObject()
+    fun toJson(): String {
+        val json=JSONObject()
         .put("schema", 2)
         .put("name", name.trim().take(48))
         .put("xp", xp.coerceAtLeast(0))
@@ -28,7 +39,21 @@ data class ShareProgress(
         .put("dailyXp", JSONArray(dailyXp.takeLast(30).map {
             JSONObject().put("day", it.day).put("xp", it.xp.coerceAtLeast(0))
         }))
-        .toString(2)
+        .put("dailyGoal", dailyGoal)
+        .put("hourlyDay", hourlyDay)
+        .put("hourlyXp", JSONArray(hourlyXp.map {JSONObject().put("hour",it.hour).put("xp",it.xp)}))
+        .put("hourlyComplete",hourlyComplete)
+        .put("zoneId",zoneId)
+        .put("appVersion",appVersion)
+        .put("appVersionCode",appVersionCode)
+        var history=activityHistory?.forPublication()
+        if(history!=null)json.put("activityHistory",history.toJson())
+        var result=json.toString(2)
+        while(result.length>30_000&&history!=null&&history.months.isNotEmpty()) {
+            history=history.trimOldestMonth();json.put("activityHistory",history.toJson());result=json.toString(2)
+        }
+        return result
+    }
 
     companion object {
         fun fromJson(json: String): ShareProgress {
@@ -68,8 +93,32 @@ data class ShareProgress(
                     DailyPoint(day, amount.toInt())
                 }.also { require(it.map { point -> point.day }.distinct().size == it.size) { "Jour de progression répété." } }.sortedBy { it.day }
             } ?: emptyList()
+            val goal=if(data.has("dailyGoal"))number("dailyGoal").also {require(it in 1..1000)} else null
+            val hourlyDay=if(data.has("hourlyDay"))data.getString("hourlyDay").also {require(it.length==10);LocalDate.parse(it)} else null
+            val hours=data.optJSONArray("hourlyXp")?.let {array->
+                require(array.length()<=24)
+                (0 until array.length()).map {i->val point=array.getJSONObject(i)
+                    val h=point.opt("hour");val x=point.opt("xp")
+                    require(h is Number&&h.toDouble()%1.0==0.0&&h.toDouble() in 0.0..23.0)
+                    require(x is Number&&x.toDouble()%1.0==0.0&&x.toDouble() in 0.0..Int.MAX_VALUE.toDouble())
+                    HourlyPoint(h.toInt(),x.toInt())
+                }.also {require(it.map {p->p.hour}.distinct().size==it.size)}.sortedBy {it.hour}
+            }.orEmpty()
+            val complete=if(data.has("hourlyComplete"))data.get("hourlyComplete").also {require(it is Boolean)} as Boolean else false
+            val zone=if(data.has("zoneId"))data.getString("zoneId").also {require(it.length<=64);ZoneId.of(it)} else null
+            val history=if(data.has("activityHistory"))PublicActivityHistory.read(data.getJSONObject("activityHistory")) else null
+            val appVersion=if(data.has("appVersion"))data.get("appVersion").also {value->
+                require(value is String&&value.length in 3..64&&value.matches(Regex("[0-9]+(?:\\.[0-9]+){1,3}(?:[-+][A-Za-z0-9.-]+)*")))
+            } as String else null
+            val appVersionCode=if(data.has("appVersionCode"))number("appVersionCode").also {require(it>0)} else null
+            points.forEach {p->history?.xp(LocalDate.parse(p.day))?.let {require(it==p.xp)}}
+            require(hours.isEmpty()||hourlyDay!=null)
+            if(complete) {
+                require(hourlyDay!=null)
+                require(points.firstOrNull {it.day==hourlyDay}?.xp?.toLong()==hours.sumOf {it.xp.toLong()})
+            }
             return ShareProgress(name, number("xp"), number("streak"), number("lessons"),
-                number("weeklyXp", optional = true), date, points)
+                number("weeklyXp", optional = true), date, points,goal,hourlyDay,hours,complete,zone,history,appVersion,appVersionCode)
         }
     }
 }

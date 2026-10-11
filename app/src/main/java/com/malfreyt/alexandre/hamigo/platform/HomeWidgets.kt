@@ -63,7 +63,8 @@ internal object HomeWidgets {
                 manager.updateAppWidget(id,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(id),id))
             } }
         }
-        scheduleMidnight(context,installed.any { it.second.isNotEmpty() })
+        SocialWidgets.refresh(context)
+        scheduleMidnight(context,installed.any { it.second.isNotEmpty() }||SocialWidgets.installed(context))
     }
 
     fun update(context: Context, manager: AppWidgetManager, ids: IntArray, kind: HomeWidgetKind) {
@@ -76,11 +77,7 @@ internal object HomeWidgets {
         appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID): RemoteViews {
         val transparent = WidgetSettings.transparent(context,appWidgetId)
         val lightText = WidgetSettings.lightText(context,appWidgetId)
-        val defaults = when (kind) {
-            HomeWidgetKind.STREAK -> SizeF(130f,130f)
-            HomeWidgetKind.GOAL -> SizeF(220f,150f)
-            HomeWidgetKind.WEEK -> SizeF(280f,180f)
-        }
+        val defaults = WidgetDimensions.defaultSize(context,kind)
         fun option(key: String, fallback: Float) = options.getInt(key,fallback.toInt()).toFloat().coerceAtLeast(40f)
         val portrait = SizeF(option(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,defaults.width), option(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,defaults.height))
         val landscape = SizeF(option(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,defaults.width), option(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,defaults.height))

@@ -2,6 +2,9 @@ package com.malfreyt.alexandre.hamigo.releaseprobe;
 
 import android.app.Activity;
 import android.app.Instrumentation;
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.app.usage.StorageStats;
 import android.app.usage.StorageStatsManager;
 import android.content.Context;
@@ -19,11 +22,14 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.zip.ZipFile;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 /** Platform-only black-box runner: independent of every class/API renamed by production R8. */
 public final class ReleaseProbe extends Instrumentation {
@@ -39,6 +45,7 @@ public final class ReleaseProbe extends Instrumentation {
             if(mode.equals("flow"))flow();
             if(mode.equals("diagnostics"))diagnostics();
             if(mode.equals("catalog"))catalog();
+            if(mode.equals("social"))social();
             recordStorage();output.putString("stream","OK: "+mode+" on the actual signed release\n");finish(Activity.RESULT_OK,output);
         } catch(Throwable e) {
             try {capture("release-failure");recordStorage();}catch(Exception ignored){}
@@ -47,6 +54,61 @@ public final class ReleaseProbe extends Instrumentation {
         }
     }
     private Activity open() {return startActivitySync(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));}
+    private void social() throws Exception {
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().clear().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).putBoolean("interactionHaptics",false).commit();
+        for(String file:new String[]{"hamigo_social","hamigo_secure","hamigo_diagnostics"})context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear().commit();
+        Activity activity=open();waitText("HAMIGO",30000);SystemClock.sleep(1000);
+        String today=LocalDate.now().toString();JSONObject daily=new JSONObject().put(today,24);
+        JSONObject progress=new JSONObject().put("schema",2).put("questionIdsVersion",1).put("xp",350).put("answers",30).put("correct",24).put("completed",new JSONArray()).put("dailyXp",daily).put("reviews",new JSONObject()).put("awarded",new JSONObject()).put("syncEvents",new JSONObject());
+        progress.put("syncBase",new JSONObject(progress.toString()));
+        JSONArray days=new JSONArray();for(int i=6;i>=0;i--)days.put(new JSONObject().put("day",LocalDate.now().minusDays(i).toString()).put("xp",60));
+        JSONObject friend=new JSONObject().put("schema",2).put("name","Camille Démo").put("xp",800).put("streak",5).put("lessons",13).put("weeklyXp",420).put("updatedAt",java.time.Instant.now().toString()).put("dailyXp",days).put("dailyGoal",60).put("hourlyDay",today).put("hourlyXp",new JSONArray().put(new JSONObject().put("hour",9).put("xp",30)).put(new JSONObject().put("hour",12).put("xp",30))).put("hourlyComplete",true).put("zoneId",ZoneId.systemDefault().getId());
+        friend.put("dailyGoal",120).put("appVersion","0.49+12345678").put("appVersionCode",49);
+        JSONObject months=new JSONObject();LocalDate start=LocalDate.now().minusDays(59);
+        for(java.time.YearMonth month=java.time.YearMonth.from(start);!month.isAfter(java.time.YearMonth.now());month=month.plusMonths(1)) {
+            StringBuilder values=new StringBuilder();for(int d=1;d<=month.lengthOfMonth();d++){if(d>1)values.append(',');LocalDate day=month.atDay(d);values.append(day.isBefore(start)||day.isAfter(LocalDate.now())?0:60);}months.put(month.toString(),values.toString());
+        }
+        friend.put("activityHistory",new JSONObject().put("start",start.toString()).put("end",today).put("months",months));
+        JSONArray friends=new JSONArray().put(new JSONObject().put("gist","https://gist.github.com/"+"1".repeat(32)).put("modifiedAt",System.currentTimeMillis()).put("progress",friend));
+        // Seed after initial loading: the screen uses cached summaries, with no credentials.
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putString("name","Alex Démo").putInt("dailyGoal",30).putString("progress",progress.toString()).putString("friends",friends.toString()).commit();
+        SystemClock.sleep(500);String before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null);
+        click("Équipe",false);reveal("Camille Démo",false);click("Camille Démo",false);
+        waitText("60 / 120 XP",10000);capture("release-friend-goal-calendar");
+        reveal("Voir le mois précédent",true);click("Voir le mois précédent",true);SystemClock.sleep(400);capture("release-friend-previous-month");
+        reveal("Les 7 derniers jours",false);reveal("Voir la semaine précédente",true);click("Voir la semaine précédente",true);SystemClock.sleep(400);reveal("Historique hebdomadaire",false);capture("release-friend-previous-week");
+        reveal("Aujourd’hui · heure par heure",false);capture("release-friend-hours");
+        reveal("Retirer cet équipier",false);capture("release-friend-actions");click("Retirer cet équipier",false);waitText("Retirer Camille Démo ?",10000);click("Annuler",false);
+        reveal("Infos techniques",false);check(find("Hamigo 0.49+12345678",false)==null,"Build details start collapsed");click("Infos techniques",false);
+        reveal("Hamigo 0.49+12345678",false);reveal("Code de version : 49",false);waitText("Code de version : 49",10000);capture("release-friend-app-version");back();
+        click("Moi",false);reveal("24 / 60 XP",false);capture("release-daily-goal");
+        click("Modifier l’objectif quotidien",true);waitText("Objectif quotidien",10000);SystemClock.sleep(1000);capture("release-goal-settings-focused");back();
+        reveal("Retrouver mes révisions",false);click("Retrouver mes révisions",false);waitText("Lancer les révisions",10000);SystemClock.sleep(1000);capture("release-reviews-focus");
+        check(java.util.Objects.equals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null)),"Social browsing preserves progression");
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putString("friends","[]").commit();
+        runOnMainSync(()->activity.startActivity(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("hamigo_route","friends")));
+        waitText("Sur la même fréquence",10000);
+        AppWidgetManager manager=AppWidgetManager.getInstance(context);AppWidgetHost host=new AppWidgetHost(context,2849);int id=-1;
+        getUiAutomation().adoptShellPermissionIdentity(android.Manifest.permission.BIND_APPWIDGET);
+        try {
+            id=host.allocateAppWidgetId();ComponentName provider=new ComponentName(context.getPackageName(),context.getPackageName()+".platform.SocialWidgetProvider");
+            check(manager.bindAppWidgetIdIfAllowed(id,provider),"Social provider binds in the optimized release");
+            ComponentName configuration=manager.getAppWidgetInfo(id).configure;check(configuration!=null,"Social widget is configurable");
+            startActivitySync(new Intent().setComponent(configuration).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id));
+            waitText("Comparer",10000);click("Aujourd’hui",false);reveal("Fond transparent",false);
+            AccessibilityNodeInfo toggle=firstToggle(find("Fond transparent",false).getParent());
+            check(toggle!=null&&toggle.performAction(AccessibilityNodeInfo.ACTION_CLICK),"Transparent switch is operable");
+            SystemClock.sleep(300);capture("release-social-widget-settings");click("Appliquer",false);
+            check(context.getSharedPreferences("hamigo_widgets",Context.MODE_PRIVATE).getBoolean("socialToday_"+id,false),"Widget day selection persists");
+        } finally {if(id>=0)host.deleteAppWidgetId(id);host.deleteHost();getUiAutomation().dropShellPermissionIdentity();}
+        runOnMainSync(activity::finish);
+    }
+    private AccessibilityNodeInfo firstToggle(AccessibilityNodeInfo node) {
+        if(node==null)return null;
+        if(node.isCheckable()&&node.isClickable()&&node.isEnabled())return node;
+        for(int i=0;i<node.getChildCount();i++){AccessibilityNodeInfo found=firstToggle(node.getChild(i));if(found!=null)return found;}
+        return null;
+    }
     private void catalog() throws Exception {
         context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).commit();
         context.getSharedPreferences("hamigo_diagnostics",Context.MODE_PRIVATE).edit().putBoolean("enabled",true).putBoolean("frozen",true).commit();
@@ -169,6 +231,8 @@ public final class ReleaseProbe extends Instrumentation {
     }
     private AccessibilityNodeInfo find(AccessibilityNodeInfo node,String label,boolean description,boolean exact) {
         if(node==null)return null;
+        // Pager-derived titles can otherwise remain cached after the visible text changes.
+        if(!node.refresh())return null;
         for(int i=0;i<node.getChildCount();i++){AccessibilityNodeInfo found=find(node.getChild(i),label,description,exact);if(found!=null)return found;}
         CharSequence text=description?node.getContentDescription():node.getText();
         Rect bounds=new Rect();node.getBoundsInScreen(bounds);
@@ -192,7 +256,11 @@ public final class ReleaseProbe extends Instrumentation {
     private boolean scroll(AccessibilityNodeInfo node) {
         if(node==null)return false;
         for(int i=0;i<node.getChildCount();i++)if(scroll(node.getChild(i)))return true;
-        return node.isScrollable()&&node.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
+        if(!node.isScrollable())return false;
+        if(node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN))return node.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.getId());
+        // Revealing content is vertical; do not page the calendar/week horizontally.
+        if(node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_LEFT)||node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_RIGHT))return false;
+        return node.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
     }
     private void reveal(String text,boolean description) {
         for(int i=0;i<35;i++){if(find(text,description)!=null)return;scroll(getUiAutomation().getRootInActiveWindow());SystemClock.sleep(200);}
@@ -215,7 +283,7 @@ public final class ReleaseProbe extends Instrumentation {
         SystemClock.sleep(600);
     }
     private void capture(String name) throws Exception {
-        File directory=new File(context.getExternalFilesDir(null),"storage-0.48-release");directory.mkdirs();
+        File directory=new File(context.getExternalFilesDir(null),mode.equals("social")?"social-0.49-release":"storage-0.48-release");directory.mkdirs();
         Bitmap bitmap=getUiAutomation().takeScreenshot();check(bitmap!=null,"Screenshot available");
         try(FileOutputStream out=new FileOutputStream(new File(directory,name+".png"))){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}finally{bitmap.recycle();}
     }

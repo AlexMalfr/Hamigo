@@ -1,6 +1,6 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="130dp" android:minHeight="130dp" android:minResizeWidth="40dp" android:minResizeHeight="40dp" android:resizeMode="horizontal|vertical"
-    android:updatePeriodMillis="1800000" android:initialLayout="@layout/widget_compact"
+    android:minWidth="@dimen/widget_streak_width" android:minHeight="@dimen/widget_streak_height" android:minResizeWidth="40dp" android:minResizeHeight="40dp" android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="1800000" android:initialLayout="@layout/widget_initial"
     android:configure="com.malfreyt.alexandre.hamigo.platform.WidgetConfigurationActivity"
     android:widgetFeatures="reconfigurable|configuration_optional"
-    android:description="@string/widget_streak_description" android:widgetCategory="home_screen" />
+    android:description="@string/widget_streak_description" android:previewImage="@drawable/widget_preview_streak" android:widgetCategory="home_screen" />

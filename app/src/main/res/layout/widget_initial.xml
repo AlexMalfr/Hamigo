@@ -1,0 +1,5 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="@string/widget_preview_loading">
+    <FrameLayout android:id="@android:id/background" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/widget_goal_background" android:clipToOutline="true">
+        <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:padding="8dp" android:src="@drawable/ic_hamigo_foreground" android:scaleType="fitCenter" android:importantForAccessibility="no" />
+    </FrameLayout>
+</FrameLayout>

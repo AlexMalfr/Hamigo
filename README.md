@@ -21,7 +21,7 @@ Hamigo est une application Android en français pour préparer le **certificat d
 - **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions aléatoires des notions étudiées, qui mélangent les rappels de la répétition espacée.
 - **Garder le rythme** avec un objectif quotidien, des XP, une série de jours, un calendrier, des rappels et des widgets redimensionnables, avec un fond transparent facultatif par widget.
 - **Ressentir les interactions** avec de petits sons inspirés des commandes radio, des vibrations mesurées et des confettis de fin de séance. Sons et vibrations se désactivent séparément ; la composition Morse peut être écoutée en direct, avec un réglage dédié.
-- **Jouer en équipe** : comparer les progrès de ses amis, les ajouter par lien ou QR et partager un bilan en image.
+- **Jouer en équipe** : consulter le calendrier et les semaines d’un ami, son objectif et sa progression d’aujourd’hui, les ajouter par lien ou QR, comparer les XP dans un widget social avec Pico et partager un bilan avec les photos GitHub. Encourager partage une petite carte et ses statistiques. L’historique disponible dépend de son dernier résumé synchronisé. Les fins de séance montrent aussi l’objectif du jour et proposent leur propre image de résultats.
 - **Faire un retour** depuis une question ou une fiche mémo : son identifiant accompagne le lien de contact ; pour Exam1, l’app propose aussi le contact de la banque originale.
 
 Les révisions s’adaptent aux réponses. Une leçon demande au moins 80 % de bonnes réponses au premier essai et la correction des erreurs pour être validée.

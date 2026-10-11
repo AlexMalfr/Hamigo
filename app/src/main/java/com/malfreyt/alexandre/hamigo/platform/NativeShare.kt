@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.icu.text.BreakIterator
@@ -18,6 +19,8 @@ import com.malfreyt.alexandre.hamigo.MascotPose
 import com.malfreyt.alexandre.hamigo.PicoRenderer
 import com.malfreyt.alexandre.hamigo.dayCount
 import com.malfreyt.alexandre.hamigo.dayUnit
+import com.malfreyt.alexandre.hamigo.GitHubAvatarImages
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.NumberFormat
 import java.time.Instant
@@ -32,18 +35,36 @@ import kotlin.math.pow
 
 /** Share cards are drawn locally, with the same Pico artwork as the app and notifications. */
 object NativeShare {
-    fun resultsImage(context:Context,results:ShareResults) {
-        shareFile(context,renderResultsImage(context,results),"image/png","Mes résultats Hamigo",
-            "${cleanName(results.name)} : ${results.correct}/${results.total} sur ${results.title}, avec Hamigo 📻")
+    const val APP_DOWNLOAD_URL="https://github.com/AlexMalfr/Hamigo/releases/latest"
+    private val sharing=CoroutineScope(SupervisorJob()+Dispatchers.Main)
+    private var pendingShare:Job?=null
+    private fun imageWithAvatars(context:Context,identities:Map<Int,GitHubIdentity?>,title:String,text:String,render:(Map<Int,Bitmap>)->File) {
+        if(pendingShare?.isActive==true)return
+        pendingShare=sharing.launch {
+            try {
+                val file=withContext(Dispatchers.IO) {
+                    val cache=GitHubAvatarImages.cache(context)
+                    val avatars=coroutineScope {identities.map {(key,identity)->async {key to identity?.avatarUrl?.let {cache.cached(it) ?: cache.load(it)}}}.awaitAll().mapNotNull {(key,picture)->picture?.let {key to it}}.toMap()}
+                    render(avatars)
+                }
+                if(context is Activity&&(context.isFinishing||context.isDestroyed))return@launch
+                shareFile(context,file,"image/png",title,text)
+            } catch(e:CancellationException){throw e} catch(_:Exception) {android.widget.Toast.makeText(context,"L’image n’a pas pu être préparée. Réessaie.",android.widget.Toast.LENGTH_SHORT).show()}
+        }
+    }
+    fun resultsImage(context:Context,results:ShareResults,identity:GitHubIdentity?=null) {
+        imageWithAvatars(context,mapOf(0 to identity),"Mes résultats Hamigo",
+            "${cleanName(results.name)} : ${results.correct}/${results.total} sur ${results.title}, avec Hamigo 📻") {renderResultsImage(context,results,it[0])}
     }
 
-    fun renderResultsImage(context:Context,results:ShareResults):File=posterFile(context,"hamigo-resultats-") {card ->
+    fun renderResultsImage(context:Context,results:ShareResults,avatar:Bitmap?=null):File=posterFile(context,"hamigo-resultats-") {card ->
         card.brand("MES RÉSULTATS")
         PicoRenderer.draw(card.canvas,RectF(800f,54f,1030f,284f),
             if(results.successful)MascotMood.CELEBRATE else MascotMood.DETERMINED,
             if(results.successful)MascotPose.JUMP else MascotPose.POINT)
         card.text("Une nouvelle étape",64f,215f,57f,Ink)
-        card.fittedText(cleanName(results.name),64f,274f,37f,Teal,716f)
+        card.avatar(avatar,results.name,RectF(64f,239f,132f,307f))
+        card.fittedText(cleanName(results.name),154f,279f,37f,Teal,625f)
         card.fittedText(results.title,64f,317f,27f,Muted,950f,heavy=false)
         val total=results.total.coerceAtLeast(1)
         val correct=results.correct.coerceIn(0,total)
@@ -91,25 +112,66 @@ object NativeShare {
         card.footer()
     }
 
-    fun progressImage(context: Context, progress: ShareProgress) {
-        shareFile(context, renderProgressImage(context, progress), "image/png", "Ma progression Hamigo",
-            "${progress.name} : ${progress.xp} XP, ${dayCount(progress.streak)} de série sur Hamigo 📻")
+    fun progressImage(context: Context, progress: ShareProgress,identity:GitHubIdentity?=null) {
+        imageWithAvatars(context,mapOf(0 to identity),"Ma progression Hamigo",
+            "${progress.name} : ${progress.xp} XP, ${dayCount(progress.streak)} de série sur Hamigo 📻") {renderProgressImage(context,progress,it[0])}
     }
 
-    fun teamImage(context: Context, own: ShareProgress, others: List<ShareProgress>) {
-        shareFile(context, renderTeamImage(context, own, others), "image/png", "Notre progression Hamigo",
-            "Sur la même fréquence : notre équipe progresse ensemble sur Hamigo 📻")
+    fun teamImage(context: Context, own: ShareProgress, others: List<ShareProgress>,ownIdentity:GitHubIdentity?=null,otherIdentities:List<GitHubIdentity?> = emptyList()) {
+        val members=teamMembers(own,others);val ownRank=members.indexOfFirst {it.isOwn}
+        val visible=(if(ownRank>5)members.take(5)+members[ownRank] else members.take(6)).map {it.identity}
+        val identities=visible.associateWith {if(it==0)ownIdentity else otherIdentities.getOrNull(it-1)}
+        imageWithAvatars(context,identities,"Notre progression Hamigo","Sur la même fréquence : notre équipe progresse ensemble sur Hamigo 📻") {renderTeamImage(context,own,others,it)}
     }
 
-    fun inviteImage(context: Context, link: String) {
-        shareFile(context, renderInviteImage(context, link), "image/png", "Mon invitation Hamigo",
-            "Rejoins mon équipe Hamigo 📻\n$link")
+    fun inviteImage(context: Context, link: String,name:String="Mon équipe",identity:GitHubIdentity?=null) {
+        imageWithAvatars(context,mapOf(0 to identity),"Mon invitation Hamigo","Rejoins mon équipe Hamigo 📻\n$link") {renderInviteImage(context,link,name,it[0])}
     }
 
-    fun nudge(context: Context, name: String) {
-        val message = "Hé ${cleanName(name)} ! Une petite session Hamigo aujourd'hui ? 📻 " +
-            "On garde nos séries et on se rapproche du certificat radioamateur ensemble !"
-        text(context, message, "Envoyer une petite onde")
+    fun nudge(context: Context, name: String,from:String="Un équipier",identity:GitHubIdentity?=null,recipient:GitHubIdentity?=null,progress:ShareProgress?=null) {
+        val message = progress?.let {EncouragementContent.from(it).message} ?: ("Hé ${cleanName(name)} ! Une petite session Hamigo aujourd'hui ? 📻 " +
+            "On garde nos séries et on se rapproche du certificat radioamateur ensemble !")
+        imageWithAvatars(context,mapOf(0 to identity,1 to recipient),"Encourager ${cleanName(name)}",message) {renderNudgeImage(context,name,from,it[0],it[1],progress)}
+    }
+
+    fun application(context:Context) = imageWithAvatars(context,emptyMap(),"Partager Hamigo",
+        "Découvre Hamigo 📻 : prépare le certificat radioamateur avec des cours interactifs, des fiches Mémo et des révisions. On peut aussi progresser entre amis !\nTéléchargement : $APP_DOWNLOAD_URL") {renderApplicationImage(context)}
+
+    fun renderNudgeImage(context:Context,name:String,from:String,avatar:Bitmap?=null,recipient:Bitmap?=null,progress:ShareProgress?=null):File=posterFile(context,"hamigo-encouragement-",720) {card->
+        val encouragement=progress?.let {EncouragementContent.from(it)}
+        card.brand("ON PROGRESSE ENSEMBLE")
+        card.avatar(recipient,name,RectF(64f,222f,132f,290f))
+        card.fittedText("Hé ${cleanName(name)} !",154f,268f,48f,Ink,435f)
+        if(encouragement==null) {
+            card.text("Une petite session",64f,341f,39f,Teal)
+            card.text("Hamigo aujourd’hui ?",64f,391f,39f,Teal)
+        } else {
+            card.fittedText(encouragement.headline,64f,342f,38f,Teal,520f)
+            card.fittedText(encouragement.detail,64f,381f,27f,Muted,520f,heavy=false)
+            encouragement.ratio?.let {ratio->
+                card.rounded(RectF(64f,397f,572f,407f),Mint,5f)
+                if(ratio>0)card.rounded(RectF(64f,397f,64f+508f*ratio,407f),if(encouragement.reached)Gold else Teal,5f)
+            }
+            card.fittedText(encouragement.stats,64f,443f,24f,Ink,520f,heavy=false)
+            card.fittedText(encouragement.week,64f,477f,23f,Muted,520f,heavy=false)
+        }
+        PicoRenderer.draw(card.canvas,RectF(604f,152f,1030f,578f),if(encouragement?.reached==true)MascotMood.CELEBRATE else MascotMood.HAPPY,MascotPose.WAVE)
+        card.avatar(avatar,from,RectF(64f,504f,138f,578f));card.fittedText("De ${cleanName(from)}",158f,550f,29f,Muted,416f)
+        card.footer()
+    }
+
+    fun renderApplicationImage(context:Context):File=posterFile(context,"hamigo-decouverte-",1080) {card->
+        card.brand("LE CERTIFICAT RADIOAMATEUR, À TON RYTHME")
+        card.text("Hamigo",64f,302f,108f,Ink)
+        card.text("Apprends, révise",64f,363f,37f,Teal)
+        card.text("et progresse avec tes amis.",64f,415f,32f,Teal)
+        PicoRenderer.draw(card.canvas,RectF(650f,158f,1032f,540f),MascotMood.CELEBRATE,MascotPose.WAVE)
+        listOf("Cours interactifs" to Mint,"Mémo, outils et révisions" to GoldLight,"Progression entre amis" to Peach).forEachIndexed {i,entry->
+            val top=558f+i*124f;card.rounded(RectF(64f,top,1016f,top+100f),entry.second)
+            card.text("✓",112f,top+65f,42f,Teal);card.text(entry.first,178f,top+64f,37f,Ink)
+        }
+        card.text("Disponible gratuitement sur GitHub",540f,986f,27f,Muted,heavy=false,align=Paint.Align.CENTER)
+        card.footer()
     }
 
     fun text(context: Context, text: String, title: String = "Partager Hamigo") {
@@ -124,12 +186,12 @@ object NativeShare {
         shareFile(context, file, "application/json", "Sauvegarder ma progression Hamigo")
     }
 
-    fun renderProgressImage(context: Context, progress: ShareProgress): File = posterFile(context, "hamigo-progression-") { card ->
+    fun renderProgressImage(context: Context, progress: ShareProgress,avatar:Bitmap?=null): File = posterFile(context, "hamigo-progression-") { card ->
         card.brand("MON CARNET DE BORD")
         PicoRenderer.draw(card.canvas, RectF(778f, 48f, 1030f, 300f), MascotMood.CELEBRATE, MascotPose.JUMP)
         card.text("Ma progression", 64f, 206f, 58f, Ink)
-        card.fittedText(cleanName(progress.name), 64f, 269f, 43f, Ink, 696f)
-        card.text("Une petite onde chaque jour.", 64f, 316f, 28f, Teal, heavy = false)
+        card.avatar(avatar,progress.name,RectF(64f,235f,132f,303f))
+        card.fittedText(cleanName(progress.name),154f,278f,40f,Ink,605f)
 
         card.stat(RectF(64f, 352f, 532f, 476f), format(progress.xp), "XP collectionnés", Mint)
         card.stat(RectF(548f, 352f, 1016f, 476f), format(progress.streak), "${dayUnit(progress.streak)} de série", Peach)
@@ -150,11 +212,9 @@ object NativeShare {
     }
 
     /** Weekly rank is computed over everybody, even when only six rows fit on the image. */
-    fun renderTeamImage(context: Context, own: ShareProgress, others: List<ShareProgress>): File =
+    fun renderTeamImage(context: Context, own: ShareProgress, others: List<ShareProgress>,avatars:Map<Int,Bitmap> = emptyMap()): File =
         posterFile(context, "hamigo-equipe-") { card ->
-            val members = (listOf(Member(own, true, 0)) + others.mapIndexed { index, progress -> Member(progress, false, index + 1) })
-                .sortedWith(compareByDescending<Member> { it.progress.weeklyXp }
-                    .thenByDescending { it.isOwn }.thenBy { it.progress.name.lowercase(Locale.FRENCH) })
+            val members = teamMembers(own,others)
             val ownRank = members.indexOfFirst { it.isOwn }
             // Always include the sharer: show the top five plus their real rank when outside the top six.
             val visible = if (ownRank > 5) members.take(5) + members[ownRank] else members.take(6)
@@ -182,13 +242,14 @@ object NativeShare {
                 card.text(rank.toString(), 117f, baseline + 12f, 21f, if (member.isOwn) Color.WHITE else Ink,
                     align = Paint.Align.CENTER)
                 val name = cleanName(member.progress.name) + if (member.isOwn) " · toi" else ""
-                card.fittedText(name, 158f, baseline, 26f, Ink, 566f)
+                card.avatar(avatars[member.identity],member.progress.name,RectF(152f,baseline-22f,202f,baseline+28f))
+                card.fittedText(name,220f,baseline,26f,Ink,500f)
                 card.text("${format(member.progress.weeklyXp)} XP", 980f, baseline, 24f,
                     if (member.isOwn) Teal else Ink, align = Paint.Align.RIGHT)
-                card.rounded(RectF(158f, baseline + 13f, 980f, baseline + 30f), Mist, 9f)
+                card.rounded(RectF(220f, baseline + 13f, 980f, baseline + 30f), Mist, 9f)
                 val amount = member.progress.weeklyXp.coerceAtLeast(0)
-                if (amount > 0) card.rounded(RectF(158f, baseline + 13f,
-                    158f + max(8f, 822f * amount / mostXp), baseline + 30f), if (member.isOwn) Teal else Coral, 9f)
+                if (amount > 0) card.rounded(RectF(220f, baseline + 13f,
+                    220f + max(8f, 760f * amount / mostXp), baseline + 30f), if (member.isOwn) Teal else Coral, 9f)
             }
             val note = when {
                 hidden > 0 -> "+ $hidden ${if (hidden == 1) "autre membre" else "autres membres"} dans l’équipe"
@@ -204,14 +265,14 @@ object NativeShare {
             card.footer()
         }
 
-    fun renderInviteImage(context: Context, link: String): File {
+    fun renderInviteImage(context: Context, link: String,name:String="Mon équipe",avatar:Bitmap?=null): File {
         // Validate before drawing or exporting: an invitation must never encode an arbitrary URL.
         require(FriendInvite.parse(link) != null && link.startsWith(FriendInvite.HTTPS_BASE)) { "Invitation Hamigo invalide." }
         return posterFile(context, "hamigo-invitation-") { card ->
             card.brand("UNE INVITATION SUR NOS ONDES")
             PicoRenderer.draw(card.canvas, RectF(806f, 48f, 1030f, 272f), MascotMood.HAPPY, MascotPose.POINT)
             card.text("Ajoute-moi sur Hamigo", 64f, 225f, 54f, Ink)
-            card.text("Une onde à la fois, on progresse ensemble.", 64f, 286f, 28f, Teal, heavy = false)
+            card.avatar(avatar,name,RectF(64f,267f,126f,329f));card.fittedText(cleanName(name),146f,309f,30f,Teal,800f)
             card.panel(RectF(100f, 344f, 980f, 1213f))
             val qr = FriendInvite.qr(link, 700)
             try { card.canvas.drawBitmap(qr, 190f, 384f, null) } finally { qr.recycle() }
@@ -223,6 +284,8 @@ object NativeShare {
     }
 
     private data class Member(val progress: ShareProgress, val isOwn: Boolean, val identity: Int)
+    private fun teamMembers(own:ShareProgress,others:List<ShareProgress>)=(listOf(Member(own.copy(weeklyXp=SocialActivity.weeklyXp(own)),true,0))+others.mapIndexed {i,p->Member(p.copy(weeklyXp=SocialActivity.weeklyXp(p)),false,i+1)})
+        .sortedWith(compareByDescending<Member> {it.progress.weeklyXp}.thenByDescending {it.isOwn}.thenBy {it.progress.name.lowercase(Locale.FRENCH)})
     private data class DayBar(val day: LocalDate, val xp: Int?)
 
     private fun dailySeries(progress: ShareProgress): List<DayBar> {
@@ -289,7 +352,13 @@ object NativeShare {
             text(subtitle, 64f, 148f, 19f, Muted, heavy = false)
         }
 
-        fun footer() = text("APPRENDS · RÉVISE · RAYONNE", 540f, 1310f, 22f, Teal, align = Paint.Align.CENTER)
+        fun avatar(bitmap:Bitmap?,name:String,bounds:RectF) {
+            val saved=canvas.save();canvas.clipPath(Path().apply {addOval(bounds,Path.Direction.CW)})
+            if(bitmap==null) {rounded(bounds,Mist,0f);text(cleanName(name).take(1).uppercase(Locale.FRENCH),bounds.centerX(),bounds.centerY()+bounds.height()*.17f,bounds.height()*.42f,Teal,align=Paint.Align.CENTER)}
+            else {val side=minOf(bitmap.width,bitmap.height);val left=(bitmap.width-side)/2;val top=(bitmap.height-side)/2;canvas.drawBitmap(bitmap,android.graphics.Rect(left,top,left+side,top+side),bounds,Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG))}
+            canvas.restoreToCount(saved)
+        }
+        fun footer() = text("APPRENDS · RÉVISE · RAYONNE", 540f, canvas.height-40f, 22f, Teal, align = Paint.Align.CENTER)
 
         fun stat(bounds: RectF, value: String, label: String, color: Int, numberSize: Float = 55f) {
             rounded(bounds, color)
@@ -378,8 +447,8 @@ object NativeShare {
     private fun format(value: Number): String = NumberFormat.getIntegerInstance(Locale.FRANCE).format(value.toLong().coerceAtLeast(0))
     private fun cleanName(name: String): String = name.replace(Regex("[\\p{Cntrl}\\r\\n]"), " ").trim().ifEmpty { "Pilote des ondes" }
 
-    private fun posterFile(context: Context, prefix: String, draw: (Poster) -> Unit): File {
-        val bitmap = Bitmap.createBitmap(1080, 1350, Bitmap.Config.ARGB_8888)
+    private fun posterFile(context: Context, prefix: String, height:Int=1350,draw: (Poster) -> Unit): File {
+        val bitmap = Bitmap.createBitmap(1080, height, Bitmap.Config.ARGB_8888)
         try {
             draw(Poster(Canvas(bitmap)))
             val file = newFile(context, prefix, ".png")
@@ -420,6 +489,7 @@ object NativeShare {
     private val Mist = Color.rgb(229, 241, 235)
     private val Peach = Color.rgb(255, 211, 179)
     private val GoldLight = Color.rgb(255, 232, 180)
+    private val Gold = Color.rgb(255, 198, 111)
     private val Coral = Color.rgb(255, 120, 105)
     private val ShortDate = DateTimeFormatter.ofPattern("dd/MM", Locale.FRANCE)
     private val Weekday = DateTimeFormatter.ofPattern("EEE", Locale.FRANCE)

@@ -114,6 +114,25 @@ class WidgetConfigurationInstrumentedTest {
             assertEquals(Activity.RESULT_CANCELED,it.result.resultCode)
         }
     }
+    @Test fun socialPeriodAndTransparencyAreIndependentPerInstance() {
+        val id=bind(SocialWidgetProvider::class.java);val other=bind(SocialWidgetProvider::class.java)
+        fun intent()=Intent(context,WidgetConfigurationActivity::class.java).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id)
+        ActivityScenario.launchActivityForResult<WidgetConfigurationActivity>(intent()).use {scenario->
+            ui.onNodeWithText("Aujourd’hui").performScrollTo().performClick()
+            ui.onNodeWithTag("widget-transparent").performScrollTo().performClick()
+            ui.onNodeWithTag("widget-light-text").performScrollTo().performClick()
+            ui.onNodeWithTag("widget-config-save").performClick()
+            assertEquals(Activity.RESULT_OK,scenario.result.resultCode)
+        }
+        assertTrue(WidgetSettings.socialToday(context,id));assertFalse(WidgetSettings.socialToday(context,other))
+        assertTrue(WidgetSettings.transparent(context,id));assertFalse(WidgetSettings.lightText(context,id))
+        ActivityScenario.launchActivityForResult<WidgetConfigurationActivity>(intent()).use {scenario->
+            ui.onNodeWithText("7 jours").performScrollTo().performClick()
+            ui.onNodeWithContentDescription("Annuler").performClick()
+            assertEquals(Activity.RESULT_CANCELED,scenario.result.resultCode)
+        }
+        assertTrue(WidgetSettings.socialToday(context,id))
+    }
 
     @Test fun allThreeModelsKeepTheWallpaperVisibleInARealHostAtTwoSizes() {
         val date = LocalDate.of(2026,10,9)

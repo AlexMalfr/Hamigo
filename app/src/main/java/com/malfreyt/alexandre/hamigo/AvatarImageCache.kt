@@ -28,6 +28,12 @@ internal class AvatarImageCache(private val directory:File,private val client:Ok
     private val locks=ConcurrentHashMap<String,Mutex>()
     private val retryAfter=ConcurrentHashMap<String,Long>()
     fun peek(url:String?):Bitmap?=url?.let {memory.get(it)?.bitmap}
+    /** Disk-only access for launcher rendering; never opens a network connection. Call off main. */
+    fun cached(url:String?):Bitmap?=url?.let {u->
+        memory.get(u)?.bitmap ?: runCatching {val entry=file(u)
+            if(!entry.isFile||entry.length()>MAX_BYTES)null else Picture(decode(entry.readBytes()),entry.lastModified()).also {memory.put(u,it)}.bitmap
+        }.getOrNull()
+    }
     private fun file(url:String)=File(directory,MessageDigest.getInstance("SHA-256").digest(url.toByteArray(Charsets.UTF_8)).joinToString(""){"%02x".format(it)}+".img")
     suspend fun load(url:String,onCached:((Bitmap)->Unit)?=null):Bitmap?=withContext(Dispatchers.IO) {
         locks.computeIfAbsent(url){Mutex()}.withLock {

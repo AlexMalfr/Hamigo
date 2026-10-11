@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.SizeF
 import android.widget.FrameLayout
+import android.widget.RemoteViews
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,10 +37,12 @@ class WidgetConfigurationActivity : ComponentActivity() {
         val result = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
         setResult(RESULT_CANCELED, result)
         val manager = AppWidgetManager.getInstance(this)
+        val social=manager.getAppWidgetInfo(id)?.provider?.className==SocialWidgetProvider::class.java.name
         val kind = when (manager.getAppWidgetInfo(id)?.provider?.className) {
             StreakWidgetProvider::class.java.name -> HomeWidgetKind.STREAK
             GoalWidgetProvider::class.java.name -> HomeWidgetKind.GOAL
             WeekWidgetProvider::class.java.name -> HomeWidgetKind.WEEK
+            SocialWidgetProvider::class.java.name -> null
             else -> { finish(); return }
         }
         enableEdgeToEdge()
@@ -45,8 +50,10 @@ class WidgetConfigurationActivity : ComponentActivity() {
             HamigoTheme {
                 var transparent by remember { mutableStateOf(WidgetSettings.transparent(this, id)) }
                 var lightText by remember { mutableStateOf(WidgetSettings.lightText(this,id)) }
+                var socialToday by remember {mutableStateOf(WidgetSettings.socialToday(this,id))}
                 var error by remember { mutableStateOf(false) }
                 val snapshot = remember { WidgetSnapshot.read(this) }
+                val teamSnapshot=remember {if(social)SocialWidgetSnapshot.read(this) else null}
                 Column(Modifier.fillMaxSize().background(Cream).safeDrawingPadding()) {
                     Row(Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton({ finish() }) { Icon(Icons.Rounded.ArrowBack, "Annuler",tint=Teal) }
@@ -56,15 +63,29 @@ class WidgetConfigurationActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(18.dp)) {
                         // Neutral backdrop makes the transparency visible without assuming the wallpaper colour.
                         Surface(shape = RoundedCornerShape(24.dp), color = if(transparent&&!lightText)androidx.compose.ui.graphics.Color(0xFFEEEAE2) else androidx.compose.ui.graphics.Color(0xFF53636D)) {
-                            Box(Modifier.fillMaxWidth().padding(20.dp), contentAlignment = Alignment.Center) {
-                                AndroidView(factory = { FrameLayout(it) }, modifier = Modifier.size(240.dp, 180.dp), update = { parent ->
+                            BoxWithConstraints(Modifier.fillMaxWidth().padding(12.dp), contentAlignment = Alignment.Center) {
+                                val default=WidgetDimensions.defaultSize(this@WidgetConfigurationActivity,kind)
+                                val width=minOf(default.width,maxWidth.value)
+                                val previewSize=SizeF(width,default.height*width/default.width)
+                                val teamPreview by produceState<RemoteViews?>(null,transparent,lightText,socialToday,previewSize) {
+                                    if(teamSnapshot!=null)value=withContext(Dispatchers.IO){SocialWidgetPresentation.views(this@WidgetConfigurationActivity,teamSnapshot.copy(today=socialToday),previewSize,transparent=transparent,lightText=lightText)}
+                                }
+                                AndroidView(factory = { FrameLayout(it) }, modifier = Modifier.size(previewSize.width.dp,previewSize.height.dp), update = { parent ->
                                     parent.removeAllViews()
-                                    val views = WidgetPresentation.views(this@WidgetConfigurationActivity, kind, snapshot,
-                                        SizeF(240f, 180f), transparent = transparent, lightText = lightText)
-                                    parent.addView(views.apply(this@WidgetConfigurationActivity, parent).also {
+                                    val views = if(social)teamPreview else WidgetPresentation.views(this@WidgetConfigurationActivity, kind!!, snapshot,
+                                        previewSize, transparent = transparent, lightText = lightText)
+                                    if(views!=null)parent.addView(views.apply(this@WidgetConfigurationActivity, parent).also {
                                         it.findViewById<android.view.View>(R.id.widget_root).setOnClickListener(null)
                                     })
                                 })
+                            }
+                        }
+                        Text("Redimensionnable depuis l’écran d’accueil",color=Muted,style=MaterialTheme.typography.bodySmall)
+                        if(social)Surface(shape=RoundedCornerShape(20.dp),color=Mist) {
+                            Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                Text("Comparer",Modifier.weight(1f),fontWeight=FontWeight.Bold)
+                                FilterChip(!socialToday,{socialToday=false},label={Text("7 jours")})
+                                FilterChip(socialToday,{socialToday=true},label={Text("Aujourd’hui")})
                             }
                         }
                         Surface(shape = RoundedCornerShape(20.dp), color = Mist) {
@@ -86,8 +107,9 @@ class WidgetConfigurationActivity : ComponentActivity() {
                         if (error) Text("Le réglage n’a pas pu être enregistré. Réessaie.", color = MaterialTheme.colorScheme.error)
                     }
                     Button({
-                        if (manager.getAppWidgetInfo(id) != null && WidgetSettings.save(this@WidgetConfigurationActivity, id, transparent, lightText)) {
-                            HomeWidgets.update(this@WidgetConfigurationActivity, manager, intArrayOf(id), kind)
+                        if (manager.getAppWidgetInfo(id) != null && WidgetSettings.save(this@WidgetConfigurationActivity, id, transparent, lightText,socialToday)) {
+                            if(social)SocialWidgets.executor.execute {SocialWidgets.update(this@WidgetConfigurationActivity,manager,intArrayOf(id))}
+                            else HomeWidgets.update(this@WidgetConfigurationActivity, manager, intArrayOf(id), kind!!)
                             setResult(RESULT_OK, result)
                             finish()
                         } else error = true

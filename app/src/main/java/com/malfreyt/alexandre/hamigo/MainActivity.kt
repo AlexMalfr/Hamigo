@@ -129,7 +129,7 @@ class MainActivity : ComponentActivity() {
             }
             return
         }
-        if(intent?.getStringExtra("hamigo_route")=="path") model.route="path"
+        intent?.getStringExtra("hamigo_route")?.takeIf {it in setOf("path","friends")}?.let {model.route=it}
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
         @Suppress("DEPRECATION")
         val uri=if(intent?.action==Intent.ACTION_SEND) intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) else intent?.data

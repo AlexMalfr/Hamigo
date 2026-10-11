@@ -74,6 +74,20 @@ class ExamBankInstrumentedTest {
         assertTrue(repo.refresh(force=true));assertEquals(requests+2,server.requestCount)
         assertEquals(generation,repo.status.value.snapshot!!.generation)
     }
+    @Test fun readingInstalledBankDoesNotWaitForAnInFlightBackgroundUpdate()=scenario {_,server,repo->
+        queue(server);assertTrue(repo.refresh());val initial=repo.status.value.snapshot!!
+        server.enqueue(MockResponse().setBody(raw("two",changed=true)).setHeader("ETag","two").setBodyDelay(2,TimeUnit.SECONDS))
+        server.enqueue(MockResponse().setHeader("ETag","one").setHeader("Content-Length",archive().size))
+        coroutineScope {
+            val download=async(Dispatchers.IO){repo.refresh(force=true)}
+            withTimeout(2_000){while(!repo.status.value.updating)delay(10)}
+            withTimeout(500){repo.initialize()}
+            assertEquals(initial,repo.status.value.snapshot)
+            assertFalse(download.isCompleted)
+            assertTrue(download.await())
+        }
+        assertEquals("two",repo.status.value.snapshot!!.version)
+    }
     @Test fun jsonOnlyCorrectionsReuseTheVerifiedIllustrationsWithoutAnotherNetworkTransfer()=scenario {store,server,repo->
         val bytes=archive();queue(server,zip=bytes);assertTrue(repo.refresh());val previous=repo.status.value.snapshot!!
         server.enqueue(MockResponse().setBody(raw("two",changed=true)).setHeader("ETag","two"))

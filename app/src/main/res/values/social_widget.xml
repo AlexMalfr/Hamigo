@@ -1,0 +1,13 @@
+<resources>
+    <string name="widget_social_name">Hamigo · Équipe</string>
+    <string name="widget_social_description">Compare tes XP avec ceux de tes amis, sur 7 jours ou aujourd’hui.</string>
+    <string name="widget_social_preview_title">Équipe</string>
+    <string name="widget_social_preview_period">7 derniers jours</string>
+    <string name="widget_social_preview_friend">Camille · 120 XP</string>
+    <string name="widget_social_preview_own">Toi · 90 XP</string>
+    <style name="SocialWidgetText">
+        <item name="android:layout_width">match_parent</item><item name="android:layout_height">match_parent</item>
+        <item name="android:includeFontPadding">false</item><item name="android:maxLines">1</item><item name="android:ellipsize">end</item><item name="android:textSize">12sp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+</resources>

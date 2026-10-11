@@ -1,0 +1,19 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent">
+    <FrameLayout android:id="@android:id/background" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/widget_outline_24" android:clipToOutline="true">
+        <ImageView android:id="@+id/widget_art" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitXY" android:importantForAccessibility="no" />
+        <TextView android:id="@+id/social_title" style="@style/SocialWidgetText" android:text="@string/widget_social_name" android:textStyle="bold" />
+        <TextView android:id="@+id/social_period" style="@style/SocialWidgetText" />
+        <TextView android:id="@+id/social_rank" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_name1" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_name2" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_name3" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_name4" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_name5" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_xp1" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_xp2" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_xp3" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_xp4" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_xp5" style="@style/SocialWidgetText" android:textStyle="bold" />
+        <TextView android:id="@+id/social_footer" style="@style/SocialWidgetText" />
+    </FrameLayout>
+</FrameLayout>

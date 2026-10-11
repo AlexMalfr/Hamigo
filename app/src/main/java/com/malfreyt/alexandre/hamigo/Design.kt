@@ -8,6 +8,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -50,9 +53,23 @@ val ChapterColors=listOf(Teal,Color(0xFF547FCD),Purple,Color(0xFFD47648))
     Text(title,fontSize=26.sp,fontWeight=FontWeight.ExtraBold,color=Ink,lineHeight=30.sp)
     if(subtitle.isNotBlank()) {Spacer(Modifier.height(5.dp));Text(subtitle,color=Muted,fontSize=14.sp,lineHeight=20.sp)}
 }
-@Composable fun Panel(modifier: Modifier=Modifier,color: Color=Color.White,content: @Composable ColumnScope.() -> Unit) {
+@Composable fun Panel(modifier: Modifier=Modifier,color: Color=Color.White,spacing:Dp=10.dp,content: @Composable ColumnScope.() -> Unit) {
     Surface(modifier.fillMaxWidth(),shape=RoundedCornerShape(20.dp),color=color,tonalElevation=0.dp) {
-        Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp),content=content)
+        Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(spacing),content=content)
+    }
+}
+/** Stack related links as one panel child, without adding the panel's gap between every row. */
+@Composable internal fun ActionLinks(modifier:Modifier=Modifier,content:@Composable ColumnScope.()->Unit) {
+    Column(modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(0.dp),content=content)
+}
+@Composable internal fun ActionLink(label:String,modifier:Modifier=Modifier,icon:ImageVector?=null,trailingIcon:ImageVector?=null,
+    color:Color=Teal,enabled:Boolean=true,labelStyle:TextStyle=MaterialTheme.typography.bodyMedium,onClick:()->Unit) {
+    TextButton(feedbackClick(onClick),modifier.fillMaxWidth().heightIn(min=48.dp),enabled=enabled,
+        shape=RoundedCornerShape(10.dp),contentPadding=PaddingValues(horizontal=4.dp,vertical=4.dp),
+        colors=ButtonDefaults.textButtonColors(contentColor=color)) {
+        if(icon!=null){Icon(icon,null,Modifier.size(20.dp));Spacer(Modifier.width(10.dp))}
+        Text(label,Modifier.weight(1f),style=labelStyle)
+        if(trailingIcon!=null){Spacer(Modifier.width(8.dp));Icon(trailingIcon,null,Modifier.size(18.dp))}
     }
 }
 @Composable fun Action(label: String,modifier: Modifier=Modifier,enabled: Boolean=true,onClick:()->Unit) {
