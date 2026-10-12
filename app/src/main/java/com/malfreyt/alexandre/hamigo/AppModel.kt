@@ -112,9 +112,10 @@ class AppModel internal constructor(
         private set
     private var taskJob: Job? = null
     private var socialJob: Job? = null
+    private var friendRefreshJob: Job? = null
     private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key in setOf("progress", "friends", "socialInbox", "friendIncomingCache", "name", "dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute",
-                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownerId", "ownGistUrl")) {
+                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownerId", "ownGistUrl") || key?.startsWith("friendRead_")==true) {
             // Workers can finish while a screen remains open. Reload data without starting another sync.
             scope.launch { refresh() }
         }
@@ -214,7 +215,7 @@ class AppModel internal constructor(
     internal fun startClientSandbox() {
         val loaded=content ?: return
         diagnostics.pauseSync()
-        socialJob?.cancel();taskJob?.cancel();ProgressSyncScheduler.cancel(context)
+        socialJob?.cancel();friendRefreshJob?.cancel();taskJob?.cancel();ProgressSyncScheduler.cancel(context)
         val base=context
         val demo=AppModel().apply {initializeDiagnostics(base,this@AppModel,loaded);diagnosticAwards=true}
         diagnostics.useSandbox(demo)
@@ -428,7 +429,7 @@ class AppModel internal constructor(
             githubBrowserCommands.value = GitHubBrowserCommand.Close
         }
     }
-    fun disconnectGitHub() { taskJob?.cancel();socialJob?.cancel();sync.disconnect(); ProgressSyncScheduler.cancel(context); busy=false;refresh() }
+    fun disconnectGitHub() { taskJob?.cancel();socialJob?.cancel();friendRefreshJob?.cancel();sync.disconnect(); ProgressSyncScheduler.cancel(context); busy=false;refresh() }
     fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }
     fun acceptInvite(sendReciprocal:Boolean=false) {
         val invite=pendingInvite ?: return
@@ -465,10 +466,45 @@ class AppModel internal constructor(
         catch(_:Exception){message="La demande n’a pas pu partir ; ton équipier est conservé. Tu peux réessayer dans Équipe."}
         finally {refresh()}
     }
+    var refreshingFriend by mutableStateOf<String?>(null)
+        private set
+    var friendRefreshError by mutableStateOf<Pair<String,String>?>(null)
+        private set
+
+    /** Read this friend's social Gist only; no backup publication or inbox messages. */
+    fun refreshFriend(gist: String) {
+        if(diagnosticModel || diagnostics.sandbox!=null || refreshingFriend!=null)return
+        val id=GitHubSync.gistId(gist)
+        refreshingFriend=id;friendRefreshError=null
+        friendRefreshJob=scope.launch {
+            try {
+                socialJob?.join()
+                val profile=sync.readProfile(gist)
+                ensureActive()
+                synchronized(Progress.CLOUD_LOCK) {
+                    loadFriends()
+                    friends=friends.map { previous ->
+                        if(GitHubSync.gistId(previous.gist)!=id)previous else {
+                            val previousTime=runCatching { Instant.parse(previous.progress.updatedAt) }.getOrNull()
+                            val updateTime=runCatching { Instant.parse(profile.progress.updatedAt) }.getOrNull()
+                            previous.copy(progress=if(previousTime!=null&&updateTime!=null&&previousTime.isAfter(updateTime))previous.progress else profile.progress,
+                                githubIdentity=profile.identity ?: previous.githubIdentity,
+                                githubIdentityCheckedAt=if(profile.identity!=null)System.currentTimeMillis() else previous.githubIdentityCheckedAt)
+                        }
+                    }
+                    saveFriends()
+                }
+                revision++
+            } catch(e:CancellationException){throw e}
+            catch(_:Exception){friendRefreshError=id to "Actualisation impossible. Le dernier profil reste disponible."}
+            finally {refreshingFriend=null}
+        }
+    }
+
     fun refreshSocial(manual: Boolean = false) {
         if(diagnosticModel){refresh();return}
         if(diagnostics.sandbox!=null)return
-        if(busy || socialJob?.isActive==true) return
+        if(busy || socialJob?.isActive==true || refreshingFriend!=null) return
         // Foreground and finished sessions: network remains optional and never blocks learning.
         socialJob=scope.launch {
             socialRefreshing=true

@@ -13,9 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +34,25 @@ internal fun questionCountOptions(availableCount:Int?=null):List<Int> {
     return if(availableCount in fitting)fitting else fitting+availableCount
 }
 
+private val ChoiceMinimumWidth=38.dp
+private val ChoicePadding=6.dp
+
+/** A shared threshold also works when the other card is outside the LazyColumn viewport. */
+@Composable internal fun questionCountInlineWidth(availableCount:Int?=null,customCount:Int?=null):Int {
+    val options=questionCountOptions(availableCount)
+    val measurer=rememberTextMeasurer()
+    val density=LocalDensity.current
+    val style=LocalTextStyle.current
+    return remember(options,customCount,measurer,density,style) {with(density) {
+        fun textWidth(text:String,size:Int)=measurer.measure(AnnotatedString(text),style.copy(fontSize=size.sp,fontWeight=FontWeight.Bold),softWrap=false).size.width
+        val label=measurer.measure(AnnotatedString("Questions :"),style.copy(fontSize=12.sp),softWrap=false).size.width
+        val padding=ChoicePadding.roundToPx()*2
+        val choices=options.sumOf {maxOf(ChoiceMinimumWidth.roundToPx(),textWidth(it.toString(),13)+padding)}
+        val pencil=maxOf(ChoiceMinimumWidth.roundToPx(),18.dp.roundToPx()+padding+(customCount?.let {3.dp.roundToPx()+textWidth(it.toString(),12)} ?: 0))
+        label+8.dp.roundToPx()+choices+pencil+4.dp.roundToPx()*options.size
+    }}
+}
+
 /** One set of compact choices for mixes and reviews, measured at the current font size. */
 @Composable
 fun QuestionCountSelector(
@@ -40,6 +62,7 @@ fun QuestionCountSelector(
     testTag: String,
     customButtonTag: String,
     availableCount: Int?=null,
+    minimumInlineWidth: Int=0,
 ) {
     var customOpen by remember { mutableStateOf(false) }
     var custom by remember { mutableStateOf(count.toString()) }
@@ -47,17 +70,17 @@ fun QuestionCountSelector(
     val customMaximum=minOf(1000,availableCount?:1000)
     Layout(modifier=Modifier.fillMaxWidth().testTag(testTag),content={
         Text("Questions :",fontSize=12.sp,color=Muted,modifier=Modifier.testTag("$testTag-label"))
-        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 40.dp) {
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides ChoiceMinimumWidth) {
             options.forEach { n ->
                 val active=count==n&&!customSelected
                 QuestionCountChoice(active,{onCountSelected(n,false)},Modifier.testTag("$testTag-$n")) {
-                    Box(Modifier.padding(horizontal=8.dp),contentAlignment=Alignment.Center) {
+                    Box(Modifier.padding(horizontal=ChoicePadding),contentAlignment=Alignment.Center) {
                         Text("$n",fontSize=13.sp,fontWeight=if(active)FontWeight.Bold else FontWeight.Normal,color=Ink)
                     }
                 }
             }
             QuestionCountChoice(customSelected,{custom=count.toString();customOpen=true},Modifier.testTag(customButtonTag)) {
-                Row(Modifier.padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp,Alignment.CenterHorizontally)) {
+                Row(Modifier.padding(horizontal=ChoicePadding),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(3.dp,Alignment.CenterHorizontally)) {
                     Icon(Icons.Rounded.Edit,"Choisir un nombre personnalisé",modifier=Modifier.size(18.dp),tint=if(customSelected)Teal else Purple)
                     if(customSelected)Text("$count",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
                 }
@@ -72,7 +95,7 @@ fun QuestionCountSelector(
         val choiceWidth=choices.sumOf {it.width}+gap*(choices.size-1)
         val preferredWidth=label.width+labelGap+choiceWidth
         val width=if(constraints.hasBoundedWidth)constraints.maxWidth else preferredWidth
-        val inline=preferredWidth<=width
+        val inline=maxOf(preferredWidth,minimumInlineWidth)<=width
         val positions=mutableListOf<Pair<Int,Int>>()
         var height: Int
         if(inline) {
@@ -122,10 +145,10 @@ fun QuestionCountSelector(
     )
 }
 
-/** Forty-dp touch area around a chip whose painted body is only thirty-two dp high. */
+/** Forty-dp-high touch area around a chip whose painted body is thirty-two dp high. */
 @Composable
 private fun QuestionCountChoice(active:Boolean,onClick:()->Unit,modifier:Modifier,content:@Composable ()->Unit) {
-    Surface(onClick=feedbackClick(onClick),modifier=modifier.height(40.dp).widthIn(min=40.dp).semantics {selected=active},
+    Surface(onClick=feedbackClick(onClick),modifier=modifier.height(40.dp).widthIn(min=ChoiceMinimumWidth).semantics {selected=active},
         color=Color.Transparent,shape=RoundedCornerShape(10.dp)) {
         Surface(modifier=Modifier.padding(vertical=4.dp),color=if(active)Mist else Cream,shape=RoundedCornerShape(10.dp),
             border=BorderStroke(1.dp,if(active)Teal else Color(0xFFD4DEDA)),content=content)

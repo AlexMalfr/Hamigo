@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -32,6 +33,48 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 class QuestionCountSelectorLayoutInstrumentedTest {
     @get:Rule val ui=createComposeRule()
+
+    @Test fun mixAndReviewsWrapTogetherWithAnExtraReviewChoiceAndCustomValues() {
+        var width by mutableStateOf(347.dp)
+        var fontScale by mutableFloatStateOf(1f)
+        var customReview by mutableStateOf(false)
+        ui.setContent {HamigoTheme {
+            val density=LocalDensity.current
+            Box(Modifier.fillMaxSize().background(Cream).padding(8.dp)) {
+                CompositionLocalProvider(LocalDensity provides Density(density.density,fontScale)) {
+                    val shared=maxOf(questionCountInlineWidth(),questionCountInlineWidth(231,if(customReview)37 else null))
+                    Column(Modifier.width(width+32.dp).testTag("paired-selectors"),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                        Panel {Eyebrow("Mix");QuestionCountSelector(20,false,{_,_->},"paired-mix","paired-mix-custom",minimumInlineWidth=shared)}
+                        Panel {Eyebrow("Révisions");QuestionCountSelector(if(customReview)37 else 20,customReview,{_,_->},"paired-review","paired-review-custom",availableCount=231,minimumInlineWidth=shared)}
+                    }
+                }
+            }
+        }}
+        fun assertSameWrap() {
+            val inline=listOf("paired-mix","paired-review").map {tag ->
+                val label=ui.onNodeWithTag("$tag-label").fetchSemanticsNode().boundsInRoot
+                val first=ui.onNodeWithTag("$tag-10").fetchSemanticsNode().boundsInRoot
+                kotlin.math.abs(label.center.y-first.center.y)<1f
+            }
+            assertEquals("Both cards must use the same label placement",inline[0],inline[1])
+            listOf("paired-mix" to listOf(10,20,40,80,150),"paired-review" to listOf(10,20,40,80,150,231)).forEach {(tag,options)->
+                val parent=ui.onNodeWithTag(tag).fetchSemanticsNode().boundsInRoot
+                (options.map {"$tag-$it"}+"$tag-custom").forEach {choice->
+                    val rect=ui.onNodeWithTag(choice).fetchSemanticsNode().boundsInRoot
+                    assertTrue("Choice remains within its selector",rect.left>=parent.left-1&&rect.right<=parent.right+1&&rect.bottom<=parent.bottom+1)
+                }
+            }
+        }
+        fun capture(name:String) {
+            val dir=File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null),"question-count-0.50").apply {mkdirs()}
+            val bitmap=ui.onNodeWithTag("paired-selectors").captureToImage().asAndroidBitmap()
+            try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
+        }
+        listOf(360,347,330,280,220).forEach {size->ui.runOnIdle {width=size.dp};assertSameWrap();if(size in listOf(360,347,220))capture("paired-$size")}
+        ui.runOnIdle {width=347.dp;fontScale=1.3f;customReview=true}
+        assertSameWrap();ui.onNodeWithTag("paired-review-custom").assertIsSelected();ui.onNodeWithTag("paired-mix-20").assertIsSelected()
+        capture("paired-347-custom-font130")
+    }
 
     @Test fun labelWrapsAtSmallWidthsAndLargeFontsWithoutClippingChoices() {
         var width by mutableStateOf(360.dp)

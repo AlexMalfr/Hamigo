@@ -11,8 +11,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
+import android.view.inspector.WindowInspector
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.graphics.toPixelMap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -101,7 +105,10 @@ class SocialFeaturesInstrumentedTest {
     }
     private fun before()=model.progress.prefs.getString("progress",null)
     private fun capture(name:String) {
-        ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}};assertTrue(latch.await(5,TimeUnit.SECONDS))}
+        ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {
+            val view=if(Build.VERSION.SDK_INT>=29)WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()} else null
+            (view ?: ui.activity.window.decorView).let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}
+        };assertTrue(latch.await(5,TimeUnit.SECONDS))}
         val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),"social-0.49").apply {mkdirs()}
         File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
     }
@@ -165,7 +172,7 @@ class SocialFeaturesInstrumentedTest {
         ui.onNodeWithText("Annuler").performClick();ui.onNodeWithTag("friend-progress-screen").assertIsDisplayed()
         assertEquals(2,model.friends.size);assertEquals(original,before());assertTrue(sent.isEmpty())
     }
-    @Test fun friendActionsAreGroupedVersionIsCollapsedAndEncouragementIncludesTheirStats() {
+    @Test fun friendActionsAreGroupedVersionIsVisibleAndEncouragementIncludesTheirStats() {
         val original=before();ui.runOnIdle {model.route="friends"}
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
         val goal=ui.onNodeWithTag("daily-goal-summary").fetchSemanticsNode().boundsInRoot
@@ -180,15 +187,122 @@ class SocialFeaturesInstrumentedTest {
         val first=ui.onNodeWithText("Ouvrir le profil GitHub").fetchSemanticsNode().boundsInRoot
         val second=ui.onNodeWithText("Ouvrir le Gist social").fetchSemanticsNode().boundsInRoot
         assertTrue("Links must not acquire another panel gap",second.top-first.bottom in -1f..2f)
-        ui.onNodeWithText("Hamigo 0.49+12345678").assertDoesNotExist()
-        list.performScrollToNode(hasTestTag("friend-technical-toggle"));ui.onNodeWithTag("friend-technical-toggle").performClick()
         list.performScrollToNode(hasText("Hamigo 0.49+12345678"));ui.onNodeWithText("Hamigo 0.49+12345678").assertIsDisplayed()
         ui.onNodeWithText("Code de version : 49").assertExists();capture("friend-grouped-actions-version")
         androidx.test.espresso.Espresso.pressBackUnconditionally()
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-2"));ui.onNodeWithTag("team-rank-2").performClick()
-        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasTestTag("friend-technical-toggle"));ui.onNodeWithTag("friend-technical-toggle").performClick()
         ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Hamigo ≤0.49+8ed1305d"))
         ui.onNodeWithText("Hamigo ≤0.49+8ed1305d").assertIsDisplayed();capture("friend-legacy-version")
+        assertEquals(original,before())
+    }
+    @Test fun friendPullRefreshReadsOnlyThatGistAndKeepsSuccessfulDatesOnFailure() {
+        val original=before();val originalSync=model.sync
+        val friend=seededFriends.first();val id=GitHubSync.gistId(friend.gist)
+        val requests=CopyOnWriteArrayList<String>()
+        val gate=kotlinx.coroutines.CompletableDeferred<Unit>()
+        var failed=false
+        val checked=java.time.Instant.parse("2026-10-12T12:30:00Z")
+        val updated="2026-10-11T08:15:00Z"
+        val gateway=object:GitHubGateway {
+            override suspend fun api(method:String,path:String,token:String?,body:String?):String {
+                requests+="$method $path";gate.await()
+                if(failed)throw SocialException("Offline")
+                return JSONObject().put("updated_at",updated).put("owner",friend.githubIdentity!!.toJson())
+                    .put("files",JSONObject().put(GitHubSync.FILE_NAME,JSONObject().put("content",
+                        friend.progress.copy(xp=1600,updatedAt=java.time.Instant.now().plusSeconds(10).toString()).toJson()))).toString()
+            }
+            override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String=error("Unexpected")
+        }
+        try {
+            ui.runOnIdle {model.sync=GitHubSync(context,gateway){checked};model.route="friends"}
+            ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
+            ui.onNodeWithTag("friend-profile-refresh").performTouchInput {swipeDown(durationMillis=600)}
+            ui.waitUntil(10_000){model.refreshingFriend==id&&requests.size==1}
+            capture("friend-refresh-loading");gate.complete(Unit)
+            ui.waitUntil(10_000){model.refreshingFriend==null&&model.friends.first().progress.xp==1600}
+            assertEquals(listOf("GET /gists/$id"),requests.toList())
+            assertEquals(friend.modifiedAt,model.friends.first().modifiedAt)
+            val status=model.sync.friendReadStatus(friend.gist)
+            assertEquals(FriendReadStatus(checked.toString(),updated),status)
+            ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasTestTag("friend-technical-info"))
+            ui.onNodeWithText("Dernière vérification : ${friendTechnicalDate(checked.toString())}").assertIsDisplayed()
+            ui.onNodeWithText("Modification du Gist : ${friendTechnicalDate(updated)}").assertIsDisplayed()
+            capture("friend-refresh-technical-dates")
+            ui.onNodeWithTag("friend-progress-list").performScrollToIndex(0)
+            failed=true
+            ui.onNodeWithTag("friend-profile-refresh").performTouchInput {swipeDown(durationMillis=600)}
+            ui.waitUntil(10_000){model.friendRefreshError!=null&&model.refreshingFriend==null}
+            ui.onNodeWithText("Actualisation impossible. Le dernier profil reste disponible.").assertIsDisplayed()
+            assertEquals(status,model.sync.friendReadStatus(friend.gist))
+            assertEquals(1600,model.friends.first().progress.xp)
+            assertEquals(2,requests.size);assertEquals(original,before())
+            capture("friend-refresh-offline")
+        } finally {gate.complete(Unit);ui.runOnIdle {model.sync=originalSync}}
+    }
+
+    @Test fun offlineDemoFriendWithoutGistHasUnavailableTechnicalDates() {
+        val original=before()
+        ui.runOnIdle {model.friends=seededFriends.map {it.copy(gist="")};model.route="friends"}
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasTestTag("friend-technical-info"))
+        ui.onNodeWithText("Dernière vérification : Non disponible").assertIsDisplayed()
+        ui.onNodeWithText("Modification du Gist : Non disponible").assertIsDisplayed()
+        capture("friend-demo-no-gist")
+        assertEquals(original,before())
+    }
+
+    @Test fun friendHeaderShadowAppearsAcrossTheViewportAndDisappearsAtTheTop() {
+        val original=before();ui.runOnIdle {model.route="friends"}
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
+        val header=ui.onNodeWithTag("friend-progress-header")
+        val root=ui.onNodeWithTag("friend-progress-screen")
+        val headerBounds=header.fetchSemanticsNode().boundsInRoot
+        val rootOrigin=root.fetchSemanticsNode().boundsInRoot
+        fun profileBitmap():Bitmap {
+            repeat(2) {
+                val frame=CountDownLatch(1)
+                instrumentation.runOnMainSync {
+                    val view=if(Build.VERSION.SDK_INT>=29)WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()} else null
+                    val target=view ?: ui.activity.window.decorView
+                    target.viewTreeObserver.registerFrameCommitCallback {frame.countDown()};target.invalidate()
+                }
+                assertTrue(frame.await(5,TimeUnit.SECONDS))
+            }
+            return instrumentation.uiAutomation.takeScreenshot()
+        }
+        val initialPixels=profileBitmap().asImageBitmap().toPixelMap()
+        fun captureProfile(name:String) {
+            val image=profileBitmap()
+            val dir=File(context.getExternalFilesDir(null),"social-0.49").apply {mkdirs()}
+            try {File(dir,"$name.png").outputStream().use {image.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {image.recycle()}
+        }
+        fun reds():List<Float> {
+            val bounds=header.fetchSemanticsNode().boundsInRoot
+            val origin=root.fetchSemanticsNode().boundsInRoot
+            val pixels=profileBitmap().asImageBitmap().toPixelMap()
+            val y=(bounds.bottom-origin.top+with(ui.density){1.dp.toPx()}).toInt()
+            return listOf(2,pixels.width/2,pixels.width-3).map {pixels[it,y].red}
+        }
+        val initial=reds();captureProfile("friend-header-attached")
+        val list=ui.onNodeWithTag("friend-progress-list")
+        list.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.ScrollBy){scroll->scroll(0f,with(ui.density){80.dp.toPx()})}
+        ui.waitForIdle();val scrolled=reds()
+        scrolled.forEach {assertTrue("Header shadow must reach the full width",it<Cream.red-.08f)}
+        assertEquals("Both side gutters have the same shadow",scrolled[0],scrolled[2],.02f)
+        assertTrue("The card must not paint over the middle of the shadow",scrolled[1]<=maxOf(scrolled[0],scrolled[2])+.03f)
+        header.assertIsDisplayed()
+        val afterPixels=profileBitmap().asImageBitmap().toPixelMap()
+        var difference=0f;var samples=0
+        for(y in (headerBounds.top-rootOrigin.top).toInt() until (headerBounds.bottom-rootOrigin.top).toInt() step 3) {
+            for(x in 0 until initialPixels.width step 3) {
+                val before=initialPixels[x,y];val after=afterPixels[x,y]
+                difference+=kotlin.math.abs(before.red-after.red)+kotlin.math.abs(before.green-after.green)+kotlin.math.abs(before.blue-after.blue);samples++
+            }
+        }
+        assertTrue("Scrolling must preserve the avatar and header text",difference/samples<.02f)
+        captureProfile("friend-header-detached")
+        list.performScrollToIndex(0);ui.waitForIdle()
+        reds().forEachIndexed {i,value->assertEquals("Returning to the top removes the shadow",initial[i],value,.02f)}
         assertEquals(original,before())
     }
     @Test fun settingsActionGroupsHaveCompactRowsAndKeepComfortableTouchAreas() {

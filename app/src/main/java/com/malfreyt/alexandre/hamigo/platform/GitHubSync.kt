@@ -26,7 +26,7 @@ data class GistSnapshot(val id: String, val url: String, val progress: ShareProg
 data class SyncReport(val social: GistSnapshot, val restored: Boolean, val lastSyncedAt: String)
 
 /** Opt-in snapshot publishing. A secret Gist is unlisted, and readable by anyone with its link. */
-class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp) {
+class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private val now: () -> Instant = { Instant.now() }) {
     private val appContext = context.applicationContext
     private val transport=gateway
     private val gateway=object:GitHubGateway {
@@ -48,6 +48,16 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp) {
         }) }.getOrNull()
     }
     val lastSyncError: String? get() = prefs.getString("lastSyncError", null)
+
+    /** Device-local read metadata, deliberately absent from both progress Gists. */
+    fun friendReadStatus(gistUrlOrId: String): FriendReadStatus {
+        val value = prefs.getString("friendRead_${gistId(gistUrlOrId)}", null)
+        return runCatching {
+            val json = JSONObject(value ?: "{}")
+            FriendReadStatus(json.optString("checkedAt").takeIf { it.isNotBlank() },
+                json.optString("updatedAt").takeIf { it.isNotBlank() })
+        }.getOrDefault(FriendReadStatus())
+    }
 
     private fun savedGistPage(key: String): String? = prefs.getString(key, null)
         ?.takeIf { ID_PATTERN.matches(it) }?.let { gistPageUrl(it) }
@@ -179,7 +189,14 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp) {
             ?: throw SocialException("Ce lien ne contient pas de progression Hamigo.")
         if (file.optBoolean("truncated", false)) throw SocialException("Le fichier de progression est trop volumineux.")
         val content = file.optString("content")
-        return try { GitHubFriendProfile(ShareProgress.fromJson(content), GitHubIdentity.fromApi(gist.optJSONObject("owner"))) } catch (e: IllegalArgumentException) {
+        return try {
+            val profile = GitHubFriendProfile(ShareProgress.fromJson(content), GitHubIdentity.fromApi(gist.optJSONObject("owner")))
+            val updatedAt = runCatching { Instant.parse(gist.getString("updated_at")).toString() }.getOrNull()
+            currentCoroutineContext().ensureActive()
+            prefs.edit().putString("friendRead_$id", JSONObject().put("checkedAt", now().toString())
+                .put("updatedAt", updatedAt).toString()).apply()
+            profile
+        } catch (e: IllegalArgumentException) {
             throw SocialException(e.message ?: "Progression Hamigo invalide.")
         }
     }
@@ -270,3 +287,5 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp) {
         }
     }
 }
+
+data class FriendReadStatus(val checkedAt: String? = null, val updatedAt: String? = null)

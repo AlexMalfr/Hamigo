@@ -75,6 +75,9 @@ import kotlin.random.Random
     val effectiveReviewCount=if(reviewPool.isEmpty())0 else reviewCount.coerceIn(1,reviewPool.size)
     val reviewOptions=questionCountOptions(reviewPool.size)
     val effectiveReviewCustom=effectiveReviewCount==reviewCount&&(reviewCustomSelected||effectiveReviewCount !in reviewOptions)
+    val mixInlineWidth=questionCountInlineWidth(customCount=if(customSelected)count else null)
+    val reviewInlineWidth=questionCountInlineWidth(reviewPool.size,if(effectiveReviewCustom)effectiveReviewCount else null)
+    val sharedInlineWidth=maxOf(mixInlineWidth,if(reviewPool.isNotEmpty())reviewInlineWidth else 0)
     LaunchedEffect(reviewPool.size) {
         if(reviewPool.isNotEmpty()) {
             if(reviewCount!=effectiveReviewCount) {reviewCount=effectiveReviewCount;reviewCustomSelected=false}
@@ -94,7 +97,7 @@ import kotlin.random.Random
         }}
         item {Panel {
             Row(verticalAlignment=Alignment.CenterVertically) {Icon(Icons.Rounded.Shuffle,null,tint=Purple);Spacer(Modifier.width(8.dp));Eyebrow("MIX SUR MESURE",Purple)}
-            QuestionCountSelector(count,customSelected,{n,isCustom ->count=n;customSelected=isCustom},"mix-question-count","custom-question-count")
+            QuestionCountSelector(count,customSelected,{n,isCustom ->count=n;customSelected=isCustom},"mix-question-count","custom-question-count",minimumInlineWidth=sharedInlineWidth)
             if(bankReady&&count>available)Text("Choisis plus de thèmes ou réduis la longueur du mix.",fontSize=12.sp,color=Coral)
             Action("Lancer mon mix",enabled=bankReady&&count in 1..available) {
                 model.startQuestions("Mix radio · $count questions",index.questions(selected,count))
@@ -126,7 +129,7 @@ import kotlin.random.Random
             val reviewSummary="($dueCount à revoir · ${reviewPool.size} question${if(reviewPool.size==1)"" else "s"} disponible${if(reviewPool.size==1)"" else "s"})."
             Text(if(reviewPool.isEmpty())"Réponds aux cours ou révise les fiches Mémo pour retrouver ici les notions étudiées $reviewSummary" else "Retrouve les notions étudiées, avec priorité aux questions à revoir. Les rappels sont mélangés dans la séance $reviewSummary",fontSize=13.sp,lineHeight=19.sp,color=Muted)
             if(reviewPool.isNotEmpty()) {
-                QuestionCountSelector(effectiveReviewCount,effectiveReviewCustom,{n,isCustom ->reviewCount=n;reviewCustomSelected=isCustom},"review-question-count","custom-review-question-count",availableCount=reviewPool.size)
+                QuestionCountSelector(effectiveReviewCount,effectiveReviewCustom,{n,isCustom ->reviewCount=n;reviewCustomSelected=isCustom},"review-question-count","custom-review-question-count",availableCount=reviewPool.size,minimumInlineWidth=sharedInlineWidth)
             }
             Action("Lancer les révisions",enabled=reviewPool.isNotEmpty()) {
                 model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,effectiveReviewCount))

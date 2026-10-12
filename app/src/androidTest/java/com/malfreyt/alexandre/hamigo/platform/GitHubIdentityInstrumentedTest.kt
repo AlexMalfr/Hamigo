@@ -14,6 +14,41 @@ import java.util.UUID
 
 @RunWith(AndroidJUnit4::class)
 class GitHubIdentityInstrumentedTest {
+    @Test fun friendReadDatesTrackSuccessfulChecksSeparatelyFromGitHubUpdates() = runBlocking {
+        val context=isolatedContext()
+        var clock=java.time.Instant.parse("2026-10-12T12:30:00Z")
+        var fail=false
+        var invalid=false
+        var updated:String?="2026-10-11T08:15:00Z"
+        val requests=mutableListOf<String>()
+        val gateway=object:GitHubGateway {
+            override suspend fun api(method:String,path:String,token:String?,body:String?):String {
+                requests+="$method $path";if(fail)throw SocialException("Offline")
+                return JSONObject().put("updated_at",updated).put("files",JSONObject().put(GitHubSync.FILE_NAME,
+                    JSONObject().put("content",if(invalid)"{}" else ShareProgress("Cam",1,0,0,updatedAt="2026-10-10T06:00:00Z").toJson()))).toString()
+            }
+            override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String=error("Unexpected")
+        }
+        var sync=GitHubSync(context,gateway){clock}
+        assertEquals(FriendReadStatus(),sync.friendReadStatus("abcde12345"))
+        sync.readProfile("abcde12345")
+        assertEquals(FriendReadStatus(clock.toString(),updated),sync.friendReadStatus("https://gist.github.com/abcde12345"))
+        clock=clock.plusSeconds(600);sync.readProfile("abcde12345")
+        val successful=sync.friendReadStatus("abcde12345")
+        assertEquals(clock.toString(),successful.checkedAt);assertEquals(updated,successful.updatedAt)
+        sync=GitHubSync(context,gateway){clock}
+        assertEquals(successful,sync.friendReadStatus("abcde12345")) // survives a new client instance
+        clock=clock.plusSeconds(600);fail=true
+        assertTrue(runCatching {sync.readProfile("abcde12345")}.isFailure)
+        assertEquals(successful,sync.friendReadStatus("abcde12345"))
+        fail=false;invalid=true
+        assertTrue(runCatching {sync.readProfile("abcde12345")}.isFailure)
+        assertEquals(successful,sync.friendReadStatus("abcde12345"))
+        invalid=false;updated=null;sync.readProfile("abcde12345")
+        assertEquals(FriendReadStatus(clock.toString(),null),sync.friendReadStatus("abcde12345"))
+        assertTrue(requests.all {it=="GET /gists/abcde12345"})
+        assertEquals(FriendReadStatus(),sync.friendReadStatus("fffff12345"))
+    }
     @Test fun ownerMetadataWinsOverIdentityForgedInsideSharedProgress() = runBlocking {
         val content=JSONObject(ShareProgress("Alice",3,0,0).toJson())
             .put("githubIdentity",JSONObject().put("login","attacker").put("id",777))

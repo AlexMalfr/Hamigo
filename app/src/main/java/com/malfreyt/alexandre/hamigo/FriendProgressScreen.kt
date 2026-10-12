@@ -11,6 +11,7 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import com.malfreyt.alexandre.hamigo.platform.*
 import java.time.LocalDate
 import java.time.YearMonth
@@ -38,25 +40,36 @@ import java.time.format.TextStyle
 import java.util.Locale
 import kotlinx.coroutines.launch
 
-/** Uses cached public summaries only; opening a profile does not access a friend's backup. */
+/** Opens the cached public summary, with an explicit refresh that never reads a friend's backup. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable internal fun FriendProgressScreen(model:AppModel,friend:Friend,dismiss:()->Unit) {
     val profile=friend.progress;val date=SocialActivity.date(profile);val context=LocalContext.current
     val earliest=SocialActivity.earliest(profile)?.coerceAtMost(date)
     val weeks=maxOf(1,earliest?.let {(ChronoUnit.DAYS.between(it,date)/7).toInt()+1} ?: 1)
     val months=maxOf(1,earliest?.let {ChronoUnit.MONTHS.between(YearMonth.from(it),YearMonth.from(date)).toInt()+1} ?: 1)
     val weekHistory=rememberPagerState(pageCount={weeks})
+    val listState=rememberLazyListState()
     val scope=rememberCoroutineScope()
     val actions=remember(friend.gist){FriendActionState()}
-    var technicalDetails by remember(friend.gist){mutableStateOf(false)}
+    val gistId=remember(friend.gist){runCatching {GitHubSync.gistId(friend.gist)}.getOrNull()}
+    val refreshing=gistId!=null&&model.refreshingFriend==gistId
+    val pullState=rememberPullToRefreshState()
+    val readStatus=remember(friend.gist,model.revision,refreshing){if(gistId==null)FriendReadStatus() else model.sync.friendReadStatus(friend.gist)}
     Dialog(dismiss,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
         Surface(color=Cream,modifier=Modifier.fillMaxSize().testTag("friend-progress-screen")) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-                Row(Modifier.fillMaxWidth().padding(horizontal=8.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth().testTag("friend-progress-header").zIndex(1f).stickyHeaderShadow(listState).padding(horizontal=8.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                     IconButton(feedbackClick(dismiss)){Icon(Icons.AutoMirrored.Rounded.ArrowBack,"Revenir à l’équipe")}
                     GitHubAvatar(friend.githubIdentity,profile.name,Modifier.size(52.dp))
                     Column(Modifier.weight(1f)){Text(profile.name,fontWeight=FontWeight.ExtraBold,fontSize=22.sp);Text("${profile.xp} XP · ${dayCount(profile.streak)} de série",fontSize=12.sp,color=Muted)}
                 }
-                LazyColumn(Modifier.fillMaxSize().testTag("friend-progress-list"),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                PullToRefreshBox(isRefreshing=refreshing,onRefresh={if(gistId!=null)model.refreshFriend(friend.gist)},
+                    state=pullState,modifier=Modifier.fillMaxSize().testTag("friend-profile-refresh"),indicator={
+                        PullToRefreshDefaults.Indicator(state=pullState,isRefreshing=refreshing,
+                            modifier=Modifier.align(Alignment.TopCenter),containerColor=Mist,color=Teal)
+                    }) {
+                LazyColumn(Modifier.fillMaxSize().testTag("friend-progress-list"),state=listState,contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                    model.friendRefreshError?.takeIf {it.first==gistId}?.let { error -> item {Text(error.second,color=Muted,fontSize=12.sp)} }
                     item {
                         val today=SocialActivity.todayXp(profile,date)
                         if(today!=null&&profile.dailyGoal!=null)DailyGoalSummary(today,profile.dailyGoal)
@@ -99,7 +112,6 @@ import kotlinx.coroutines.launch
                     }}
                     item {Panel {
                         Text("${profile.lessons} leçon${if(profile.lessons==1)" terminée" else "s terminées"}",fontWeight=FontWeight.Bold)
-                        Text("Mis à jour le ${syncDate(profile.updatedAt)}",fontSize=12.sp,color=Muted)
                     }}
                     item {Panel(spacing=4.dp) {
                         Text("Sur GitHub",fontWeight=FontWeight.Bold,fontSize=17.sp)
@@ -109,21 +121,25 @@ import kotlinx.coroutines.launch
                         Text("Dans ton équipe",fontWeight=FontWeight.Bold,fontSize=17.sp)
                         FriendActionItems(model,friend,actions,group=FriendActionGroup.TEAM)
                     }}
-                    item {Column {
-                        ActionLink("Infos techniques",Modifier.testTag("friend-technical-toggle"),trailingIcon=if(technicalDetails)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                            color=Muted,labelStyle=MaterialTheme.typography.bodySmall){technicalDetails=!technicalDetails}
-                        if(technicalDetails)Column(Modifier.padding(horizontal=4.dp,vertical=4.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                    item {Column(Modifier.padding(horizontal=4.dp,vertical=4.dp).testTag("friend-technical-info"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                            Text("Infos techniques",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Muted)
                             Text("Hamigo ${profile.appVersion ?: "≤0.49+8ed1305d"}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
                             profile.appVersionCode?.let {Text("Code de version : $it",fontSize=12.sp,lineHeight=16.sp,color=Muted)}
-                            Text("Résumé publié le ${syncDate(profile.updatedAt)}",fontSize=11.sp,lineHeight=16.sp,color=Muted)
-                        }
+                            Text("Dernière vérification : ${friendTechnicalDate(readStatus.checkedAt)}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
+                            Text("Modification du Gist : ${friendTechnicalDate(readStatus.updatedAt)}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
                     }}
+                }
                 }
             }
             FriendActionDialogs(model,friend,actions,onRemoved=dismiss)
         }
     }
 }
+
+internal fun friendTechnicalDate(value:String?):String = value?.let {
+    runCatching { java.time.Instant.parse(it).atZone(java.time.ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm",Locale.FRENCH)) }.getOrNull()
+} ?: "Non disponible"
 
 @Composable internal fun PublicXpChart(values:List<Int?>,labels:List<String>,goal:Int?,emptyLabel:String="Pas de progression sur cette période.") {
     val maximum=maxOf(1,values.filterNotNull().maxOrNull() ?: 0,goal ?: 0)

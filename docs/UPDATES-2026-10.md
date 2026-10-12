@@ -380,3 +380,16 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Les actions de sa fiche sont séparées en « Sur GitHub » et « Dans ton équipe ». La petite rubrique repliée « Infos techniques » indique la version ayant publié le résumé social ; les profils sans ce champ affichent `≤0.49+8ed1305d`.
 - Les listes de liens emploient un composant commun compact, sans additionner les marges du panneau à celles des boutons. Appliqué aux actions d’amis, aux Gists, aux sauvegardes, aux sources et à Contact & Projet ; zones de toucher conservées.
 - `appVersion` et `appVersionCode` sont facultatifs dans le résumé social existant. Aucune migration, modification d’ID ou nouvelle donnée de progression.
+
+## Sélecteurs de Défis et header d’ami — 0.50
+
+- Les boutons de nombres de questions passent de 40 à 38 dp de largeur minimale, avec un padding horizontal légèrement réduit ; hauteur inchangée.
+- Mix et Révisions partagent le seuil de retour à la ligne du libellé « Questions : », en tenant compte du choix exact supplémentaire et du nombre personnalisé. Ce calcul fonctionne aussi lorsque l’autre carte est hors écran. Les valeurs choisies restent indépendantes et les rangées dépliées gardent leur répartition sur toute la largeur.
+- Le header du profil d’un ami reçoit la même ombre que les autres headers lorsque le contenu défile ; elle disparaît au retour en haut et passe devant le contenu sur toute la largeur.
+- Aucun changement de progression, de contenu ou de schéma de sauvegarde.
+
+### Actualisation du profil d’ami — même 0.50
+
+- Pull-to-refresh dans le profil plein écran d’un ami, avec indicateur et repli sur le cache en cas de coupure. Seul son Gist social est relu.
+- Informations techniques visibles directement au pied de la fiche. Deux dates distinctes : dernière vérification réussie sur cet appareil et modification du Gist sur GitHub, avec date complète et heure.
+- Métadonnées locales séparées des sauvegardes ; aucun changement de schéma, de progression ou d’identité de relation. Même numéro de version, commit et APK remplacés.
