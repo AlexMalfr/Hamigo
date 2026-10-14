@@ -393,3 +393,9 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Pull-to-refresh dans le profil plein écran d’un ami, avec indicateur et repli sur le cache en cas de coupure. Seul son Gist social est relu.
 - Informations techniques visibles directement au pied de la fiche. Deux dates distinctes : dernière vérification réussie sur cet appareil et modification du Gist sur GitHub, avec date complète et heure.
 - Métadonnées locales séparées des sauvegardes ; aucun changement de schéma, de progression ou d’identité de relation. Même numéro de version, commit et APK remplacés.
+
+## Nettoyage du dépôt — 14 octobre, non publié
+
+- Retrait de cinq anciens layouts de widgets, de leurs sept dessins/fonds inutilisés et de seize textes d’aperçu obsolètes. Les layouts responsifs, aperçus actuels et ressources des launchers sont conservés.
+- Clarification dans le README : `data/curriculum.json` sert à l’édition avec les questions complètes ; `app/src/main/assets/curriculum.json` est la version générée, avec leurs UUID, chargée par Android. Les deux restent nécessaires.
+- Générateurs, registres d’identités, archives pédagogiques, outils d’import et de validation conservés. Aucun changement de contenu ou de progression ; aucune release ni installation pour ce nettoyage.

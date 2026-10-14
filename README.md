@@ -75,6 +75,8 @@ Pour tester directement un identifiant de question, parcourir les formats ou ins
 
 Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; les sauvegardes antérieures sont converties pendant la fenêtre 0.47–0.51.
 
+Le parcours s’édite dans `data/curriculum.json`, avec les questions complètes. `node tools/expand_curriculum.mjs` génère `app/src/main/assets/curriculum.json` (introductions et références `questionIds`) et la banque `course-questions.json` lue par Android. Les deux fichiers `curriculum.json` ont donc des rôles différents et doivent être conservés ; ne pas modifier directement la version distribuée.
+
 ## Sources et documentation
 
 Hamigo est un projet indépendant de l’ANFR. Le contenu continue d’être revu et enrichi.
