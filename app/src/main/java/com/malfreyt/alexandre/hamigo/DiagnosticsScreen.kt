@@ -72,7 +72,9 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
     var tab by remember {mutableStateOf("Outils")}
     var selected by remember {mutableStateOf<DiagnosticSelection?>(null)}
     var mock by remember {mutableStateOf<String?>(null)}
-    fun back(){when {inspector.session!=null->inspector.leaveSession();selected!=null->selected=null;mock!=null->mock=null;else->owner.debugToolsOpen=false}}
+    var previewBack by remember {mutableStateOf<(() -> Boolean)?>(null)}
+    if(mock=="Onboarding") {DiagnosticOnboarding(owner,content){mock=null};return}
+    fun back(){if(mock!=null&&previewBack?.invoke()==true)return;when {inspector.session!=null->inspector.leaveSession();selected!=null->selected=null;mock!=null->mock=null;else->owner.debugToolsOpen=false}}
     Dialog(onDismissRequest=::back,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
         Surface(Modifier.fillMaxSize().testTag("diagnostics-screen"),color=Cream) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(if(inspector.session?.done==false)WindowInsets.safeDrawing.only(WindowInsetsSides.Top+WindowInsetsSides.Horizontal) else WindowInsets.safeDrawing)) {
@@ -93,7 +95,7 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
                             CompositionLocalProvider(LocalDiagnosticsCovered provides false,LocalContext provides inspector.diagnosticContext,LocalAnimatedBack provides {inspector.leaveSession()},LocalNavigationContentOverlap provides 0.dp) {QuizScreen(inspector)}
                         }
                         selected!=null->DiagnosticQuestionPager(selected!!,content,courseLocations) {q->inspector.startQuestions("Test · ${q.id}",listOf(q));selected=null}
-                        mock!=null->DiagnosticMock(owner,content,mock!!)
+                        mock!=null->DiagnosticMock(owner,content,mock!!){previewBack=it}
                         tab=="Questions"->DiagnosticCatalog(content,courseLocations) {q,matches->selected=DiagnosticSelection(matches,matches.indexOfFirst {it.id==q.id})}
                         tab=="Types"->LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                             item {Action("Tester tous les types"){inspector.startQuestions("Tour des types",DiagnosticData.representatives(content))}}
@@ -103,9 +105,9 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
                             }}
                             item {Spacer(Modifier.height(18.dp))}
                         }
-                        tab=="Aperçus"->LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                            item {Text("Écrans natifs avec données factices. Tu peux défiler ; les actions sont bloquées.",fontSize=13.sp,color=Muted)}
-                            items(listOf("Moi · début","Moi · série en cours","Moi · objectif atteint","Moi · série cassée","Équipe · deux amis","Parcours · chapitres terminés","Fin de cours · réussite","Fin de cours · à consolider","Fin d’examen")) {label->OutlinedButton({mock=label},Modifier.fillMaxWidth()){Text(label)}}
+                        tab=="Aperçus"->LazyColumn(Modifier.testTag("diagnostic-preview-list"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                            item {Text("L’accueil est interactif. Les autres aperçus permettent seulement de défiler.",fontSize=13.sp,color=Muted)}
+                            items(listOf("Onboarding","Moi · début","Moi · série en cours","Moi · objectif atteint","Moi · série cassée","Équipe · deux amis","Parcours · chapitres terminés","Fin de cours · réussite","Fin de cours · à consolider","Fin d’examen")+DiagnosticStressPreviews.presets) {label->OutlinedButton({mock=label},Modifier.fillMaxWidth()){Text(label)}}
                         }
                         tab=="Infos"->DiagnosticStats(content)
                         else->DiagnosticControls(owner,content)
@@ -271,33 +273,62 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
     }
 }
 
-@Composable private fun DiagnosticMock(owner:AppModel,content:Content,preset:String) {
+@Composable private fun DiagnosticOnboarding(owner:AppModel,content:Content,onClose:()->Unit) {
+    val context=LocalContext.current
+    val model=remember(owner,content){AppModel().apply {initializeDiagnostics(context,owner,content)}}
+    DisposableEffect(model){onDispose {model.disposeDiagnostics()}}
+    Dialog(onDismissRequest=onClose,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
+        CompositionLocalProvider(LocalContext provides model.diagnosticContext) {
+            OnboardingScreen(model,simulation=true,onSimulationFinished=onClose)
+        }
+    }
+}
+
+@Composable private fun DiagnosticMock(owner:AppModel,content:Content,preset:String,onBackChanged:((() -> Boolean)?)->Unit) {
     val context=LocalContext.current
     val model=remember(preset){AppModel().apply {
         initializeDiagnostics(context,owner,content)
         DiagnosticData.seed(this,when {preset.contains("début")->"empty";preset.contains("cassée")->"broken";else->"active"},
-            todayXp=if(preset.contains("atteint"))75 else 24,completed=if(preset.startsWith("Parcours"))20 else 8)
-    }}
-    DisposableEffect(model){onDispose {model.disposeDiagnostics()}}
-    Column(Modifier.fillMaxSize()) {
-        Text("$preset · défilement uniquement",Modifier.padding(horizontal=14.dp,vertical=8.dp),fontSize=12.sp,color=Teal)
-        CompositionLocalProvider(LocalContext provides model.diagnosticContext,LocalNavigationContentOverlap provides 0.dp) {
-            ReadOnlyDiagnosticPreview {
-                when {
-                    preset.startsWith("Moi")->ProfileScreen(model,content)
-                    preset.startsWith("Équipe")->FriendsScreen(model)
-                    preset.startsWith("Parcours")->PathScreen(model,content)
-                    else->{
-                        val session=remember(preset) {val exam=preset.contains("examen");val count=if(exam)40 else 8
+            todayXp=if(preset.contains("atteint"))DailyGoals.xp(60) else 24,completed=if(preset.startsWith("Parcours"))20 else 8)
+        when {
+            preset in DiagnosticStressPreviews.presets->DiagnosticStressPreviews.prepare(this,preset)
+            preset.startsWith("Moi")->route="profile"
+            preset.startsWith("Équipe")->route="friends"
+            preset.startsWith("Parcours")->route="path"
+            else->{
+                route="practice"
+                session=run {val exam=preset.contains("examen");val count=if(exam)40 else 8
                             val questions=List(count){Question("debug-$it","Quel appareil commande la transmission ?",listOf("Le manipulateur","Le fusible"),0,"Le manipulateur commande le signal.",section=if(exam&&it<20)"regulation" else "technique")}
                             Session(preset,questions.toMutableList(),lessonId=if(preset.startsWith("Fin de cours"))"debug-lesson" else null,exam=preset.contains("examen")).apply {
                                 index=count;firstCorrect=if(exam)28 else if(preset.contains("consolider"))3 else 8;correct=firstCorrect;gain=0;regulationScore=15;techniqueScore=13
                                 if(exam)questions.forEachIndexed {i,q->val good=if(i<20)i<15 else i<33;responses[i]=SessionResponse(good,display=q.choices[if(good)0 else 1],choiceIndex=if(good)0 else 1);if(!good)missed[q.id]=q}
                                 else if(firstCorrect<8){missed[questions[0].id]=questions[0];unresolved.add(questions[0].id)}
                             }}
-                        ResultsScreen(model,session)
-                    }
-                }
+            }
+        }
+    }}
+    val originalRoute=remember(model){model.route}
+    val originalSession=remember(model){model.session}
+    val originalLesson=remember(model){model.lesson}
+    val originalResource=remember(model){model.resource}
+    DisposableEffect(model) {
+        onBackChanged {
+            if(model.route==originalRoute&&model.session===originalSession&&model.lesson===originalLesson&&model.resource===originalResource)false
+            else when {
+                model.session!=null->{model.leaveSession();true}
+                model.resource!=null->{model.resource=null;true}
+                model.lesson!=null->{model.lesson=null;true}
+                model.route=="settings"->{model.route="profile";true}
+                else->false
+            }
+        }
+        onDispose {onBackChanged(null);model.disposeDiagnostics()}
+    }
+    Column(Modifier.fillMaxSize().testTag("diagnostic-interactive-preview")) {
+        Text("$preset · données fictives, sans connexion externe",Modifier.padding(horizontal=14.dp,vertical=8.dp),fontSize=12.sp,color=Teal)
+        FeedbackPreferenceScope(owner.interactionFeedback,model.progress.prefs) {
+            CompositionLocalProvider(LocalContext provides model.diagnosticContext,LocalDiagnosticsCovered provides false) {
+                HamigoAppContent(model,owner,diagnosticPreview=true)
             }
         }
     }

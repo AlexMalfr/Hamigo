@@ -34,6 +34,13 @@ val Muted=Color(0xFF597678)
 val Purple=Color(0xFF8B77C5)
 val ChapterColors=listOf(Teal,Color(0xFF547FCD),Purple,Color(0xFFD47648))
 
+@Composable internal fun StatMetric(text:String,icon:ImageVector,color:Color=Teal,fontSize:androidx.compose.ui.unit.TextUnit=14.sp,iconSize:Dp=18.dp) {
+    Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+        Icon(icon,null,Modifier.size(iconSize),tint=color)
+        Text(text,color=color,fontWeight=FontWeight.Bold,fontSize=fontSize)
+    }
+}
+
 @Composable fun HamigoTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme=lightColorScheme(primary=Teal,onPrimary=Color.White,primaryContainer=Mist,onPrimaryContainer=Ink,
         secondary=Coral,onSecondary=Ink,secondaryContainer=Color(0xFFFFE8E0),onSecondaryContainer=Ink,background=Cream,surface=Cream,

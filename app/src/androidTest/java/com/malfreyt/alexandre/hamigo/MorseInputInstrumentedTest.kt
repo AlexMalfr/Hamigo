@@ -64,22 +64,35 @@ class MorseInputInstrumentedTest {
     }
 
     @Test fun settingsPreviewSeparatesLettersAndWordsAndClearCancelsItsPendingPause() {
-        ui.setContent { HamigoTheme { MorseSettingsPreview(MorseInputSettings(true,300)) } }
+        ui.setContent { HamigoTheme { MorseSettingsPreview(MorseInputSettings(true,600,liveSound=false,autoSpaces=true)) } }
         val key=ui.onNodeWithTag("morse-single-key")
-        key.performTouchInput {
-            down(center);advanceEventTime(120);up()
-            advanceEventTime(450);down(center);advanceEventTime(350);up()
-            advanceEventTime(1050);down(center);advanceEventTime(120);up()
-        }
+        val emptyHeight=ui.onNodeWithTag("morse-settings-preview").fetchSemanticsNode().boundsInRoot.height
+        key.performClick()
+        assertEquals(emptyHeight,ui.onNodeWithTag("morse-settings-preview").fetchSemanticsNode().boundsInRoot.height,.5f)
+        ui.waitUntil(2_000) {ui.onAllNodes(hasStateDescription("Pause entre lettres")).fetchSemanticsNodes().isNotEmpty()}
+        key.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnLongClick){it()}
+        ui.waitUntil(4_000) {ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).fetchSemanticsNodes().isNotEmpty()}
+        key.performClick()
         ui.onNodeWithTag("morse-preview-text").assertTextEquals("ET E")
         org.junit.Assert.assertTrue(ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).fetchSemanticsNodes().isNotEmpty())
         val bitmap=ui.onNodeWithTag("morse-settings-preview").captureToImage().asAndroidBitmap()
         val folder=java.io.File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null),"morse-audit").apply {mkdirs()}
         java.io.File(folder,"preview-letter-word.png").outputStream().use { bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it) }
         bitmap.recycle()
-        ui.onNodeWithContentDescription("Effacer l’essai Morse").performClick()
-        ui.onNodeWithTag("morse-preview-text").assertDoesNotExist()
+        ui.onNodeWithContentDescription("Effacer le dernier symbole").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnLongClick){it()}
+        ui.onNodeWithTag("morse-preview-text").assertTextEquals("Ta traduction")
         ui.mainClock.advanceTimeBy(2200)
         ui.onAllNodesWithContentDescription("séparation entre mots",useUnmergedTree=true).assertCountEquals(0)
+    }
+    @Test fun manualSpacingNeverAddsCharactersUntilTheLetterAndWordButtonsAreUsed() {
+        val text=mutableStateOf("")
+        ui.setContent {HamigoTheme {MorseComposerInput(text.value,settingsOverride=MorseInputSettings(false,150,false,false)){text.value=it}}}
+        ui.onNodeWithText("Point").performClick()
+        Thread.sleep(650)
+        ui.runOnIdle {assertEquals(".",text.value)}
+        ui.onNodeWithText("Lettre suivante").performClick();ui.onNodeWithText("Trait").performClick()
+        ui.runOnIdle {assertEquals(". -",text.value)}
+        ui.onNodeWithText("Mot suivant").performClick();ui.onNodeWithText("Point").performClick()
+        ui.runOnIdle {assertEquals(". - / .",text.value)}
     }
 }

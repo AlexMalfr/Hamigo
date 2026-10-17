@@ -51,6 +51,9 @@ class SocialWidgetInstrumentedTest {
                 val width=v.width-v.compoundPaddingLeft-v.compoundPaddingRight;val height=v.height-v.compoundPaddingTop-v.compoundPaddingBottom
                 assertTrue("No text viewport: ${v.text}",width>0&&height>0)
                 assertNotNull(v.layout);assertTrue("Text clipped vertically: ${v.text}",v.layout.height<=height)
+                if(v.id !in setOf(R.id.social_name1,R.id.social_name2,R.id.social_name3,R.id.social_name4,R.id.social_name5)) {
+                    assertEquals("Text truncated: ${v.text}",0,v.layout.getEllipsisCount(0))
+                }
             }
             if(v is ViewGroup)(0 until v.childCount).forEach {descend(v.getChildAt(it))}
         }

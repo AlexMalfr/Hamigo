@@ -90,6 +90,7 @@ import kotlin.random.Random
     val view=LocalView.current
     val feedback=s.feedback
     val receiver=rememberFrequencyReceiver(q.kind=="frequency" && feedback==null && !s.exam && !LocalDiagnosticsCovered.current,key,q.value ?: 0.0)
+    LaunchedEffect(receiver,key){receiver?.tune(frequency)}
     LaunchedEffect(key){scroll.scrollTo(0);focus.clearFocus()}
     LaunchedEffect(key,feedback) {
         if(feedback!=null) {

@@ -1,4 +1,6 @@
 import java.util.Properties
+import java.io.File
+import java.security.MessageDigest
 
 plugins {
     id("com.android.application")
@@ -12,9 +14,9 @@ fun git(vararg args: String): String = runCatching {
     check(process.waitFor() == 0) { output }; output
 }.getOrDefault("")
 val commitCount = git("rev-list", "--count", "HEAD").toIntOrNull() ?: 1
-// User-requested cleanup after five versions: block delivery until temporary 0.47 code is removed.
-check(commitCount < 52 || !rootProject.file("app/src/main/java/com/malfreyt/alexandre/hamigo/CourseQuestionMigration47.kt").exists()) {
-    "0.52: remove CourseQuestionMigration47, CourseQuestionAliases47 and their calls. Keep shipped UUIDs and the authoring registry."
+// Temporary streak compatibility runs for five versions (0.52 through 0.56).
+check(commitCount<57 || !rootProject.file("app/src/main/java/com/malfreyt/alexandre/hamigo/StreakMigration52.kt").exists()) {
+    "0.57: remove StreakMigration52 and its temporary tests; keep StreakHistory and saved streak data."
 }
 // Explicitly requested revisions of an existing release keep its number; normal builds follow Git.
 val versionCommit = providers.gradleProperty("hamigoVersionCommit").orNull?.let {
@@ -34,10 +36,14 @@ require(gitHubClientSecret.isEmpty() || gitHubClientSecret.matches(Regex("[A-Za-
     "Invalid GitHub application credential in .tools/oauth.properties."
 }
 
-// Optional fresh output directory when Windows/OneDrive locks an earlier generated package.
-providers.gradleProperty("hamigoBuildRoot").orNull?.let { buildRoot ->
-    layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("$buildRoot/app"))
+// Windows builds live outside OneDrive, with a distinct directory for each checkout.
+val buildRootOverride=providers.gradleProperty("hamigoBuildRoot").orNull
+if(buildRootOverride!=null) layout.buildDirectory.set(rootProject.file("$buildRootOverride/app"))
+else if(System.getProperty("os.name").startsWith("Windows",ignoreCase=true)) {
+    val checkout=MessageDigest.getInstance("SHA-256").digest(rootDir.canonicalPath.toByteArray()).joinToString(""){"%02x".format(it)}.take(12)
+    layout.buildDirectory.set(File(System.getenv("LOCALAPPDATA"),"Hamigo/build/$checkout/app"))
 }
+tasks.register("printBuildDirectory"){doLast{println(layout.buildDirectory.get().asFile)}}
 
 android {
     namespace = "com.malfreyt.alexandre.hamigo"

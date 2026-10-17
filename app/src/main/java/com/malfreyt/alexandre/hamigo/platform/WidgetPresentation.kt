@@ -1,5 +1,7 @@
 package com.malfreyt.alexandre.hamigo.platform
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -33,7 +35,7 @@ import kotlin.math.sqrt
 internal data class WidgetTextSlot(val id: Int, val bounds: RectF, val text: String, val color: Int,
     val centered: Boolean = false)
 internal data class WidgetComposition(val size: SizeF, val texts: List<WidgetTextSlot>, val chart: RectF,
-    val pico: RectF?, val compact: Boolean, val column: Boolean)
+    val pico: RectF?, val compact: Boolean, val column: Boolean, val symbols:List<WidgetSymbol> = emptyList())
 
 internal object WidgetPresentation {
     private class WidgetPaint(val transparent: Boolean, val lightText: Boolean) : Paint(ANTI_ALIAS_FLAG)
@@ -46,7 +48,7 @@ internal object WidgetPresentation {
     private val french = Locale.FRANCE
     private val dayLabels = listOf("L", "Ma", "Me", "J", "V", "S", "D")
 
-    fun composition(kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF): WidgetComposition {
+    fun composition(kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF, fontScale:Float=1f): WidgetComposition {
         val w = size.width.coerceAtLeast(40f); val h = size.height.coerceAtLeast(40f)
         // Keep native text clear of both our corners and the launcher's extra rounding.
         val p = (minOf(w, h) * .10f).coerceIn(6f, 24f)
@@ -170,12 +172,26 @@ internal object WidgetPresentation {
             pico = null
             if (!sidePanel) texts.filter { it.id == R.id.widget_title || it.id == R.id.widget_metric }.forEach { it.bounds.right = w - p }
         }
-        return WidgetComposition(SizeF(w, h), texts, chart, pico, short, column)
+        val symbols=mutableListOf<WidgetSymbol>()
+        val decorated=texts.map {slot->
+            val icon=when(slot.id) {
+                R.id.widget_metric->if(kind==HomeWidgetKind.STREAK)Icons.Rounded.LocalFireDepartment else Icons.Rounded.Bolt
+                R.id.widget_title->when(kind){HomeWidgetKind.GOAL->Icons.Rounded.Flag;HomeWidgetKind.WEEK->Icons.Rounded.DateRange;else->null}
+                R.id.widget_status->if(kind==HomeWidgetKind.STREAK&&r.todayXp>0)Icons.Rounded.Bolt else null
+                else->null
+            }
+            val placement=if(icon!=null)WidgetSymbols.placement(slot.bounds,slot.text,if(slot.id==R.id.widget_metric)56f else if(slot.id==R.id.widget_title)20f else 16f,slot.id!=R.id.widget_status,slot.centered,fontScale) else null
+            if(icon!=null&&placement!=null) {
+                symbols+=WidgetSymbol(placement.second,icon,if(kind==HomeWidgetKind.STREAK&&slot.id==R.id.widget_metric)gold else slot.color)
+                slot.copy(bounds=placement.first)
+            } else slot
+        }
+        return WidgetComposition(SizeF(w, h), decorated, chart, pico, short, column,symbols)
     }
 
     fun views(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF, pixelBudget: Float = 520_000f,
         transparent: Boolean = false, lightText: Boolean = true): RemoteViews {
-        val layout = composition(kind, snapshot, size)
+        val layout = composition(kind, snapshot, size,context.resources.configuration.fontScale)
         val density = context.resources.displayMetrics.density
         fun px(dp: Float) = (dp * density).roundToInt()
         return RemoteViews(context.packageName, if(transparent&&lightText)R.layout.widget_responsive_transparent else R.layout.widget_responsive).apply {
@@ -255,6 +271,7 @@ internal object WidgetPresentation {
             (1..3).forEach { canvas.drawCircle(w, 0f, radius * it, paint) }
         }
         paint.style = Paint.Style.FILL
+        layout.symbols.forEach {symbol->WidgetSymbols.draw(canvas,if(transparent)symbol.copy(color=if(lightText)Color.WHITE else symbol.color) else symbol)}
         layout.pico?.let { drawPico(canvas, it, snapshot) }
         val chart = layout.chart
         if (chart.width() > 1f && chart.height() > 1f) {

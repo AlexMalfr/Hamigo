@@ -49,7 +49,7 @@ Captures de l’application sur émulateur, avec des profils de démonstration. 
 
 **Android 8.0 ou plus récent.** Télécharge le fichier `Hamigo-…apk` depuis la [dernière release](https://github.com/AlexMalfr/Hamigo/releases/latest), puis installe-le sur ton téléphone.
 
-Au premier lancement, tu choisis ton pseudo, ton objectif et l’heure de ton rappel. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. La banque Exam’1 se télécharge automatiquement pendant l’accueil, puis reste disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
+Au premier lancement, tu choisis ton pseudo, ton objectif, l’heure de ton rappel et ta façon de saisir le Morse. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. La banque Exam’1 se télécharge automatiquement pendant l’accueil, puis reste disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
 
 ## Sauvegarde et équipe
 
@@ -67,13 +67,13 @@ Ouvre le projet dans Android Studio avec **JDK 17 ou plus** et le **SDK Android 
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 ```
 
-Sous Windows, utilise `gradlew.bat`. L’APK debug est généré dans `app/build/outputs/apk/debug/`.
+Sous Windows, utilise `gradlew.bat`. Les builds Windows sont isolés hors de OneDrive, dans `%LOCALAPPDATA%/Hamigo/build/<checkout>/app/` ; `gradlew.bat -q :app:printBuildDirectory` donne le chemin. Sur les autres systèmes : `app/build/outputs/apk/debug/`.
 
 La signature, la configuration OAuth, les versions et les vérifications Android sont expliquées dans [les notes techniques](docs/APP-DETAILS.md) et [la documentation OAuth](docs/GITHUB-PKCE.md).
 
 Pour tester directement un identifiant de question, parcourir les formats ou inspecter des données fictives sans modifier sa progression : [outils de diagnostics sur appareil](docs/DIAGNOSTICS.md). Pour personnaliser le fond des widgets : [configuration des widgets](docs/WIDGET-CONFIGURATION.md).
 
-Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; les sauvegardes antérieures sont converties pendant la fenêtre 0.47–0.51.
+Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; la conversion temporaire des sauvegardes 0.47–0.51 a été retirée en 0.52, comme prévu.
 
 Le parcours s’édite dans `data/curriculum.json`, avec les questions complètes. `node tools/expand_curriculum.mjs` génère `app/src/main/assets/curriculum.json` (introductions et références `questionIds`) et la banque `course-questions.json` lue par Android. Les deux fichiers `curriculum.json` ont donc des rôles différents et doivent être conservés ; ne pas modifier directement la version distribuée.
 

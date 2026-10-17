@@ -543,7 +543,7 @@ class AppModel internal constructor(
         }
     }
     fun task(action: suspend () -> Unit) {
-        if(diagnosticModel)return
+        if(diagnosticModel){message="Cette action externe est désactivée dans cet aperçu.";return}
         if(busy) return
         busy=true
         taskJob=scope.launch { try { action() } catch(e: CancellationException) {throw e} catch(e:Exception){message=e.message ?: "Opération impossible."} finally {busy=false;revision++} }

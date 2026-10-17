@@ -56,10 +56,10 @@ fun ProfileScreen(model: AppModel, content: Content) {
     val p = model.displayedProgress ?: model.progress
     val context = LocalContext.current
     val backAnchors = LocalBackMotionAnchors.current
-    val today = LocalDate.now()
+    val today = StudyDay.date()
     val earliest = p.activeDays.mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }
         .filter { !it.isAfter(today) }.minOrNull() ?: today
-    val weeks = maxOf(4, (ChronoUnit.DAYS.between(earliest, today) / 7).toInt() + 1)
+    val weeks = maxOf(4, ChronoUnit.WEEKS.between(CalendarWeek.days(earliest).first(),CalendarWeek.days(today).first()).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
     val listState = rememberLazyListState()
     var headerSurfaceHeight by remember { mutableIntStateOf(0) }
@@ -89,13 +89,18 @@ fun ProfileScreen(model: AppModel, content: Content) {
         }
         item(key = "profile-level") {
             Panel(color = Mist) {
+                BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val levelPicoSize=if(maxWidth<330.dp)60.dp else 80.dp
+                val metricFont=if(maxWidth<300.dp)16.sp else 18.sp
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Pico(Modifier.size(80.dp), mood = if (p.streak > 0) MascotMood.CELEBRATE else MascotMood.HAPPY,
+                    Pico(Modifier.size(levelPicoSize), mood = if (p.streak > 0) MascotMood.CELEBRATE else MascotMood.HAPPY,
                         pose = if (p.streak > 0) MascotPose.JUMP else MascotPose.WAVE)
-                    Column(Modifier.weight(1f)) {
-                        Text("Niveau ${1 + p.xp / 250}", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("${p.xp} XP · 🔥 ${dayCount(p.streak)}", color = Teal, fontWeight = FontWeight.Bold)
+                    Text("Niveau ${1 + p.xp / 250}",Modifier.weight(1f).padding(horizontal=8.dp),fontSize=24.sp,fontWeight=FontWeight.ExtraBold)
+                    Column(Modifier.testTag("profile-level-stats"),horizontalAlignment=Alignment.End,verticalArrangement=Arrangement.spacedBy(5.dp)) {
+                        StatMetric(dayCount(p.streak),Icons.Rounded.LocalFireDepartment,Coral,fontSize=metricFont,iconSize=23.dp)
+                        StatMetric("${p.xp} XP",Icons.Rounded.Bolt,fontSize=metricFont,iconSize=23.dp)
                     }
+                }
                 }
                 LinearProgressIndicator(progress = { (p.xp % 250) / 250f }, modifier = Modifier.fillMaxWidth(), color = Teal, trackColor = Color.White)
                 Text("${250 - p.xp % 250} XP avant le prochain niveau", fontSize = 12.sp, color = Muted)
@@ -179,11 +184,11 @@ internal fun ActivityCalendar(today:LocalDate,months:Int,goal:Int?,xp:(LocalDate
             }
         }
         Row(Modifier.fillMaxWidth()) {
-            listOf("L", "M", "M", "J", "V", "S", "D").forEach { Text(it, Modifier.weight(1f), textAlign = TextAlign.Center, color = Muted, fontSize = 11.sp) }
+            CalendarWeek.days(today).forEach {Text(it.dayOfWeek.getDisplayName(TextStyle.NARROW,French),Modifier.weight(1f),textAlign=TextAlign.Center,color=Muted,fontSize=11.sp)}
         }
         HorizontalPager(history, Modifier.fillMaxWidth().testTag(tag), reverseLayout = true) { offset ->
             val month = currentMonth.minusMonths(offset.toLong())
-            val firstOffset = month.atDay(1).dayOfWeek.value - 1
+            val firstOffset = ChronoUnit.DAYS.between(CalendarWeek.days(month.atDay(1)).first(),month.atDay(1)).toInt()
             Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
                 repeat(6) { row ->
                     Row(Modifier.fillMaxWidth()) {
@@ -233,7 +238,7 @@ private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int?, goal: Int?)
 private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
     val history = rememberPagerState(pageCount = { weeks })
     val scope = rememberCoroutineScope()
-    val visibleWeekXp=(0L..6L).sumOf { p.dayXp(today.minusDays(history.currentPage*7L+it)) }
+    val visibleWeekXp=CalendarWeek.days(today.minusWeeks(history.currentPage.toLong())).sumOf {p.dayXp(it)}
     Panel {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
@@ -248,42 +253,11 @@ private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
             }
         }
         HorizontalPager(history, Modifier.fillMaxWidth(), reverseLayout = true) { week ->
-            val days = (6L downTo 0L).map { today.minusDays(week * 7L + it) }
-            val goal = p.dailyGoal.coerceAtLeast(1)
-            val maximum = maxOf(days.maxOf { p.dayXp(it) }, goal) * 1.15f
-            val weeklyXp = days.sumOf { p.dayXp(it) }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("${days.first().format(DateTimeFormatter.ofPattern("d MMM", French))} – ${days.last().format(DateTimeFormatter.ofPattern("d MMM yyyy", French))}", fontSize = 12.sp, color = Muted)
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    days.forEach { Text("${p.dayXp(it)}", Modifier.weight(1f), fontSize = 10.sp, color = Muted, textAlign = TextAlign.Center) }
-                }
-                Box(Modifier.fillMaxWidth().height(128.dp), contentAlignment = Alignment.Center) {
-                    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Bottom) {
-                        days.forEach { day ->
-                            Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.BottomCenter) {
-                                val achieved = p.dayXp(day) >= goal
-                                val fill = if (day == today) Coral else Teal
-                                Box(Modifier.fillMaxWidth().fillMaxHeight((p.dayXp(day) / maximum).coerceIn(0f, 1f))
-                                    .background(Brush.horizontalGradient(if (achieved) GoalMetal else listOf(fill, fill)), RoundedCornerShape(5.dp))) {
-                                    if (achieved) Icon(Icons.Rounded.Check,null,tint=Ink,
-                                        modifier=Modifier.align(Alignment.TopCenter).padding(top=3.dp).size(14.dp))
-                                }
-                            }
-                        }
-                    }
-                    Canvas(Modifier.fillMaxSize().testTag("weekly-goal-line").clearAndSetSemantics { contentDescription = "Objectif journalier : $goal XP" }) {
-                        val y = size.height * (1f - goal / maximum)
-                        drawLine(GoalOrange, Offset(0f, y), Offset(size.width, y), strokeWidth = 1.5.dp.toPx(),
-                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 4.dp.toPx())))
-                    }
-                    if (weeklyXp == 0) Text("Pas de progressions cette semaine.", Modifier.padding(horizontal = 12.dp),
-                        fontSize = 14.sp, lineHeight = 20.sp, color = Color.Gray, textAlign = TextAlign.Center)
-                }
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    days.forEach { day ->
-                        Text(day.dayOfWeek.getDisplayName(TextStyle.NARROW, French), Modifier.weight(1f), fontSize = 11.sp, textAlign = TextAlign.Center)
-                    }
-                }
+            val days=CalendarWeek.days(today.minusWeeks(week.toLong()))
+            Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                Text(days.first().format(DateTimeFormatter.ofPattern("d MMM",French))+" – "+days.last().format(DateTimeFormatter.ofPattern("d MMM yyyy",French)),fontSize=12.sp,color=Muted)
+                PublicXpChart(days.map {if(it>today)0 else p.dayXp(it)},days.map {it.dayOfWeek.getDisplayName(TextStyle.NARROW,French)},
+                    p.dailyGoal,"Pas de progressions cette semaine.",todayIndex=days.indexOf(today).takeIf {it>=0})
             }
         }
     }

@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
@@ -258,7 +260,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             item { MemoFeedbackButton(cat) }
             item {
                 Box(Modifier.fillMaxWidth().padding(top=12.dp,bottom=8.dp),contentAlignment=Alignment.Center) {
-                    Pico(Modifier.size(84.dp).testTag("memo-footer-pico"),pose=MascotPose.WAVE)
+                    Pico(Modifier.size(84.dp).testTag("memo-footer-pico"),mood=if(audio.preparing)MascotMood.THINKING else MascotMood.HAPPY,pose=MascotPose.WAVE)
                 }
             }
         }
@@ -333,7 +335,10 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                         MorseAwareText(row.description, fontSize = 14.sp, lineHeight = 20.sp)
                     }
                 }
-                if (speak != null) IconButton(speak, Modifier.size(44.dp)) { Icon(Icons.Rounded.VolumeUp, "Écouter " + row.term) }
+                if (speak != null) IconButton(speak, Modifier.size(44.dp).semantics {contentDescription=(if(cat.id=="nato"&&audio.activeWord==row.description)"Arrêter " else "Écouter ")+row.term}) {
+                    if(cat.id=="nato"&&audio.activeWord==row.description&&audio.preparing)CircularProgressIndicator(Modifier.size(20.dp),color=Teal,strokeWidth=2.dp)
+                    else Icon(if(cat.id=="nato"&&audio.activeWord==row.description)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,null)
+                }
                 if (cat.id == "callsigns") radioCallsignMapQuery(row)?.let { location ->
                     IconButton(feedbackClick { openLink(context, "https://www.google.com/maps/search/?api=1&query=" + Uri.encode(location)) }, Modifier.size(44.dp)) { Icon(Icons.Rounded.LocationOn, "Situer " + location, tint = Teal) }
                 }

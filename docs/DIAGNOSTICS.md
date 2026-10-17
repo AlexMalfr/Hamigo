@@ -7,7 +7,7 @@ Depuis une calculatrice Hamigo, saisir **73887388 suivi de l’année courante**
 - **Outils** : mode debug persistant, gel de progression, bac à sable client, essais des vibrations.
 - **Types** : ouvrir un exemple de chacun des formats d'exercice, ou une séance qui les parcourt tous.
 - **Questions** : catalogue des identifiants uniques du contenu Hamigo et de la banque Exam1 téléchargée, avec filtres Toutes / Hamigo / Exam’1 / Variantes / Mémo et nombre de questions par banque. Exam’1 inclut ses questions illustrées, également testables. Recherche dans tous les champs (ID, énoncé, réponses possibles, explication, paires, valeurs, unités, thème, source, asset et emplacement dans le Parcours), filtre par format. Les mots peuvent correspondre à des champs différents. Chaque question du Parcours indique chapitre → leçon → position dans la leçon, dans la liste et le détail ; une question présente dans plusieurs cours indique chaque emplacement. Les positions sont des repères de lecture, jamais des identifiants. Si Exam1 affiche zéro question en 0.48, sa banque manque encore : attendre son téléchargement ou consulter son état dans les paramètres. Le détail présente aussi source, asset, valeur/tolérance et correction masquable. « Tester cette question » ouvre l'écran natif de réponse. Pendant la migration 0.47–0.51, les anciens IDs du Parcours restent aussi recherchables. Les filtres défilent horizontalement sur petit écran et les résultats restent au-dessus du clavier.
-- **Aperçus** : pages Moi avec différents états d'activité, équipe fictive, chapitres terminés et bilans de cours/examen. Les pages restent défilables ; les actions sont bloquées.
+- **Aperçus** : pages Moi avec différents états d'activité, équipe fictive, chapitres terminés et bilans de cours/examen. Les pages sont interactives dans un modèle isolé : navigation, questions, réglages, outils, graphiques et réactions de Pico.
 - **Infos** : version, appareil, API Android, dimensions/densité/police de la fenêtre, heap et inventaire du contenu par banque/type.
 
 Le mode debug ajoute une **surimpression** avec ID, type, position et version sur les questions. Il ne réserve pas d'espace dans leur layout. Son icône permet de rouvrir les outils. Les identifiants affichés sont ceux déjà utilisés par le contenu et la répétition espacée ; le menu ne les renumérote pas.
@@ -24,9 +24,13 @@ Mode debug et gel sont des préférences **locales persistantes**. Aucune modifi
 
 Les préférences Sons/Vibrations des séances isolées et du bac à sable sont également séparées. Leur réglage initial reprend celui de l'appareil ; le contrôleur retrouve le réglage réel en quittant le test, sans enregistrer ses modifications dans les préférences personnelles.
 
-La question visible dans le diagnostic conserve ses écoutes pédagogiques, y compris le récepteur Fréquence : souffle et voix en continu après la première manipulation, selon Sons, avec reprise après une lecture de Pico. La séance réelle derrière le menu reste couverte et silencieuse. Fermer le test, valider la réponse, couper ses sons ou passer en arrière-plan arrête sa piste ; aucun XP ni SRS réel n'est ajouté. La simulation reste désactivée dans un véritable examen.
+La question visible dans le diagnostic conserve ses écoutes pédagogiques, y compris le récepteur Fréquence : souffle et voix en continu dès son ouverture, selon Sons, avec reprise après une lecture de Pico. La séance réelle derrière le menu reste couverte et silencieuse. Fermer le test, valider la réponse, couper ses sons ou passer en arrière-plan arrête sa piste ; aucun XP ni SRS réel n'est ajouté. La simulation reste désactivée dans un véritable examen.
 
 Les paramètres Gameplay sont repris à l'ouverture du modèle isolé : mode Morse à un/deux boutons et timing, avec les espaces de lettre/mot qui en découlent. La copie reste en mémoire ; la changer dans le bac à sable ne modifie pas les préférences personnelles. Les aperçus possèdent aussi un registre Android de résultats isolé pour les écrans qui enregistrent un sélecteur ou une demande de permission. Toute tentative de lancement reçoit une annulation, sans ouvrir d'application ni demander d'autorisation réelle.
+
+L’aperçu **Onboarding** est interactif : les cinq étapes peuvent être parcourues et refermées. Il utilise un modèle et des préférences en mémoire, sans enregistrer le pseudo réel, modifier l’objectif, programmer les rappels, demander une permission Android ou ouvrir GitHub. Les autres aperçus utilisent aussi la navigation native avec des données fictives.
+
+Les **cas limites** de l’onglet Aperçus reprennent les vrais composants : introduction Lorem ipsum très longue, énoncé/réponses développés, texte à trou avec une réponse longue, fiche Mémo volumineuse, statistiques extrêmes et grands pseudonymes d’équipe. Ces fixtures sont interactives, sans récompense réelle, sauvegarde ou contenu pédagogique ajouté.
 
 ## Bac à sable client
 
@@ -43,3 +47,5 @@ Le changement de modèle recrée la navigation Compose : un champ de réponse no
 Les profils et bilans sont des fixtures, pas des comptes GitHub de test. Ils servent à inspecter les composants natifs. La surimpression est volontairement visible et peut recouvrir un petit bout de contenu ; elle n'est pas affichée en usage normal. Les essais haptiques respectent les réglages de l'app et d'Android et ne constituent pas une calibration du moteur physique.
 
 Validation exécutée et limites appareil : [VALIDATION.md](VALIDATION.md).
+
+Le bouton Retour du header Diagnostics remonte dans le détail ou les paramètres de l’aperçu, puis ferme cet aperçu. Les barres de navigation, boutons et gestes sont ceux de l’app. Les réglages locaux restent dans le modèle fictif jusqu’à sa fermeture ; aucune notification, permission système ou connexion réelle ne peut être déclenchée depuis ces pages.

@@ -33,7 +33,10 @@ object DailyReminder {
     internal const val SNOOZE_DAY = "reminderSnoozeDay"
 
     fun configure(context: Context, enabled: Boolean, hour: Int = 20, minute: Int = 0) {
-        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext) {
+            context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("reminderEnabled",enabled).putInt("reminderHour",hour).putInt("reminderMinute",minute).apply()
+            return
+        }
         require(hour in 0..23 && minute in 0..59)
         synchronized(Progress.CLOUD_LOCK) {
             val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
@@ -151,7 +154,7 @@ object DailyReminder {
     }
 
     internal fun notify(context: Context, message: String? = null): Boolean {
-        val content = ReminderContent.build(Progress(context.applicationContext), LocalDate.now())
+        val content = ReminderContent.build(Progress(context.applicationContext), com.malfreyt.alexandre.hamigo.StudyDay.date())
         return showPreview(context, if (message == null) content else content.copy(message = message))
     }
 

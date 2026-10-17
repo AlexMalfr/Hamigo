@@ -24,9 +24,9 @@ internal data class WidgetSnapshot(val reminder: ReminderMessage, val week: List
     val weeklyXp get() = week.sumOf { it.xp }
     val activeDays get() = week.count { it.xp > 0 }
     companion object {
-        fun read(context: Context, date: LocalDate = LocalDate.now()): WidgetSnapshot = synchronized(Progress.CLOUD_LOCK) {
+        fun read(context: Context, date: LocalDate = com.malfreyt.alexandre.hamigo.StudyDay.date()): WidgetSnapshot = synchronized(Progress.CLOUD_LOCK) {
             val progress = Progress(context.applicationContext)
-            val monday = date.minusDays((date.dayOfWeek.value-1).toLong())
+            val monday = com.malfreyt.alexandre.hamigo.CalendarWeek.days(date).first()
             WidgetSnapshot(ReminderContent.build(progress,date), (0L..6L).map { offset ->
                 val day = monday.plusDays(offset)
                 WidgetDay(day,if(day.isAfter(date))0 else progress.dayXp(day).coerceAtLeast(0))
@@ -64,13 +64,13 @@ internal object HomeWidgets {
             } }
         }
         SocialWidgets.refresh(context)
-        scheduleMidnight(context,installed.any { it.second.isNotEmpty() }||SocialWidgets.installed(context))
+        scheduleDayBoundary(context,installed.any { it.second.isNotEmpty() }||SocialWidgets.installed(context))
     }
 
     fun update(context: Context, manager: AppWidgetManager, ids: IntArray, kind: HomeWidgetKind) {
         val snapshot = WidgetSnapshot.read(context)
         ids.forEach { manager.updateAppWidget(it,responsiveViews(context,kind,snapshot,manager.getAppWidgetOptions(it),it)) }
-        scheduleMidnight(context,true)
+        scheduleDayBoundary(context,true)
     }
 
     internal fun responsiveViews(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, options: Bundle,
@@ -102,14 +102,17 @@ internal object HomeWidgets {
 
     internal fun views(context: Context, kind: HomeWidgetKind, snapshot: WidgetSnapshot, size: SizeF): RemoteViews =
         WidgetPresentation.views(context, kind, snapshot, size)
-    private fun scheduleMidnight(context: Context, installed: Boolean) {
+    private fun scheduleDayBoundary(context: Context, installed: Boolean) {
         val pending = PendingIntent.getBroadcast(context,REQUEST_CODE,
             Intent(context,StreakWidgetProvider::class.java).setAction(ACTION_DAY_CHANGED),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val manager = context.getSystemService(AlarmManager::class.java)
         manager.cancel(pending)
-        if(installed) manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-            ZonedDateTime.now().toLocalDate().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).plusMinutes(1).toInstant().toEpochMilli(),pending)
+        if(installed) {
+            val now=ZonedDateTime.now()
+            val boundary=now.toLocalDate().atTime(3,0).atZone(now.zone).let {if(it>now)it else it.plusDays(1)}
+            manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,boundary.toInstant().toEpochMilli(),pending)
+        }
     }
 
     fun received(context: Context, intent: Intent) {

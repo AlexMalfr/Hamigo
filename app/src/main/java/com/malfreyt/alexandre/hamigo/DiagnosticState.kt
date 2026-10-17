@@ -115,7 +115,7 @@ internal object DiagnosticData {
     fun seed(model:AppModel,kind:String="active",xp:Int=1240,todayXp:Int=24,days:Int=7,completed:Int=8) {
         check(model.diagnosticModel)
         val content=model.content ?: return
-        val today=LocalDate.now();val daily=JSONObject()
+        val today=StudyDay.date();val daily=JSONObject()
         if(kind!="empty") {
             val offset=if(kind=="broken")2 else 0
             val priorDays=(days.coerceIn(0,90)-if(kind!="broken"&&todayXp>0)1 else 0).coerceAtLeast(0)
@@ -131,7 +131,10 @@ internal object DiagnosticData {
         model.progress.prefs.edit().putString("name","Camille · Démo").putString("progress",root.toString()).putInt("dailyGoal",60)
             .putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).commit()
         model.refresh()
-        model.friends=listOf(Friend(ShareProgress("Léa · Démo",960,5,6,180)),Friend(ShareProgress("Sam · Démo",1720,12,11,240)))
+        model.friends=listOf(Friend(ShareProgress("Léa · Démo",960,5,6,180),"https://gist.github.com/00000000000000000000000000000001"),
+            Friend(ShareProgress("Sam · Démo",1720,12,11,240),"https://gist.github.com/00000000000000000000000000000002"))
+        val relations=JSONArray(model.friends.map {f->JSONObject().put("gist",f.gist).put("modifiedAt",f.modifiedAt).put("progress",JSONObject(f.progress.toJson()))})
+        model.progress.saveFriendRecords(com.malfreyt.alexandre.hamigo.platform.CloudProgress.localFriends(relations,JSONObject()))
     }
     fun origin(q:Question)=when {q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.image?.startsWith("exam-bank/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
     fun typeName(kind:String)=when(kind) {
@@ -156,7 +159,7 @@ internal object DiagnosticData {
             if(kind.isNotBlank()&&q.kind!=kind)return@filter false
             if(bank.isNotBlank()&&origin(q)!=bank)return@filter false
             val corpus=(listOf(q.id,q.prompt,q.explanation,q.topic,q.section,q.kind,q.source,q.image.orEmpty(),q.unit,
-                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString(),CourseQuestionMigration47.legacyId(q.id))+
+                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString())+
                 q.choices+q.bands+q.pairs.flatMap {listOf(it.left,it.right)}+courseLocations[q.id].orEmpty()).joinToString(" ").lowercase()
             words.all(corpus::contains)
         }

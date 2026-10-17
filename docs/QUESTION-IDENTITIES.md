@@ -21,8 +21,8 @@ Elle traduit les clés des révisions SRS et des récompenses, ainsi que les `aw
 
 La progression porte `questionIdsVersion: 1`, tandis que le schéma de sauvegarde complète reste **2**. Ce marqueur distingue l'espace d'identifiants ; ce n'est pas le numéro de version de l'APK. Un marqueur inconnu est refusé. La conversion précède la déduplication des événements, afin qu'une sauvegarde d'un appareil ancien et celle d'un appareil mis à jour ne récompensent pas deux fois la même réponse question/jour. Relire la sauvegarde convertie est idempotent.
 
-## Retrait demandé à la 0.52
+## Retrait effectué en 0.52
 
-À **0.52**, après cinq versions, supprimer `CourseQuestionMigration47`, `CourseQuestionAliases47`, leurs appels, les tests temporaires de migration et l'émission des aliases Kotlin dans `tools/question_identities.mjs`. Le contrôle Gradle bloque une livraison 0.52 tant que la classe de migration existe. Conserver les UUID publiés, le registre d'identités, la banque et son marqueur de format.
+La migration 0.47, ses aliases Kotlin, ses appels et ses tests temporaires ont été retirés après la fenêtre 0.47–0.51. Le générateur n’émet plus la table embarquée. Les UUID publiés, les 850 identités historiques, les banques et le marqueur `questionIdsVersion: 1` sont conservés.
 
-Après ce retrait, une sauvegarde restée exclusivement sur les anciens IDs ne sera plus convertie automatiquement. Les appareils doivent avoir ouvert une version 0.47–0.51 et synchronisé leur sauvegarde pendant cette période. Cette limite résulte du retrait explicitement demandé ; ce mécanisme n'est pas une promesse de compatibilité permanente avec toutes les anciennes sauvegardes.
+Une sauvegarde restée exclusivement sur les anciens IDs n’est plus convertie automatiquement. Les appareils doivent avoir ouvert une version 0.47–0.51 et synchronisé pendant cette période. Le registre d’édition conserve les anciennes correspondances pour préserver les identités lors des générations ; ce n’est pas une migration dans l’app.

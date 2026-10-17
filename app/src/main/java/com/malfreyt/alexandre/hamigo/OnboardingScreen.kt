@@ -47,19 +47,21 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationManagerCompat
 import com.malfreyt.alexandre.hamigo.platform.DailyReminder
 
-private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
+private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","Morse","GitHub")
 
 /** Full-screen first run; confirmed choices survive an interrupted setup, without resetting users. */
 @OptIn(ExperimentalLayoutApi::class)
-@Composable internal fun OnboardingScreen(model:AppModel) {
+@Composable internal fun OnboardingScreen(model:AppModel,simulation:Boolean=false,onSimulationFinished:()->Unit={}) {
     val context=LocalContext.current
     val focus=LocalFocusManager.current
     val prefs=model.progress.prefs
-    var step by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingStep",0).coerceIn(0,3))}
+    var step by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingStep",0).coerceIn(0,4))}
     var name by rememberSaveable {mutableStateOf(prefs.getString("onboardingName",prefs.getString("name","")) ?: "")}
     var goal by rememberSaveable {mutableIntStateOf(model.progress.dailyGoal.takeIf {it in DailyGoals.values} ?: DailyGoals.values[1])}
     var hour by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderHour",prefs.getInt("reminderHour",20)).coerceIn(0,23))}
     var minute by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderMinute",prefs.getInt("reminderMinute",0)).coerceIn(0,59))}
+    var morse by remember {mutableStateOf(GameplayPreferences.read(prefs))}
+    var advancedMorse by rememberSaveable {mutableStateOf(false)}
     var permissionPending by remember {mutableStateOf(false)}
     var permissionError by rememberSaveable {mutableStateOf(false)}
     fun moveTo(next:Int) {
@@ -68,7 +70,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
         prefs.edit().putInt("onboardingStep",next).apply()
     }
     fun confirmReminder(enabled:Boolean) {
-        DailyReminder.configure(context,enabled,hour,minute)
+        if(!simulation)DailyReminder.configure(context,enabled,hour,minute)
         model.refresh()
         moveTo(3)
     }
@@ -78,6 +80,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
         else {DailyReminder.configure(context,false,hour,minute);permissionError=true}
     }
     fun finish(connect:Boolean) {
+        if(simulation){onSimulationFinished();return}
         model.welcome(name.trim())
         if(connect) {model.route="friends";model.startGitHubConnection()}
         else model.route="path"
@@ -88,13 +91,15 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
             1 -> {model.progress.setDailyGoalChoice(DailyGoals.values.indexOf(goal));model.refresh();moveTo(2)}
             2 -> {
                 permissionError=false
-                if(Build.VERSION.SDK_INT>=33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED) {
+                if(simulation)confirmReminder(true)
+                else if(Build.VERSION.SDK_INT>=33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED) {
                     permissionPending=true
                     permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 } else if(NotificationManagerCompat.from(context).areNotificationsEnabled())confirmReminder(true)
                 else permissionError=true
             }
-            3 -> finish(!model.sync.tokens.hasToken())
+            3 -> {GameplayPreferences.save(prefs,morse);moveTo(4)}
+            4 -> finish(!model.sync.tokens.hasToken())
         }
     }
     BackHandler(enabled=step>0 && !permissionPending) {moveTo(step-1)}
@@ -113,10 +118,11 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                 if(step>0)IconButton(feedbackClick {moveTo(step-1)},Modifier.size(40.dp),enabled=!permissionPending) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack,"Étape précédente")
-                } else Spacer(Modifier.width(8.dp))
-                Eyebrow("HAMIGO")
+                } else if(simulation)IconButton(onSimulationFinished){Icon(Icons.Rounded.Close,"Fermer la simulation")}
+                else Spacer(Modifier.width(8.dp))
+                Eyebrow(if(simulation)"SIMULATION" else "HAMIGO")
                 Spacer(Modifier.weight(1f))
-                Text("${step+1}/4 · ${onboardingSteps[step]}",fontSize=12.sp,lineHeight=16.sp,color=Muted,modifier=Modifier.testTag("onboarding-stage"))
+                Text("${step+1}/5 · ${onboardingSteps[step]}",fontSize=12.sp,lineHeight=16.sp,color=Muted,modifier=Modifier.testTag("onboarding-stage"))
             }
         }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(),contentAlignment=Alignment.TopCenter) {
@@ -128,13 +134,14 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                         (fadeOut(tween(160))+slideOutHorizontally(tween(260)){-it/5*direction})
                 }) {page ->
                 Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=24.dp,vertical=8.dp),
-                    horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(16.dp)) {
-                    OnboardingPico(page,heroSize)
-                    val title=when(page) {0->"Bienvenue dans Hamigo";1->"Un objectif à ton rythme";2->"On garde le rendez-vous ?";else->"Retrouve ta progression"}
+                    horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(if(page==3)10.dp else 16.dp)) {
+                    OnboardingPico(page,if(page==3)heroSize.coerceAtMost(96.dp) else heroSize)
+                    val title=when(page) {0->"Bienvenue dans Hamigo";1->"Un objectif à ton rythme";2->"On garde le rendez-vous ?";3->"Comment veux-tu saisir le Morse ?";else->"Retrouve ta progression"}
                     val description=when(page) {
                         0->"Moi, c’est Pico ! On prépare ton certificat radioamateur, une notion à la fois. Comment dois-je t’appeler ?"
                         1->"Choisis les XP que tu veux gagner chaque jour. Tu pourras ajuster ton objectif à tout moment."
                         2->"Un petit rappel de Pico pour penser à ta séance, à l’heure qui te convient."
+                        3->"Choisis une façon de découvrir le Morse. Tu pourras la changer dans les paramètres."
                         else->"Avec GitHub, sauvegarde tes révisions et rejoins tes amis pour vous motiver ensemble."
                     }
                     Text(title,fontSize=28.sp,lineHeight=32.sp,fontWeight=FontWeight.ExtraBold,color=Ink,textAlign=TextAlign.Center)
@@ -182,6 +189,27 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
                             } else Text("Un rappel par jour. Tu gardes la main dans les paramètres.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
                         }
                         3-> {
+                            if(!advancedMorse)MorseProfiles.forEachIndexed {index,profile ->
+                                val chosen=morse.singleKey==profile.settings.singleKey&&morse.autoSpaces==profile.settings.autoSpaces&&morse.thresholdMs==profile.settings.thresholdMs
+                                Surface(onClick=feedbackClick {morse=profile.settings.copy(liveSound=morse.liveSound)},color=if(chosen)Mist else Color.White,shape=RoundedCornerShape(16.dp),border=androidx.compose.foundation.BorderStroke(if(chosen)2.dp else 1.dp,if(chosen)Teal else Mist)) {
+                                    Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                                        Row(verticalAlignment=Alignment.CenterVertically) {
+                                            Text(profile.title,Modifier.weight(1f),fontWeight=FontWeight.Bold,color=Teal)
+                                            Row(Modifier.semantics {contentDescription="Difficulté ${index+1} sur 3"},horizontalArrangement=Arrangement.spacedBy(2.dp)) {
+                                                repeat(index+1){Icon(Icons.Rounded.Bolt,null,Modifier.size(17.dp),tint=if(index==2)Coral else Teal)}
+                                            }
+                                        }
+                                        Text(when(index){0->"Recommandé pour les débutants";1->"Pour prendre le rythme";else->"Plus réaliste · avancé"},fontSize=11.sp,lineHeight=15.sp,fontWeight=FontWeight.Bold,color=if(index==2)Coral else Teal)
+                                        Text(profile.description,fontSize=12.sp,lineHeight=17.sp,color=Muted)
+                                    }
+                                }
+                            }
+                            TextButton(feedbackClick {advancedMorse=!advancedMorse}){Text(if(advancedMorse)"Revenir aux profils" else "Réglages avancés",fontSize=12.sp)}
+                            if(advancedMorse)MorseSettingsControls(morse){morse=it}
+                            Text("Essaie ici",Modifier.fillMaxWidth(),fontSize=13.sp,fontWeight=FontWeight.Bold,color=Teal)
+                            Surface(color=Mist,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth()) {MorseSettingsPreview(morse)}
+                        }
+                        4-> {
                             Surface(color=Mist,shape=RoundedCornerShape(20.dp)) {
                                 Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                                     OnboardingBenefit(Icons.Rounded.CloudDone,"Ta progression sauvegardée")
@@ -199,10 +227,10 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
         Column(Modifier.fillMaxWidth().padding(horizontal=24.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
             Button(feedbackClick {continueStep()},Modifier.fillMaxWidth().heightIn(min=54.dp).testTag("onboarding-continue"),
                 enabled=(step!=0 || name.isNotBlank()) && !permissionPending,shape=RoundedCornerShape(16.dp)) {
-                Text(when(step){2->if(permissionPending)"Autorisation…" else "Activer le rappel";3->if(model.sync.tokens.hasToken())"C’est parti !" else "Se connecter avec GitHub";else->"Continuer"},fontWeight=FontWeight.Bold,fontSize=16.sp)
+                Text(when(step){2->if(permissionPending)"Autorisation…" else "Activer le rappel";4->if(model.sync.tokens.hasToken())"C’est parti !" else "Se connecter avec GitHub";else->"Continuer"},fontWeight=FontWeight.Bold,fontSize=16.sp)
                 Spacer(Modifier.width(8.dp));Icon(if(step==2)Icons.Rounded.NotificationsActive else Icons.AutoMirrored.Rounded.ArrowForward,null,Modifier.size(20.dp))
             }
-            if(step>=2)TextButton(feedbackClick {if(step==2)confirmReminder(false) else finish(false)},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
+            if(step==2||step==4)TextButton(feedbackClick {if(step==2)confirmReminder(false) else finish(false)},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
                 Text(if(step==2)"Pas maintenant" else "Commencer sans compte")
             }
         }
@@ -210,8 +238,8 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","GitHub")
 }
 
 @Composable private fun OnboardingPico(step:Int,size:androidx.compose.ui.unit.Dp) {
-    val mood=listOf(MascotMood.HAPPY,MascotMood.DETERMINED,MascotMood.GOOFY,MascotMood.CELEBRATE)[step]
-    val pose=listOf(MascotPose.WAVE,MascotPose.POINT,MascotPose.HUG,MascotPose.DANCE)[step]
+    val mood=listOf(MascotMood.HAPPY,MascotMood.DETERMINED,MascotMood.GOOFY,MascotMood.THINKING,MascotMood.CELEBRATE)[step]
+    val pose=listOf(MascotPose.WAVE,MascotPose.POINT,MascotPose.HUG,MascotPose.POINT,MascotPose.DANCE)[step]
     Box(Modifier.size(size).background(if(step==2)Color(0xFFFFE8E0) else Mist,CircleShape).testTag("onboarding-pico"),contentAlignment=Alignment.Center) {
         Pico(Modifier.fillMaxSize().padding(8.dp),mood=mood,pose=pose)
     }

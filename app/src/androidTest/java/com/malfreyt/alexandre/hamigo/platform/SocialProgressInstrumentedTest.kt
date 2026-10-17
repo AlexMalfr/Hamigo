@@ -86,9 +86,9 @@ class SocialProgressInstrumentedTest {
         assertTrue(json.length<=32_768);val parsed=ShareProgress.fromJson(json).activityHistory!!
         assertTrue(parsed.start>start);assertEquals(Int.MAX_VALUE,parsed.xp(end));assertNull(parsed.xp(start))
     }
-    @Test fun rollingWeekExpiresOldDaysInsteadOfRepeatingTheLastPublishedScore() {
+    @Test fun calendarWeekExpiresPreviousWeeksInsteadOfRepeatingTheLastPublishedScore() {
         val profile=ShareProgress("Camille",999,3,4,weeklyXp=999,dailyXp=listOf(DailyPoint(day.minusDays(7).toString(),100),DailyPoint(day.minusDays(6).toString(),15),DailyPoint(day.toString(),30)))
-        assertEquals(45,SocialActivity.weeklyXp(profile,day));assertEquals(30,SocialActivity.todayXp(profile,day))
+        assertEquals(30,SocialActivity.weeklyXp(profile,day));assertEquals(30,SocialActivity.todayXp(profile,day))
         assertEquals(0,SocialActivity.weeklyXp(profile,day.plusDays(7)))
     }
     @Test fun malformedOrInconsistentPublicHourlyDataIsRejected() {

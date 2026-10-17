@@ -45,4 +45,42 @@ class CalculatorEditingTest {
         assertEquals(full, CalculatorEditing.press(full, "7"))
         assertEquals(512, CalculatorEditing.press(full.copy(start = 0, end = 1), "7").text.length)
     }
+    @Test fun toolsAreAtomicAndDeletingAnEmptyOpenerAlsoRemovesItsCloser() {
+        for(key in listOf("sin","cos","asin","log","ln","√","10ˣ","eˣ","1/x")) {
+            val opened=CalculatorEditing.press(CalculatorEdit(""),key)
+            assertEquals(CalculatorEdit(""),CalculatorEditing.press(opened,"⌫"))
+            assertEquals(0,CalculatorEditing.move(opened,-1).start)
+            assertEquals(opened.start,CalculatorEditing.move(opened.copy(start=0,end=0),1).start)
+        }
+        assertEquals(CalculatorEdit("12+",3),CalculatorEditing.press(CalculatorEdit("12+()",4),"⌫"))
+        assertEquals(CalculatorEdit("2+30",2),CalculatorEditing.press(CalculatorEdit("2+sin(30)",6),"⌫"))
+        val selected=CalculatorEditing.selectBackwards(CalculatorEdit("2+sin(30)",8),3)
+        assertEquals(2,selected.start);assertEquals(8,selected.end)
+        assertEquals("2+",CalculatorEditing.press(selected,"⌫").text)
+    }
+    @Test fun swipingAwayOpenersRemovesTheirOwnClosersAndKeepsOtherGroups() {
+        assertEquals(CalculatorEdit("2+30+4×cos(60)",2),CalculatorEditing.press(CalculatorEdit("2+sin(sqrt(30)+4)×cos(60)",2,11),"⌫"))
+        assertEquals(CalculatorEdit("sin(30+4)",4),CalculatorEditing.press(CalculatorEdit("sin((30)+4)",4,5),"⌫"))
+        assertEquals(CalculatorEdit("2+30+sin(4)",2),CalculatorEditing.press(CalculatorEdit("2+(30)+sin(4)",2,3),"⌫"))
+    }
+    @Test fun powersOfTenKeepAnExplicitProductAndCursorMovesAcrossTokens() {
+        val inserted=CalculatorEditing.press(CalculatorEdit("2"),"10ˣ")
+        assertEquals("2×10^()",inserted.text)
+        val number=CalculatorEditing.press(CalculatorEditing.press(inserted,"3"),")")
+        assertEquals(2000.0,CalculatorEngine.evaluate(number.text),1e-10)
+        assertEquals("2×10^()",CalculatorEditing.press(CalculatorEdit("2×"),"10ˣ").text)
+        assertEquals("10^()",CalculatorEditing.press(CalculatorEdit(""),"10ˣ").text)
+        assertEquals(0,CalculatorEditing.snap("sqrt(9)",3));assertEquals(5,CalculatorEditing.snap("sqrt(9)",3,true))
+    }
+    @Test fun scientificToolsApplyToTheCompletePowerOrSignedAtomAtTheCursor() {
+        val squared=CalculatorEditing.press(CalculatorEdit("2+10^(3)"),"x²")
+        assertEquals("2+(10^(3))^2",squared.text)
+        assertEquals(1_000_002.0,CalculatorEngine.evaluate(squared.text),1e-8)
+        val inverse=CalculatorEditing.press(CalculatorEdit("(3)^2"),"1/x")
+        assertEquals(1.0/9,CalculatorEngine.evaluate(inverse.text),1e-10)
+        val negative=CalculatorEditing.press(CalculatorEdit("−3"),"x²")
+        assertEquals(9.0,CalculatorEngine.evaluate(negative.text),1e-10)
+        val binaryMinus=CalculatorEditing.press(CalculatorEdit("2−3^2"),"1/x")
+        assertEquals(2.0-1.0/9,CalculatorEngine.evaluate(binaryMinus.text),1e-10)
+    }
 }

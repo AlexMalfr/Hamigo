@@ -175,7 +175,7 @@ class CalculatorMotionInstrumentedTest {
             ui.runOnIdle { harness.open = true }
             ui.mainClock.advanceTimeBy(256)
             surface().assertIsDisplayed()
-            tapAboveTheFloatingPanel()
+            tapOutsideTheFloatingPanel()
             ui.mainClock.advanceTimeBy(96)
             ui.runOnIdle { assertFalse("A tap on the backdrop should request dismissal.", harness.open) }
             surface().assertExists()
@@ -187,42 +187,47 @@ class CalculatorMotionInstrumentedTest {
         }
     }
 
-    @Test fun theKeyboardKeepsTheCalculatorAboveItAndTheBackdropHasNoCreamBottomStrip() {
+    @Test fun theNativeEditorRetainsSelectionWithoutOpeningTheSystemKeyboard() {
         assumeTrue(Build.VERSION.SDK_INT>=30)
         mount(initialOpen=true)
         expression().performClick()
-        try {
-            ui.waitUntil(10_000) {
-                WindowInspector.getGlobalWindowViews().any {
-                    val insets = it.rootWindowInsets
-                    insets?.isVisible(WindowInsets.Type.ime()) == true && insets.getInsets(WindowInsets.Type.ime()).bottom > 0
-                }
-            }
-        } catch (failure: Throwable) {
-            captureFullScreen("calculator-keyboard-unavailable")
-            println(WindowInspector.getGlobalWindowViews().joinToString { "${it.javaClass.simpleName}: ${it.rootWindowInsets}" })
-            throw failure
-        }
         ui.waitForIdle()
-        var keyboardHeight=0
         ui.runOnIdle {
-            keyboardHeight=WindowInspector.getGlobalWindowViews().maxOf {
-                it.rootWindowInsets?.getInsets(WindowInsets.Type.ime())?.bottom ?: 0
-            }
+            assertFalse(expression().view().showSoftInputOnFocus)
+            assertTrue(WindowInspector.getGlobalWindowViews().none {it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true})
         }
-        val backdrop=ui.onNodeWithTag("calculator-backdrop",useUnmergedTree=true)
-        val backdropBounds=backdrop.fetchSemanticsNode().boundsInRoot
-        val panelBounds=surface().fetchSemanticsNode().boundsInRoot
-        assertTrue("The IME should leave a useful floating calculator viewport.",keyboardHeight>0)
-        assertTrue("The calculator must remain entirely above the keyboard.",panelBounds.bottom<=backdropBounds.bottom-keyboardHeight+ui.density.density)
-        // Check the drawing just above the keyboard at the outer edge, away from
-        // the cream calculator itself: it must retain the grey dialog backdrop.
-        val image=backdrop.captureToImage().asAndroidBitmap()
-        val y=(image.height-keyboardHeight-3*ui.density.density).toInt().coerceIn(0,image.height-1)
-        val color=android.graphics.Color.valueOf(image.getPixel((3*ui.density.density).toInt(),y))
-        assertTrue("The keyboard boundary should have a dim backdrop, not a beige strip.",color.red()<.8f)
-        captureFullScreen("calculator-keyboard")
-        Espresso.closeSoftKeyboard()
+        expression().performTextReplacement("2+sin(30)").select(6)
+        ui.onNodeWithContentDescription("Curseur à gauche").performClick()
+        assertEquals(2,expression().selection().start)
+        ui.onNodeWithContentDescription("Curseur à droite").performClick()
+        assertEquals(6,expression().selection().start)
+        // The native context menu supports clipboard paste at the current selection.
+        ui.runOnIdle {
+            val editor=expression().view()
+            editor.context.getSystemService(android.content.ClipboardManager::class.java)
+                .setPrimaryClip(android.content.ClipData.newPlainText("test","90"))
+            editor.setSelection(6,8);assertTrue(editor.onTextContextMenuItem(android.R.id.paste))
+        }
+        expression().assertTextEquals("2+sin(90)")
+        expression().performTextReplacement("12345678")
+        ui.onNodeWithTag("calculator-key-⌫").performScrollTo().performTouchInput {swipe(center,center-androidx.compose.ui.geometry.Offset(80*ui.density.density,0f),600)}
+        assertTrue(expression().text(),expression().text().length in 2..7)
+        Thread.sleep(8000) // Let Android's clipboard overlay dismiss before checking the app pixels.
+        ui.onNodeWithText("Utiliser dans ma réponse").assertIsDisplayed()
+        captureFullScreen("calculator-native-editing")
+    }
+
+    @Test fun draggingBackspaceHighlightsTheRangeBeforeItIsErased() {
+        mount(initialOpen=true)
+        expression().performTextReplacement("123456789")
+        val erase=ui.onNodeWithTag("calculator-key-⌫")
+        erase.performTouchInput {down(center);moveBy(androidx.compose.ui.geometry.Offset(-65*ui.density.density,0f))}
+        ui.waitForIdle()
+        assertTrue(expression().selection().start<expression().selection().end)
+        expression().assertTextEquals("123456789")
+        captureFullScreen("calculator-erasure-selection")
+        erase.performTouchInput {up()}
+        assertTrue(expression().text().length<9)
     }
 
     private fun surface() = ui.onNodeWithTag("calculator-surface", useUnmergedTree = true)
@@ -230,19 +235,19 @@ class CalculatorMotionInstrumentedTest {
     @Test fun editingWithCalculatorKeysPreservesTheSelectionAndNestedFunctions() {
         mount(initialOpen = true)
         expression().performTextReplacement("2+30×4")
-        expression().performSemanticsAction(SemanticsActions.SetSelection) { it(2, 4, false) }
+        expression().select(2,4)
         ui.onNodeWithTag("calculator-key-sin").performScrollTo().performClick()
         expression().assertTextContains("2+sin(30)×4")
         ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
         ui.onNodeWithTag("calculator-result").assertTextEquals("4")
-        expression().performSemanticsAction(SemanticsActions.SetSelection) { it(2, 9, false) }
+        expression().select(2,9)
         ui.onNodeWithTag("calculator-key-√").performScrollTo().performClick()
         expression().assertTextContains("2+sqrt(sin(30))×4")
-        val selection = expression().fetchSemanticsNode().config[androidx.compose.ui.semantics.SemanticsProperties.TextSelectionRange]
+        val selection = expression().selection()
         assertEquals(15, selection.start)
         captureFullScreen("calculator-selection-edit")
     }
-    private fun expression() = ui.onNodeWithTag("calculator-expression")
+    private fun expression() = CalculatorEditorDriver(ui)
 
     private fun awaitOpeningSurface() {
         // LaunchedEffect retains the dialog, then its new window joins the next composition.
@@ -254,19 +259,15 @@ class CalculatorMotionInstrumentedTest {
         surface().assertExists()
     }
 
-    private fun tapAboveTheFloatingPanel() {
+    private fun tapOutsideTheFloatingPanel() {
         val visible = android.graphics.Rect()
-        var statusBarTop = 0
         ui.runOnIdle {
             val decor = ui.activity.window.decorView
             decor.getWindowVisibleDisplayFrame(visible)
-            val insets = decor.rootWindowInsets
-            @Suppress("DEPRECATION")
-            statusBarTop = if (Build.VERSION.SDK_INT >= 30) insets?.getInsets(WindowInsets.Type.statusBars())?.top ?: 0
-                else insets?.stableInsetTop ?: 0
         }
-        val x = visible.centerX().toFloat()
-        val y = maxOf(visible.top, statusBarTop) + 8f * ui.density.density
+        // A compact panel can cover the area just under the status bar; its side gutter stays free.
+        val x = visible.left + 4f * ui.density.density
+        val y = visible.centerY().toFloat()
         val automation = InstrumentationRegistry.getInstrumentation().uiAutomation
         val downTime = SystemClock.uptimeMillis()
         listOf(MotionEvent.ACTION_DOWN, MotionEvent.ACTION_UP).forEach { action ->

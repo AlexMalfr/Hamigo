@@ -454,6 +454,7 @@ fun SettingsScreen(model: AppModel) {
     var hour by remember { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
     var minute by remember { mutableStateOf(p.prefs.getInt("reminderMinute", 0).toString().padStart(2, '0')) }
     var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
+    val pickerWindowContext=androidx.compose.ui.platform.LocalView.current.context
     var permissionForTest by remember { mutableStateOf(false) }
     var backupExpanded by remember { mutableStateOf(false) }
     var versionTaps by remember { mutableIntStateOf(0) }
@@ -516,18 +517,19 @@ fun SettingsScreen(model: AppModel) {
                         Text("Un message de Pico chaque jour, à l’heure locale.", fontSize = 12.sp, color = Muted)
                     }
                     Switch(reminderEnabled, { on ->
-                        if (on && Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        if (!model.diagnosticModel && on && Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                             permissionForTest = false; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else configure(on)
                     })
                 }
                 FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(feedbackClick {TimePickerDialog(context,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.widthIn(min=(128*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
+                    OutlinedButton(feedbackClick {TimePickerDialog(pickerWindowContext,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.widthIn(min=(128*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
                         Icon(Icons.Rounded.Schedule,null,Modifier.size(22.dp));Spacer(Modifier.width(8.dp))
                         Text("${hour.padStart(2,'0')}:${minute.padStart(2,'0')}",fontSize=20.sp,fontWeight=FontWeight.Bold,maxLines=1,softWrap=false)
                     }
                     OutlinedButton(feedbackClick {
-                        if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                        if(model.diagnosticModel)model.message="Aperçu : aucune notification n’est envoyée."
+                        else if (Build.VERSION.SDK_INT >= 33 && context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                             permissionForTest = true; permission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         } else DailyReminder.showTest(context)
                     }, Modifier.widthIn(min=(120*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min = 48.dp).testTag("test-reminder")) { Text("Tester le rappel", fontSize = 12.sp,maxLines=1,softWrap=false) }
@@ -658,42 +660,17 @@ fun SettingsScreen(model: AppModel) {
     }
 }
 
-@Composable private fun GameplaySettings(model: AppModel, progress: Progress) {
-    val settings = remember(model.revision) { GameplayPreferences.read(progress.prefs) }
-    var threshold by remember(settings.thresholdMs) { mutableFloatStateOf(settings.thresholdMs.toFloat()) }
-    fun save(value: MorseInputSettings) {
-        GameplayPreferences.save(progress.prefs, value)
-        model.refresh(); model.refreshSocial()
-    }
+@Composable private fun GameplaySettings(model:AppModel,progress:Progress) {
+    val settings=remember(model.revision){GameplayPreferences.read(progress.prefs)}
+    fun save(value:MorseInputSettings){GameplayPreferences.save(progress.prefs,value);model.refresh();model.refreshSocial()}
     Panel(Modifier.testTag("morse-gameplay")) {
-        Text("Saisie du Morse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text("Dans les questions et le traducteur.", fontSize = 12.sp, color = Muted)
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Écoute pendant la saisie", fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 19.sp)
-                Text("Quand les sons sont activés.", fontSize = 12.sp, lineHeight = 16.sp, color = Muted)
-            }
-            Switch(settings.liveSound, { save(settings.copy(liveSound = it)) },
-                Modifier.testTag("morse-live-sound").semantics { contentDescription = "Écoute pendant la saisie" })
+        Text("Saisie du Morse",fontSize=18.sp,fontWeight=FontWeight.Bold)
+        MorseSettingsControls(settings,::save)
+        Row(verticalAlignment=Alignment.CenterVertically) {
+            MorseOptionLabel("Écoute pendant la saisie",Icons.Rounded.VolumeUp,Modifier.weight(1f))
+            Switch(settings.liveSound,{save(settings.copy(liveSound=it))},Modifier.testTag("morse-live-sound"))
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!settings.singleKey, feedbackClick { save(settings.copy(singleKey = false)) },
-                label = { Text("Deux boutons") }, modifier = Modifier.weight(1f))
-            FilterChip(settings.singleKey, feedbackClick { save(settings.copy(singleKey = true)) },
-                label = { Text("Un bouton") }, modifier = Modifier.weight(1f))
-        }
-        if (settings.singleKey) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Durée minimale d’un trait", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text("${threshold.toInt()} ms", fontWeight = FontWeight.Bold, color = Teal, fontSize = 13.sp)
-            }
-            Slider(threshold, { threshold = it }, valueRange = 150f..600f, steps = 8,
-                onValueChangeFinished = { save(settings.copy(thresholdMs = (kotlin.math.round(threshold / 50f) * 50).toInt())) },
-                modifier = Modifier.testTag("morse-timing"))
-            Text("Plus court : un point. L’essai reconnaît aussi les pauses entre lettres et mots.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
-        }
-        Surface(color = Mist, shape = RoundedCornerShape(14.dp)) {
-            MorseSettingsPreview(settings)
-        }
+        Text("Essaie ici",fontWeight=FontWeight.Bold,fontSize=13.sp)
+        Surface(color=Mist,shape=RoundedCornerShape(14.dp)){MorseSettingsPreview(settings)}
     }
 }

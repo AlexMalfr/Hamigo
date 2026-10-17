@@ -213,11 +213,40 @@ class QuestionDesignInstrumentedTest {
         val q=Question("split-cloze","Une résistance se mesure en ___ .",listOf("ohms","volts","watts"),0,"La résistance utilise l’ohm.",kind="cloze")
         ui.runOnIdle {model.startQuestions("Compléter",listOf(q))}
         val source=ui.onNodeWithText("ohms");val bounds=source.fetchSemanticsNode().boundsInRoot
-        val target=ui.onNodeWithContentDescription("Emplacement pour le mot à compléter").fetchSemanticsNode().boundsInRoot.center
+        val emptySlot=ui.onNodeWithContentDescription("Emplacement pour le mot à compléter").fetchSemanticsNode().boundsInRoot
+        val target=emptySlot.center
         source.performTouchInput {swipe(center,target-bounds.topLeft,800)}
+        assertTrue(ui.onNodeWithContentDescription("Mot choisi : ohms. Toucher pour enlever.").fetchSemanticsNode().boundsInRoot.width<emptySlot.width)
         ui.onNodeWithText("Vérifier").assertIsEnabled().performClick()
         ui.runOnIdle {assertTrue(model.session!!.feedback!!)}
         capture("final-cloze-drag")
+    }
+    @Test fun longClozeAnswersWrapWithoutEllipsesOrClipping() {
+        listOf("électromagnétique","une caractéristique électromagnétique particulièrement développée").forEachIndexed {index,word->
+            val q=Question("cloze-wide-$index","Ce phénomène est ___ dans cet exemple.",listOf(word,"autre"),0,"Une démonstration.",kind="cloze")
+            ui.runOnIdle {model.startQuestions("Mot long",listOf(q))}
+            ui.onNodeWithText(word).performScrollTo().performClick()
+            val layouts=mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+            ui.onNode(hasText(word) and hasAnyAncestor(hasContentDescription("Mot choisi : $word. Toucher pour enlever.")),useUnmergedTree=true)
+                .performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult){it(layouts)}
+            capture("refinement52-cloze-long-$index")
+            if(index==1) {
+                val slot=ui.onNodeWithContentDescription("Mot choisi : $word. Toucher pour enlever.").fetchSemanticsNode().boundsInRoot
+                val before=ui.onNodeWithText("Ce phénomène est",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+                val after=ui.onNodeWithText("dans cet exemple.",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+                assertTrue("Answer overlaps its sentence: $before / $slot / $after",before.bottom<=slot.top+1f&&after.top>=slot.bottom-1f)
+            }
+            assertTrue(layouts.isNotEmpty())
+            // Compose can reuse a wider paragraph after narrowing the measured box. Check the
+            // actual glyph extents, rather than hasVisualOverflow's cached paragraph width.
+            layouts.forEach {layout->
+                assertTrue(layout.layoutInput.text.text==word)
+                repeat(layout.lineCount) {line->
+                    assertTrue("Clipped line $line in ${layout.size}",layout.getLineLeft(line)>=-1f&&layout.getLineRight(line)<=layout.size.width+1f&&layout.getLineBottom(line)<=layout.size.height+1f)
+                    assertTrue(!layout.isLineEllipsized(line))
+                }
+            }
+        }
     }
     @Test fun mascotReadsTheQuestionAndStopsWhenQuestionChanges() {
         val first=Question("spoken","Une résistance de dix ohms est parcourue par un courant de deux ampères. Quelle tension est présente à ses bornes ?",emptyList(),0,"Vingt volts.",kind="number",value=20.0,unit="V")

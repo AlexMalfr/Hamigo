@@ -171,7 +171,7 @@ class VisualAuditTest {
         capture("requests-all-accepted")
     }
 
-    @Test fun onboardingHasFourFullscreenStepsAndKeepsChoicesWhenGoingBack() {
+    @Test fun onboardingHasFiveFullscreenStepsAndKeepsChoicesWhenGoingBack() {
         beginOnboarding()
         ui.onNodeWithTag("navigation-label-path").assertDoesNotExist()
         ui.onNodeWithTag("onboarding-continue").assertIsNotEnabled()
@@ -192,14 +192,30 @@ class VisualAuditTest {
         ui.onNodeWithTag("onboarding-continue").performClick()
         capture("53-onboarding-reminder")
         ui.onNodeWithTag("onboarding-skip").performClick()
-        capture("54-onboarding-github")
+        capture("refinement52-onboarding-morse-top")
+        ui.onNodeWithText("Au manipulateur").performScrollTo()
+        capture("refinement52-onboarding-morse-profiles")
+        ui.onNodeWithText("En rythme").performScrollTo().performClick()
+        capture("54-onboarding-morse")
+        ui.onNodeWithText("Réglages avancés").performScrollTo().performClick()
+        ui.onNodeWithText("Pas à pas").assertDoesNotExist()
+        ui.onNodeWithTag("morse-auto-spaces").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("morse-auto-spaces").performClick()
+        ui.onNodeWithTag("morse-timing").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Point").performScrollTo().performClick()
+        ui.onNodeWithTag("morse-preview-text").assertTextEquals("E")
+        ui.onNodeWithTag("morse-auto-spaces").performScrollTo().performClick()
+        capture("54-onboarding-morse-advanced")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        capture("55-onboarding-github")
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         capture("57-onboarding-finished")
         ui.onNodeWithTag("navigation-icon-path",useUnmergedTree=true).assertExists()
         ui.onNodeWithText("Salut F4Alex !").assertIsDisplayed()
         ui.runOnIdle {
-            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==120)
+            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==60)
+            check(GameplayPreferences.read(model.progress.prefs).autoSpaces)
             check(model.progress.xp==760);check(model.progress.prefs.getBoolean("welcomed",false))
             check(!model.progress.prefs.getBoolean("reminderEnabled",false));check(!model.progress.prefs.contains("onboardingStep"))
             check(model.authSession==null && model.oauthSession==null)
@@ -243,6 +259,7 @@ class VisualAuditTest {
         capture("56-onboarding-permission-denied")
         ui.runOnIdle {check(!model.progress.prefs.getBoolean("reminderEnabled",false))}
         ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {check(model.progress.prefs.getBoolean("welcomed",false));check(model.progress.xp==760)}
@@ -257,7 +274,7 @@ class VisualAuditTest {
         ui.runOnIdle {model.showWelcome=false}
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {model.showWelcome=true}
-        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/4 · Rappel")
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/5 · Rappel")
         ui.onNodeWithContentDescription("Étape précédente").performClick()
         ui.onNodeWithTag("onboarding-goal-100").assertIsSelected()
         ui.onNodeWithContentDescription("Étape précédente").performClick()
@@ -462,7 +479,7 @@ class VisualAuditTest {
         for ((route, label) in listOf("path" to "01-parcours", "practice" to "02-defis", "resources" to "03-memo", "friends" to "04-equipe", "profile" to "05-moi", "settings" to "06-reglages")) {
             navigate(route)
             capture("$label-top")
-            if(route=="practice")ui.onNodeWithText("Choisir les thèmes",substring=true).performScrollTo().performClick()
+            if(route=="practice")clickInList("Choisir les thèmes","practice-list",substring=true)
             val lastText = when (route) {
                 "path" -> "Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous."
                 "practice" -> "Ouvrir le labo · 12 questions"
@@ -493,6 +510,7 @@ class VisualAuditTest {
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         val first = model.content!!.lessons.first()
         ui.runOnIdle { model.startLesson(first) }
@@ -505,7 +523,7 @@ class VisualAuditTest {
         }
 
         navigate("friends")
-        ui.onNodeWithText("Ajouter").performScrollTo().performClick()
+        clickInList("Ajouter","friends-list")
         capture("10-ajout-par-lien")
         ui.onNodeWithText("Annuler").performClick()
         ui.runOnIdle { model.pendingInvite = "abcde0123456789" }
@@ -907,6 +925,13 @@ class VisualAuditTest {
         }
         container.performScrollToNode(hasText(text, substring = substring))
         ui.waitForIdle()
+    }
+    private fun clickInList(text:String,listTag:String,substring:Boolean=false) {
+        val target=ui.onNodeWithText(text,substring=substring).performScrollTo()
+        val list=ui.onNodeWithTag(listTag)
+        val delta=target.fetchSemanticsNode().boundsInRoot.center.y-list.fetchSemanticsNode().boundsInRoot.center.y
+        list.performSemanticsAction(SemanticsActions.ScrollBy){it(0f,delta)}
+        target.performClick()
     }
 
     private fun capture(name: String) {

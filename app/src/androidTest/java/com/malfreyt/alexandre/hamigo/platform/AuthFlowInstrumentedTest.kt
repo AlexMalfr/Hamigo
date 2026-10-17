@@ -227,6 +227,8 @@ class AuthFlowInstrumentedTest {
             assertTrue(backup.getJSONObject("friends").has(friendId))
             val summary = JSONObject(socialGist.getJSONObject("files").getJSONObject(GitHubSync.FILE_NAME).getString("content"))
             assertEquals(9, summary.getInt("xp"))
+            assertEquals(com.malfreyt.alexandre.hamigo.BuildConfig.VERSION_NAME,summary.getString("appVersion"))
+            assertEquals(com.malfreyt.alexandre.hamigo.BuildConfig.VERSION_CODE,summary.getInt("appVersionCode"))
             for (privateField in listOf("progress", "reviews", "preferences", "syncEvents", "friends", "token")) assertFalse(summary.has(privateField))
 
             // Simulate an independent installation with its own offline work before its first sign-in.

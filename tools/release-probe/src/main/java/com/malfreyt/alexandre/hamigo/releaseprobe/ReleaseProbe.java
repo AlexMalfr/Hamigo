@@ -76,14 +76,14 @@ public final class ReleaseProbe extends Instrumentation {
         click("Équipe",false);reveal("Camille Démo",false);click("Camille Démo",false);
         waitText("60 / 120 XP",10000);capture("release-friend-goal-calendar");
         reveal("Voir le mois précédent",true);click("Voir le mois précédent",true);SystemClock.sleep(400);capture("release-friend-previous-month");
-        reveal("Les 7 derniers jours",false);reveal("Voir la semaine précédente",true);click("Voir la semaine précédente",true);SystemClock.sleep(400);reveal("Historique hebdomadaire",false);capture("release-friend-previous-week");
+        reveal("Cette semaine",false);reveal("Voir la semaine précédente",true);click("Voir la semaine précédente",true);SystemClock.sleep(400);reveal("Historique hebdomadaire",false);capture("release-friend-previous-week");
         reveal("Aujourd’hui · heure par heure",false);capture("release-friend-hours");
         reveal("Retirer cet équipier",false);capture("release-friend-actions");click("Retirer cet équipier",false);waitText("Retirer Camille Démo ?",10000);click("Annuler",false);
-        reveal("Infos techniques",false);
         reveal("Hamigo 0.49+12345678",false);reveal("Code de version : 49",false);waitText("Code de version : 49",10000);capture("release-friend-app-version");back();
         click("Moi",false);reveal("24 / 60 XP",false);capture("release-daily-goal");
         click("Modifier l’objectif quotidien",true);waitText("Objectif quotidien",10000);SystemClock.sleep(1000);capture("release-goal-settings-focused");back();
         reveal("Retrouver mes révisions",false);click("Retrouver mes révisions",false);waitText("Lancer les révisions",10000);SystemClock.sleep(1000);capture("release-reviews-focus");
+        calculator();
         check(java.util.Objects.equals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null)),"Social browsing preserves progression");
         context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putString("friends","[]").commit();
         runOnMainSync(()->activity.startActivity(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("hamigo_route","friends")));
@@ -102,6 +102,21 @@ public final class ReleaseProbe extends Instrumentation {
             check(context.getSharedPreferences("hamigo_widgets",Context.MODE_PRIVATE).getBoolean("socialToday_"+id,false),"Widget day selection persists");
         } finally {if(id>=0)host.deleteAppWidgetId(id);host.deleteHost();getUiAutomation().dropShellPermissionIdentity();}
         runOnMainSync(activity::finish);
+    }
+    private void calculator() throws Exception {
+        click("Mémo",false);click("Ouvrir la calculatrice",true);waitText("Calculatrice",10000);
+        setText("2+sin(30)");
+        Bundle selection=new Bundle();selection.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT,6);selection.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT,6);
+        check(editable(getUiAutomation().getRootInActiveWindow()).performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION,selection),"Native selection works in R8");
+        click("Curseur à gauche",true);
+        check(editable(getUiAutomation().getRootInActiveWindow()).getTextSelectionStart()==2,"Cursor skips a whole function");
+        click("Curseur à droite",true);
+        check(editable(getUiAutomation().getRootInActiveWindow()).getTextSelectionStart()==6,"Cursor passes the function in the other direction");
+        click("C",false);click("sin",false);click("Effacer",true);
+        CharSequence empty=editable(getUiAutomation().getRootInActiveWindow()).getText();
+        check(empty==null||empty.length()==0,"Deleting an empty function also deletes its closing parenthesis");
+        setText("20");click("=",false);waitText("20",10000);capture("release-calculator-native");
+        click("Fermer la calculatrice",true);
     }
     private AccessibilityNodeInfo firstToggle(AccessibilityNodeInfo node) {
         if(node==null)return null;
@@ -158,7 +173,7 @@ public final class ReleaseProbe extends Instrumentation {
         click("proc-band-147.0",false);click("Tester cette question",false);
         reveal("+ 0,05",false);
         AudioManager audio=(AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-        SystemClock.sleep(1500);check(!audio.isMusicActive(),"No spontaneous receiver audio");
+        waitAudio(audio,true);check(audio.isMusicActive(),"Receiver audio starts when the question opens");
         click("+ 0,05",false);waitAudio(audio,true);capture("release-diagnostic-frequency");
         SystemClock.sleep(3000);check(audio.isMusicActive(),"Receiver keeps playing without another gesture");
         click("Écouter la question",true);SystemClock.sleep(300);
@@ -247,11 +262,26 @@ public final class ReleaseProbe extends Instrumentation {
     private void click(String label,boolean description) {
         long until=SystemClock.uptimeMillis()+20000;
         while(SystemClock.uptimeMillis()<until) {
-            AccessibilityNodeInfo node=find(label,description);
-            while(node!=null){if(node.isClickable()&&node.isEnabled()&&node.performAction(AccessibilityNodeInfo.ACTION_CLICK)){SystemClock.sleep(250);return;}node=node.getParent();}
+            AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();
+            AccessibilityNodeInfo node=clickableLabel(root,label,description,true);
+            if(node==null)node=clickableLabel(root,label,description,false);
+            if(node!=null&&node.performAction(AccessibilityNodeInfo.ACTION_CLICK)){SystemClock.sleep(250);return;}
             SystemClock.sleep(100);
         }
         throw new AssertionError("Cannot click: "+label);
+    }
+    private AccessibilityNodeInfo clickableLabel(AccessibilityNodeInfo node,String label,boolean description,boolean exact) {
+        if(node==null||!node.refresh())return null;
+        for(int i=0;i<node.getChildCount();i++) {
+            AccessibilityNodeInfo match=clickableLabel(node.getChild(i),label,description,exact);
+            if(match!=null)return match;
+        }
+        CharSequence text=description?node.getContentDescription():node.getText();
+        Rect bounds=new Rect();node.getBoundsInScreen(bounds);
+        if(node.isEditable()||!node.isVisibleToUser()||bounds.isEmpty()||!bounds.intersects(0,0,context.getResources().getDisplayMetrics().widthPixels,context.getResources().getDisplayMetrics().heightPixels)||text==null)return null;
+        if(!(exact?text.toString().equals(label):text.toString().contains(label)))return null;
+        for(AccessibilityNodeInfo parent=node;parent!=null;parent=parent.getParent())if(parent.isClickable()&&parent.isEnabled())return parent;
+        return null;
     }
     private boolean scroll(AccessibilityNodeInfo node) {
         if(node==null)return false;

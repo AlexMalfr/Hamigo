@@ -227,7 +227,10 @@ class ReminderFeedbackInstrumentedTest {
         }
         ui.onNodeWithTag("profile-list").performScrollToNode(hasTestTag("activity-calendar"))
         capture("profile-goals-calendar")
-        ui.onNodeWithTag("profile-list").performScrollToNode(hasTestTag("weekly-goal-line"))
+        ui.onNodeWithTag("profile-list").performScrollToNode(hasText("Cette semaine"))
+        val title=ui.onNodeWithText("Cette semaine").fetchSemanticsNode().boundsInRoot
+        val header=ui.onNodeWithTag("profile-header").fetchSemanticsNode().boundsInRoot
+        ui.onNodeWithTag("profile-list").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.ScrollBy) {it(0f,(title.top-header.bottom-8).coerceAtLeast(0f))}
         ui.onNodeWithTag("weekly-goal-line",useUnmergedTree=true).assertExists()
         capture("profile-goals-week")
         ui.runOnIdle {

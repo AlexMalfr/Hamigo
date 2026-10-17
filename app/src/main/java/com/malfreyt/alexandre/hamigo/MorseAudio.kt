@@ -9,12 +9,12 @@ import kotlin.random.Random
 
 internal data class MorsePcm(val samples:ShortArray,val rate:Int,val signalRanges:List<IntRange>)
 internal object MorseSignalAudio {
-    const val LEAD_MS=180
+    const val LEAD_MS=800
     const val DOT_MS=90
     fun render(code:String):MorsePcm {
         val words=normalizeMorse(code).take(240).split('/').map {it.trim().split(Regex("\\s+")).filter(String::isNotBlank)}.filter(List<String>::isNotEmpty)
         val rate=16000;val dot=rate*DOT_MS/1000
-        val lead=rate*LEAD_MS/1000;val tail=rate*90/1000
+        val lead=rate*LEAD_MS/1000;val tail=rate*LEAD_MS/1000
         val ranges=mutableListOf<IntRange>();var cursor=lead
         words.forEachIndexed {wi,letters->letters.forEachIndexed {li,symbols->symbols.forEachIndexed {si,c->
             if(c=='.'||c=='-') {

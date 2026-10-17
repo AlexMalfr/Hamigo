@@ -84,7 +84,7 @@ class MemoUpgradeInstrumentedTest {
             ui.onNodeWithContentDescription("Retour aux mémos").performClick()
         }
         ui.onNodeWithContentDescription("Ouvrir la calculatrice").performClick()
-        ui.onNodeWithText("Calculatrice").assertIsDisplayed()
+        ui.onNodeWithTag("calculator-surface",useUnmergedTree=true).assertIsDisplayed()
         capture("00-memo-calculator")
         ui.onNodeWithContentDescription("Fermer la calculatrice").performClick()
     }

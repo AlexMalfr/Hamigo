@@ -50,6 +50,68 @@ class DiagnosticsInstrumentedTest {
     private lateinit var model:AppModel
     @Before fun load(){model=ViewModelProvider(ui.activity)[AppModel::class.java];ui.waitUntil(60_000){model.content!=null&&!model.socialRefreshing};ui.runOnIdle {model.showWelcome=false}}
     private fun q()=Question("debug-fixture","Quelle commande ouvre le contact ?",listOf("Le manipulateur","Le fusible"),0,"Le manipulateur commande le signal.")
+    @Test fun onboardingCanBeSimulatedWithoutChangingTheRealProfileOrOpeningGitHub() {
+        val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        ui.onNodeWithText("Onboarding").performClick()
+        ui.onNodeWithTag("onboarding-name").performTextReplacement("Test sans sauvegarde")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithText("Au manipulateur").performScrollTo().performClick()
+        capture("revision52-onboarding-morse")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithText("Diagnostics").assertIsDisplayed()
+        assertEquals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap())
+    }
+    @Test fun previewsNavigateAndChangeOnlyTheirOwnGameplayPreferences() {
+        val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        ui.onNodeWithText("Moi · objectif atteint").performClick()
+        ui.onNodeWithTag("profile-level-stats").assertIsDisplayed()
+        capture("interactive52-profile-large-stats")
+        ui.onNodeWithContentDescription("Réglages").performClick()
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasText("Un bouton"))
+        ui.onNodeWithText("Un bouton").performClick().assertIsSelected()
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        ui.onNodeWithTag("profile-level-stats").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Réglages").performClick()
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasText("Un bouton"))
+        ui.onNodeWithText("Un bouton").assertIsSelected()
+        capture("interactive52-settings-local")
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText("Équipe · deux amis"))
+        ui.onNodeWithText("Équipe · deux amis").performClick()
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasContentDescription("Options de Sam · Démo"))
+        ui.onNodeWithContentDescription("Options de Sam · Démo").performClick()
+        ui.onNodeWithText("Retirer cet équipier").performClick()
+        ui.onNodeWithText("Retirer").performClick()
+        ui.onNodeWithTag("friend-card-https://gist.github.com/00000000000000000000000000000002").assertDoesNotExist()
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasContentDescription("Options de Léa · Démo"))
+        ui.onNodeWithContentDescription("Options de Léa · Démo").assertIsDisplayed()
+        capture("interactive52-team-after-removal")
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        assertEquals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap())
+    }
+    @Test fun boundaryPreviewsScrollWithoutChangingTheRealProfile() {
+        val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        DiagnosticStressPreviews.presets.forEachIndexed {index,label->
+            ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText(label))
+            ui.onNodeWithText(label).performClick()
+            capture("refinement52-stress-$index-top")
+            val preview=ui.onNodeWithTag("diagnostic-interactive-preview")
+            repeat(3){preview.performTouchInput {swipeUp()}}
+            capture("refinement52-stress-$index-scrolled")
+            ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        }
+        assertEquals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap())
+    }
     @Test fun catalogFindsChoiceTextAndTestsTheOpaqueIdWithoutTouchingRealProgress() {
         val before=raw()
         val target=model.content!!.courseQuestions.first {"Vendre des communications" in it.choices}
@@ -110,7 +172,6 @@ class DiagnosticsInstrumentedTest {
     @Test fun diagnosticFrequencyGesturesPlayOnlyTheVisibleSessionAndRespectItsMute() {
         val before=raw();val question=model.content!!.allQuestions.getValue("proc-band-147.0")
         ui.runOnIdle {model.diagnostics.freeze(true);model.startQuestions("Séance derrière le diagnostic",listOf(question))}
-        ui.onNodeWithTag("question-slider").performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(147f)}
         ui.waitUntil(5000){FeedbackAudioGate.busy}
         ui.runOnIdle {model.debugToolsOpen=true}
         ui.waitUntil(5000){!FeedbackAudioGate.busy}
@@ -119,7 +180,6 @@ class DiagnosticsInstrumentedTest {
         ui.waitUntil(10000){ui.onAllNodesWithTag("diagnostic-question-${question.id}").fetchSemanticsNodes().isNotEmpty()}
         ui.onNodeWithTag("diagnostic-question-${question.id}").performClick()
         text("Tester cette question").performClick()
-        inside(hasTestTag("question-slider")).performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.SetProgress) {it(147f)}
         ui.waitUntil(5000){FeedbackAudioGate.busy}
         capture("frequency-diagnostic-playing")
         Thread.sleep(2600);assertTrue(FeedbackAudioGate.busy)
@@ -127,7 +187,8 @@ class DiagnosticsInstrumentedTest {
         ui.waitUntil(5000){FeedbackAudioGate.busy}
         inside(hasContentDescription("Couper les sons")).performClick()
         ui.waitUntil(5000){!FeedbackAudioGate.busy}
-        inside(hasText("− 0,05")).performClick()
+        ui.waitUntil(5000){ui.onAllNodes(hasText("− 0,05") and hasAnyAncestor(hasTestTag("diagnostics-screen"))).fetchSemanticsNodes().isNotEmpty()}
+        inside(hasText("− 0,05")).performScrollTo().performClick()
         ui.waitForIdle();assertFalse(FeedbackAudioGate.busy)
         assertTrue(FeedbackPreferences.read(model.progress.prefs).sound)
         inside(hasContentDescription("Activer les sons")).performClick()
@@ -272,7 +333,10 @@ class DiagnosticsInstrumentedTest {
     private fun text(value:String)=inside(hasText(value))
     private fun raw()=model.progress.prefs.getString("progress",null)
     private fun capture(name:String) {
-        ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}};assertTrue(latch.await(5,TimeUnit.SECONDS))}
+        ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {
+            val v=if(Build.VERSION.SDK_INT>=29)android.view.inspector.WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()} ?: ui.activity.window.decorView else ui.activity.window.decorView
+            v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()
+        };assertTrue(latch.await(5,TimeUnit.SECONDS))}
         val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),when {name.startsWith("catalog48-")->"ui-0.48";name.startsWith("content47-")->"ui-0.47";name.startsWith("morse-live-")->"ui-0.46";else->"ui-0.45"}).apply {mkdirs()}
         try {File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
     }
@@ -281,7 +345,7 @@ class DiagnosticsInstrumentedTest {
         ui.runOnIdle {model.startQuestions("Question réelle",listOf(q()))}
         val before=raw();val original=model.session
         ui.onNodeWithContentDescription("Ouvrir la calculatrice").performClick()
-        ui.onNodeWithTag("calculator-expression").performTextInput(DiagnosticAccess.CODE)
+        CalculatorEditorDriver(ui).performTextInput(DiagnosticAccess.CODE)
         ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
         ui.onNodeWithTag("diagnostics-screen").assertIsDisplayed();capture("menu")
         ui.onNodeWithTag("diagnostic-enabled").performClick().assertIsOn()
@@ -447,9 +511,9 @@ class DiagnosticsInstrumentedTest {
             ui.runOnIdle {model.debugToolsOpen=true}
             ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
             text("Équipe · deux amis").performClick()
-            ui.onNodeWithContentDescription("Aperçu de démonstration, défilement uniquement").assertIsDisplayed()
+            ui.onNodeWithTag("diagnostic-interactive-preview").assertIsDisplayed()
             capture("mock-team-top")
-            ui.onNodeWithContentDescription("Aperçu de démonstration, défilement uniquement").performTouchInput {swipeUp()}
+            ui.onNodeWithTag("diagnostic-interactive-preview").performTouchInput {swipeUp()}
             capture("mock-team-friends")
             ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
             ui.onNodeWithContentDescription("Retour des diagnostics").performClick()

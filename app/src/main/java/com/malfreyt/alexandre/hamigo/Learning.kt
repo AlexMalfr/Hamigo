@@ -115,15 +115,21 @@ class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=E
 fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
 fun JSONArray.strings() = (0 until length()).map { getString(it) }
 
-class Progress(private val context: Context, private val sideEffects:Boolean=true) {
+class Progress(private val context: Context, private val sideEffects:Boolean=true,private val clock:java.time.Clock?=null) {
+    private val activityClock get()=clock ?: java.time.Clock.systemDefaultZone()
     companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = loadState()
-    // Finish the identity conversion before another reader can load the old keys.
+    // Persist the temporary streak bridge before another reader can load the old state.
     @android.annotation.SuppressLint("ApplySharedPref")
     private fun loadState():JSONObject = synchronized(CLOUD_LOCK) {
         val state=runCatching {JSONObject(prefs.getString("progress","{}")!!)}.getOrElse {JSONObject()}
-        if(CourseQuestionMigration47.apply(state))check(prefs.edit().putString("progress",state.toString()).commit())
+        if(state.has("questionIdsVersion"))require(state.getInt("questionIdsVersion")==1)
+        val streakChanged=StreakMigration52.apply(state,activityClock.instant(),activityClock.zone)
+        val dayChanged=StudyDayMigration52.apply(state)
+        val changed=streakChanged||dayChanged||!state.has("questionIdsVersion")
+        state.put("questionIdsVersion",1)
+        if(changed)check(prefs.edit().putString("progress",state.toString()).commit())
         state
     }
     var name: String
@@ -140,9 +146,9 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     }
     val activeDays: Set<String> get() = (root.optJSONObject("dailyXp") ?: JSONObject()).keys().asSequence().toSet()
     val xp get() = root.optInt("xp")
-    val streak get() = LearningRules.streak(activeDays, LocalDate.now())
-    val todayXp get() = dayXp(LocalDate.now())
-    val weeklyXp get() = (0L..6L).sumOf { dayXp(LocalDate.now().minusDays(it)) }
+    val streak get() = StreakHistory.count(root,StudyDay.date(activityClock.instant(),activityClock.zone))
+    val todayXp get() = dayXp(StudyDay.date(activityClock.instant(),activityClock.zone))
+    val weeklyXp get() = CalendarWeek.days(StudyDay.date(activityClock.instant(),activityClock.zone)).sumOf {dayXp(it).toLong()}.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     val totalAnswers get() = root.optInt("answers")
     val totalCorrect get() = root.optInt("correct")
     val dailyGoal get() = DailyGoals.xp(prefs.getInt("dailyGoal",30))
@@ -154,7 +160,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     fun answer(id: String, correct: Boolean, quality: Int = if (correct) 4 else 1): Int = synchronized(CLOUD_LOCK) {
         reload()
         CloudProgress.ensureLedger(root)
-        val now = System.currentTimeMillis()
+        val now = activityClock.millis()
         val previous = reviews[id] ?: Review()
         // Early successful rereading isn't a spaced recall. Failed items may be corrected immediately.
         val review = if(correct && previous.repetitions>0 && previous.due>now) previous else SpacedRepetition.next(previous, quality, now)
@@ -163,30 +169,32 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
             .put("repetitions", review.repetitions).put("lapses", review.lapses).put("updatedAt",now))
         // Revisiting a card early is allowed, but can't farm XP on the same item in the same day.
         val awarded = root.optJSONObject("awarded") ?: JSONObject().also { root.put("awarded", it) }
-        val day = LocalDate.now().toString()
+        val day = StudyDay.date(java.time.Instant.ofEpochMilli(now),activityClock.zone).toString()
         val gain = if (awarded.optString(id) == day) 0 else if (correct) 3 else 1
         awarded.put(id, day)
         root.put("answers", totalAnswers + 1).put("correct", totalCorrect + if (correct) 1 else 0)
-        addXp(gain)
-        CloudProgress.recordEvent(root,day,gain,answers=1,correct=if(correct)1 else 0,awardKey=if(gain>0)"answer:$id:$day" else null)
+        addXp(gain,day)
+        CloudProgress.recordEvent(root,day,gain,answers=1,correct=if(correct)1 else 0,awardKey=if(gain>0)"answer3:$id:$day" else null,at=now)
         save(); gain
     }
     fun complete(id: String): Int = synchronized(CLOUD_LOCK) {
         reload()
         CloudProgress.ensureLedger(root)
         if (id !in completed) {
-            root.put("completed", JSONArray((completed + id).toList())); addXp(6)
-            CloudProgress.recordEvent(root,LocalDate.now().toString(),6,completed=id)
+            val now=activityClock.millis()
+            val day=StudyDay.date(java.time.Instant.ofEpochMilli(now),activityClock.zone).toString()
+            root.put("completed", JSONArray((completed + id).toList())); addXp(6,day)
+            CloudProgress.recordEvent(root,day,6,completed=id,at=now)
             save(); 6
         } else {
             0
         }
     }
-    private fun addXp(gain: Int) {
+    private fun addXp(gain: Int,day:String) {
         root.put("xp", xp + gain)
         if (gain > 0) {
             val days = root.optJSONObject("dailyXp") ?: JSONObject().also { root.put("dailyXp", it) }
-            val day = LocalDate.now().toString(); days.put(day, days.optInt(day) + gain)
+            days.put(day, days.optInt(day) + gain)
         }
     }
     private fun save(editor: android.content.SharedPreferences.Editor = prefs.edit()) {
@@ -327,12 +335,12 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     }
     private fun reminderSettings() = Triple(prefs.getBoolean("reminderEnabled",false),prefs.getInt("reminderHour",20),prefs.getInt("reminderMinute",0))
     fun snapshot() = synchronized(CLOUD_LOCK) {
-        val today=LocalDate.now();val hours=com.malfreyt.alexandre.hamigo.platform.SocialActivity.hours(root,today)
+        val today=StudyDay.date(activityClock.instant(),activityClock.zone);val hours=com.malfreyt.alexandre.hamigo.platform.SocialActivity.hours(root,today,activityClock.zone)
         com.malfreyt.alexandre.hamigo.platform.ShareProgress(name,xp,streak,completed.size,weeklyXp,
             dailyXp=(0L..13L).reversed().map {today.minusDays(it).let {day->DailyPoint(day.toString(),dayXp(day))}},
-            dailyGoal=dailyGoal,hourlyDay=today.toString(),hourlyXp=hours.points,hourlyComplete=hours.complete,zoneId=java.time.ZoneId.systemDefault().id,
+            dailyGoal=dailyGoal,hourlyDay=today.toString(),hourlyXp=hours.points,hourlyComplete=hours.complete,zoneId=activityClock.zone.id,
             activityHistory=com.malfreyt.alexandre.hamigo.platform.PublicActivityHistory.fromDailyXp(root.optJSONObject("dailyXp"),today),
-            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE)
+            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE,dayStartHour=3)
     }
 }
 

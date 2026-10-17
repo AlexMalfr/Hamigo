@@ -399,3 +399,44 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Retrait de cinq anciens layouts de widgets, de leurs sept dessins/fonds inutilisés et de seize textes d’aperçu obsolètes. Les layouts responsifs, aperçus actuels et ressources des launchers sont conservés.
 - Clarification dans le README : `data/curriculum.json` sert à l’édition avec les questions complètes ; `app/src/main/assets/curriculum.json` est la version générée, avec leurs UUID, chargée par Android. Les deux restent nécessaires.
 - Générateurs, registres d’identités, archives pédagogiques, outils d’import et de validation conservés. Aucun changement de contenu ou de progression ; aucune release ni installation pour ce nettoyage.
+
+## Semaines, séries et outils de saisie — 0.52
+
+- Semaines calendaires selon la locale système, sur Moi, les amis, partages et widgets. Jour courant en orange ; comparaison personnelle en pointillés sur les graphes des amis, avec une même échelle. Les heures demandent des jours et fuseaux identiques.
+- Statistiques en quatre bulles (XP total, série, leçons terminées, XP de la semaine), actions Équipe avant GitHub, métadonnées discrètes sans titre. Version de l’APK réappliquée à chaque publication sociale.
+- Séries sur des journées de 03:00 à 03:00, avec transition conservant les séries existantes. XP, récompenses et révisions restent intacts. Compatibilité pendant cinq versions, retrait à 0.57.
+- Toute la bande de narration des introductions contrôle le TTS, sans ripple hors du bouton. Pico réfléchit et le bouton devient un spinner pendant la préparation ; bouche animée seulement à la lecture. Premier appui OTAN mis en attente pendant l’initialisation.
+- Souffle Morse de 800 ms avant et après les signaux ; choix d’espacement automatique ou manuel commun aux questions, au traducteur et à l’essai des paramètres. Accueil en cinq étapes avec trois profils de saisie et réglages avancés.
+- Calculatrice sans clavier logiciel : champ natif, curseur clignotant, copier-coller, flèches et glissement pour déplacer le curseur, effacement par glissement, fonctions atomiques et suppression des paires vides. Touches roses pour effacer, outils turquoise pastel (Ans et % compris), opérateurs à peine teintés au-dessus du blanc des chiffres. En-tête avec titre et fermeture, outils compacts, zéro et égal agrandis ; hauteur réduite sur une fenêtre courte et davantage d'air autour du résultat et entre les deux claviers sur une fenêtre assez haute.
+- Retrait prévu de la migration des identifiants 0.47, sans changer les UUID. Builds Windows isolés par checkout, hors de OneDrive.
+
+
+### Finitions et diagnostics — amendement de la même 0.52
+
+- Comparaison personnelle plus transparente dans les graphes des amis ; quatre statistiques resserrées et centrées. Icônes communes pour XP, séries et cours terminés dans Parcours et Moi. Les quatre widgets reprennent aussi des icônes vectorielles (équipe, XP, série, objectif, semaine), avec espace réservé avant de mesurer leurs textes et aperçus du sélecteur régénérés.
+- TTS : attente invisible pendant les 160 premières millisecondes ; si l'indicateur apparaît, il reste au moins 400 ms. La synthèse est préparée avant la lecture, pour que Pico ne parle qu'une fois le son réellement lancé. Arrêt, priorité audio et fichiers temporaires restent attachés à l'écran.
+- Morse : essai avec emplacements de signal/traduction réservés, titre extérieur et options accompagnées d'icônes. Appui long sur l'effacement commun pour tout vider, dans les questions, le traducteur et les paramètres.
+- Calculatrice : sélection visible pendant le glissement d'effacement, curseur clignotant et opérateurs gris légèrement teintés. Textes à trous : emplacement un peu plus haut et largeur adaptée au mot choisi. Récepteur Fréquence actif dès l'ouverture, selon Sons, sans attendre un geste.
+- Diagnostics : simulation interactive des cinq étapes de l'accueil dans un modèle en mémoire, sans modifier le profil réel ni lancer GitHub, programmer de rappel ou demander une permission système. Aucun changement de contenu, d'identifiant ou de sauvegarde.
+
+
+### Saisie et contenus longs — même 0.52
+
+- Moi : série puis XP à droite du niveau, avec une mascotte adaptée à la largeur disponible.
+- Accueil : l’étape nomme explicitement le Morse, réduit Pico et présente les trois profils avec un indicateur de difficulté, une recommandation débutants et un repère avancé. Les réglages manuels remplacent les profils ; un essai du manipulateur reste disponible. Le rythme reste visible même sans espaces automatiques.
+- Saisie Morse commune : gomme à droite du signal, appui long pour tout vider. Les espaces automatiques n’ajoutent plus de texte à la place des boutons manuels.
+- Calculatrice : effacer une ouverture, seule ou dans une sélection par glissement, supprime aussi sa fermeture correspondante. Les fermetures d’autres groupes et le contenu conservé restent intacts, y compris avec des fonctions imbriquées.
+- Textes à trous : réserve vide plus large et réponse choisie avec de vraies marges, mesure du texte et retour à la ligne au besoin, sans ellipses.
+- Diagnostics : six cas limites supplémentaires dans Aperçus, avec une introduction Lorem ipsum très longue, des questions/réponses longues, un mot à trou développé, une fiche Mémo volumineuse et des profils/statistiques extrêmes. Données synthétiques en mémoire, sans changement des cours ou des identifiants réels.
+
+
+### Journée d’activité complète à 03:00 — même 0.52
+
+- Correction de l’application incomplète du changement : tous les XP quotidiens, objectifs, calendriers, semaines, rappels, widgets et partages utilisent la même journée de 03:00 à 03:00. Entre minuit et 02:59, la journée affichée reste celle de la veille.
+- Historique horodaté reprojeté sans modifier les identifiants, récompenses, totaux, cours, amis ou SRS ; fusion dédupliquée et conversion idempotente. Les anciens agrégats sans heure conservent leurs dates.
+- Convention et fuseau publiés dans le résumé social, avec compatibilité des anciens résumés. Graphique horaire dans l’ordre 03 h à 02 h. Rafraîchissement des écrans et widgets à la limite de 03:00.
+
+### Aperçus interactifs et statistiques — même 0.52
+
+- Les aperçus Diagnostics reprennent la navigation complète et les interactions natives, dans leur modèle en mémoire. Les réglages fictifs persistent entre les pages de cet aperçu ; la progression réelle, GitHub et les rappels système restent protégés.
+- Streak et XP total plus grands sur Moi, avec des icônes agrandies et une taille adaptée aux petits écrans.

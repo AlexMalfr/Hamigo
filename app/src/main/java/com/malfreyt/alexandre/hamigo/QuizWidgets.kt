@@ -33,6 +33,7 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import kotlin.math.PI
 import kotlin.math.sin
@@ -55,21 +56,58 @@ class ClozeDragState {
     val hover=state.dragged>=0&&state.slot.contains(state.position)
     val accent=if(feedback==null)Purple else if(choice==q.answer)Teal else Color(0xFFB65049)
     BoxWithConstraints(Modifier.fillMaxWidth()) {
+    val density=androidx.compose.ui.platform.LocalDensity.current
+    val measurer=androidx.compose.ui.text.rememberTextMeasurer()
+    val selected=q.choices.getOrNull(choice)
+    val labelStyle=LocalTextStyle.current.copy(fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Bold)
+    val measured=measurer.measure(selected.orEmpty(),labelStyle,constraints=androidx.compose.ui.unit.Constraints(maxWidth=
+        (constraints.maxWidth-with(density){32.dp.roundToPx()}).coerceAtLeast(1)))
+    val widthPx=with(density) {
+        (if(selected==null)140.sp.toPx() else measured.size.width+32.dp.toPx())
+            .coerceAtMost((constraints.maxWidth-1).coerceAtLeast(1).toFloat())
+    }
+    val heightPx=with(density){maxOf(32.sp.toPx(),if(selected==null)0f else measured.size.height+16.dp.toPx())}
+    // Android's placeholder span uses linear sp even with nonlinear accessibility font scaling.
+    val pxPerSp=density.density*density.fontScale
+    val measuredPlaceholder=Placeholder((widthPx/pxPerSp).sp,(heightPx/pxPerSp).sp,PlaceholderVerticalAlign.Center)
     val start=q.prompt.substringBefore("___").length
     val font=questionTextSize(sentence,constraints.maxWidth,listOf(androidx.compose.ui.text.AnnotatedString.Range(
-        Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center),start,start+"[mot à compléter]".length)))
-    Text(sentence,color=Ink,fontWeight=FontWeight.ExtraBold,fontSize=font,lineHeight=(font.value*1.32f).sp,textAlign=textAlign,
-        inlineContent=mapOf("answer" to InlineTextContent(Placeholder(108.sp,28.sp,PlaceholderVerticalAlign.Center)) {
+        measuredPlaceholder,start,start+"[mot à compléter]".length)))
+    val fontPx=with(density){font.toPx()}
+    val placeholder=Placeholder((widthPx/fontPx).em,(heightPx/fontPx).em,PlaceholderVerticalAlign.Center)
+    val answerSlot:@Composable (Modifier)->Unit={slotModifier->
             Surface(onClick=feedbackClick {onChoice(-1)},enabled=enabled&&choice>=0,shape=RoundedCornerShape(10.dp),
-                modifier=Modifier.fillMaxSize().padding(2.dp).onGloballyPositioned {state.slot=it.boundsInWindow()}
+                modifier=slotModifier.padding(2.dp).onGloballyPositioned {state.slot=it.boundsInWindow()}
                     .semantics {contentDescription=if(choice<0)"Emplacement pour le mot à compléter" else "Mot choisi : ${q.choices.getOrNull(choice).orEmpty()}. Toucher pour enlever."},
                 color=if(hover)Gold.copy(alpha=.4f) else accent.copy(alpha=.10f),border=BorderStroke(2.dp,accent)) {
                 Box(contentAlignment=Alignment.Center) {
-                    if(choice>=0)MorseAwareText(q.choices[choice],Modifier.padding(horizontal=3.dp),fontSize=14.sp,fontWeight=FontWeight.Bold,color=accent,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                    if(choice>=0)CompositionLocalProvider(LocalTextStyle provides labelStyle) {
+                        MorseAwareText(q.choices[choice],Modifier.padding(horizontal=12.dp,vertical=4.dp),fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Bold,color=accent)
+                    }
                     else Icon(Icons.Rounded.Add,null,tint=accent,modifier=Modifier.size(22.dp))
                 }
             }
-        }))
+    }
+    if(selected!=null&&measured.lineCount>1) {
+        // Android inline spans do not expand a paragraph's explicit line height reliably.
+        // A multiline answer gets its own flowing row so it cannot cover adjacent text.
+        Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp),
+            horizontalAlignment=when(textAlign) {
+                androidx.compose.ui.text.style.TextAlign.End,androidx.compose.ui.text.style.TextAlign.Right->Alignment.End
+                androidx.compose.ui.text.style.TextAlign.Center->Alignment.CenterHorizontally
+                else->Alignment.Start
+            }) {
+            val parts=q.prompt.split("___",limit=2)
+            parts.firstOrNull()?.trim()?.takeIf {it.isNotEmpty()}?.let {
+                MorseAwareText(it,Modifier.fillMaxWidth(),fontSize=font,lineHeight=(font.value*1.32f).sp,fontWeight=FontWeight.ExtraBold,textAlign=textAlign)
+            }
+            answerSlot(Modifier.width(with(density){widthPx.toDp()}).height(with(density){heightPx.toDp()}))
+            parts.getOrNull(1)?.trim()?.takeIf {it.isNotEmpty()}?.let {
+                MorseAwareText(it,Modifier.fillMaxWidth(),fontSize=font,lineHeight=(font.value*1.32f).sp,fontWeight=FontWeight.ExtraBold,textAlign=textAlign)
+            }
+        }
+    } else Text(sentence,color=Ink,fontWeight=FontWeight.ExtraBold,fontSize=font,lineHeight=(font.value*1.32f).sp,textAlign=textAlign,
+        inlineContent=mapOf("answer" to InlineTextContent(placeholder) {answerSlot(Modifier.fillMaxSize())}))
     }
 }
 
@@ -135,19 +173,12 @@ class ClozeDragState {
 }
 
 fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.').replace('−','-').replace('–','-')
-    .filter{it=='.'||it=='-'||it=='/'||it.isWhitespace()}.trim().replace(Regex("\\s+")," ").replace(Regex("\\s*/\\s*")," / ")
+    .filter{it=='.'||it=='-'||it=='/'||it.isWhitespace()}.trim {it.isWhitespace()||it=='/'}
+    .replace(Regex("\\s+")," ").replace(Regex("\\s*/\\s*")," / ")
 
 @Composable fun MorseComposer(code:String,onChange:(String)->Unit,enabled:Boolean) {
     Panel(color=Mist) {
-        if(code.isBlank())Text("Ton message attend son premier point…",fontSize=13.sp,color=Muted)
-        else MorseSymbols(code)
-        val feedback=LocalAppFeedback.current
-        MorseSignalInput(enabled) { feedback?.event(if(it=='.')FeedbackCue.MORSE_DOT else if(it=='-')FeedbackCue.MORSE_DASH else FeedbackCue.SNAP);onChange(code + it) }
-        Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
-            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}
-            IconButton(feedbackClick {onChange(code.dropLast(1))},enabled=enabled&&code.isNotBlank()){Icon(Icons.Rounded.Backspace,"Effacer le dernier symbole")}
-        }
+        MorseComposerInput(code,enabled,onChange=onChange)
         OutlinedButton(feedbackClick {playMorse(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Icon(Icons.Rounded.VolumeUp,null);Spacer(Modifier.width(8.dp));Text("Écouter ma transmission")}
     }
 }

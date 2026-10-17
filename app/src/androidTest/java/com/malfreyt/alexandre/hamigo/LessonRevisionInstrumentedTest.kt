@@ -238,6 +238,20 @@ class LessonRevisionInstrumentedTest {
         capture("goals-onboarding")
     }
 
+    @Test fun everyPartOfTheIntroNarrationBandControlsTheSameSpeechWithoutChangingProgress() {
+        val before=model.progress.export()
+        ui.runOnIdle {model.startLesson(model.content!!.lessons.first())}
+        ui.onNodeWithText("D'abord le déclic.\nEnsuite, à toi de jouer.").performClick()
+        ui.onNodeWithContentDescription("Arrêter la lecture du cours").assertExists()
+        capture("intro-band-speaking")
+        ui.onNodeWithTag("lesson-listen").performClick()
+        ui.onNodeWithContentDescription("Écouter le cours").assertExists()
+        ui.onNodeWithTag("lesson-narration-band").performTouchInput {click(androidx.compose.ui.geometry.Offset(width*.6f,height-2f))}
+        ui.onNodeWithContentDescription("Arrêter la lecture du cours").assertExists()
+        ui.onNodeWithTag("lesson-listen").performClick()
+        assertEquals(before,model.progress.export())
+    }
+
     private fun capture(name:String) {
         ui.waitForIdle()
         repeat(2) {

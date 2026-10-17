@@ -25,7 +25,8 @@ data class ShareProgress(
     val zoneId: String? = null,
     val activityHistory:PublicActivityHistory? = null,
     val appVersion:String?=null,
-    val appVersionCode:Int?=null
+    val appVersionCode:Int?=null,
+    val dayStartHour:Int=0
 ) {
     fun toJson(): String {
         val json=JSONObject()
@@ -46,6 +47,7 @@ data class ShareProgress(
         .put("zoneId",zoneId)
         .put("appVersion",appVersion)
         .put("appVersionCode",appVersionCode)
+        .put("dayStartHour",dayStartHour)
         var history=activityHistory?.forPublication()
         if(history!=null)json.put("activityHistory",history.toJson())
         var result=json.toString(2)
@@ -111,6 +113,7 @@ data class ShareProgress(
                 require(value is String&&value.length in 3..64&&value.matches(Regex("[0-9]+(?:\\.[0-9]+){1,3}(?:[-+][A-Za-z0-9.-]+)*")))
             } as String else null
             val appVersionCode=if(data.has("appVersionCode"))number("appVersionCode").also {require(it>0)} else null
+            val dayStartHour=if(data.has("dayStartHour"))number("dayStartHour").also {require(it==0||it==3)} else 0
             points.forEach {p->history?.xp(LocalDate.parse(p.day))?.let {require(it==p.xp)}}
             require(hours.isEmpty()||hourlyDay!=null)
             if(complete) {
@@ -118,7 +121,7 @@ data class ShareProgress(
                 require(points.firstOrNull {it.day==hourlyDay}?.xp?.toLong()==hours.sumOf {it.xp.toLong()})
             }
             return ShareProgress(name, number("xp"), number("streak"), number("lessons"),
-                number("weeklyXp", optional = true), date, points,goal,hourlyDay,hours,complete,zone,history,appVersion,appVersionCode)
+                number("weeklyXp", optional = true), date, points,goal,hourlyDay,hours,complete,zone,history,appVersion,appVersionCode,dayStartHour)
         }
     }
 }

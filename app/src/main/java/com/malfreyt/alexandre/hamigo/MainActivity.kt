@@ -19,6 +19,8 @@ import androidx.compose.animation.core.tween
 import androidx.browser.auth.AuthTabIntent
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.isActive
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -191,7 +193,20 @@ private data class BackScreenSnapshot(
     }
 }
 
-@Composable private fun HamigoAppContent(model:AppModel,diagnosticOwner:AppModel) {
+@Composable internal fun HamigoAppContent(model:AppModel,diagnosticOwner:AppModel,diagnosticPreview:Boolean=false) {
+    val dayContext=LocalContext.current.applicationContext
+    val lifecycle=androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(model,lifecycle) {
+        lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+            var day=StudyDay.date()
+            while(kotlinx.coroutines.currentCoroutineContext().isActive) {
+                val now=java.time.Instant.now()
+                kotlinx.coroutines.delay(java.time.Duration.between(now,StudyDay.nextBoundary(now)).toMillis().coerceIn(100L,60_000L))
+                val next=StudyDay.date()
+                if(next!=day) {day=next;model.refresh();if(!model.diagnosticModel)HomeWidgets.progressChanged(dayContext)}
+            }
+        }
+    }
     val content=model.content
     val tick=model.revision
     val context=LocalContext.current
@@ -362,7 +377,7 @@ private data class BackScreenSnapshot(
             end=regularPadding.calculateEndPadding(layoutDirection),bottom=0.dp
         )else regularPadding
         CompositionLocalProvider(LocalNavigationContentOverlap provides if(raisedBarVisible)HamigoNavigationContentOverlap else 0.dp, LocalBackMotionAnchors provides backAnchors,
-            LocalAnimatedBack provides { (context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed() }) {
+            LocalAnimatedBack provides { if(diagnosticPreview)BackScreenSnapshot(model.route,model.session,model.lesson,model.resource).navigate(model) else (context as? ComponentActivity)?.onBackPressedDispatcher?.onBackPressed() }) {
         Box(Modifier.fillMaxSize().padding(contentPadding).consumeWindowInsets(contentPadding)
             .onGloballyPositioned {contentBounds=it.boundsInWindow()}
             .pointerInput(backSettling) {
@@ -425,13 +440,13 @@ private data class BackScreenSnapshot(
                 model.session!=null -> QuizScreen(model)
                 model.resource!=null -> ReferenceDetailScreen(model,model.resource!!)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)
-                model.route=="settings" -> if(model.diagnosticModel)ReadOnlyDiagnosticPreview {SettingsScreen(model)} else SettingsScreen(model)
+                model.route=="settings" -> if(model.diagnosticModel&&!diagnosticPreview)ReadOnlyDiagnosticPreview {SettingsScreen(model)} else SettingsScreen(model)
                 else -> MainDestination(model,content)
             }}
             }
             if(memoMorph)MemoMorphRow(backSource!!.resource!!,Modifier.fillMaxWidth().graphicsLayer { alpha=((dock-.18f)/.5f).coerceIn(0f,1f) },titleSize=(21f-5f*dock).sp)
             }
-            DiagnosticHud(diagnosticOwner,model,Modifier.align(Alignment.TopStart).padding(start=8.dp,top=82.dp))
+            if(!diagnosticPreview)DiagnosticHud(diagnosticOwner,model,Modifier.align(Alignment.TopStart).padding(start=8.dp,top=82.dp))
         }
         }
     }
@@ -494,7 +509,7 @@ private data class BackScreenSnapshot(
                     .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${dayCount(p.streak)} de série, ${p.xp} XP"}
                     .padding(horizontal=10.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,
                     horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-                    Column(horizontalAlignment=Alignment.End) {Text("🔥 ${dayCount(p.streak)}",fontWeight=FontWeight.Bold,color=Color(0xFFB44D30));Text("⚡ ${p.xp} XP",fontSize=13.sp,color=Teal)}
+                    Column(horizontalAlignment=Alignment.End) {StatMetric(dayCount(p.streak),Icons.Rounded.LocalFireDepartment,Color(0xFFB44D30));StatMetric("${p.xp} XP",Icons.Rounded.Bolt,fontSize=13.sp)}
                     Icon(Icons.Rounded.ChevronRight,null,Modifier.size(17.dp),tint=Muted)
                 }
             }
@@ -556,7 +571,10 @@ private data class BackScreenSnapshot(
                         }
                         Spacer(Modifier.width(15.dp))
                         Column(Modifier.weight(1f).testTag("lesson-copy-${l.id}").clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button,onClick=feedbackClick {model.startLesson(l)}).padding(vertical=13.dp)) {
-                            Text(l.title+if(done)" ✅" else "",fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
+                            Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+                                Text(l.title,Modifier.weight(1f,fill=false),fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
+                                if(done)Icon(Icons.Rounded.CheckCircle,"Cours terminé",Modifier.size(17.dp),tint=Teal)
+                            }
                             Text(l.summary,maxLines=2,overflow=TextOverflow.Ellipsis,fontSize=12.sp,lineHeight=16.sp,color=Muted)
                         }
                         }
