@@ -33,6 +33,7 @@ internal object LessonNarration {
 internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
     var reading by mutableStateOf(false);private set
     var speaking by mutableStateOf(false);private set
+    val preparing get()=reading&&!speaking
     private val main=Handler(Looper.getMainLooper())
     private val manager=context.getSystemService(AudioManager::class.java)
     private val attributes=AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_SPEECH).build()
@@ -44,18 +45,20 @@ internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
     private var pending:List<String>?=null
     private var prefix:String?=null
     private var lastId:String?=null
+    private var playingId:String?=null
     private var engine:TextToSpeech?=null
     init {if(eager)prepare()}
     private fun prepare() {
         if(engine!=null||closed)return
-        engine=TextToSpeech(context.applicationContext) {status ->
+        engine=TextToSpeech(context.applicationContext) {status -> main.post {
             if(!closed)runCatching {setup.execute {
                 val current=engine ?: return@execute
                 val language=if(status==TextToSpeech.SUCCESS)current.setLanguage(Locale.FRANCE) else TextToSpeech.ERROR
                 current.setAudioAttributes(attributes)
                 current.setOnUtteranceProgressListener(object:UtteranceProgressListener() {
-                    override fun onStart(id:String?) {main.post {if(prefix!=null && id?.startsWith(prefix!!)==true)speaking=true}}
-                    override fun onDone(id:String?) {main.post {if(id==lastId)stop()}}
+                    override fun onStart(id:String?) {main.post {if(prefix!=null && id?.startsWith(prefix!!)==true){playingId=id;speaking=true}}}
+                    override fun onDone(id:String?) {main.post {if(id==playingId){playingId=null;speaking=false};if(id==lastId)stop()}}
+                    override fun onStop(id:String?,interrupted:Boolean) {main.post {if(prefix!=null&&id?.startsWith(prefix!!)==true)stop()}}
                     @Deprecated("Android callback") override fun onError(id:String?)=failed(id)
                     override fun onError(id:String?,errorCode:Int)=failed(id)
                     private fun failed(id:String?) {main.post {if(prefix!=null && id?.startsWith(prefix!!)==true) {stop();notice("La lecture audio a été interrompue.")}}}
@@ -69,7 +72,7 @@ internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
                     }
                 }
             }}
-        }
+        }}
     }
     fun toggle(lesson:Lesson) {
         toggleSegments(LessonNarration.segments(lesson,TextToSpeech.getMaxSpeechInputLength()))
@@ -94,7 +97,7 @@ internal class LessonSpeech(private val context:Context,eager:Boolean=true) {
             }
         }
     }
-    fun stop() {pending=null;prefix=null;lastId=null;reading=false;speaking=false;FeedbackAudioGate.release(this);if(ready)engine?.stop();manager.abandonAudioFocusRequest(focus)}
+    fun stop() {pending=null;prefix=null;lastId=null;playingId=null;reading=false;speaking=false;FeedbackAudioGate.release(this);if(ready)engine?.stop();manager.abandonAudioFocusRequest(focus)}
     fun close() {closed=true;stop();setup.shutdownNow();engine?.shutdown();engine=null}
     private fun notice(text:String) {Toast.makeText(context,text,Toast.LENGTH_SHORT).show()}
 }

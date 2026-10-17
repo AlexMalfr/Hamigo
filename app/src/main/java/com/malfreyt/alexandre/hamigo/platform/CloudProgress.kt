@@ -4,7 +4,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 import java.util.UUID
-import com.malfreyt.alexandre.hamigo.CourseQuestionMigration47
+import com.malfreyt.alexandre.hamigo.StreakMigration52
+import com.malfreyt.alexandre.hamigo.StreakHistory
+import com.malfreyt.alexandre.hamigo.StudyDay
 
 /** A mergeable backup: historical totals form a baseline, subsequent attempts are immutable events. */
 object CloudProgress {
@@ -153,8 +155,10 @@ object CloudProgress {
         ensureLedger(state)
         require(xp >= 0 && answers in 0..1 && correct in 0..answers)
         LocalDate.parse(day)
+        val at=System.currentTimeMillis()
         val event = JSONObject().put("day", day).put("xp", xp)
-            .put("answers", answers).put("correct", correct).put("at", System.currentTimeMillis())
+            .put("answers", answers).put("correct", correct).put("at", at)
+            .put("streakDay",StudyDay.date(java.time.Instant.ofEpochMilli(at)).toString())
         completed?.let { event.put("completed", it) }
         awardKey?.let { event.put("awardKey", it) }
         state.getJSONObject("syncEvents").put(UUID.randomUUID().toString(), event)
@@ -218,6 +222,7 @@ object CloudProgress {
             }
         }
         val state = JSONObject().put("schema", 2).put("questionIdsVersion",1).put("xp", capped(xp))
+            .put("streakHistory",StreakHistory.merge(left,right))
             .put("answers", capped(answers)).put("correct", capped(correct))
             .put("dailyXp", days).put("completed", JSONArray(completed.sorted()))
             .put("reviews", reviews).put("awarded", awarded).put("syncBase", base).put("syncEvents", events)
@@ -268,6 +273,7 @@ object CloudProgress {
             date(event.getString("day")); int(event, "xp"); int(event, "answers"); int(event, "correct")
             require(event.getInt("answers") in 0..1 && event.getInt("correct") in 0..event.getInt("answers"))
             require(event.optLong("at") >= 0)
+            if(event.has("streakDay"))date(event.getString("streakDay"))
             require(event.optString("completed").length <= 128 && event.optString("awardKey").length <= 512)
         }
         val reviews = state.optJSONObject("reviews") ?: JSONObject()
@@ -294,7 +300,7 @@ object CloudProgress {
         if (preferences.has("morseSingleKey")) require(preferences.opt("morseSingleKey") is Boolean)
         if (preferences.has("morseThresholdMs")) require(int(preferences,"morseThresholdMs") in 150..600)
         if(state.has("questionIdsVersion"))require(int(state,"questionIdsVersion")==1) {"Version des identifiants de questions non reconnue."}
-        CourseQuestionMigration47.apply(state)
+        StreakMigration52.apply(state)
         return wrapper
     }
 

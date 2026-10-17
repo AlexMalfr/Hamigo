@@ -40,7 +40,7 @@ internal object SocialActivity {
     fun todayXp(profile:ShareProgress,date:LocalDate=date(profile)):Int?=dayXp(profile,date)
     fun earliest(profile:ShareProgress):LocalDate?=profile.activityHistory?.start ?: profile.dailyXp.minOfOrNull {LocalDate.parse(it.day)}
     fun week(profile:ShareProgress,date:LocalDate=date(profile)):List<Pair<LocalDate,Int?>> {
-        return (6L downTo 0L).map {offset->date.minusDays(offset).let {it to dayXp(profile,it)}}
+        return com.malfreyt.alexandre.hamigo.CalendarWeek.days(date).map {it to if(it>date(profile))0 else dayXp(profile,it)}
     }
     fun weeklyXp(profile:ShareProgress,date:LocalDate=date(profile)):Int=if(profile.dailyXp.isEmpty()&&profile.activityHistory==null)profile.weeklyXp else
         week(profile,date).sumOf {it.second?.toLong() ?: 0L}.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()

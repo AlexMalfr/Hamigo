@@ -171,7 +171,7 @@ class VisualAuditTest {
         capture("requests-all-accepted")
     }
 
-    @Test fun onboardingHasFourFullscreenStepsAndKeepsChoicesWhenGoingBack() {
+    @Test fun onboardingHasFiveFullscreenStepsAndKeepsChoicesWhenGoingBack() {
         beginOnboarding()
         ui.onNodeWithTag("navigation-label-path").assertDoesNotExist()
         ui.onNodeWithTag("onboarding-continue").assertIsNotEnabled()
@@ -192,14 +192,21 @@ class VisualAuditTest {
         ui.onNodeWithTag("onboarding-continue").performClick()
         capture("53-onboarding-reminder")
         ui.onNodeWithTag("onboarding-skip").performClick()
-        capture("54-onboarding-github")
+        ui.onNodeWithText("En rythme").performScrollTo().performClick()
+        capture("54-onboarding-morse")
+        ui.onNodeWithText("Avancé").performScrollTo().performClick()
+        ui.onNodeWithTag("morse-auto-spaces").performScrollTo().assertIsOn()
+        capture("54-onboarding-morse-advanced")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        capture("55-onboarding-github")
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         capture("57-onboarding-finished")
         ui.onNodeWithTag("navigation-icon-path",useUnmergedTree=true).assertExists()
         ui.onNodeWithText("Salut F4Alex !").assertIsDisplayed()
         ui.runOnIdle {
-            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==120)
+            check(model.progress.name=="F4Alex");check(model.progress.dailyGoal==60)
+            check(GameplayPreferences.read(model.progress.prefs).autoSpaces)
             check(model.progress.xp==760);check(model.progress.prefs.getBoolean("welcomed",false))
             check(!model.progress.prefs.getBoolean("reminderEnabled",false));check(!model.progress.prefs.contains("onboardingStep"))
             check(model.authSession==null && model.oauthSession==null)
@@ -243,6 +250,7 @@ class VisualAuditTest {
         capture("56-onboarding-permission-denied")
         ui.runOnIdle {check(!model.progress.prefs.getBoolean("reminderEnabled",false))}
         ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {check(model.progress.prefs.getBoolean("welcomed",false));check(model.progress.xp==760)}
@@ -257,7 +265,7 @@ class VisualAuditTest {
         ui.runOnIdle {model.showWelcome=false}
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {model.showWelcome=true}
-        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/4 · Rappel")
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/5 · Rappel")
         ui.onNodeWithContentDescription("Étape précédente").performClick()
         ui.onNodeWithTag("onboarding-goal-100").assertIsSelected()
         ui.onNodeWithContentDescription("Étape précédente").performClick()
@@ -493,6 +501,7 @@ class VisualAuditTest {
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         val first = model.content!!.lessons.first()
         ui.runOnIdle { model.startLesson(first) }

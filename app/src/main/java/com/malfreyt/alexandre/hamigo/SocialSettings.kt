@@ -658,42 +658,16 @@ fun SettingsScreen(model: AppModel) {
     }
 }
 
-@Composable private fun GameplaySettings(model: AppModel, progress: Progress) {
-    val settings = remember(model.revision) { GameplayPreferences.read(progress.prefs) }
-    var threshold by remember(settings.thresholdMs) { mutableFloatStateOf(settings.thresholdMs.toFloat()) }
-    fun save(value: MorseInputSettings) {
-        GameplayPreferences.save(progress.prefs, value)
-        model.refresh(); model.refreshSocial()
-    }
+@Composable private fun GameplaySettings(model:AppModel,progress:Progress) {
+    val settings=remember(model.revision){GameplayPreferences.read(progress.prefs)}
+    fun save(value:MorseInputSettings){GameplayPreferences.save(progress.prefs,value);model.refresh();model.refreshSocial()}
     Panel(Modifier.testTag("morse-gameplay")) {
-        Text("Saisie du Morse", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text("Dans les questions et le traducteur.", fontSize = 12.sp, color = Muted)
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Écoute pendant la saisie", fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 19.sp)
-                Text("Quand les sons sont activés.", fontSize = 12.sp, lineHeight = 16.sp, color = Muted)
-            }
-            Switch(settings.liveSound, { save(settings.copy(liveSound = it)) },
-                Modifier.testTag("morse-live-sound").semantics { contentDescription = "Écoute pendant la saisie" })
+        Text("Saisie du Morse",fontSize=18.sp,fontWeight=FontWeight.Bold)
+        MorseSettingsControls(settings,::save)
+        Row(verticalAlignment=Alignment.CenterVertically) {
+            Text("Écoute pendant la saisie",Modifier.weight(1f),fontWeight=FontWeight.Bold,fontSize=14.sp)
+            Switch(settings.liveSound,{save(settings.copy(liveSound=it))},Modifier.testTag("morse-live-sound"))
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(!settings.singleKey, feedbackClick { save(settings.copy(singleKey = false)) },
-                label = { Text("Deux boutons") }, modifier = Modifier.weight(1f))
-            FilterChip(settings.singleKey, feedbackClick { save(settings.copy(singleKey = true)) },
-                label = { Text("Un bouton") }, modifier = Modifier.weight(1f))
-        }
-        if (settings.singleKey) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("Durée minimale d’un trait", fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                Text("${threshold.toInt()} ms", fontWeight = FontWeight.Bold, color = Teal, fontSize = 13.sp)
-            }
-            Slider(threshold, { threshold = it }, valueRange = 150f..600f, steps = 8,
-                onValueChangeFinished = { save(settings.copy(thresholdMs = (kotlin.math.round(threshold / 50f) * 50).toInt())) },
-                modifier = Modifier.testTag("morse-timing"))
-            Text("Plus court : un point. L’essai reconnaît aussi les pauses entre lettres et mots.", fontSize = 12.sp, lineHeight = 17.sp, color = Muted)
-        }
-        Surface(color = Mist, shape = RoundedCornerShape(14.dp)) {
-            MorseSettingsPreview(settings)
-        }
+        Surface(color=Mist,shape=RoundedCornerShape(14.dp)){MorseSettingsPreview(settings)}
     }
 }

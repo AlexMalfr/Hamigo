@@ -84,15 +84,16 @@ private object LessonIntroNavigation {
             item {
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                 val picoSize=if(maxWidth<340.dp)108.dp else 124.dp
-                Row(verticalAlignment=Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().testTag("lesson-narration-band").clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.audio {speech?.toggle(lesson)}},verticalAlignment=Alignment.CenterVertically) {
                     TalkingPico(Modifier.size(picoSize).alignBy(PicoBodyCenter).testTag("lesson-pico")
-                        .semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours avec Pico" else "Écouter le cours avec Pico";stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(speech?.speaking==true)"Pico parle" else companion.mood.description}
+                        .semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours avec Pico" else "Écouter le cours avec Pico";stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(speech?.preparing==true)"Pico prépare la lecture" else if(speech?.speaking==true)"Pico parle" else companion.mood.description}
                         .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},talking=speech?.speaking==true,
-                        mood=if(touch.playful)touch.mood else if(speech?.reading==true)MascotMood.HAPPY else companion.mood,pose=if(touch.playful)MascotPose.HUG else companion.pose,mirrored=true,pointLeft=true,eyesClosed=touch.closedEyes,idleMotion=companion.active,reaction=if(touch.playful)touch.burst else 0)
+                        mood=if(touch.playful)touch.mood else if(speech?.preparing==true)MascotMood.THINKING else if(speech?.reading==true)MascotMood.HAPPY else companion.mood,pose=if(touch.playful)MascotPose.HUG else companion.pose,mirrored=true,pointLeft=true,eyesClosed=touch.closedEyes,idleMotion=companion.active||speech?.preparing==true,reaction=if(touch.playful)touch.burst else 0)
                     Spacer(Modifier.width(12.dp))
                     Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f).alignBy {it.measuredHeight/2},fontWeight=FontWeight.Bold,color=Teal)
-                    IconButton(feedbackClick {touch.audio {speech?.toggle(lesson)}},Modifier.size(48.dp).alignBy {it.measuredHeight/2}.testTag("lesson-listen"),enabled=speech!=null) {
-                        Icon(if(speech?.reading==true)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,if(speech?.reading==true)"Arrêter la lecture du cours" else "Écouter le cours",tint=Teal)
+                    IconButton(feedbackClick {touch.audio {speech?.toggle(lesson)}},Modifier.size(48.dp).alignBy {it.measuredHeight/2}.testTag("lesson-listen").semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours" else "Écouter le cours"},enabled=speech!=null) {
+                        if(speech?.preparing==true)CircularProgressIndicator(Modifier.size(22.dp).testTag("lesson-tts-preparing"),color=Teal,strokeWidth=2.dp)
+                        else Icon(if(speech?.reading==true)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,null,tint=Teal)
                     }
                 }
                 }

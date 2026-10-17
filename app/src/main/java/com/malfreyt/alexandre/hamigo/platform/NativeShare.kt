@@ -295,7 +295,7 @@ object NativeShare {
         val end = points.keys.maxOrNull() ?: runCatching {
             Instant.parse(progress.updatedAt).atZone(ZoneId.systemDefault()).toLocalDate()
         }.getOrDefault(LocalDate.now())
-        return (6L downTo 0L).map { daysAgo -> end.minusDays(daysAgo).let { DayBar(it, points[it]) } }
+        return com.malfreyt.alexandre.hamigo.CalendarWeek.days(end).map {DayBar(it,if(it>end)0 else points[it])}
     }
 
     private class Poster(val canvas: Canvas) {

@@ -281,7 +281,7 @@ class DiagnosticsInstrumentedTest {
         ui.runOnIdle {model.startQuestions("Question réelle",listOf(q()))}
         val before=raw();val original=model.session
         ui.onNodeWithContentDescription("Ouvrir la calculatrice").performClick()
-        ui.onNodeWithTag("calculator-expression").performTextInput(DiagnosticAccess.CODE)
+        CalculatorEditorDriver(ui).performTextInput(DiagnosticAccess.CODE)
         ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
         ui.onNodeWithTag("diagnostics-screen").assertIsDisplayed();capture("menu")
         ui.onNodeWithTag("diagnostic-enabled").performClick().assertIsOn()

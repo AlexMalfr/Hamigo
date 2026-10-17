@@ -351,14 +351,7 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
                     else MorseVisual(code, compact = true)
                 }
             }
-            MorseSignalInput { code = (code + it).take(240) }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                OutlinedButton(feedbackClick { if (code.isNotBlank() && !code.endsWith(' ')) code = (code + " ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) { Text("Lettre", fontSize = 12.sp) }
-                OutlinedButton(feedbackClick { if (code.trim().isNotBlank() && !code.trim().endsWith('/')) code = (code.trimEnd() + " / ").take(240) }, Modifier.weight(1.3f), contentPadding = PaddingValues(4.dp)) {
-                    MorseVisual("/", compact = true); Text("Mot", fontSize = 12.sp)
-                }
-                IconButton(feedbackClick { code = code.dropLast(1); stopMorse() }, Modifier.size(40.dp), enabled = code.isNotEmpty()) { Icon(Icons.Rounded.Backspace, "Effacer le dernier signal", Modifier.size(19.dp)) }
-            }
+            MorseComposerInput(code,onChange={code=it})
         }
         Surface(color = Mist.copy(alpha = .55f), shape = RoundedCornerShape(12.dp)) {
             Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {

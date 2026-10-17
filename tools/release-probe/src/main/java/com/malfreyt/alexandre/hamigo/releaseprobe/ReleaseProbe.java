@@ -76,10 +76,9 @@ public final class ReleaseProbe extends Instrumentation {
         click("Équipe",false);reveal("Camille Démo",false);click("Camille Démo",false);
         waitText("60 / 120 XP",10000);capture("release-friend-goal-calendar");
         reveal("Voir le mois précédent",true);click("Voir le mois précédent",true);SystemClock.sleep(400);capture("release-friend-previous-month");
-        reveal("Les 7 derniers jours",false);reveal("Voir la semaine précédente",true);click("Voir la semaine précédente",true);SystemClock.sleep(400);reveal("Historique hebdomadaire",false);capture("release-friend-previous-week");
+        reveal("Cette semaine",false);reveal("Voir la semaine précédente",true);click("Voir la semaine précédente",true);SystemClock.sleep(400);reveal("Historique hebdomadaire",false);capture("release-friend-previous-week");
         reveal("Aujourd’hui · heure par heure",false);capture("release-friend-hours");
         reveal("Retirer cet équipier",false);capture("release-friend-actions");click("Retirer cet équipier",false);waitText("Retirer Camille Démo ?",10000);click("Annuler",false);
-        reveal("Infos techniques",false);
         reveal("Hamigo 0.49+12345678",false);reveal("Code de version : 49",false);waitText("Code de version : 49",10000);capture("release-friend-app-version");back();
         click("Moi",false);reveal("24 / 60 XP",false);capture("release-daily-goal");
         click("Modifier l’objectif quotidien",true);waitText("Objectif quotidien",10000);SystemClock.sleep(1000);capture("release-goal-settings-focused");back();

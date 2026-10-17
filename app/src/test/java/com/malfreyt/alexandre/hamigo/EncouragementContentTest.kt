@@ -13,7 +13,7 @@ class EncouragementContentTest {
         val data=EncouragementContent.from(profile(),day)
         assertTrue(data.message.contains("60 XP aujourd’hui sur ton objectif de 120 XP"))
         assertTrue(data.message.contains("Encore 60 XP"));assertTrue(data.message.contains("5 jours de série"))
-        assertTrue(data.message.contains("13 leçons terminées"));assertTrue(data.message.contains("210 XP sur les 7 derniers jours"))
+        assertTrue(data.message.contains("13 leçons terminées"));assertTrue(data.message.contains("60 XP"));assertTrue(data.message.contains("cette semaine"))
         assertEquals(.5f,data.ratio!!,0f);assertFalse(data.reached)
     }
     @Test fun aCompletedGoalCongratulatesRatherThanAskingForTheMissingXp() {

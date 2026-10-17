@@ -44,8 +44,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable internal fun FriendProgressScreen(model:AppModel,friend:Friend,dismiss:()->Unit) {
     val profile=friend.progress;val date=SocialActivity.date(profile);val context=LocalContext.current
+    val ownProgress=model.displayedProgress ?: model.progress
+    val own=remember(model.revision,ownProgress){ownProgress.snapshot()}
     val earliest=SocialActivity.earliest(profile)?.coerceAtMost(date)
-    val weeks=maxOf(1,earliest?.let {(ChronoUnit.DAYS.between(it,date)/7).toInt()+1} ?: 1)
+    val weeks=maxOf(1,earliest?.let {ChronoUnit.WEEKS.between(CalendarWeek.days(it).first(),CalendarWeek.days(date).first()).toInt()+1} ?: 1)
     val months=maxOf(1,earliest?.let {ChronoUnit.MONTHS.between(YearMonth.from(it),YearMonth.from(date)).toInt()+1} ?: 1)
     val weekHistory=rememberPagerState(pageCount={weeks})
     val listState=rememberLazyListState()
@@ -84,7 +86,7 @@ import kotlinx.coroutines.launch
                     item {Panel {
                         Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(if(weekHistory.currentPage==0)"Les 7 derniers jours" else "Historique hebdomadaire",fontSize=20.sp,fontWeight=FontWeight.Bold)
+                                Text(if(weekHistory.currentPage==0)"Cette semaine" else "Historique hebdomadaire",fontSize=20.sp,fontWeight=FontWeight.Bold)
                                 val visible=SocialActivity.week(profile,date.minusDays(weekHistory.currentPage*7L))
                                 Text(if(visible.any {it.second!=null})"${visible.sumOf {it.second?.toLong() ?: 0L}} XP" else "— XP",fontSize=25.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
                             }
@@ -96,7 +98,9 @@ import kotlinx.coroutines.launch
                             Column(verticalArrangement=Arrangement.spacedBy(6.dp)) {
                                 val format=DateTimeFormatter.ofPattern("d MMM yyyy",Locale.FRENCH)
                                 Text("${series.first().first.format(format)} – ${series.last().first.format(format)}",fontSize=12.sp,color=Muted)
-                                PublicXpChart(series.map {it.second},series.map {it.first.dayOfWeek.getDisplayName(TextStyle.SHORT,Locale.FRENCH).take(2)},profile.dailyGoal,"Pas de progression cette semaine.")
+                                PublicXpChart(series.map {it.second},series.map {it.first.dayOfWeek.getDisplayName(TextStyle.NARROW,Locale.FRENCH)},profile.dailyGoal,"Pas de progression cette semaine.",
+                                    todayIndex=series.indexOfFirst {it.first==date}.takeIf {it>=0},
+                                    comparison=series.map {if(it.first>LocalDate.now())0 else ownProgress.dayXp(it.first)})
                                 if(series.any {it.second==null})Text("— : journée sans données partagées",fontSize=11.sp,color=Muted)
                             }
                         }
@@ -106,23 +110,36 @@ import kotlinx.coroutines.launch
                         val current=profile.hourlyDay==date.toString()
                         if(current&&(profile.hourlyComplete||profile.hourlyXp.isNotEmpty())) {
                             val hours=profile.hourlyXp.associate {it.hour to it.xp}
-                            PublicXpChart((0..23).map {hours[it] ?: if(profile.hourlyComplete)0 else null},(0..23).map {if(it%6==0)"${it}h" else ""},null,"Pas de progression aujourd’hui.")
+                            val comparable=own.hourlyDay==profile.hourlyDay&&own.zoneId==profile.zoneId
+                            val ownHours=own.hourlyXp.associate {it.hour to it.xp}
+                            PublicXpChart((0..23).map {hours[it] ?: if(profile.hourlyComplete)0 else null},(0..23).map {if(it%6==0)"${it}h" else ""},null,"Pas de progression aujourd’hui.",
+                                comparison=if(comparable)(0..23).map {ownHours[it] ?: if(own.hourlyComplete)0 else null} else null)
+                            if(!comparable)Text("Comparaison horaire indisponible : jours ou fuseaux différents.",color=Muted,fontSize=11.sp)
                             if(!profile.hourlyComplete)Text("Historique partiel : ${profile.hourlyXp.sumOf {it.xp}} XP horodatés. Le total du jour reste affiché au-dessus.",fontSize=12.sp,color=Muted)
                         } else Text(if(current)"Le total du jour est connu, mais sa répartition horaire n’a pas été enregistrée." else "La courbe horaire sera disponible après une synchronisation depuis une version récente de Hamigo.",color=Muted,fontSize=13.sp,lineHeight=19.sp)
                     }}
                     item {Panel {
-                        Text("${profile.lessons} leçon${if(profile.lessons==1)" terminée" else "s terminées"}",fontWeight=FontWeight.Bold)
-                    }}
-                    item {Panel(spacing=4.dp) {
-                        Text("Sur GitHub",fontWeight=FontWeight.Bold,fontSize=17.sp)
-                        FriendActionItems(model,friend,actions,group=FriendActionGroup.GITHUB)
+                        Text("Statistiques",fontWeight=FontWeight.Bold,fontSize=19.sp)
+                        Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                            Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                FriendStatistic(profile.xp,"XP au total",Icons.Rounded.Bolt,Color(0xFFBA861C),Modifier.weight(1f))
+                                FriendStatistic(profile.streak,if(profile.streak==1)"Jour de série" else "Jours de série",Icons.Rounded.LocalFireDepartment,Coral,Modifier.weight(1f))
+                            }
+                            Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+                                FriendStatistic(profile.lessons,if(profile.lessons==1)"Leçon terminée" else "Leçons terminées",Icons.Rounded.School,Teal,Modifier.weight(1f))
+                                FriendStatistic(SocialActivity.weeklyXp(profile,date),if(profile.activityHistory==null&&profile.dailyXp.isEmpty())"Dernier bilan hebdo" else "XP cette semaine",Icons.Rounded.DateRange,Purple,Modifier.weight(1f))
+                            }
+                        }
                     }}
                     item {Panel(spacing=4.dp) {
                         Text("Dans ton équipe",fontWeight=FontWeight.Bold,fontSize=17.sp)
                         FriendActionItems(model,friend,actions,group=FriendActionGroup.TEAM)
                     }}
+                    item {Panel(spacing=4.dp) {
+                        Text("Sur GitHub",fontWeight=FontWeight.Bold,fontSize=17.sp)
+                        FriendActionItems(model,friend,actions,group=FriendActionGroup.GITHUB)
+                    }}
                     item {Column(Modifier.padding(horizontal=4.dp,vertical=4.dp).testTag("friend-technical-info"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                            Text("Infos techniques",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Muted)
                             Text("Hamigo ${profile.appVersion ?: "≤0.49+8ed1305d"}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
                             profile.appVersionCode?.let {Text("Code de version : $it",fontSize=12.sp,lineHeight=16.sp,color=Muted)}
                             Text("Dernière vérification : ${friendTechnicalDate(readStatus.checkedAt)}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
@@ -136,28 +153,25 @@ import kotlinx.coroutines.launch
     }
 }
 
+@Composable private fun FriendStatistic(value:Int,label:String,icon:androidx.compose.ui.graphics.vector.ImageVector,tint:Color,modifier:Modifier) {
+    val number=when {
+        value>=1_000_000_000->String.format(Locale.FRENCH,"%.1f Md",value/1_000_000_000.0)
+        value>=1_000_000->String.format(Locale.FRENCH,"%.1f M",value/1_000_000.0)
+        else->String.format(Locale.FRENCH,"%,d",value)
+    }
+    Surface(modifier=modifier.fillMaxHeight().heightIn(min=74.dp).clearAndSetSemantics {contentDescription="$value · $label"},shape=androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        color=tint.copy(alpha=.055f),border=androidx.compose.foundation.BorderStroke(1.dp,tint.copy(alpha=.22f))) {
+        Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+            Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                Icon(icon,null,Modifier.size(22.dp),tint=tint)
+                Text(number,fontSize=if(number.length>6)16.sp else 21.sp,fontWeight=FontWeight.ExtraBold,color=Ink,maxLines=1)
+            }
+            Text(label,fontSize=12.sp,lineHeight=16.sp,color=Muted)
+        }
+    }
+}
+
 internal fun friendTechnicalDate(value:String?):String = value?.let {
     runCatching { java.time.Instant.parse(it).atZone(java.time.ZoneId.systemDefault())
         .format(DateTimeFormatter.ofPattern("dd/MM/yyyy à HH:mm",Locale.FRENCH)) }.getOrNull()
 } ?: "Non disponible"
-
-@Composable internal fun PublicXpChart(values:List<Int?>,labels:List<String>,goal:Int?,emptyLabel:String="Pas de progression sur cette période.") {
-    val maximum=maxOf(1,values.filterNotNull().maxOrNull() ?: 0,goal ?: 0)
-    val hasActivity=values.any {it!=null&&it>0};val emptyText=if(values.any {it!=null})emptyLabel else "Historique non disponible"
-    Column(Modifier.fillMaxWidth().clearAndSetSemantics {contentDescription=if(!hasActivity)emptyText else values.mapIndexed {i,x->"${labels.getOrElse(i){i.toString()}} : ${x?.let {"$it XP"} ?: "sans données"}"}.joinToString(", ")}) {
-        Box(Modifier.fillMaxWidth(),contentAlignment=Alignment.Center) {
-        Canvas(Modifier.fillMaxWidth().height(146.dp)) {
-            val step=size.width/values.size.coerceAtLeast(1);val plotHeight=size.height-12.dp.toPx();val scaleHeight=plotHeight-8.dp.toPx();val width=step*.58f
-            drawLine(Mist,Offset(0f,plotHeight),Offset(size.width,plotHeight),1.dp.toPx())
-            values.forEachIndexed {i,x->
-                val h=if(x==null)2.dp.toPx() else if(x==0)0f else maxOf(3.dp.toPx(),scaleHeight*x/maximum)
-                if(h>0)drawRoundRect(if(x==null)Muted.copy(alpha=.35f) else if(goal!=null&&x>=goal)Color(0xFFEBC45E) else Teal,Offset(step*(i+.5f)-width/2,plotHeight-h),Size(width,h),CornerRadius(3.dp.toPx()))
-            }
-            goal?.let {val y=plotHeight-scaleHeight*it/maximum;drawLine(Color(0xFFD97827),Offset(0f,y),Offset(size.width,y),1.5.dp.toPx(),pathEffect=PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(),4.dp.toPx())))}
-        }
-        if(!hasActivity)Text(emptyText,color=Muted,fontSize=12.sp)
-        }
-        Row(Modifier.fillMaxWidth()){(if(values.size>12)labels.filter {it.isNotBlank()} else labels).forEach {Text(it,Modifier.weight(1f),fontSize=10.sp,color=Muted,textAlign=if(values.size>12)TextAlign.Start else TextAlign.Center,maxLines=1)}}
-        if(hasActivity)Text("${maximum} XP",fontSize=10.sp,color=Muted,modifier=Modifier.align(Alignment.End))
-    }
-}

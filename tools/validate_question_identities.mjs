@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {persistCourseQuestions} from './question_identities.mjs';
-const paths=['data/curriculum.json','data/course-questions.json','data/question-identities.json','app/src/main/assets/curriculum.json','app/src/main/assets/course-questions.json','app/src/main/java/com/malfreyt/alexandre/hamigo/CourseQuestionAliases47.kt'];
+const paths=['data/curriculum.json','data/course-questions.json','data/question-identities.json','app/src/main/assets/curriculum.json','app/src/main/assets/course-questions.json'];
 const digest=()=>paths.map(p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex'));
 const before=digest();
 execFileSync(process.execPath,['tools/expand_curriculum.mjs']);

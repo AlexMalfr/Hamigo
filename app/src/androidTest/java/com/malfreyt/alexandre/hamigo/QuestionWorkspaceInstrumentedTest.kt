@@ -64,7 +64,7 @@ class QuestionWorkspaceInstrumentedTest {
     }
     private fun openCalculator()=ui.onNodeWithContentDescription("Ouvrir la calculatrice").performClick()
     private fun openNotes()=ui.onNodeWithContentDescription("Ouvrir le brouillon").performClick()
-    private fun field()=ui.onNodeWithTag("calculator-expression")
+    private fun field()=CalculatorEditorDriver(ui)
     private fun closeNotes()=ui.onNodeWithContentDescription("Fermer le brouillon").performClick()
 
     @Test fun erasingAndQuestionChangesClearBothWorkspacesButReopeningKeepsThem() {
@@ -77,9 +77,9 @@ class QuestionWorkspaceInstrumentedTest {
         ui.onNodeWithContentDescription("Fermer la calculatrice").performClick()
         openCalculator();field().assertTextContains("20")
         ui.onNodeWithTag("calculator-key-⌫").performScrollTo().performClick()
-        field().assertTextEquals("Calcul","2")
+        field().assertTextEquals("2")
         ui.onNodeWithTag("calculator-key-⌫").performTouchInput { longClick() }
-        field().assertTextEquals("Calcul","")
+        field().assertTextEquals("")
         ui.onNodeWithTag("calculator-result").assertTextEquals("=")
         field().performTextInput("20")
         ui.onNodeWithText("Utiliser dans ma réponse").performScrollTo().performClick()
@@ -113,7 +113,7 @@ class QuestionWorkspaceInstrumentedTest {
         ui.onNodeWithText("Vérifier",substring=false).performClick()
         ui.onNodeWithText("Continuer",substring=false).performClick()
         ui.runOnIdle { assertEquals(1,model.session!!.index) }
-        openCalculator();field().assertTextEquals("Calcul","")
+        openCalculator();field().assertTextEquals("")
         ui.onNodeWithTag("calculator-result").assertTextEquals("=")
         ui.onNodeWithText("Ans",substring=false).performClick()
         ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()

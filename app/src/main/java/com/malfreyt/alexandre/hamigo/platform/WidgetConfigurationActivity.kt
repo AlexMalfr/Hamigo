@@ -84,7 +84,7 @@ class WidgetConfigurationActivity : ComponentActivity() {
                         if(social)Surface(shape=RoundedCornerShape(20.dp),color=Mist) {
                             Row(Modifier.fillMaxWidth().padding(12.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                                 Text("Comparer",Modifier.weight(1f),fontWeight=FontWeight.Bold)
-                                FilterChip(!socialToday,{socialToday=false},label={Text("7 jours")})
+                                FilterChip(!socialToday,{socialToday=false},label={Text("Cette semaine")})
                                 FilterChip(socialToday,{socialToday=true},label={Text("Aujourd’hui")})
                             }
                         }

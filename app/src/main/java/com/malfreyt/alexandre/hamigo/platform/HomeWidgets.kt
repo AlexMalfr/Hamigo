@@ -26,7 +26,7 @@ internal data class WidgetSnapshot(val reminder: ReminderMessage, val week: List
     companion object {
         fun read(context: Context, date: LocalDate = LocalDate.now()): WidgetSnapshot = synchronized(Progress.CLOUD_LOCK) {
             val progress = Progress(context.applicationContext)
-            val monday = date.minusDays((date.dayOfWeek.value-1).toLong())
+            val monday = com.malfreyt.alexandre.hamigo.CalendarWeek.days(date).first()
             WidgetSnapshot(ReminderContent.build(progress,date), (0L..6L).map { offset ->
                 val day = monday.plusDays(offset)
                 WidgetDay(day,if(day.isAfter(date))0 else progress.dayXp(day).coerceAtLeast(0))
@@ -108,8 +108,12 @@ internal object HomeWidgets {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val manager = context.getSystemService(AlarmManager::class.java)
         manager.cancel(pending)
-        if(installed) manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
-            ZonedDateTime.now().toLocalDate().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).plusMinutes(1).toInstant().toEpochMilli(),pending)
+        if(installed) {
+            val now=ZonedDateTime.now()
+            val midnight=now.toLocalDate().plusDays(1).atStartOfDay(now.zone).plusMinutes(1)
+            val boundary=now.toLocalDate().atTime(3,1).atZone(now.zone).let {if(it>now)it else it.plusDays(1)}
+            manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,minOf(midnight,boundary).toInstant().toEpochMilli(),pending)
+        }
     }
 
     fun received(context: Context, intent: Intent) {

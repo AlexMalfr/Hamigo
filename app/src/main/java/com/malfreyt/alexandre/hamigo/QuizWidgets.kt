@@ -135,19 +135,14 @@ class ClozeDragState {
 }
 
 fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.').replace('−','-').replace('–','-')
-    .filter{it=='.'||it=='-'||it=='/'||it.isWhitespace()}.trim().replace(Regex("\\s+")," ").replace(Regex("\\s*/\\s*")," / ")
+    .filter{it=='.'||it=='-'||it=='/'||it.isWhitespace()}.trim {it.isWhitespace()||it=='/'}
+    .replace(Regex("\\s+")," ").replace(Regex("\\s*/\\s*")," / ")
 
 @Composable fun MorseComposer(code:String,onChange:(String)->Unit,enabled:Boolean) {
     Panel(color=Mist) {
         if(code.isBlank())Text("Ton message attend son premier point…",fontSize=13.sp,color=Muted)
         else MorseSymbols(code)
-        val feedback=LocalAppFeedback.current
-        MorseSignalInput(enabled) { feedback?.event(if(it=='.')FeedbackCue.MORSE_DOT else if(it=='-')FeedbackCue.MORSE_DASH else FeedbackCue.SNAP);onChange(code + it) }
-        Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith(" "))onChange(code+" ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Lettre suivante",fontSize=11.sp)}
-            OutlinedButton(feedbackClick {if(code.isNotBlank()&&!code.endsWith("/ "))onChange(code.trimEnd()+" / ")},Modifier.weight(1f),enabled=enabled&&code.isNotBlank(),contentPadding=PaddingValues(6.dp)){Text("Mot suivant",fontSize=11.sp)}
-            IconButton(feedbackClick {onChange(code.dropLast(1))},enabled=enabled&&code.isNotBlank()){Icon(Icons.Rounded.Backspace,"Effacer le dernier symbole")}
-        }
+        MorseComposerInput(code,enabled,onChange=onChange)
         OutlinedButton(feedbackClick {playMorse(code)},enabled=code.isNotBlank(),modifier=Modifier.fillMaxWidth()){Icon(Icons.Rounded.VolumeUp,null);Spacer(Modifier.width(8.dp));Text("Écouter ma transmission")}
     }
 }

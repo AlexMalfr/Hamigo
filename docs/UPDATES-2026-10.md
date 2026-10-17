@@ -399,3 +399,13 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Retrait de cinq anciens layouts de widgets, de leurs sept dessins/fonds inutilisés et de seize textes d’aperçu obsolètes. Les layouts responsifs, aperçus actuels et ressources des launchers sont conservés.
 - Clarification dans le README : `data/curriculum.json` sert à l’édition avec les questions complètes ; `app/src/main/assets/curriculum.json` est la version générée, avec leurs UUID, chargée par Android. Les deux restent nécessaires.
 - Générateurs, registres d’identités, archives pédagogiques, outils d’import et de validation conservés. Aucun changement de contenu ou de progression ; aucune release ni installation pour ce nettoyage.
+
+## Semaines, séries et outils de saisie — prochaine 0.52, non publiée
+
+- Semaines calendaires selon la locale système, sur Moi, les amis, partages et widgets. Jour courant en orange ; comparaison personnelle en pointillés sur les graphes des amis, avec une même échelle. Les heures demandent des jours et fuseaux identiques.
+- Statistiques en quatre bulles (XP total, série, leçons terminées, XP de la semaine), actions Équipe avant GitHub, métadonnées discrètes sans titre. Version de l’APK réappliquée à chaque publication sociale.
+- Séries sur des journées de 03:00 à 03:00, avec transition conservant les séries existantes. XP, récompenses et révisions restent intacts. Compatibilité pendant cinq versions, retrait à 0.57.
+- Toute la bande de narration des introductions contrôle le TTS, sans ripple hors du bouton. Pico réfléchit et le bouton devient un spinner pendant la préparation ; bouche animée seulement à la lecture. Premier appui OTAN mis en attente pendant l’initialisation.
+- Souffle Morse de 800 ms avant et après les signaux ; choix d’espacement automatique ou manuel commun aux questions, au traducteur et à l’essai des paramètres. Accueil en cinq étapes avec trois profils de saisie et réglages avancés.
+- Calculatrice sans clavier logiciel : champ natif, curseur permanent, copier-coller, flèches et glissement pour déplacer le curseur, effacement par glissement, fonctions atomiques et suppression des paires vides. Touches roses pour effacer, outils turquoise pastel (Ans et % compris), opérateurs à peine teintés au-dessus du blanc des chiffres. En-tête avec titre et fermeture, outils compacts, zéro et égal agrandis ; hauteur réduite sur une fenêtre courte.
+- Retrait prévu de la migration des identifiants 0.47, sans changer les UUID. Builds Windows isolés par checkout, hors de OneDrive.

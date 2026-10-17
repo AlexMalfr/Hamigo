@@ -15,7 +15,7 @@ internal data class EncouragementContent(val headline:String,val detail:String,v
             val lesson="${profile.lessons} leçon${if(profile.lessons==1)" terminée" else "s terminées"}"
             val stats="${dayCount(profile.streak)} de série · $lesson"
             val days=SocialActivity.week(profile,date)
-            val week=if(days.any {it.second!=null})"${days.sumOf {it.second?.toLong() ?: 0L}} XP ${if(days.all {it.second!=null})"sur les 7 derniers jours" else "enregistrés sur les 7 derniers jours"}"
+            val week=if(days.any {it.second!=null}&&(profile.dailyXp.isNotEmpty()||profile.activityHistory!=null))"${days.sumOf {it.second?.toLong() ?: 0L}} XP ${if(days.all {it.second!=null})"cette semaine" else "enregistrés cette semaine"}"
                 else "${profile.weeklyXp} XP dans ton dernier bilan hebdo"
             val name=profile.name.replace(Regex("[\\p{Cntrl}\\r\\n]")," ").trim()
             val daily=when {reached->"Bravo, tu as atteint ton objectif du jour : $today / $goal XP ! 🎉";today!=null&&goal!=null->"Tu as gagné $today XP aujourd’hui sur ton objectif de $goal XP. Encore ${goal-today} XP pour l’atteindre !";today!=null->"Tu as gagné $today XP aujourd’hui.";else->"D’après ta dernière progression partagée :"}

@@ -156,7 +156,8 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
             }
         }
         if (existing == null) existing = findExisting(token, owner, FILE_NAME).firstOrNull()
-        val safe = ShareProgress.fromJson(progress.toJson())
+        val safe = ShareProgress.fromJson(progress.copy(appVersion=com.malfreyt.alexandre.hamigo.BuildConfig.VERSION_NAME,
+            appVersionCode=com.malfreyt.alexandre.hamigo.BuildConfig.VERSION_CODE).toJson())
         val body = JSONObject()
             .put("description", "Hamigo • ma progression radioamateur")
             .put("files", JSONObject().put(FILE_NAME, JSONObject().put("content", safe.toJson())))

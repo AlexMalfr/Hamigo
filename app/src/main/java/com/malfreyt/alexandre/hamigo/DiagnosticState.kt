@@ -156,7 +156,7 @@ internal object DiagnosticData {
             if(kind.isNotBlank()&&q.kind!=kind)return@filter false
             if(bank.isNotBlank()&&origin(q)!=bank)return@filter false
             val corpus=(listOf(q.id,q.prompt,q.explanation,q.topic,q.section,q.kind,q.source,q.image.orEmpty(),q.unit,
-                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString(),CourseQuestionMigration47.legacyId(q.id))+
+                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString())+
                 q.choices+q.bands+q.pairs.flatMap {listOf(it.left,it.right)}+courseLocations[q.id].orEmpty()).joinToString(" ").lowercase()
             words.all(corpus::contains)
         }

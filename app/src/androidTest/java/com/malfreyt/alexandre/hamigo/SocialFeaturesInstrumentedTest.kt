@@ -118,10 +118,15 @@ class SocialFeaturesInstrumentedTest {
         capture("team-ranking-clickable")
         ui.onNodeWithTag("team-rank-1").performClick();ui.onNodeWithTag("friend-progress-screen").assertIsDisplayed()
         ui.onNodeWithText("60 / 120 XP").assertIsDisplayed();capture("friend-goal-calendar")
-        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Les 7 derniers jours"))
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Cette semaine"))
         capture("friend-progress-week")
         ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Aujourd’hui · heure par heure"))
         capture("friend-progress-hours")
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Statistiques"))
+        ui.onNodeWithContentDescription("1500 · XP au total").assertExists()
+        ui.onNodeWithContentDescription("5 · Jours de série").assertExists()
+        ui.onNodeWithContentDescription("13 · Leçons terminées").assertExists()
+        capture("friend-statistics")
         // The full-screen profile is a separate Dialog window, not the Activity root.
         androidx.test.espresso.Espresso.pressBackUnconditionally();ui.onNodeWithTag("friend-progress-screen").assertDoesNotExist()
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("friend-card-https://gist.github.com/${"1".repeat(32)}"))
@@ -180,7 +185,7 @@ class SocialFeaturesInstrumentedTest {
         capture("friend-top-encouragement");nudge.performClick();ui.waitUntil(20_000){sent.size==1}
         val target=sent.single().getParcelableExtra<Intent>(Intent.EXTRA_INTENT)!!
         assertTrue(target.getStringExtra(Intent.EXTRA_TEXT)!!.contains("60 XP aujourd’hui sur ton objectif de 120 XP"))
-        assertTrue(target.getStringExtra(Intent.EXTRA_TEXT)!!.contains("210 XP sur les 7 derniers jours"))
+        assertTrue(target.getStringExtra(Intent.EXTRA_TEXT)!!.contains("cette semaine"))
         copySharedImage(target,"share-friend-contextual",720)
         val list=ui.onNodeWithTag("friend-progress-list")
         list.performScrollToNode(hasText("Ouvrir le Gist social"))

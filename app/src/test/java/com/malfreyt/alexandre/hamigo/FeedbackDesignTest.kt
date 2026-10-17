@@ -32,7 +32,8 @@ class FeedbackDesignTest {
         val ranges=pcm.signalRanges
         val dot=pcm.rate*90/1000
         assertEquals(4,ranges.size)
-        assertTrue(ranges.first().first>=pcm.rate*150/1000)
+        assertTrue(ranges.first().first>=pcm.rate*800/1000)
+        assertTrue(pcm.samples.size-ranges.last().last-1>=pcm.rate*800/1000)
         assertEquals(dot,ranges[0].count());assertEquals(dot*3,ranges[1].count())
         assertEquals(dot,ranges[1].first-ranges[0].last-1)
         assertEquals(dot*3,ranges[2].first-ranges[1].last-1)
@@ -40,6 +41,8 @@ class FeedbackDesignTest {
         val lead=pcm.samples.take(ranges.first().first)
         assertTrue(lead.any {it!=0.toShort()})
         assertTrue(lead.maxOf {abs(it.toInt())}<170)
+        val tail=pcm.samples.takeLast(pcm.rate*700/1000)
+        assertTrue(tail.any {it!=0.toShort()});assertTrue(tail.maxOf {abs(it.toInt())}<170)
         assertTrue(ranges[0].maxOf {abs(pcm.samples[it].toInt())}>9000)
         assertEquals(0,pcm.samples.first().toInt());assertEquals(0,pcm.samples.last().toInt())
         assertTrue(MorseSignalAudio.render("").samples.isEmpty())

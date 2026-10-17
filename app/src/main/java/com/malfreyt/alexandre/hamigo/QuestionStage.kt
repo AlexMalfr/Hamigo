@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Stop
@@ -100,7 +101,7 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
     }
     val reading=speech.reading
     val talking=speech.speaking
-    val mood=if(touch.playful)touch.mood else if(reading)MascotMood.HAPPY else if(feedback==true)MascotMood.CELEBRATE else if(feedback==false)MascotMood.THINKING else if(flash)companion.mood else expression
+    val mood=if(touch.playful)touch.mood else if(speech.preparing)MascotMood.THINKING else if(reading)MascotMood.HAPPY else if(feedback==true)MascotMood.CELEBRATE else if(feedback==false)MascotMood.THINKING else if(flash)companion.mood else expression
     val textMeasurer=rememberTextMeasurer()
     val textStyle=LocalTextStyle.current
     val density=LocalDensity.current
@@ -133,11 +134,13 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
                     touch.tap(SystemClock.uptimeMillis(),{speech.toggleText(q.prompt)},speech::stop)
                 }) {
                 TalkingPico(Modifier.fillMaxSize(),talking=talking,mood=mood,pose=if(touch.playful)MascotPose.HUG else if(flash)companion.pose else if(above)MascotPose.WAVE else MascotPose.POINT,
-                    mirrored=onLeft&&!above,pointLeft=!above,eyesClosed=touch.closedEyes,idleMotion=flash&&companion.active,reaction=if(touch.playful)touch.burst else if(flash)companion.reaction else 0)
+                    mirrored=onLeft&&!above,pointLeft=!above,eyesClosed=touch.closedEyes,idleMotion=speech.preparing||flash&&companion.active,reaction=if(touch.playful)touch.burst else if(flash)companion.reaction else 0)
                 Box(Modifier.align(if(onLeft&&!above)Alignment.BottomStart else Alignment.BottomEnd)
                     .offset(x=if(onLeft&&!above)(-8).dp else 8.dp).size(24.dp).background(Cream,CircleShape).testTag("question-pico-audio-hint")
+                    .semantics {contentDescription=if(reading)"Arrêter la lecture de la question" else "Écouter la question"}
                     .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button) {touch.audio {speech.toggleText(q.prompt)}},contentAlignment=Alignment.Center) {
-                    Icon(if(reading)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,if(reading)"Arrêter la lecture de la question" else "Écouter la question",Modifier.size(16.dp),tint=Muted.copy(alpha=.68f))
+                    if(speech.preparing)CircularProgressIndicator(Modifier.size(15.dp).testTag("question-tts-preparing"),strokeWidth=1.5.dp,color=Muted)
+                    else Icon(if(reading)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,null,Modifier.size(16.dp),tint=Muted.copy(alpha=.68f))
                 }
             }
         }

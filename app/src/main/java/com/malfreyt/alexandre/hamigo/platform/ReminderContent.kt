@@ -10,7 +10,7 @@ import java.time.LocalDate
 enum class ReminderContext { START, CONTINUE, RESTART, IN_PROGRESS, GOAL_REACHED }
 
 /** Small, immutable input: constructing a reminder never loads the question bank. */
-data class ReminderState(val todayXp: Int, val goal: Int, val activeDays: Set<String>)
+data class ReminderState(val todayXp: Int, val goal: Int, val activeDays: Set<String>, val streak:Int?=null)
 
 data class ReminderMessage(
     val date: LocalDate,
@@ -30,7 +30,7 @@ object ReminderContent {
     fun build(progress: Progress, date: LocalDate = LocalDate.now()): ReminderMessage = build(
         ReminderState(progress.dayXp(date), progress.dailyGoal, progress.activeDays.filterTo(mutableSetOf()) { day ->
             runCatching { progress.dayXp(LocalDate.parse(day)) > 0 }.getOrDefault(false)
-        }), date
+        },progress.streak), date
     )
 
     fun build(state: ReminderState, date: LocalDate = LocalDate.now()): ReminderMessage {
@@ -39,7 +39,7 @@ object ReminderContent {
         }
         val goal = state.goal.coerceAtLeast(1)
         val todayXp = state.todayXp.coerceAtLeast(0)
-        val streak = LearningRules.streak(activeDays, date)
+        val streak = state.streak ?: LearningRules.streak(activeDays, date)
         val context = when {
             todayXp >= goal -> ReminderContext.GOAL_REACHED
             todayXp > 0 -> ReminderContext.IN_PROGRESS

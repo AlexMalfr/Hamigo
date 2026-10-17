@@ -119,11 +119,14 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = loadState()
-    // Finish the identity conversion before another reader can load the old keys.
+    // Persist the temporary streak bridge before another reader can load the old state.
     @android.annotation.SuppressLint("ApplySharedPref")
     private fun loadState():JSONObject = synchronized(CLOUD_LOCK) {
         val state=runCatching {JSONObject(prefs.getString("progress","{}")!!)}.getOrElse {JSONObject()}
-        if(CourseQuestionMigration47.apply(state))check(prefs.edit().putString("progress",state.toString()).commit())
+        if(state.has("questionIdsVersion"))require(state.getInt("questionIdsVersion")==1)
+        val changed=StreakMigration52.apply(state)||!state.has("questionIdsVersion")
+        state.put("questionIdsVersion",1)
+        if(changed)check(prefs.edit().putString("progress",state.toString()).commit())
         state
     }
     var name: String
@@ -140,9 +143,9 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     }
     val activeDays: Set<String> get() = (root.optJSONObject("dailyXp") ?: JSONObject()).keys().asSequence().toSet()
     val xp get() = root.optInt("xp")
-    val streak get() = LearningRules.streak(activeDays, LocalDate.now())
+    val streak get() = StreakHistory.count(root)
     val todayXp get() = dayXp(LocalDate.now())
-    val weeklyXp get() = (0L..6L).sumOf { dayXp(LocalDate.now().minusDays(it)) }
+    val weeklyXp get() = CalendarWeek.days(LocalDate.now()).sumOf {dayXp(it).toLong()}.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     val totalAnswers get() = root.optInt("answers")
     val totalCorrect get() = root.optInt("correct")
     val dailyGoal get() = DailyGoals.xp(prefs.getInt("dailyGoal",30))
