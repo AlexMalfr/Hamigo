@@ -465,3 +465,9 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Même 0.53 : retrait de la transcription `ku` pour Q, qui pouvait être lue « kou » ; la voix française reçoit maintenant la lettre isolée, dans les sigles comme dans les formules.
 
 - Même 0.53 : épellation cohérente des codes Q à trois lettres, notamment QRZ qui manquait à la liste partielle alors que QRT y figurait.
+
+### Essai Morse à la demande — 0.54
+
+- Dans l’accueil, le manipulateur reste masqué jusqu’au clic sur « Essayer », centré en bas au-dessus de Continuer. Il remplace le bouton et se met en vue si nécessaire.
+- « Revenir aux profils » suit les réglages manuels, juste avant l’essai, comme « Réglages avancés » en mode profils. L’essai reste ouvert lors du changement de mode.
+- Sous-texte raccourci à « Tu pourras le changer dans les paramètres. ». Préférences Morse et autres étapes conservées.

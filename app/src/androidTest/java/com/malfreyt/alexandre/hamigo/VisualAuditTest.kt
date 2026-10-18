@@ -202,6 +202,7 @@ class VisualAuditTest {
         ui.onNodeWithTag("morse-auto-spaces").performScrollTo().assertIsOn()
         ui.onNodeWithTag("morse-auto-spaces").performClick()
         ui.onNodeWithTag("morse-timing").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithTag("onboarding-morse-try").performScrollTo().performClick()
         ui.onNodeWithText("Point").performScrollTo().performClick()
         ui.onNodeWithTag("morse-preview-text").assertTextEquals("E")
         ui.onNodeWithTag("morse-auto-spaces").performScrollTo().performClick()

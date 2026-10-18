@@ -15,6 +15,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -62,6 +64,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","Morse","GitHub"
     var minute by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderMinute",prefs.getInt("reminderMinute",0)).coerceIn(0,59))}
     var morse by remember {mutableStateOf(GameplayPreferences.read(prefs))}
     var advancedMorse by rememberSaveable {mutableStateOf(false)}
+    var showMorsePreview by rememberSaveable {mutableStateOf(false)}
     var permissionPending by remember {mutableStateOf(false)}
     var permissionError by rememberSaveable {mutableStateOf(false)}
     fun moveTo(next:Int) {
@@ -126,6 +129,7 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","Morse","GitHub"
             }
         }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(),contentAlignment=Alignment.TopCenter) {
+            val pageHeight=maxHeight
             val heroSize=if(WindowInsets.isImeVisible)112.dp else (maxHeight*(.35f/LocalDensity.current.fontScale.coerceAtLeast(1f))).coerceIn(140.dp,240.dp)
             AnimatedContent(targetState=step,modifier=Modifier.fillMaxSize(),label="onboarding-step",
                 transitionSpec={
@@ -133,94 +137,114 @@ private val onboardingSteps=listOf("Pseudo","Objectif","Rappel","Morse","GitHub"
                     (fadeIn(tween(220))+slideInHorizontally(tween(260)){it/5*direction}) togetherWith
                         (fadeOut(tween(160))+slideOutHorizontally(tween(260)){-it/5*direction})
                 }) {page ->
-                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal=24.dp,vertical=8.dp),
-                    horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(if(page==3)10.dp else 16.dp)) {
-                    OnboardingPico(page,if(page==3)heroSize.coerceAtMost(96.dp) else heroSize)
-                    val title=when(page) {0->"Bienvenue dans Hamigo";1->"Un objectif à ton rythme";2->"On garde le rendez-vous ?";3->"Comment veux-tu saisir le Morse ?";else->"Retrouve ta progression"}
-                    val description=when(page) {
-                        0->"Moi, c’est Pico ! On prépare ton certificat radioamateur, une notion à la fois. Comment dois-je t’appeler ?"
-                        1->"Choisis les XP que tu veux gagner chaque jour. Tu pourras ajuster ton objectif à tout moment."
-                        2->"Un petit rappel de Pico pour penser à ta séance, à l’heure qui te convient."
-                        3->"Choisis une façon de découvrir le Morse. Tu pourras la changer dans les paramètres."
-                        else->"Avec GitHub, sauvegarde tes révisions et rejoins tes amis pour vous motiver ensemble."
-                    }
-                    Text(title,fontSize=28.sp,lineHeight=32.sp,fontWeight=FontWeight.ExtraBold,color=Ink,textAlign=TextAlign.Center)
-                    Text(description,color=Muted,fontSize=15.sp,lineHeight=22.sp,textAlign=TextAlign.Center)
-                    when(page) {
-                        0->OutlinedTextField(name,{name=it.take(40);prefs.edit().putString("onboardingName",name).apply()},
-                            label={Text("Ton pseudo")},placeholder={Text("Par exemple, Alex")},singleLine=true,
-                            modifier=Modifier.fillMaxWidth().widthIn(max=480.dp).testTag("onboarding-name"),
-                            keyboardOptions=KeyboardOptions(capitalization=KeyboardCapitalization.Words,imeAction=ImeAction.Next),
-                            keyboardActions=KeyboardActions(onNext={continueStep()}))
-                        1->Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                            DailyGoals.values.zip(listOf("Léger","Régulier","Soutenu","Intensif")).chunked(2).forEach {row ->
-                                Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
-                                    row.forEach {(value,label)->
-                                        Surface(onClick=feedbackClick {goal=value},modifier=Modifier.weight(1f).fillMaxHeight().testTag("onboarding-goal-$value").semantics {selected=goal==value},
-                                            shape=RoundedCornerShape(20.dp),color=if(goal==value)Mist else Color.White,
-                                            border=androidx.compose.foundation.BorderStroke(if(goal==value)2.dp else 1.dp,if(goal==value)Teal else Ink.copy(alpha=.1f))) {
-                                            Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(5.dp)) {
-                                                Row(verticalAlignment=Alignment.CenterVertically) {
-                                                    Text("$value XP",Modifier.weight(1f),fontSize=21.sp,lineHeight=25.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
-                                                    if(goal==value)Icon(Icons.Rounded.CheckCircle,"Objectif sélectionné",Modifier.size(20.dp),tint=Teal)
+                Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                    .then(if(page==3)Modifier.heightIn(min=pageHeight) else Modifier).padding(horizontal=24.dp,vertical=8.dp),
+                    horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.SpaceBetween) {
+                    Column(Modifier.fillMaxWidth(),horizontalAlignment=Alignment.CenterHorizontally,
+                        verticalArrangement=Arrangement.spacedBy(if(page==3)10.dp else 16.dp)) {
+                        OnboardingPico(page,if(page==3)heroSize.coerceAtMost(96.dp) else heroSize)
+                        val title=when(page) {0->"Bienvenue dans Hamigo";1->"Un objectif à ton rythme";2->"On garde le rendez-vous ?";3->"Comment veux-tu saisir le Morse ?";else->"Retrouve ta progression"}
+                        val description=when(page) {
+                            0->"Moi, c’est Pico ! On prépare ton certificat radioamateur, une notion à la fois. Comment dois-je t’appeler ?"
+                            1->"Choisis les XP que tu veux gagner chaque jour. Tu pourras ajuster ton objectif à tout moment."
+                            2->"Un petit rappel de Pico pour penser à ta séance, à l’heure qui te convient."
+                            3->"Tu pourras le changer dans les paramètres."
+                            else->"Avec GitHub, sauvegarde tes révisions et rejoins tes amis pour vous motiver ensemble."
+                        }
+                        Text(title,fontSize=28.sp,lineHeight=32.sp,fontWeight=FontWeight.ExtraBold,color=Ink,textAlign=TextAlign.Center)
+                        Text(description,color=Muted,fontSize=15.sp,lineHeight=22.sp,textAlign=TextAlign.Center)
+                        when(page) {
+                            0->OutlinedTextField(name,{name=it.take(40);prefs.edit().putString("onboardingName",name).apply()},
+                                label={Text("Ton pseudo")},placeholder={Text("Par exemple, Alex")},singleLine=true,
+                                modifier=Modifier.fillMaxWidth().widthIn(max=480.dp).testTag("onboarding-name"),
+                                keyboardOptions=KeyboardOptions(capitalization=KeyboardCapitalization.Words,imeAction=ImeAction.Next),
+                                keyboardActions=KeyboardActions(onNext={continueStep()}))
+                            1->Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
+                                DailyGoals.values.zip(listOf("Léger","Régulier","Soutenu","Intensif")).chunked(2).forEach {row ->
+                                    Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
+                                        row.forEach {(value,label)->
+                                            Surface(onClick=feedbackClick {goal=value},modifier=Modifier.weight(1f).fillMaxHeight().testTag("onboarding-goal-$value").semantics {selected=goal==value},
+                                                shape=RoundedCornerShape(20.dp),color=if(goal==value)Mist else Color.White,
+                                                border=androidx.compose.foundation.BorderStroke(if(goal==value)2.dp else 1.dp,if(goal==value)Teal else Ink.copy(alpha=.1f))) {
+                                                Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(5.dp)) {
+                                                    Row(verticalAlignment=Alignment.CenterVertically) {
+                                                        Text("$value XP",Modifier.weight(1f),fontSize=21.sp,lineHeight=25.sp,fontWeight=FontWeight.ExtraBold,color=Teal)
+                                                        if(goal==value)Icon(Icons.Rounded.CheckCircle,"Objectif sélectionné",Modifier.size(20.dp),tint=Teal)
+                                                    }
+                                                    Text(label,fontSize=14.sp,lineHeight=18.sp,fontWeight=FontWeight.Bold,color=Ink)
+                                                    Text(if(value==60)"Conseillé pour démarrer" else "Par jour",fontSize=11.sp,lineHeight=15.sp,color=Muted)
                                                 }
-                                                Text(label,fontSize=14.sp,lineHeight=18.sp,fontWeight=FontWeight.Bold,color=Ink)
-                                                Text(if(value==60)"Conseillé pour démarrer" else "Par jour",fontSize=11.sp,lineHeight=15.sp,color=Muted)
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        2-> {
-                            OutlinedButton(feedbackClick {TimePickerDialog(context,{_,h,m->
-                                hour=h;minute=m
-                                prefs.edit().putInt("onboardingReminderHour",h).putInt("onboardingReminderMinute",m).apply()
-                            },hour,minute,true).show()},Modifier.fillMaxWidth().heightIn(min=64.dp).testTag("onboarding-reminder-time")) {
-                                Icon(Icons.Rounded.Schedule,null);Spacer(Modifier.width(12.dp))
-                                Text("%02d:%02d".format(hour,minute),fontSize=26.sp,fontWeight=FontWeight.ExtraBold)
-                                Spacer(Modifier.weight(1f));Icon(Icons.Rounded.Edit,"Choisir l’heure du rappel")
-                            }
-                            if(permissionError) {
-                                Text("Les notifications restent désactivées. Tu peux continuer sans rappel.",color=MaterialTheme.colorScheme.error,fontSize=13.sp,lineHeight=18.sp,textAlign=TextAlign.Center)
-                                TextButton(feedbackClick {context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName))}) {
-                                    Text("Ouvrir les réglages de notifications")
+                            2-> {
+                                OutlinedButton(feedbackClick {TimePickerDialog(context,{_,h,m->
+                                    hour=h;minute=m
+                                    prefs.edit().putInt("onboardingReminderHour",h).putInt("onboardingReminderMinute",m).apply()
+                                },hour,minute,true).show()},Modifier.fillMaxWidth().heightIn(min=64.dp).testTag("onboarding-reminder-time")) {
+                                    Icon(Icons.Rounded.Schedule,null);Spacer(Modifier.width(12.dp))
+                                    Text("%02d:%02d".format(hour,minute),fontSize=26.sp,fontWeight=FontWeight.ExtraBold)
+                                    Spacer(Modifier.weight(1f));Icon(Icons.Rounded.Edit,"Choisir l’heure du rappel")
                                 }
-                            } else Text("Un rappel par jour. Tu gardes la main dans les paramètres.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
-                        }
-                        3-> {
-                            if(!advancedMorse)MorseProfiles.forEachIndexed {index,profile ->
-                                val chosen=morse.singleKey==profile.settings.singleKey&&morse.autoSpaces==profile.settings.autoSpaces&&morse.thresholdMs==profile.settings.thresholdMs
-                                Surface(onClick=feedbackClick {morse=profile.settings.copy(liveSound=morse.liveSound)},color=if(chosen)Mist else Color.White,shape=RoundedCornerShape(16.dp),border=androidx.compose.foundation.BorderStroke(if(chosen)2.dp else 1.dp,if(chosen)Teal else Mist)) {
-                                    Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                                        Row(verticalAlignment=Alignment.CenterVertically) {
-                                            Text(profile.title,Modifier.weight(1f),fontWeight=FontWeight.Bold,color=Teal)
-                                            Row(Modifier.semantics {contentDescription="Difficulté ${index+1} sur 3"},horizontalArrangement=Arrangement.spacedBy(2.dp)) {
-                                                repeat(index+1){Icon(Icons.Rounded.Bolt,null,Modifier.size(17.dp),tint=if(index==2)Coral else Teal)}
+                                if(permissionError) {
+                                    Text("Les notifications restent désactivées. Tu peux continuer sans rappel.",color=MaterialTheme.colorScheme.error,fontSize=13.sp,lineHeight=18.sp,textAlign=TextAlign.Center)
+                                    TextButton(feedbackClick {context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE,context.packageName))}) {
+                                        Text("Ouvrir les réglages de notifications")
+                                    }
+                                } else Text("Un rappel par jour. Tu gardes la main dans les paramètres.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
+                            }
+                            3-> {
+                                if(!advancedMorse)MorseProfiles.forEachIndexed {index,profile ->
+                                    val chosen=morse.singleKey==profile.settings.singleKey&&morse.autoSpaces==profile.settings.autoSpaces&&morse.thresholdMs==profile.settings.thresholdMs
+                                    Surface(onClick=feedbackClick {morse=profile.settings.copy(liveSound=morse.liveSound)},color=if(chosen)Mist else Color.White,shape=RoundedCornerShape(16.dp),border=androidx.compose.foundation.BorderStroke(if(chosen)2.dp else 1.dp,if(chosen)Teal else Mist)) {
+                                        Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                                            Row(verticalAlignment=Alignment.CenterVertically) {
+                                                Text(profile.title,Modifier.weight(1f),fontWeight=FontWeight.Bold,color=Teal)
+                                                Row(Modifier.semantics {contentDescription="Difficulté ${index+1} sur 3"},horizontalArrangement=Arrangement.spacedBy(2.dp)) {
+                                                    repeat(index+1){Icon(Icons.Rounded.Bolt,null,Modifier.size(17.dp),tint=if(index==2)Coral else Teal)}
+                                                }
                                             }
+                                            Text(when(index){0->"Recommandé pour les débutants";1->"Pour prendre le rythme";else->"Plus réaliste · avancé"},fontSize=11.sp,lineHeight=15.sp,fontWeight=FontWeight.Bold,color=if(index==2)Coral else Teal)
+                                            Text(profile.description,fontSize=12.sp,lineHeight=17.sp,color=Muted)
                                         }
-                                        Text(when(index){0->"Recommandé pour les débutants";1->"Pour prendre le rythme";else->"Plus réaliste · avancé"},fontSize=11.sp,lineHeight=15.sp,fontWeight=FontWeight.Bold,color=if(index==2)Coral else Teal)
-                                        Text(profile.description,fontSize=12.sp,lineHeight=17.sp,color=Muted)
                                     }
                                 }
+                                if(advancedMorse)MorseSettingsControls(morse){morse=it}
+
                             }
-                            TextButton(feedbackClick {advancedMorse=!advancedMorse}){Text(if(advancedMorse)"Revenir aux profils" else "Réglages avancés",fontSize=12.sp)}
-                            if(advancedMorse)MorseSettingsControls(morse){morse=it}
-                            Text("Essaie ici",Modifier.fillMaxWidth(),fontSize=13.sp,fontWeight=FontWeight.Bold,color=Teal)
-                            Surface(color=Mist,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth()) {MorseSettingsPreview(morse)}
-                        }
-                        4-> {
-                            Surface(color=Mist,shape=RoundedCornerShape(20.dp)) {
-                                Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-                                    OnboardingBenefit(Icons.Rounded.CloudDone,"Ta progression sauvegardée")
-                                    OnboardingBenefit(Icons.Rounded.Groups,"Ton équipe et ses progrès")
-                                    OnboardingBenefit(Icons.Rounded.WifiOff,"Tes révisions accessibles hors ligne")
+                            4-> {
+                                Surface(color=Mist,shape=RoundedCornerShape(20.dp)) {
+                                    Column(Modifier.fillMaxWidth().padding(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                                        OnboardingBenefit(Icons.Rounded.CloudDone,"Ta progression sauvegardée")
+                                        OnboardingBenefit(Icons.Rounded.Groups,"Ton équipe et ses progrès")
+                                        OnboardingBenefit(Icons.Rounded.WifiOff,"Tes révisions accessibles hors ligne")
+                                    }
                                 }
+                                Text("GitHub est facultatif. Tu peux le connecter plus tard.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
                             }
-                            Text("GitHub est facultatif. Tu peux le connecter plus tard.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
                         }
+                        Spacer(Modifier.height(4.dp))
                     }
-                    Spacer(Modifier.height(4.dp))
+                    if(page==3)Column(Modifier.fillMaxWidth().padding(top=10.dp),horizontalAlignment=Alignment.CenterHorizontally,
+                        verticalArrangement=Arrangement.spacedBy(10.dp)) {
+                            TextButton(feedbackClick {advancedMorse=!advancedMorse},Modifier.testTag("onboarding-morse-mode")) {
+                                Text(if(advancedMorse)"Revenir aux profils" else "Réglages avancés",fontSize=12.sp)
+                            }
+                            if(showMorsePreview) {
+                                val previewRequester=remember {BringIntoViewRequester()}
+                                Surface(color=Mist,shape=RoundedCornerShape(16.dp),modifier=Modifier.fillMaxWidth().bringIntoViewRequester(previewRequester)) {MorseSettingsPreview(morse)}
+                                LaunchedEffect(advancedMorse) {
+                                    withFrameNanos { }
+                                    previewRequester.bringIntoView()
+                                }
+                            } else OutlinedButton(feedbackClick {showMorsePreview=true},Modifier.testTag("onboarding-morse-try")) {
+                                Icon(Icons.Rounded.PlayArrow,null,Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Essayer")
+                            }
+                    }
                 }
             }
         }
