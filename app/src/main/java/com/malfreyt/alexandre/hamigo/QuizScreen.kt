@@ -67,9 +67,7 @@ import kotlin.random.Random
     }
     var choice by rememberSaveable(key){mutableIntStateOf(s.responses[s.index]?.choiceIndex ?: -1)}
     var numeric by rememberSaveable(key){mutableStateOf(s.responses[s.index]?.display?.substringBeforeLast(" ").orEmpty())}
-    var ordered by remember(key){mutableStateOf(q.choices.indices.shuffled(Random(q.id.hashCode())).let {list->
-        if(list.size>1&&list==q.choices.indices.toList())list.drop(1)+list.first() else list
-    })}
+    var ordered by remember(key){mutableStateOf(initialQuestionOrder(q))}
     var matches by remember(key){mutableStateOf(emptyMap<Int,Int>())}
     var flipped by rememberSaveable(key){mutableStateOf(false)}
     var revealed by rememberSaveable(key){mutableStateOf(false)}
@@ -153,7 +151,7 @@ import kotlin.random.Random
                 }
             }
         } else QuestionStage(Modifier.weight(1f).fillMaxWidth(),scroll,compact=imeVisible,illustrated=q.image!=null,
-            prompt={QuestionPrompt(q,key,feedback,stacked=q.image!=null) {picoOnLeft ->
+            prompt={QuestionPrompt(q,key,feedback,stacked=q.image!=null,spokenOrder=ordered.map(q.choices::get)) {picoOnLeft ->
                 if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
                 else if(q.kind=="cloze")ClozeSentence(q,choice,feedback==null,feedback,clozeDrag,textAlign=if(picoOnLeft)androidx.compose.ui.text.style.TextAlign.Start else androidx.compose.ui.text.style.TextAlign.End){choice=it}
                 else QuestionText(q.prompt,towardsLeft=picoOnLeft)

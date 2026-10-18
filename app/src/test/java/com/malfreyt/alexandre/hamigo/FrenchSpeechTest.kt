@@ -4,6 +4,13 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class FrenchSpeechTest {
+    @Test fun qUsesTheNativeFrenchLetterNameInsteadOfTheAmbiguousKuSpelling() {
+        assertEquals("Q",FrenchSpeech.prepare(FrenchSpeech.option("Q")))
+        assertEquals("La lettre Q.",FrenchSpeech.prepare("La lettre Q."))
+        assertEquals("Q cé emme",FrenchSpeech.prepare("QCM"))
+        assertEquals("Q égale 2",FrenchSpeech.prepare("Q = 2"))
+    }
+
     @Test fun morseSignalsBecomePointsTraitsAndExplicitSeparatorsWithoutReadingPunctuation() {
         assertEquals("Quel caractère correspond à trait, point ?",FrenchSpeech.prepare("Quel caractère correspond à ━• ?"))
         assertEquals("Lis en Morse point, trait, pause entre lettres, trait, point, pause entre mots, point",FrenchSpeech.prepare("Lis en Morse .- -. / ."))
@@ -33,7 +40,7 @@ class FrenchSpeechTest {
     @Test fun greekIndicesExponentsComparisonsAndRadioAbbreviationsAreSpoken() {
         val actual=FrenchSpeech.prepare("λ ≈ 300/f ; R₁ = 10³ Ω ; 10⁻⁶ F ; ±5 % ; U ≤ 5 V ; log₁₀(100).")
         listOf("lambda","environ égal","indice 1","au cube","puissance moins 6","plus ou moins","pour cent","inférieur ou égal","logarithme en base dix").forEach {assertTrue("Missing $it in $actual",actual.contains(it))}
-        assertEquals("cé ku et ku ère emme, vé ache effe.",FrenchSpeech.prepare("CQ et QRM, VHF."))
+        assertEquals("cé Q et Q ère emme, vé ache effe.",FrenchSpeech.prepare("CQ et QRM, VHF."))
         assertTrue(FrenchSpeech.prepare("F4ABC/P").contains("barre oblique"))
     }
     @Test fun normalizationDoesNotLeakPlaceholdersOrReadUrlsOrInventAnAnswer() {
@@ -80,4 +87,27 @@ class FrenchSpeechTest {
         assertTrue(course,course.contains("ohms et farads"))
         assertTrue(FrenchSpeech.prepare("Les unités de base : utilise Ω et F.").contains("ohms et farads"))
     }
+    @Test fun compactEnergyProductsAndChainedEqualitiesNeverReachTheEngineAsRomanNumerals() {
+        assertEquals("e égale un demi fois elle fois i au carré",FrenchSpeech.prepare("E = ½LI²"))
+        assertEquals("e égale un demi fois cé fois u au carré",FrenchSpeech.prepare("E = ½CU²"))
+        assertEquals("un demi fois elle fois i au carré",FrenchSpeech.option("½LI²"))
+        assertEquals("pé égale u fois i égale ère fois i au carré égale u au carré divisé par ère",FrenchSpeech.prepare("P = UI = RI² = U²/R"))
+        assertEquals("Une valeur de 51 volts.",FrenchSpeech.prepare("Une valeur de 51 V."))
+    }
+    @Test fun subscriptsAndUnparsedFractionsStillHaveSafeSpokenFallbacks() {
+        assertEquals("ixe égale ixe indice elle moins ixe indice cé",FrenchSpeech.prepare("X = XL − XC"))
+        assertEquals("u égale e fois elle",FrenchSpeech.prepare("U = EL"))
+        val reflected=FrenchSpeech.prepare("Γ = (RL−Z0)/(RL+Z0)")
+        assertTrue(reflected,reflected.contains("divisé par"));assertFalse(reflected.contains("pause entre mots"))
+        assertTrue(reflected.contains("zède indice 0"));assertFalse(reflected.contains("Z0"))
+        assertFalse(FrenchSpeech.prepare("E ≈ ½LI²").contains("LI"))
+        assertEquals("elle divisé par 10",FrenchSpeech.prepare("L/10"))
+        val derivative=FrenchSpeech.prepare("u = L di/dt")
+        assertTrue(derivative,derivative.contains("elle fois le taux de variation de l’intensité au cours du temps"))
+        assertFalse(Regex("\\b(?:di|dt)\\b").containsMatchIn(derivative))
+        val power=FrenchSpeech.prepare("Un rapport 10^(−L/10).")
+        assertTrue(power,power.contains("puissance"));assertFalse(power.contains("^"));assertFalse(power.contains("elle elle"))
+        assertEquals("effe e té, esse dé ère, a gé cé.",FrenchSpeech.prepare("FET, SDR, AGC."))
+    }
+
 }

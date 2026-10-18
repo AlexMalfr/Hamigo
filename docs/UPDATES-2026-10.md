@@ -440,3 +440,28 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 
 - Les aperçus Diagnostics reprennent la navigation complète et les interactions natives, dans leur modèle en mémoire. Les réglages fictifs persistent entre les pages de cet aperçu ; la progression réelle, GitHub et les rappels système restent protégés.
 - Streak et XP total plus grands sur Moi, avec des icônes agrandies et une taille adaptée aux petits écrans.
+
+
+### Lecture vocale et Pico — 0.53
+
+- Narration par type d’exercice : phrases à compléter, choix, groupes à associer, ordre courant, unités et tolérances. Aucun dévoilement des solutions, du signal d’écoute Morse ou du dos caché des flashcards.
+- Adaptations orales de 65 introductions, dont les 50 rappels de formules ; épellation des lettres, indicatifs et abréviations, listes et plages de valeurs. Le texte affiché et les identifiants restent conservés.
+- Bouche de Pico pilotée par les pauses réelles du fichier synthétisé, avec fermeture rapide et progressive ; les yeux et le corps restent en parole pendant une pause. Analyse hors du fil UI, fichiers temporaires nettoyés à l’arrêt.
+- Actions Lire/Arrêter exposées aux services d’accessibilité. Les activations par exploration tactile ne déclenchent pas les grimaces. Voir les [règles et limites de la lecture vocale](SPEECH.md).
+
+- Ajustement de la même 0.53 : retour à une bouche ovale simple, mouvement régulier et légère variation audio lissée ; fermeture réactive aux pauses sans changer la forme du visage.
+
+- Même 0.53 : tracé de bouche et langue d’avant restaurés, avec fermeture sans sourire. État de parole maintenu entre les fichiers des paragraphes ; visage de repos interdit pendant toute la narration, préparation comprise.
+
+- Même 0.53 : vingt et un paragraphes supplémentaires ou révisés pour l’oral, au-delà des encadrés finaux. Produits avec fractions, égalités en chaîne, indices, dérivées et acronymes ne sont plus laissés bruts au moteur ; `LI` dans `½LI²` ne devient pas 51. Réutilisation des expressions régulières de préparation.
+- Diagnostics : onglets Intros et TTS, recherche dans les cours affichés et leur narration, emplacement dans le Parcours, aperçu natif, tests isolés des questions, copie du contexte et du texte oral exact. Inspecteur TTS aussi dans le détail d’une question ; repérage indicatif des notations à contrôler.
+
+- Même 0.53 : accès « Voix de synthèse » sous Sons/Vibrations dans Gameplay, pour ouvrir le réglage TTS système ; courte indication du moteur système utilisé.
+
+- Même 0.53 : les questions numériques de note annoncent « sur vingt » pour l’unité `/20`, au lieu de « en divisé par vingt ». Tolérance éventuelle en points ; divisions mathématiques conservées.
+
+- Même 0.53 : correction de la détection orale des conversions ; les problèmes de calcul, dont le temps moyen par question d’examen, ne sont plus précédés arbitrairement de « Convertis ».
+
+- Même 0.53 : retrait de la transcription `ku` pour Q, qui pouvait être lue « kou » ; la voix française reçoit maintenant la lettre isolée, dans les sigles comme dans les formules.
+
+- Même 0.53 : épellation cohérente des codes Q à trois lettres, notamment QRZ qui manquait à la liste partielle alors que QRT y figurait.

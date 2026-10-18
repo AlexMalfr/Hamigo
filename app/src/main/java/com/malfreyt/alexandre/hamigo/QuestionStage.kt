@@ -76,10 +76,12 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
 }
 
 @Composable internal fun QuestionPrompt(q:Question,questionKey:String,feedback:Boolean?,stacked:Boolean=false,flashFlipped:Boolean=false,
+    spokenOrder:List<String> = initialQuestionOrder(q).map(q.choices::get),
     content:@Composable (Boolean)->Unit) {
     val context=LocalContext.current
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context) {LessonSpeech(context,eager=false)}
+    val accessibleTap=rememberTouchExploration()
     val onLeft=remember(questionKey) {Random.nextBoolean()}
     val expression=remember(questionKey) {listOf(MascotMood.HAPPY,MascotMood.GOOFY,MascotMood.DETERMINED,MascotMood.THINKING).random()}
     val flash=q.kind=="flash"
@@ -101,14 +103,19 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
     }
     val reading=speech.reading
     val talking=speech.speaking
+    val spoken=QuestionNarration.text(q,spokenOrder,flashFlipped)
+    val toggleSpeech={speech.toggleText(spoken)}
+    LaunchedEffect(flashFlipped){speech.stop()}
     val mood=if(touch.playful)touch.mood else if(speech.preparing)MascotMood.THINKING else if(reading)MascotMood.HAPPY else if(feedback==true)MascotMood.CELEBRATE else if(feedback==false)MascotMood.THINKING else if(flash)companion.mood else expression
     val textMeasurer=rememberTextMeasurer()
     val textStyle=LocalTextStyle.current
     val density=LocalDensity.current
     val requestedHeight=LocalQuestionPromptMinimumHeight.current
     val narrationModifier=if(q.image==null&&q.kind!="flash")Modifier.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,
-        onClickLabel="Écouter la question") {touch.audio {speech.toggleText(q.prompt)}} else Modifier
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        onClickLabel=if(reading)"Arrêter la lecture" else "Lire la question et les choix") {touch.audio(toggleSpeech)} else Modifier
+    BoxWithConstraints(Modifier.fillMaxWidth().testTag("question-narration-actions").semantics {
+        customActions=listOf(CustomAccessibilityAction(if(reading)"Arrêter la lecture" else "Lire la question et les choix") {touch.audio(toggleSpeech);true})
+    }) {
         val preferredHeight=if(requestedHeight.value.isFinite())requestedHeight else if(constraints.hasBoundedHeight)maxHeight else 220.dp
         val baseMascotSize=if(flash)(preferredHeight*.32f).coerceIn(96.dp,160.dp).coerceAtMost(maxWidth*.46f)
             else if(stacked)(preferredHeight*.40f).coerceIn(76.dp,116.dp) else (preferredHeight*.76f).coerceIn(76.dp,132.dp).coerceAtMost(maxWidth*.31f)
@@ -131,14 +138,14 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
                     contentDescription=if(reading)"Arrêter la lecture de la question" else "Écouter la question avec Pico"
                     stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(talking)"Pico parle" else if(reading)"Lecture audio en préparation" else if(flash)companion.mood.description else "Pico présente la question"
                 }.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button) {
-                    touch.tap(SystemClock.uptimeMillis(),{speech.toggleText(q.prompt)},speech::stop)
+                    if(accessibleTap)touch.audio(toggleSpeech) else touch.tap(SystemClock.uptimeMillis(),toggleSpeech,speech::stop)
                 }) {
-                TalkingPico(Modifier.fillMaxSize(),talking=talking,mood=mood,pose=if(touch.playful)MascotPose.HUG else if(flash)companion.pose else if(above)MascotPose.WAVE else MascotPose.POINT,
+                TalkingPico(Modifier.fillMaxSize(),talking=talking,speechActive=reading,mouthActivity=speech.mouthActivity,mood=mood,pose=if(touch.playful)MascotPose.HUG else if(flash)companion.pose else if(above)MascotPose.WAVE else MascotPose.POINT,
                     mirrored=onLeft&&!above,pointLeft=!above,eyesClosed=touch.closedEyes,idleMotion=speech.preparing||flash&&companion.active,reaction=if(touch.playful)touch.burst else if(flash)companion.reaction else 0)
                 Box(Modifier.align(if(onLeft&&!above)Alignment.BottomStart else Alignment.BottomEnd)
                     .offset(x=if(onLeft&&!above)(-8).dp else 8.dp).size(24.dp).background(Cream,CircleShape).testTag("question-pico-audio-hint")
                     .semantics {contentDescription=if(reading)"Arrêter la lecture de la question" else "Écouter la question"}
-                    .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button) {touch.audio {speech.toggleText(q.prompt)}},contentAlignment=Alignment.Center) {
+                    .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button) {touch.audio(toggleSpeech)},contentAlignment=Alignment.Center) {
                     if(speech.preparing)CircularProgressIndicator(Modifier.size(15.dp).testTag("question-tts-preparing"),strokeWidth=1.5.dp,color=Muted)
                     else Icon(if(reading)Icons.Rounded.Stop else Icons.Rounded.VolumeUp,null,Modifier.size(16.dp),tint=Muted.copy(alpha=.68f))
                 }

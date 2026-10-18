@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -71,21 +72,25 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
     DisposableEffect(inspector){onDispose {inspector.disposeDiagnostics()}}
     var tab by remember {mutableStateOf("Outils")}
     var selected by remember {mutableStateOf<DiagnosticSelection?>(null)}
+    var selectedCourse by remember {mutableStateOf<DiagnosticCourseEntry?>(null)}
+    var courseQuery by remember {mutableStateOf("")};var courseFilter by remember {mutableStateOf("")}
+    val courseListState=rememberLazyListState()
+    val courseEntries by produceState<List<DiagnosticCourseEntry>?>(null,content) {value=withContext(Dispatchers.Default){NarrationAudit.entries(content.chapters)}}
     var mock by remember {mutableStateOf<String?>(null)}
     var previewBack by remember {mutableStateOf<(() -> Boolean)?>(null)}
     if(mock=="Onboarding") {DiagnosticOnboarding(owner,content){mock=null};return}
-    fun back(){if(mock!=null&&previewBack?.invoke()==true)return;when {inspector.session!=null->inspector.leaveSession();selected!=null->selected=null;mock!=null->mock=null;else->owner.debugToolsOpen=false}}
+    fun back(){if(mock!=null&&previewBack?.invoke()==true)return;when {inspector.session!=null->inspector.leaveSession();inspector.resource!=null->inspector.resource=null;inspector.lesson!=null->inspector.lesson=null;selectedCourse!=null->selectedCourse=null;selected!=null->selected=null;mock!=null->mock=null;else->owner.debugToolsOpen=false}}
     Dialog(onDismissRequest=::back,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {
         Surface(Modifier.fillMaxSize().testTag("diagnostics-screen"),color=Cream) {
             Column(Modifier.fillMaxSize().windowInsetsPadding(if(inspector.session?.done==false)WindowInsets.safeDrawing.only(WindowInsetsSides.Top+WindowInsetsSides.Horizontal) else WindowInsets.safeDrawing)) {
                 if(inspector.session==null)Row(Modifier.fillMaxWidth().padding(horizontal=8.dp),verticalAlignment=Alignment.CenterVertically) {
-                    IconButton(::back){Icon(if(inspector.session!=null||selected!=null||mock!=null)Icons.Rounded.ArrowBack else Icons.Rounded.Close,"Retour des diagnostics")}
+                    IconButton(::back){Icon(if(inspector.session!=null||inspector.lesson!=null||inspector.resource!=null||selectedCourse!=null||selected!=null||mock!=null)Icons.Rounded.ArrowBack else Icons.Rounded.Close,"Retour des diagnostics")}
                     Column(Modifier.weight(1f)){Text("Diagnostics",fontWeight=FontWeight.ExtraBold,fontSize=22.sp,lineHeight=26.sp);Text("${content.allQuestions.size} questions · ${BuildConfig.VERSION_NAME}",fontSize=11.sp,lineHeight=14.sp,color=Muted,maxLines=2)}
                     Icon(Icons.Rounded.BugReport,null,tint=Teal,modifier=Modifier.padding(end=12.dp))
                 }
-                if(inspector.session==null&&selected==null&&mock==null) {
+                if(inspector.session==null&&inspector.lesson==null&&inspector.resource==null&&selectedCourse==null&&selected==null&&mock==null) {
                     Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                        listOf("Outils","Types","Questions","Aperçus","Infos").forEach {label->FilterChip(tab==label,{tab=label},label={Text(label,fontSize=12.sp)},modifier=Modifier.testTag("diagnostic-tab-$label"))}
+                        listOf("Outils","Types","Questions","Intros","TTS","Aperçus","Infos").forEach {label->FilterChip(tab==label,{tab=label},label={Text(label,fontSize=12.sp)},modifier=Modifier.testTag("diagnostic-tab-$label"))}
                     }
                 }
                 Box(Modifier.weight(1f).fillMaxWidth()) {
@@ -94,6 +99,17 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
                             // The real session underneath stays covered; this visible test is not.
                             CompositionLocalProvider(LocalDiagnosticsCovered provides false,LocalContext provides inspector.diagnosticContext,LocalAnimatedBack provides {inspector.leaveSession()},LocalNavigationContentOverlap provides 0.dp) {QuizScreen(inspector)}
                         }
+                        inspector.lesson!=null||inspector.resource!=null->FeedbackPreferenceScope(owner.interactionFeedback,inspector.progress.prefs) {
+                            CompositionLocalProvider(LocalContext provides inspector.diagnosticContext,LocalDiagnosticsCovered provides false) {
+                                HamigoAppContent(inspector,owner,diagnosticPreview=true)
+                            }
+                        }
+                        selectedCourse!=null->CompositionLocalProvider(LocalContext provides inspector.diagnosticContext) {
+                            DiagnosticCourseDetail(selectedCourse!!,{inspector.previewLesson(selectedCourse!!.lesson)},
+                                {inspector.startQuestions("Test · ${selectedCourse!!.lesson.id}",selectedCourse!!.lesson.questions)})
+                        }
+                        tab=="Intros"->DiagnosticCourseCatalog(courseEntries.orEmpty(),courseEntries==null,courseQuery,{courseQuery=it},courseFilter,{courseFilter=it},courseListState) {selectedCourse=it}
+                        tab=="TTS"->CompositionLocalProvider(LocalContext provides inspector.diagnosticContext) {DiagnosticTtsLab()}
                         selected!=null->DiagnosticQuestionPager(selected!!,content,courseLocations) {q->inspector.startQuestions("Test · ${q.id}",listOf(q));selected=null}
                         mock!=null->DiagnosticMock(owner,content,mock!!){previewBack=it}
                         tab=="Questions"->DiagnosticCatalog(content,courseLocations) {q,matches->selected=DiagnosticSelection(matches,matches.indexOfFirst {it.id==q.id})}
@@ -106,7 +122,7 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
                             item {Spacer(Modifier.height(18.dp))}
                         }
                         tab=="Aperçus"->LazyColumn(Modifier.testTag("diagnostic-preview-list"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                            item {Text("L’accueil est interactif. Les autres aperçus permettent seulement de défiler.",fontSize=13.sp,color=Muted)}
+                            item {Text("Données fictives et interactions actives, sans progression personnelle.",fontSize=13.sp,color=Muted)}
                             items(listOf("Onboarding","Moi · début","Moi · série en cours","Moi · objectif atteint","Moi · série cassée","Équipe · deux amis","Parcours · chapitres terminés","Fin de cours · réussite","Fin de cours · à consolider","Fin d’examen")+DiagnosticStressPreviews.presets) {label->OutlinedButton({mock=label},Modifier.fillMaxWidth()){Text(label)}}
                         }
                         tab=="Infos"->DiagnosticStats(content)
@@ -249,12 +265,15 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
 
 @Composable private fun DiagnosticQuestionDetail(q:Question,content:Content,courseLocations:Map<String,List<String>>,active:Boolean,test:()->Unit) {
     var reveal by remember(q.id){mutableStateOf(false)}
+    var inspectSpeech by remember(q.id){mutableStateOf(false)}
     var enlarged by remember(q.id){mutableStateOf(false)}
     val illustration=rememberExamArtwork(q.image)
     if(enlarged&&active)illustration?.let {FullscreenExamIllustration(it.original){enlarged=false}}
     LazyColumn(Modifier.fillMaxSize().then(if(active)Modifier.testTag("diagnostic-question-detail") else Modifier),contentPadding=PaddingValues(start=14.dp,end=14.dp,bottom=14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         item {Panel {Text(q.id,Modifier.testTag("diagnostic-detail-${q.id}"),fontFamily=FontFamily.Monospace,color=Teal,fontWeight=FontWeight.Bold);Text("${q.kind} · ${q.section} · ${q.topic}",fontSize=12.sp,color=Muted);MorseAwareText(q.prompt,fontWeight=FontWeight.Bold);illustration?.let {ExamIllustration(it,{enlarged=true})}}}
         item {Action("Tester cette question",onClick=test)}
+        item {OutlinedButton({inspectSpeech=!inspectSpeech},Modifier.fillMaxWidth().testTag("diagnostic-question-narration")){Icon(Icons.Rounded.RecordVoiceOver,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text(if(inspectSpeech)"Masquer le texte TTS" else "Inspecter le texte TTS")}}
+        if(inspectSpeech&&active)item {DiagnosticNarrationPanel(remember(q.id){LessonNarration.segments(listOf(QuestionNarration.text(q)),4000)})}
         item {Panel {
             Text("Origine : ${q.source}",fontSize=12.sp,color=Muted)
             val locations=courseLocations[q.id].orEmpty()
@@ -339,7 +358,7 @@ private data class DiagnosticSelection(val questions:List<Question>,val initialP
     val runtime=Runtime.getRuntime()
     LazyColumn(contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         item {Panel {Text("Appareil et application",fontWeight=FontWeight.Bold);Text("${Build.MANUFACTURER} ${Build.MODEL} · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})",fontSize=13.sp);Text(BuildConfig.VERSION_NAME,fontFamily=FontFamily.Monospace,fontSize=12.sp);Text("Fenêtre ${window.width} × ${window.height} px · densité ${density.density} · police ${density.fontScale}",fontSize=12.sp);Text("Heap utilisé : ${(runtime.totalMemory()-runtime.freeMemory())/1048576} Mio",fontSize=12.sp)}}
-        item {Panel {Text("Contenu embarqué",fontWeight=FontWeight.Bold);Text("${content.lessons.size} cours · ${content.references.size} fiches · ${content.allQuestions.size} IDs uniques");Text("${content.exam.size} Exam1 · ${content.excluded.size} exclusions · ${content.procedural.size} variantes · ${content.flashcards.size} flashcards",fontSize=12.sp,color=Muted)}}
+        item {Panel {Text("Contenu disponible",fontWeight=FontWeight.Bold);Text("${content.lessons.size} cours · ${content.references.size} fiches · ${content.allQuestions.size} IDs uniques");Text("${content.exam.size} Exam1 · ${content.excluded.size} exclusions · ${content.procedural.size} variantes · ${content.flashcards.size} flashcards",fontSize=12.sp,color=Muted)}}
         item {Panel {content.allQuestions.values.groupingBy {it.kind}.eachCount().toSortedMap().forEach {(type,count)->Row(Modifier.fillMaxWidth()){Text(DiagnosticData.typeName(type),Modifier.weight(1f),fontSize=13.sp);Text("$count",color=Teal,fontWeight=FontWeight.Bold)}}}}
     }
 }

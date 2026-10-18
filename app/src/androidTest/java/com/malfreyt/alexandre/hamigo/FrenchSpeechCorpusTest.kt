@@ -17,8 +17,21 @@ class FrenchSpeechCorpusTest {
         content.lessons.forEach {lesson->
             val segments=LessonNarration.segments(lesson,4000)
             assertTrue(segments.isNotEmpty());assertTrue(segments.none {it.contains('\uE000')})
-            introductions.put(JSONObject().put("id",lesson.id).put("title",lesson.title).put("spoken",JSONArray(segments)))
+            introductions.put(JSONObject().put("id",lesson.id).put("title",lesson.title).put("spoken",JSONArray(segments)).put("warnings",JSONArray(NarrationAudit.warnings((lesson.body+lesson.formula).joinToString(" "),segments.joinToString(" ")))))
         }
+        val energy=content.lessons.first {it.id=="c17-l01"}
+        val energySpeech=LessonNarration.segments(energy,4000).joinToString(" ")
+        assertTrue(energySpeech.contains("un demi fois l’inductance fois l’intensité au carré"))
+        assertFalse(energySpeech.contains("LI"))
+        val knownRawSymbols=Regex("\\b(?:LI|CU|UI|RI|XL|XC|Rtot|Req|Us|Ue|Up|Ns|Np|FET|PM|USB|LSB|SDR|AGC|CRC)\\b")
+        content.lessons.forEach {lesson->
+            val spoken=LessonNarration.segments(lesson,4000).joinToString(" ")
+            assertFalse("Unspoken symbol in ${lesson.id}: $spoken",knownRawSymbols.containsMatchIn(spoken))
+        }
+        val firstMorse=content.lessons.first {it.id=="c15-l01"}
+        val firstSpoken=LessonNarration.segments(firstMorse,4000).joinToString(" ")
+        assertTrue(firstSpoken.contains("les lettres e, té, i et emme"));assertFalse(firstSpoken.contains("M."))
+        assertTrue(LessonNarration.segments(content.lessons.first {it.id=="c07-l01"},4000).last().contains("fréquence de résonance"))
         val examples=content.lessons.flatMap {l->l.body.flatMap {MorseExamples.table(it)}}.filter {it.label.length==1}
         assertEquals(42,examples.size)
         examples.forEach {example->
@@ -42,6 +55,10 @@ class FrenchSpeechCorpusTest {
         val content=Content(context);val examples=JSONArray()
         var count=0
         content.allQuestions.values.forEach {q->
+            val narration=FrenchSpeech.prepare(QuestionNarration.text(q))
+            assertTrue("Missing oral task ${q.id}",narration.isNotBlank())
+            assertFalse("Blank must be a spoken sentence ${q.id}",narration.contains("___"))
+            assertFalse("Leaked narration marker ${q.id}",narration.contains('\uE000'))
             (listOf(q.prompt,q.explanation)+q.choices+q.pairs.flatMap {listOf(it.left,it.right)}).forEach {text->
                 val prepared=FrenchSpeech.prepare(text)
                 assertFalse("Leaked placeholder in ${q.id}",prepared.contains('\uE000'))
@@ -54,7 +71,7 @@ class FrenchSpeechCorpusTest {
             {it.prompt.contains(" = ")}, {it.prompt.contains("√") || it.prompt.contains("²")},
             {it.prompt.contains("QRM") || it.prompt.contains("λ") || it.prompt.contains("dB")})
         val representative=predicates.flatMap {predicate->content.allQuestions.values.filter(predicate).take(5)}.distinctBy {it.id}
-        representative.forEach {q->examples.put(JSONObject().put("id",q.id).put("source",q.prompt).put("spoken",FrenchSpeech.prepare(q.prompt)))}
+        representative.plus(content.allQuestions.values.distinctBy {it.kind}).distinctBy {it.id}.forEach {q->examples.put(JSONObject().put("id",q.id).put("source",q.prompt).put("kind",q.kind).put("spoken",FrenchSpeech.prepare(QuestionNarration.text(q))))}
         val long=Lesson("speech-test","","",listOf(List(90){"P = U²/R ; un signal de 145,05 MHz ; Morse ━•"}.joinToString(". ")),"","",emptyList())
         val pieces=LessonNarration.segments(long,120)
         assertTrue(pieces.all {it.length<=120});assertTrue(pieces.joinToString(" ").contains("trait, point"))

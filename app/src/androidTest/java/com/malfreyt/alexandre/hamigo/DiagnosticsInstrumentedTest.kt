@@ -50,10 +50,89 @@ class DiagnosticsInstrumentedTest {
     private lateinit var model:AppModel
     @Before fun load(){model=ViewModelProvider(ui.activity)[AppModel::class.java];ui.waitUntil(60_000){model.content!=null&&!model.socialRefreshing};ui.runOnIdle {model.showWelcome=false}}
     private fun q()=Question("debug-fixture","Quelle commande ouvre le contact ?",listOf("Le manipulateur","Le fusible"),0,"Le manipulateur commande le signal.")
+    @Test fun systemSpeechSettingsOpenFromGameplayAndStayBlockedInDiagnosticPreviews() {
+        val before=raw()
+        val actions=mutableListOf<String?>()
+        val unavailable=object:android.content.ContextWrapper(context) {
+            override fun startActivity(intent:android.content.Intent) {
+                actions+=intent.action
+                if(intent.action!=android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                    throw android.content.ActivityNotFoundException()
+            }
+        }
+        ui.runOnIdle {
+            openSystemSpeechSettings(DiagnosticContext(unavailable))
+            assertTrue(actions.isEmpty())
+            openSystemSpeechSettings(unavailable)
+            assertEquals(listOf("com.android.settings.TTS_SETTINGS",android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS),actions)
+            model.route="settings"
+        }
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("system-tts-settings"))
+        ui.onNodeWithText("Hamigo utilise le TTS système.").assertIsDisplayed()
+        capture("tts53-system-settings")
+        ui.onNodeWithTag("system-tts-settings").performClick()
+        val deadline=System.currentTimeMillis()+10000
+        while(instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString()!="com.android.settings" && System.currentTimeMillis()<deadline)Thread.sleep(100)
+        assertEquals("com.android.settings",instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
+        val now=android.os.SystemClock.uptimeMillis()
+        for(action in listOf(android.view.KeyEvent.ACTION_DOWN,android.view.KeyEvent.ACTION_UP))
+            instrumentation.uiAutomation.injectInputEvent(android.view.KeyEvent(now,android.os.SystemClock.uptimeMillis(),action,android.view.KeyEvent.KEYCODE_BACK,0),true)
+        val returnDeadline=System.currentTimeMillis()+10000
+        while(instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString()!=context.packageName && System.currentTimeMillis()<returnDeadline)Thread.sleep(100)
+        assertEquals(context.packageName,instrumentation.uiAutomation.rootInActiveWindow?.packageName?.toString())
+        ui.onNodeWithTag("system-tts-settings").assertIsDisplayed()
+        assertEquals(before,raw())
+    }
+    @Test fun introductionsCanBeFoundByFormulaAndReadInTheIsolatedNativeScreen() {
+        val before=raw()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Intros").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-course-search").performTextInput("½LI²")
+        ui.waitUntil(10000) {ui.onAllNodesWithTag("diagnostic-course-c17-l01").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack()
+        capture("tts53-course-search")
+        ui.onNodeWithTag("diagnostic-course-c17-l01").performClick()
+        capture("tts53-course-detail-top")
+        ui.onNodeWithTag("diagnostic-course-detail").performScrollToNode(hasTestTag("diagnostic-narration-text"))
+        val speech=ui.onNodeWithTag("diagnostic-narration-text").fetchSemanticsNode().config[SemanticsProperties.Text].joinToString(" "){it.text}
+        assertTrue(speech.contains("inductance"));assertFalse(speech.contains("LI"))
+        capture("tts53-course-inspection")
+        ui.onNodeWithTag("diagnostic-course-detail").performScrollToNode(hasTestTag("diagnostic-course-open"))
+        ui.onNodeWithTag("diagnostic-course-open").performClick()
+        ui.onNodeWithTag("lesson-pico").assertIsDisplayed()
+        ui.onNodeWithText("À toi de jouer").assertDoesNotExist()
+        capture("tts53-native-introduction")
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        ui.onNodeWithTag("diagnostic-course-test").performScrollTo().performClick()
+        ui.onNodeWithTag("question-pico").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Retour des diagnostics").assertDoesNotExist() // Native quiz owns its exit.
+        assertNull(model.session);assertNull(model.lesson);assertEquals(before,raw())
+    }
+    @Test fun speechLabShowsAndCopiesTheActualPreparedTextWithoutSavingAProfileChange() {
+        val before=raw()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-TTS").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-tts-input").performTextReplacement("E = ½LI²")
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("diagnostic-tts-lab").performScrollToNode(hasTestTag("diagnostic-narration-text"))
+        ui.onNodeWithTag("diagnostic-narration-text").assertTextEquals("e égale un demi fois elle fois i au carré")
+        capture("tts53-speech-lab-clean")
+        ui.onNodeWithTag("diagnostic-narration-copy").performScrollTo().performClick()
+        ui.runOnIdle {
+            val clip=context.getSystemService(android.content.ClipboardManager::class.java).primaryClip!!.getItemAt(0).text.toString()
+            assertEquals("e égale un demi fois elle fois i au carré",clip)
+        }
+        capture("tts53-speech-lab")
+        ui.onNodeWithTag("diagnostic-narration-toggle").performClick()
+        ui.onNodeWithTag("diagnostic-narration-toggle").assertTextContains("Arrêter")
+        ui.onNodeWithTag("diagnostic-narration-toggle").performClick()
+        ui.onNodeWithTag("diagnostic-narration-toggle").assertTextContains("Écouter")
+        assertEquals(before,raw())
+    }
     @Test fun onboardingCanBeSimulatedWithoutChangingTheRealProfileOrOpeningGitHub() {
         val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
         ui.runOnIdle {model.debugToolsOpen=true}
-        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
         ui.onNodeWithText("Onboarding").performClick()
         ui.onNodeWithTag("onboarding-name").performTextReplacement("Test sans sauvegarde")
         ui.onNodeWithTag("onboarding-continue").performClick()
@@ -69,7 +148,7 @@ class DiagnosticsInstrumentedTest {
     @Test fun previewsNavigateAndChangeOnlyTheirOwnGameplayPreferences() {
         val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
         ui.runOnIdle {model.debugToolsOpen=true}
-        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
         ui.onNodeWithText("Moi · objectif atteint").performClick()
         ui.onNodeWithTag("profile-level-stats").assertIsDisplayed()
         capture("interactive52-profile-large-stats")
@@ -100,7 +179,7 @@ class DiagnosticsInstrumentedTest {
     @Test fun boundaryPreviewsScrollWithoutChangingTheRealProfile() {
         val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
         ui.runOnIdle {model.debugToolsOpen=true}
-        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
         DiagnosticStressPreviews.presets.forEachIndexed {index,label->
             ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText(label))
             ui.onNodeWithText(label).performClick()
@@ -127,6 +206,10 @@ class DiagnosticsInstrumentedTest {
         ui.onNodeWithTag("diagnostic-question-${target.id}").performClick()
         ui.onNodeWithTag("diagnostic-question-detail").performScrollToNode(hasText(location))
         text(location).assertIsDisplayed()
+        ui.onNodeWithTag("diagnostic-question-narration").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-question-detail").performScrollToNode(hasTestTag("diagnostic-narration-text"))
+        ui.onNodeWithTag("diagnostic-narration-text").assertExists()
+        capture("tts53-question-inspection")
         text("Tester cette question").performScrollTo()
         text("Tester cette question").performClick()
         inside(hasText(target.choices[target.answer])).performScrollTo().performClick()
@@ -460,9 +543,9 @@ class DiagnosticsInstrumentedTest {
         text("Tester tous les types").performClick();inside(hasTestTag("question-pico")).assertIsDisplayed()
         // Dialog back discards only this isolated test session.
         androidx.test.espresso.Espresso.pressBack()
-        ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick();text("Moi · objectif atteint").performClick();capture("mock-profile")
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick();text("Moi · objectif atteint").performClick();capture("mock-profile")
         ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
-        ui.onNodeWithTag("diagnostic-tab-Infos").performClick();capture("stats")
+        ui.onNodeWithTag("diagnostic-tab-Infos").performScrollTo().performClick();capture("stats")
         assertEquals(before,raw())
     }
 
@@ -509,7 +592,7 @@ class DiagnosticsInstrumentedTest {
             ui.waitUntil {result!=null}
             assertEquals(android.app.Activity.RESULT_CANCELED,result!!.resultCode);assertEquals(0,outgoing.get())
             ui.runOnIdle {model.debugToolsOpen=true}
-            ui.onNodeWithTag("diagnostic-tab-Aperçus").performClick()
+            ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
             text("Équipe · deux amis").performClick()
             ui.onNodeWithTag("diagnostic-interactive-preview").assertIsDisplayed()
             capture("mock-team-top")

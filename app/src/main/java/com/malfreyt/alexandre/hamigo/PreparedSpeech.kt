@@ -19,8 +19,12 @@ import java.util.UUID
 /** Synthesize first, then play: loading can settle without animating over audible speech. */
 internal class PreparedSpeech(private val context:Context,private val locale:Locale,private val unavailable:String,eager:Boolean=true):AutoCloseable {
     var active by mutableStateOf(false);private set
+    // Narration lifetime after its first sound, including silence between synthesized files.
     var speaking by mutableStateOf(false);private set
     var preparing by mutableStateOf(false);private set
+    var mouthActivity by mutableFloatStateOf(0f);private set
+    private val envelopes=mutableMapOf<Int,SpeechEnvelope?>()
+    private var meter:Runnable?=null
     private val main=Handler(Looper.getMainLooper())
     private val setup=java.util.concurrent.Executors.newSingleThreadExecutor()
     private val manager=context.getSystemService(AudioManager::class.java)
@@ -57,7 +61,15 @@ internal class PreparedSpeech(private val context:Context,private val locale:Loc
                         val prefix=token
                         if(!closed&&active&&prefix!=null&&id?.startsWith(prefix+":")==true) {
                             val part=id.substringAfterLast(':').toIntOrNull()
-                            if(part!=null&&part in complete.indices){complete[part]=true;prepareCurrent()}
+                            if(part!=null&&part in complete.indices) {
+                                val file=files[part]
+                                setup.execute {
+                                    val envelope=SpeechEnvelope.fromWav(file)
+                                    main.post {if(active&&token==prefix&&part in complete.indices) {
+                                        envelopes[part]=envelope;complete[part]=true;prepareCurrent()
+                                    }}
+                                }
+                            }
                         }
                     }}
                     @Deprecated("Android callback") override fun onError(id:String?){main.post {if(token!=null&&id?.startsWith(token+":")==true)fail("La lecture audio a été interrompue.")}}
@@ -110,7 +122,7 @@ internal class PreparedSpeech(private val context:Context,private val locale:Loc
                         if(active&&token==expectedToken&&index==part&&player===media) {
                             if(!focused){focused=manager.requestAudioFocus(focus)==AudioManager.AUDIOFOCUS_REQUEST_GRANTED}
                             if(!focused){fail("La lecture audio n’est pas disponible pour le moment.");return@Runnable}
-                            runCatching {media.start();waiting=false;preparing=false;speaking=true}.onFailure {fail("La lecture audio a été interrompue.")}
+                            runCatching {media.start();waiting=false;preparing=false;speaking=true;followAudio(media,expectedToken,part)}.onFailure {fail("La lecture audio a été interrompue.")}
                         }
                     }
                     main.postAtTime(launch!!,at)
@@ -118,7 +130,7 @@ internal class PreparedSpeech(private val context:Context,private val locale:Loc
             }
             media.setOnCompletionListener {
                 if(player===media&&token==expectedToken) {
-                    speaking=false;media.release();player=null;files[part].delete();index++
+                    stopMeter();media.release();player=null;files[part].delete();envelopes.remove(part);index++
                     if(index>=texts.size)stop() else {beginWait();prepareCurrent()}
                 }
             }
@@ -126,7 +138,21 @@ internal class PreparedSpeech(private val context:Context,private val locale:Loc
             media.prepareAsync()
         }.onFailure {fail("La lecture audio n’a pas pu démarrer.")}
     }
+    private fun followAudio(media:MediaPlayer,expectedToken:String?,part:Int) {
+        stopMeter()
+        meter=object:Runnable {
+            override fun run() {
+                if(active&&token==expectedToken&&player===media&&speaking) {
+                    mouthActivity=runCatching {envelopes[part]?.mouthAt(media.currentPosition) ?: 1f}.getOrDefault(0f)
+                    main.postDelayed(this,16)
+                }
+            }
+        }
+        main.post(meter!!)
+    }
+    private fun stopMeter(){meter?.let(main::removeCallbacks);meter=null;mouthActivity=0f}
     fun stop() {
+        stopMeter();envelopes.clear()
         token=null;active=false;speaking=false;preparing=false;waiting=false;queued=false
         reveal?.let(main::removeCallbacks);launch?.let(main::removeCallbacks);reveal=null;launch=null
         player?.let {runCatching {it.release()}};player=null

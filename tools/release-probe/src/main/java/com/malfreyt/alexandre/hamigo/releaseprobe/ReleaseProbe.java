@@ -46,6 +46,8 @@ public final class ReleaseProbe extends Instrumentation {
             if(mode.equals("diagnostics"))diagnostics();
             if(mode.equals("catalog"))catalog();
             if(mode.equals("social"))social();
+            if(mode.equals("speech"))speech();
+            if(mode.equals("narration"))narration();
             recordStorage();output.putString("stream","OK: "+mode+" on the actual signed release\n");finish(Activity.RESULT_OK,output);
         } catch(Throwable e) {
             try {capture("release-failure");recordStorage();}catch(Exception ignored){}
@@ -54,6 +56,55 @@ public final class ReleaseProbe extends Instrumentation {
         }
     }
     private Activity open() {return startActivitySync(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));}
+    private void narration() throws Exception {
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().clear().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).commit();
+        context.getSharedPreferences("hamigo_diagnostics",Context.MODE_PRIVATE).edit().clear().putBoolean("enabled",true).putBoolean("frozen",true).commit();
+        for(String file:new String[]{"hamigo_social","hamigo_secure"})context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear().commit();
+        Activity activity=open();waitText("HAMIGO",30000);
+        String before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress","");
+        click("Ouvrir les diagnostics",true);click("Intros",false);setText("½LI²");waitText("c17-l01",20000);
+        click("c17-l01",false);reveal("Texte exact envoyé au TTS",false);reveal("l’inductance fois l’intensité au carré",false);
+        capture("release-introduction-narration");reveal("Écouter",false);click("Écouter",false);
+        AudioManager audio=context.getSystemService(AudioManager.class);waitSpeech(audio);
+        click("Arrêter",false);waitAudio(audio,false);check(speechFiles()==0,"Stopping the inspector clears synthesized files");
+        click("Retour des diagnostics",true);click("TTS",false);setText("E = ½CU²");
+        String expected="e égale un demi fois cé fois u au carré";reveal(expected,false);
+        capture("release-speech-lab");
+        click("Copier le texte TTS",true);
+        android.content.ClipboardManager clipboard=context.getSystemService(android.content.ClipboardManager.class);
+        check(clipboard.hasPrimaryClip()&&expected.contentEquals(clipboard.getPrimaryClip().getItemAt(0).getText()),"Copy exactly the text sent to speech");
+        check(before.equals(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress","")),"Inspecting speech cannot change personal progress");
+        runOnMainSync(activity::finish);
+    }
+    private void speech() throws Exception {
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().clear().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).commit();
+        for(String file:new String[]{"hamigo_social","hamigo_secure","hamigo_diagnostics"})context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear().commit();
+        Activity activity=open();waitText("HAMIGO",30000);
+        reveal("Le service amateur",false);click("Le service amateur",false);waitText("À toi de jouer",10000);
+        String before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null);
+        AudioManager audio=(AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        click("Écouter le cours",true);waitSpeech(audio);capture("release-course-speaking");
+        check(speechFiles()>0,"The production engine synthesizes actual files");
+        click("Arrêter la lecture du cours",true);waitAudio(audio,false);
+        check(speechFiles()==0,"Cancelling the course removes temporary speech files");
+        click("À toi de jouer",false);
+        click("Écouter la question",true);waitSpeech(audio);capture("release-question-speaking");
+        click("Arrêter la lecture de la question",true);waitAudio(audio,false);
+        check(speechFiles()==0,"Cancelling a question removes temporary speech files");
+        check(java.util.Objects.equals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null)),"Narration gives no XP or SRS changes");
+        runOnMainSync(activity::finish);
+    }
+    private int speechFiles() {
+        File[] files=context.getCacheDir().listFiles((dir,name)->name.startsWith("hamigo-speech-")&&name.endsWith(".wav"));
+        return files==null?0:files.length;
+    }
+    private void waitSpeech(AudioManager audio) {
+        long started=SystemClock.uptimeMillis();
+        // Same cold-engine budget as the debug audio tests, distinct from the receiver/stop budget.
+        while(!audio.isMusicActive()&&SystemClock.uptimeMillis()-started<30000)SystemClock.sleep(20);
+        check(audio.isMusicActive(),"French speech must actually play within 30 seconds");
+        System.out.println("Speech playback after "+(SystemClock.uptimeMillis()-started)+" ms");
+    }
     private void social() throws Exception {
         context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().clear().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).putBoolean("interactionHaptics",false).commit();
         for(String file:new String[]{"hamigo_social","hamigo_secure","hamigo_diagnostics"})context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear().commit();
@@ -195,14 +246,21 @@ public final class ReleaseProbe extends Instrumentation {
         check(audio.isMusicActive()==active,"Expected media playback="+active);
     }
     private void setText(String text) {
-        AccessibilityNodeInfo field=editable(getUiAutomation().getRootInActiveWindow());
-        check(field!=null,"Missing diagnostic search field");
+        AccessibilityNodeInfo field=null;
+        long until=SystemClock.uptimeMillis()+10000;
+        // Compose publishes the new tab's editable semantics after the click action returns.
+        // Fetch a fresh tree until that field exists, rather than reading a detached old tab.
+        while(field==null&&SystemClock.uptimeMillis()<until) {
+            field=editable(getUiAutomation().getRootInActiveWindow());
+            if(field==null)SystemClock.sleep(100);
+        }
+        check(field!=null,"Missing diagnostic search field after the tab settled");
         Bundle args=new Bundle();args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,text);
         check(field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,args),"Search input failed");SystemClock.sleep(500);
     }
     private AccessibilityNodeInfo editable(AccessibilityNodeInfo node) {
-        if(node==null)return null;
-        if(node.isVisibleToUser()&&node.isEditable())return node;
+        if(node==null||!node.refresh())return null;
+        if(node.isVisibleToUser()&&(node.isEditable()||node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_TEXT)))return node;
         for(int i=0;i<node.getChildCount();i++){AccessibilityNodeInfo child=editable(node.getChild(i));if(child!=null)return child;}
         return null;
     }

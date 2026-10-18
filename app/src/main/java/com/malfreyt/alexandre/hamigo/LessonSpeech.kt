@@ -7,7 +7,11 @@ import java.util.Locale
 internal object LessonNarration {
     fun segments(lesson:Lesson,maxLength:Int):List<String> {
         require(maxLength>=2)
-        return (listOf(lesson.title,lesson.summary)+lesson.body+listOf(lesson.formula)).filter {it.isNotBlank()}.flatMap {paragraph ->
+        return segments(lesson.narration.ifEmpty {listOf(lesson.title,lesson.summary)+lesson.body+listOf(lesson.formula)},maxLength)
+    }
+    fun segments(paragraphs:List<String>,maxLength:Int):List<String> {
+        require(maxLength>=2)
+        return paragraphs.filter {it.isNotBlank()}.flatMap {paragraph ->
             val result=mutableListOf<String>();var rest=FrenchSpeech.prepare(paragraph).trim()
             while(rest.length>maxLength) {
                 var end=rest.lastIndexOfAny(charArrayOf(' ','\n'),maxLength).takeIf {it>0} ?: maxLength
@@ -26,10 +30,11 @@ internal class LessonSpeech(context:Context,eager:Boolean=true) {
     val reading get()=playback.active
     val speaking get()=playback.speaking
     val preparing get()=playback.preparing
+    val mouthActivity get()=playback.mouthActivity
     fun toggle(lesson:Lesson) {
         if(reading)stop() else playback.start(LessonNarration.segments(lesson,TextToSpeech.getMaxSpeechInputLength()))
     }
-    fun toggleText(text:String)=toggle(Lesson("question-audio",text,"",emptyList(),"","",emptyList()))
+    fun toggleText(text:String){if(reading)stop() else playback.start(LessonNarration.segments(listOf(text),TextToSpeech.getMaxSpeechInputLength()))}
     fun stop()=playback.stop()
     fun close()=playback.close()
 }

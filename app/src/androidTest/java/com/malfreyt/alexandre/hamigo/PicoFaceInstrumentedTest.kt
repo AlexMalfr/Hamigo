@@ -26,6 +26,19 @@ class PicoFaceInstrumentedTest {
             } finally {reference.recycle()}
         }
     }
+    @Test fun originalSpeechOvalKeepsItsTongueAndTheSilentMouthStaysFlat() {
+        fun face(opening:Float)=Bitmap.createBitmap(512,512,Bitmap.Config.ARGB_8888).also {
+            val canvas=Canvas(it);canvas.scale(4f,4f);PicoFace.draw(canvas,MascotMood.HAPPY,opening,false,false)
+        }
+        val open=face(1f);val closed=face(0f)
+        try {
+            assertEquals("The original tongue remains visible",Color.rgb(255,120,105),open.getPixel(54*4,77*4))
+            assertEquals("The original oval reaches above the tongue",Color.rgb(23,63,66),open.getPixel(53*4,69*4))
+            val rows=(68*4..82*4).filter {y->(46*4..61*4).any {x->Color.alpha(closed.getPixel(x,y))>127}}
+            assertTrue("A silent speech mouth must be flat, not a smile",rows.size in 1..12)
+            assertEquals(0,Color.alpha(closed.getPixel(54*4,77*4)))
+        }finally{open.recycle();closed.recycle()}
+    }
     @Test fun sharedPortraitsCoverRestingTalkingAndTongueWithClosedEyes() {
         check(android.os.Build.HARDWARE in listOf("ranchu","goldfish"))
         val sheet=Bitmap.createBitmap(1120,1600,Bitmap.Config.ARGB_8888);val c=Canvas(sheet)

@@ -23,7 +23,7 @@ data class Question(
 )
 /** Optional visuals align with body paragraphs; empty entries leave the paragraph as text. */
 data class Lesson(val id: String, val title: String, val summary: String, val body: List<String>,
-    val formula: String, val topic: String, val questions: List<Question>, val visuals: List<String> = emptyList())
+    val formula: String, val topic: String, val questions: List<Question>, val visuals: List<String> = emptyList(), val narration:List<String> = emptyList())
 data class Chapter(val id: String, val title: String, val subtitle: String, val lessons: List<Lesson>)
 data class RefRow(val term: String, val description: String, val extra: String,
     val group: String = "", val kind: String = "fact", val visual: String = "",
@@ -76,7 +76,7 @@ class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=E
             val topic = l.optString("topic")
             Lesson(l.getString("id"), l.getString("title"), l.optString("summary"), l.getJSONArray("body").strings(),
                 l.optString("formula"), topic, l.getJSONArray("questionIds").strings().map {courseBank.getValue(it)},
-                l.optJSONArray("visuals")?.strings() ?: emptyList())
+                l.optJSONArray("visuals")?.strings() ?: emptyList(),l.optJSONArray("narration")?.strings() ?: emptyList())
         })
     }
     val lessons = chapters.flatMap { it.lessons }

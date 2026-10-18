@@ -28,6 +28,13 @@
             "Le certificat s’attache à la personne, alors que l’indicatif identifie sa station dans les échanges. Écouter le trafic, construire des montages et préparer l’examen sont déjà des façons d’apprendre avant de pouvoir émettre. Une activité amateur n’autorise pas à vendre un service de transmission."
           ],
           "topic": "Réglementation",
+          "narration": [
+            "Le service amateur",
+            "Un radioamateur explore les ondes pour apprendre, expérimenter et échanger avec d’autres passionnés. Le service amateur s’adresse à des personnes autorisées qui s’intéressent à la technique radio à titre personnel, sans intérêt pécuniaire.",
+            "Pour émettre sur les bandes amateur françaises, il faut un certificat d’opérateur et un indicatif attribué. Le certificat prouve des connaissances; l’indicatif permet d’identifier la station. Une application d’entraînement ne remplace pas ces démarches.",
+            "Le certificat s’attache à la personne, alors que l’indicatif identifie sa station dans les échanges. Écouter le trafic, construire des montages et préparer l’examen sont déjà des façons d’apprendre avant de pouvoir émettre. Une activité amateur n’autorise pas à vendre un service de transmission.",
+            ""
+          ],
           "questionIds": [
             "q-f39b165e-c14d-43f1-be43-a5084daf9db4",
             "q-eb65542e-1ed8-4e54-9bdc-6bf695b1fd29",
@@ -49,6 +56,13 @@
             "Les deux résultats comptent séparément : une bonne note technique ne compense pas une note de réglementation sous le seuil. Comme les mauvaises réponses n’enlèvent pas de point, il reste utile de choisir une réponse réfléchie avant la fin du temps. Réserve une petite marge pour relire les unités et les mots comme « toujours » ou « jamais »."
           ],
           "topic": "Réglementation",
+          "narration": [
+            "L’examen en deux étapes",
+            "L’examen français comporte une épreuve de réglementation et une épreuve de technique. Chacune propose 20 QCM. Les durées ordinaires sont de 15 minutes en réglementation et de 30 minutes en technique.",
+            "Chaque bonne réponse rapporte 1 point; une erreur ou une absence de réponse vaut 0. Il faut au moins 10/20 dans chaque épreuve. Une épreuve réussie reste acquise pendant un an en cas d’échec à l’autre; le délai pour se représenter après un échec est de deux mois.",
+            "Les deux résultats comptent séparément : une bonne note technique ne compense pas une note de réglementation sous le seuil. Comme les mauvaises réponses n’enlèvent pas de point, il reste utile de choisir une réponse réfléchie avant la fin du temps. Réserve une petite marge pour relire les unités et les mots comme « toujours » ou « jamais ».",
+            ""
+          ],
           "questionIds": [
             "q-9012e718-1235-4d85-ab98-b883f9d574d6",
             "q-7d5bed41-0d21-47d4-8983-6a9eff2cdc61",
@@ -70,6 +84,13 @@
             "Une identification claire aide les autres opérateurs et les services de contrôle à savoir qui émet. Elle est nécessaire même pour une conversation brève entre amis. Les mots de l’alphabet international évitent de confondre des lettres voisines; ils complètent l’indicatif, ils ne le remplacent pas."
           ],
           "topic": "Réglementation",
+          "narration": [
+            "Une identité dans le bruit",
+            "Un indicatif français comporte un préfixe et une partie qui distingue la station. Par exemple, F4ABC est un exemple pédagogique d’indicatif métropolitain. Épeler les lettres avec l’alphabet international évite de confondre B et D dans le bruit.",
+            "Pendant une émission, donne ton indicatif au début, à la fin et au moins toutes les quinze minutes si l’émission dépasse quinze minutes sur la même fréquence. Un changement de fréquence impose une nouvelle identification au début de la période sur cette fréquence.",
+            "Une identification claire aide les autres opérateurs et les services de contrôle à savoir qui émet. Elle est nécessaire même pour une conversation brève entre amis. Les mots de l’alphabet international évitent de confondre des lettres voisines; ils complètent l’indicatif, ils ne le remplacent pas.",
+            ""
+          ],
           "questionIds": [
             "q-ba4d50d3-a661-4334-9554-56f3e2273e64",
             "q-9cc337aa-5ebb-4084-9f80-9906245fbb5a",
@@ -91,6 +112,13 @@
             "Le droit d’utiliser une bande et la bonne façon de s’y organiser sont deux choses complémentaires. Les limites nationales disent où l’émission amateur est autorisée. Les plans de bande recommandent une répartition des modes; toute la largeur du signal doit rester dans la bande autorisée. Écouter une fréquence évite d’interrompre un contact déjà en cours."
           ],
           "topic": "Réglementation",
+          "narration": [
+            "Des bandes à partager",
+            "Une bande est une plage de fréquences autorisée, avec des conditions de puissance et parfois un partage avec d’autres services. Une attribution secondaire signifie que l’amateur ne doit pas brouiller un service primaire et ne peut exiger sa protection face à ce service.",
+            "Avant de lancer un appel, écoute et vérifie que la fréquence est libre. Le plan de bande organise les usages par accord entre amateurs; il complète les limites réglementaires. Il ne crée jamais une autorisation d’émettre hors d’une bande nationale.",
+            "Le droit d’utiliser une bande et la bonne façon de s’y organiser sont deux choses complémentaires. Les limites nationales disent où l’émission amateur est autorisée. Les plans de bande recommandent une répartition des modes; toute la largeur du signal doit rester dans la bande autorisée. Écouter une fréquence évite d’interrompre un contact déjà en cours.",
+            ""
+          ],
           "questionIds": [
             "q-597c056b-8e5a-4a5c-bdde-da8d679138b2",
             "q-c508d5c4-3954-4c6e-94e8-f84aec085cd1",
@@ -121,6 +149,13 @@
             "L’épellation n’est pas une traduction libre. Chaque lettre garde son mot, même si un nom de ville semble plus familier. En particulier, les graphies officielles sont Alfa et Juliett. Entraîne-toi sur ton prénom, puis sur des groupes mélangés : la récupération du mot doit devenir rapide et régulière."
           ],
           "topic": "Pratique opérateur",
+          "narration": [
+            "L’alphabet international",
+            "Pour transmettre un indicatif dans le bruit, prononce chaque lettre avec un mot fixé : A se dit Alfa, B Bravo, C Charlie. La graphie officielle est Alfa et Juliett, avec deux t pour ce dernier.",
+            "Ces mots ne traduisent pas les lettres; ils les rendent reconnaissables malgré un accent ou un signal faible. Les chiffres sont prononcés distinctement. En français, ne remplace pas spontanément ce code par des prénoms locaux.",
+            "L’épellation n’est pas une traduction libre. Chaque lettre garde son mot, même si un nom de ville semble plus familier. En particulier, les graphies officielles sont Alfa et Juliett. Entraîne-toi sur ton prénom, puis sur des groupes mélangés : la récupération du mot doit devenir rapide et régulière.",
+            ""
+          ],
           "questionIds": [
             "q-e72e1034-4044-43e5-9301-3e309c9106cd",
             "q-0bb01065-6948-4d2c-bbb3-b4c39a1a2414",
@@ -142,6 +177,13 @@
             "Les codes Q sont des raccourcis de trafic : une forme interrogative demande une information, et une réponse peut la fournir. Ils n’ont pas besoin d’être multipliés dans une conversation en phonie; une phrase claire reste utile. Distingue QRM, une gêne provenant d’autres signaux, de QRN, le bruit d’origine atmosphérique."
           ],
           "topic": "Pratique opérateur",
+          "narration": [
+            "Les codes Q",
+            "Un code Q condense une information radio. Avec un point d’interrogation, il pose une question; sans, il donne une réponse. QTH ? demande la position; QTH Lyon indique une position.",
+            "Retenir le contexte est plus utile qu’une traduction mécanique. QRM désigne un brouillage par d’autres signaux; QRN des parasites, souvent naturels. QRP évoque la réduction de puissance, QRO son augmentation.",
+            "Les codes Q sont des raccourcis de trafic : une forme interrogative demande une information, et une réponse peut la fournir. Ils n’ont pas besoin d’être multipliés dans une conversation en phonie; une phrase claire reste utile. Distingue QRM, une gêne provenant d’autres signaux, de QRN, le bruit d’origine atmosphérique.",
+            ""
+          ],
           "questionIds": [
             "q-21db47b6-9c77-447f-9716-2fc1a137da5a",
             "q-1c580788-83de-4360-adb2-5463ceff8bce",
@@ -163,6 +205,13 @@
             "On apprend le Morse comme un rythme, pas seulement comme un dessin. Un point vaut une unité, un trait trois; à l’intérieur d’une lettre, la pause vaut une unité. Entre deux lettres, laisse trois unités, et entre deux mots sept. Le chapitre dédié entraîne ensuite toutes les lettres, les chiffres, l’écoute et la composition."
           ],
           "topic": "Pratique opérateur",
+          "narration": [
+            "Le rythme du Morse",
+            "Le Morse international représente les caractères avec des points et des traits. Un point dure une unité et un trait trois. Dans un caractère, les éléments sont séparés par une unité; les caractères par trois et les mots par sept.",
+            "Il n’existe plus d’épreuve de Morse pour obtenir le certificat français actuel. Cela reste un mode efficace et amusant à apprendre : E est un point, T un trait, A point-trait et N trait-point.",
+            "On apprend le Morse comme un rythme, pas seulement comme un dessin. Un point vaut une unité, un trait trois; à l’intérieur d’une lettre, la pause vaut une unité. Entre deux lettres, laisse trois unités, et entre deux mots sept. Le chapitre dédié entraîne ensuite toutes les lettres, les chiffres, l’écoute et la composition.",
+            ""
+          ],
           "questionIds": [
             "q-d3f1d31f-b5a1-4f8f-82aa-34e6805c90e1",
             "q-12e1aea0-3865-45db-927b-592594465eac",
@@ -184,6 +233,13 @@
             "Un contact réussi donne des informations compréhensibles, sans les répéter inutilement. Écoute d’abord, annonce l’identité de la station appelée et la tienne, puis échange le report et les informations utiles. En phonie, le report RS utilise la lisibilité sur cinq et la force sur neuf; en télégraphie, RST ajoute la tonalité."
           ],
           "topic": "Pratique opérateur",
+          "narration": [
+            "Ton premier QSO",
+            "Un QSO est un contact. Après avoir écouté, demande si la fréquence est libre, puis lance un appel général CQ avec ton indicatif. Laisse des pauses pour permettre à un correspondant de répondre.",
+            "Dans un échange simple, partage les indicatifs, un report, le prénom et la position. Le report RS en phonie décrit la lisibilité de 1 à 5 et la force de 1 à 9. Le T du RST ajoute la tonalité en télégraphie. 73 est une salutation amicale.",
+            "Un contact réussi donne des informations compréhensibles, sans les répéter inutilement. Écoute d’abord, annonce l’identité de la station appelée et la tienne, puis échange le report et les informations utiles. En phonie, le report RS utilise la lisibilité sur cinq et la force sur neuf; en télégraphie, RST ajoute la tonalité.",
+            ""
+          ],
           "questionIds": [
             "q-2997913a-f78f-42f9-aa87-5d0a22e9ab4f",
             "q-94738c08-2b41-4a07-aeeb-ccd30e298368",
@@ -216,6 +272,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l01",
+          "narration": [
+            "Points, traits et premiers rythmes",
+            "Cette étape travaille les lettres E, T, I et M. Compare le point de la lettre E au trait de la lettre T. Compare ensuite les deux points de la lettre I aux deux traits de la lettre M. Écoute chaque caractère en entier, puis prononce son nom. L’objectif est de reconnaître un rythme, sans compter chaque élément à haute vitesse.",
+            "E : •   ·   T : ━   ·   I : ••   ·   M : ━━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-454d43cd-d24a-41d0-834a-0699b5649b60",
             "q-6ec27012-bd95-427e-9ccd-63cde83c983b",
@@ -245,6 +308,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l02",
+          "narration": [
+            "Inversions et triplets",
+            "Cette étape travaille les lettres A, N, S et O. Les lettres A et N utilisent les mêmes éléments dans l’ordre inverse. La lettre S contient trois points, tandis que la lettre O contient trois traits. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "A : •━   ·   N : ━•   ·   S : •••   ·   O : ━━━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-3def60a1-cbf9-44c0-af78-2b158f45a5b6",
             "q-60050807-2a11-48b6-9aba-fdd29cad3e57",
@@ -273,6 +343,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l03",
+          "narration": [
+            "Trouver le centre du rythme",
+            "Cette étape travaille les lettres D, U, R et K. La lettre D commence par un trait, tandis que la lettre U se termine par un trait. Les lettres R et K alternent points et traits, avec un élément central opposé. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "D : ━••   ·   U : ••━   ·   R : •━•   ·   K : ━•━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-edfa46bf-bfe3-4cd2-8a8b-9bb5e7029535",
             "q-b94dbe57-f101-458a-9ff8-861b01bb77c2",
@@ -301,6 +378,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l04",
+          "narration": [
+            "Du court au long",
+            "Cette étape travaille les lettres G, W, B et V. Les lettres G et W inversent les points et les traits. Pour les lettres B et V, le trait passe du début à la fin. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "G : ━━•   ·   W : •━━   ·   B : ━•••   ·   V : •••━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-343008ef-0dd8-4f4a-819d-bfc68039d512",
             "q-21e63171-ecef-49b8-8216-d2bd0a781e95",
@@ -329,6 +413,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l05",
+          "narration": [
+            "Les lettres à quatre éléments",
+            "Cette étape travaille les lettres F, L, P et J. Repère la position des traits. Les lettres F et L n’ont qu’un trait. Les lettres P et J en ont plusieurs. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "F : ••━•   ·   L : •━••   ·   P : •━━•   ·   J : •━━━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-e342b22a-4f9d-432c-bc87-5aeab582d665",
             "q-0a62fe25-25ef-4691-a47b-2ada2391e3aa",
@@ -357,6 +448,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l06",
+          "narration": [
+            "Finir l’alphabet",
+            "Cette étape travaille les lettres C, Q, X, Y, Z et H. Ces six caractères complètent l’alphabet. La lettre H contient quatre points. Écoute les groupes longs d’un seul souffle, puis prononce leur nom pour reconnaître leur rythme.",
+            "C : ━•━•   ·   Q : ━━•━   ·   X : ━••━   ·   Y : ━•━━   ·   Z : ━━••   ·   H : ••••",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-fec2a9c5-582c-46d8-9e2a-2cb1d49f5e88",
             "q-e9e3d16a-13cf-46a0-8326-7ff04d58fb82",
@@ -391,6 +489,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l07",
+          "narration": [
+            "Les chiffres de 1 à 5",
+            "Cette étape travaille les chiffres 1, 2, 3, 4 et 5. Chaque chiffre contient cinq éléments. De un à cinq, le nombre de points au début augmente. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "1 : •━━━━   ·   2 : ••━━━   ·   3 : •••━━   ·   4 : ••••━   ·   5 : •••••",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-90079335-ba5c-492b-8a52-8330aee7b693",
             "q-56a3e0c1-2251-43c6-97e2-09feedfd1e87",
@@ -422,6 +527,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l08",
+          "narration": [
+            "Les chiffres de 6 à 0",
+            "Cette étape travaille les chiffres 6, 7, 8, 9 et 0. De six à zéro, le nombre de traits au début augmente. Zéro contient cinq traits, à distinguer des trois traits de la lettre O. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "6 : ━••••   ·   7 : ━━•••   ·   8 : ━━━••   ·   9 : ━━━━•   ·   0 : ━━━━━",
+            "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-59e26dee-873d-44a1-b56b-7cbcb92176d5",
             "q-77e5422f-9bda-4f89-9887-8f139862ea0f",
@@ -453,6 +565,13 @@
           "formula": "durée du trait = 3 × durée du point",
           "section": "technique",
           "id": "c15-l09",
+          "narration": [
+            "Le silence fait partie du message",
+            "Les pauses servent de séparateurs. Une même succession de points sans séparation peut représenter un caractère différent de plusieurs lettres courtes. La cadence compte autant que le choix des points et traits.",
+            "Dans la temporisation de référence, un point et une pause interne valent une unité. Un trait et la pause entre lettres en valent trois. Entre mots, la pause totale vaut sept unités.",
+            "Si une unité vaut 100 ms, le trait dure 300 ms et la pause de mot 700 ms. Ce sont des durées relatives : changer de vitesse conserve leurs proportions.",
+            "durée du trait = 3 × durée du point"
+          ],
           "questionIds": [
             "q-50df7ae5-8525-4889-8d30-23f3d2f80714",
             "q-182901b5-e44a-49bc-b5c6-023d59caaadc",
@@ -476,6 +595,13 @@
           "formula": "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7",
           "section": "technique",
           "id": "c15-l10",
+          "narration": [
+            "Ponctuer sans confusion",
+            "Cette étape présente le point d’interrogation, la barre oblique, le point final, le signe égal, la virgule et l’arobase. Ces signes servent aux groupes usuels et aux messages. La barre oblique est elle-même un caractère. Son signal ne doit pas être confondu avec la pause entre deux mots. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme.",
+            "? : ••━━••   ·   / : ━••━•   ·   . : •━•━•━   ·   = : ━•••━   ·   , : ━━••━━   ·   @ : •━━•━•",
+            "Les exercices alternent lecture d’un code, écoute du signal et composition en points et traits. Pour un exercice d’écoute, choisis le caractère entendu. Pour composer plusieurs caractères, sépare-les bien. Tu peux réécouter le signal autant que nécessaire.",
+            "point 1 · trait 3 · pause interne 1 · entre lettres 3 · entre mots 7"
+          ],
           "questionIds": [
             "q-b13aa0ba-a1fb-4510-90aa-83624f816ae9",
             "q-d322174b-6955-41ec-a872-3ecfb488a7ff",
@@ -510,6 +636,13 @@
           "formula": "lettres séparées par un espace · mots séparés par /",
           "section": "technique",
           "id": "c15-l11",
+          "narration": [
+            "Lire des petits mots",
+            "Après les lettres isolées, garde le rythme dans des groupes courts. La pause entre deux lettres doit rester audible : ne fusionne pas les caractères. Le groupe de lettres D E signifie « de » et introduit l’identification de la station qui appelle.",
+            "CQ est un appel général; RST est un report en télégraphie. Le groupe 73 exprime une salutation de trafic. Leur sens appartient aux usages, leur codage suit les caractères ordinaires.",
+            "Pour composer un groupe, utilise le bouton de séparation entre lettres. Pour deux mots, utilise le séparateur de mots. La barre affichée comme séparateur de mots n’est pas le caractère slash encodé.",
+            "lettres séparées par un espace · mots séparés par /"
+          ],
           "questionIds": [
             "q-9f685a0b-92c7-4b84-b7ae-194c4c4f9897",
             "q-384ef759-888b-44c7-8448-be0d7ae29c89",
@@ -533,6 +666,13 @@
           "formula": "F4ABC = ..-. ....- .- -... -.-.",
           "section": "technique",
           "id": "c15-l12",
+          "narration": [
+            "Décoder un indicatif",
+            "Un indicatif mélange lettres et chiffres. Il se transmet comme un groupe de caractères ordinaires; le chiffre garde ses cinq éléments. Les exemples de cette leçon sont des groupes d’entraînement, pas des indicatifs attribués par Hamigo.",
+            "L’indicatif F4ABC contient la lettre F, le chiffre quatre, puis les lettres A, B et C. Chaque séparation doit rester claire. Pour transmettre une barre oblique suivie de la lettre P, compose le caractère barre oblique lui-même, puis la lettre P. Ne remplace pas la barre oblique par une pause entre deux mots.",
+            "Quand un caractère manque à l’écoute, conserve ceux que tu as reconnus et réécoute. Essaie de retrouver la structure globale plutôt que de recommencer mentalement toute la chaîne à chaque hésitation.",
+            "F4ABC = ..-. ....- .- -... -.-."
+          ],
           "questionIds": [
             "q-3f2695bd-4603-43ad-9019-1f731ef49566",
             "q-2d7f5231-ae97-4cfc-963f-6db93a27abc6",
@@ -556,6 +696,13 @@
           "formula": "",
           "section": "technique",
           "id": "c15-l13",
+          "narration": [
+            "Apprendre à l’oreille",
+            "Lire et écouter ne demandent pas exactement le même rappel. Révise une petite famille à la fois, puis mélange-la avec les familles précédentes. Une erreur indique une paire à retravailler, pas une raison d’accélérer.",
+            "La méthode d’espacement dite Farnsworth peut garder des caractères rapides tout en allongeant les espaces pour laisser le temps de reconnaître. Cela ne change pas le rapport des durées entre un point et un trait à l’intérieur d’un caractère.",
+            "Garde le volume raisonnable et commence les séances courtes dans un lieu calme. La télégraphie est un enrichissement pratique : elle ne constitue pas une épreuve du certificat français actuel.",
+            ""
+          ],
           "questionIds": [
             "q-cafc4752-5da0-486d-95c6-a556db0750a6",
             "q-6927fc05-3d9c-4550-9e06-ee1940659d40",
@@ -579,6 +726,13 @@
           "formula": "",
           "section": "technique",
           "id": "c15-l14",
+          "narration": [
+            "Le grand mélange Morse",
+            "Ce mélange rassemble des lettres courtes, des lettres longues et des chiffres. La réussite repose sur le rappel du rythme complet. Les questions varient entre reconnaissance visuelle, écoute et composition.",
+            "Avant de répondre, distingue la consigne : nommer un caractère entendu, retrouver celui d’un code affiché ou fabriquer le signal demandé. Une erreur corrigée se transforme en nouvelle occasion de rappel.",
+            "Après cette étape, utilise aussi le traducteur et les flashcards mélangées pour créer de nouveaux groupes. La pratique régulière de quelques minutes donne plus de rappel utile qu’une seule longue séance.",
+            ""
+          ],
           "questionIds": [
             "q-f0996b76-7407-49a5-90f4-9033fae0b3c0",
             "q-0aebbec8-86b2-4c71-a4d0-29366c7db628",
@@ -613,6 +767,13 @@
           "formula": "1 k = 10³ · 1 m = 10⁻³ · 1 µ = 10⁻⁶",
           "section": "technique",
           "id": "c16-l01",
+          "narration": [
+            "Préfixes sans piège",
+            "En notation scientifique, on écrit un nombre multiplié par une puissance de dix. Le préfixe kilo correspond à dix puissance trois. Milli correspond à dix puissance moins trois, micro à dix puissance moins six, nano à dix puissance moins neuf et pico à dix puissance moins douze. Une conversion conserve la même grandeur physique.",
+            "Pour passer d’unité plus grande à une unité plus petite, le nombre augmente. Ainsi 1 µF vaut 1 000 nF et 1 000 000 pF. Un tableau de préfixes aide au début, puis les rapports deviennent familiers.",
+            "Une formule attend généralement les unités de base. Pour RC, utilise Ω et F; pour une longueur d’onde, hertz si la vitesse est en m/s. Certaines écritures simplifiées annoncent explicitement MHz ou kΩ.",
+            "1 k = 10³ · 1 m = 10⁻³ · 1 µ = 10⁻⁶"
+          ],
           "questionIds": [
             "q-6d61861b-7276-4267-a8e0-a9b2a4477a69",
             "q-c7c5d9e8-8dc4-4eb2-9338-69a4f0b12bf2",
@@ -636,6 +797,13 @@
           "formula": "I = U/R · R = U/I · I = P/U",
           "section": "technique",
           "id": "c16-l02",
+          "narration": [
+            "Isoler la bonne inconnue",
+            "Pour transformer une relation, effectue la même opération de chaque côté du signe égal. Partons de U égale R fois I. Pour isoler I, divise les deux côtés par R. Pour isoler R, divise les deux côtés par I. Écris cette transformation avant de remplacer les lettres par les valeurs.",
+            "Les unités aident à vérifier une formule. Des volts divisés par des ohms donnent des ampères. Des watts divisés par des volts donnent aussi des ampères. On ne peut pas additionner des grandeurs incompatibles. Attention, une racine carrée ou un carré change aussi les unités et les rapports.",
+            "Teste un cas simple : si U augmente à R fixe, I doit augmenter; si R augmente à U fixe, I diminue. Ce raisonnement repère une inversion de fraction.",
+            "I = U/R · R = U/I · I = P/U"
+          ],
           "questionIds": [
             "q-58361b42-79f4-4acc-961d-8e8ac098b02a",
             "q-1f1751b8-599a-43bb-93cc-cea11f9f8905",
@@ -659,6 +827,13 @@
           "formula": "module Z = √(R² + X²)",
           "section": "technique",
           "id": "c16-l03",
+          "narration": [
+            "Carrés, racines et rapports",
+            "Une grandeur au carré amplifie l’effet d’un facteur. Si la tension est multipliée par trois avec une résistance fixe, la puissance, égale à U au carré divisé par R, est multipliée par neuf. Une racine carrée agit dans l’autre sens. Si le produit de l’inductance par la capacité est multiplié par neuf, la fréquence de résonance est divisée par trois.",
+            "Pour deux composantes perpendiculaires, calcule la racine carrée de la somme de leurs carrés. Il ne suffit pas d’ajouter leurs valeurs. Les triangles dont les côtés mesurent trois, quatre et cinq, ou six, huit et dix, sont des repères faciles.",
+            "Un rapport compare deux grandeurs de même nature et n’a pas d’unité. Le pourcentage multiplie ce rapport par 100. Énonce ce que représente le numérateur avant de calculer.",
+            "module Z = √(R² + X²)"
+          ],
           "questionIds": [
             "q-cc44a411-7f85-4b84-a876-1b5a287ad2c0",
             "q-8e329789-9197-4bb5-a593-71f57973fda7",
@@ -682,6 +857,13 @@
           "formula": "φ = 360° × Δt/T",
           "section": "technique",
           "id": "c16-l04",
+          "narration": [
+            "Angles et lecture d’oscilloscope",
+            "Un cycle complet représente trois cent soixante degrés. Pour convertir un décalage temporel en angle, divise ce décalage par la période, puis multiplie par trois cent soixante degrés. Précise toujours quel signal est en avance ou en retard.",
+            "À l’oscilloscope, les divisions ne sont pas des unités : le temps par division donne l’échelle horizontale, les volts par division l’échelle verticale. Mesure une période entre points équivalents.",
+            "La valeur de crête, la valeur crête à crête et la valeur efficace décrivent des choses différentes. Pour un signal symétrique autour de zéro, la valeur crête à crête vaut deux fois la crête. Pour une sinusoïde sans composante continue, la valeur efficace est la crête divisée par la racine carrée de deux.",
+            "φ = 360° × Δt/T"
+          ],
           "questionIds": [
             "q-8dde1164-0917-43a7-958c-578578dd09e7",
             "q-2d23fa4a-4777-49f8-8a55-4693bbff94da",
@@ -712,6 +894,13 @@
             "Écris d’abord la grandeur dans l’unité de la formule : ampères, volts, ohms, farads ou henrys. Un milli vaut 10⁻³, un micro 10⁻⁶, un kilo 10³. Les préfixes ne sont pas des unités nouvelles; ils servent à écrire des nombres plus petits. Le carré ou le produit d’une grandeur exige de convertir avant de calculer."
           ],
           "topic": "Électricité",
+          "narration": [
+            "Les unités et leurs préfixes",
+            "Une unité donne un sens au nombre : 12 V est une tension, 2 A un courant, 50 Ω une résistance. Les symboles d’unités ne prennent pas de s au pluriel. k signifie mille, M un million, m un millième et µ un millionième.",
+            "Avant un calcul, convertis toutes les grandeurs dans les unités cohérentes. 4,7 kΩ = 4 700 Ω, tandis que 220 mA = 0,220 A. Attention à la majuscule : MHz n’est pas mHz.",
+            "Écris d’abord la grandeur dans l’unité de la formule : ampères, volts, ohms, farads ou henrys. Un milli vaut 10⁻³, un micro 10⁻⁶, un kilo 10³. Les préfixes ne sont pas des unités nouvelles; ils servent à écrire des nombres plus petits. Le carré ou le produit d’une grandeur exige de convertir avant de calculer.",
+            ""
+          ],
           "questionIds": [
             "q-36d81c7b-fd0b-4a92-8440-0d9f9cc0b440",
             "q-0c3dac0a-3979-4c3e-8d8d-f89933147b59",
@@ -734,6 +923,13 @@
           ],
           "formula": "I = Q / t",
           "topic": "Électricité",
+          "narration": [
+            "Le courant continu",
+            "La tension est une différence de potentiel entre deux points. Le courant mesure la quantité de charge qui traverse un point chaque seconde. En courant continu idéal, le sens et la valeur restent constants dans le temps.",
+            "Une pile, des fils et une charge forment un circuit. Un circuit ouvert interrompt le courant. Le sens conventionnel du courant dans le circuit extérieur va du pôle positif au négatif; les électrons se déplacent dans le sens opposé.",
+            "Dans un circuit fermé, un déplacement net de charges constitue le courant. La tension décrit une différence de potentiel entre deux points : elle peut exister même si aucun courant ne circule. Le courant conventionnel utilise le déplacement de charges positives; dans un métal, les électrons se déplacent en sens opposé.",
+            "L’intensité du courant, notée I, est égale à la charge électrique Q divisée par la durée t."
+          ],
           "questionIds": [
             "q-cb1c6df3-3d48-4a3e-a50f-0df5a0ece4ca",
             "q-9b83bc39-2cd1-4e70-a1d3-29735dce86b8",
@@ -756,6 +952,13 @@
           ],
           "formula": "U = R × I",
           "topic": "Électricité",
+          "narration": [
+            "La loi d’Ohm",
+            "Dans une résistance ohmique, la tension U est proportionnelle au courant I : U = R × I. Une résistance plus grande laisse passer moins de courant pour une même tension.",
+            "Dessine les données et cherche l’inconnue. Pour le courant, I = U/R; pour la résistance, R = U/I. Exemple : 12 V sur 60 Ω donnent 0,2 A. Vérifie les unités avant de taper sur la calculatrice.",
+            "La loi d’Ohm concerne un conducteur ohmique dans des conditions données. Choisis d’abord l’inconnue : U = RI, I = U/R ou R = U/I. Avant de valider, vérifie le sens du résultat : sous une même tension, une résistance plus grande doit laisser passer moins de courant. Un ordre de grandeur repère les erreurs de préfixe.",
+            "La loi d’Ohm s’écrit : U égale R fois I. Autrement dit, la tension est égale à la résistance multipliée par l’intensité."
+          ],
           "questionIds": [
             "q-eec28acd-60f6-410b-8521-43a39bef2fc1",
             "q-9f6b9c7b-00e1-49ba-b042-2c04f613a207",
@@ -778,6 +981,13 @@
           ],
           "formula": "P = U × I ; E = P × t",
           "topic": "Électricité",
+          "narration": [
+            "Puissance et énergie",
+            "La puissance est une énergie consommée ou produite par seconde. En courant continu, P = U × I. Pour une résistance, la loi d’Ohm donne aussi P = R × I² et P = U²/R.",
+            "L’énergie ajoute une durée : E = P × t. Une charge de 10 W pendant 2 h utilise 20 Wh. La résistance choisie doit supporter la puissance dissipée, avec une marge. La puissance d’une alimentation n’est pas automatiquement la puissance radio émise.",
+            "La puissance est un débit d’énergie : le watt vaut un joule par seconde. Une facture ou une batterie emploie souvent des wattheures. Pour obtenir des joules, le temps doit être exprimé en secondes. Pour une résistance ohmique, la puissance est égale à la tension fois l’intensité. Elle est aussi égale à la résistance fois l’intensité au carré, ou à la tension au carré divisée par la résistance. La puissance nominale doit laisser une marge de température.",
+            "La puissance électrique P est égale à la tension U multipliée par l’intensité I. L’énergie E est égale à la puissance P multipliée par la durée t."
+          ],
           "questionIds": [
             "q-24b789dc-72b5-4b42-85ea-c69a74467640",
             "q-93d9ddfc-c631-4629-9b22-0fe632bb6dec",
@@ -809,6 +1019,13 @@
           ],
           "formula": "Rtot = R1 + R2 + …",
           "topic": "Circuits",
+          "narration": [
+            "Résistances en série",
+            "Des résistances en série sont traversées par le même courant : il n’existe qu’un chemin. La résistance totale est la somme de la première résistance, de la deuxième, et ainsi de suite.",
+            "La tension de la source se répartit entre les résistances. À courant identique, une résistance plus élevée prend une plus grande tension. Deux résistances égales partagent la tension en deux parts égales.",
+            "En série, il n’existe qu’un chemin pour le courant. La résistance équivalente est la somme, et les chutes de tension s’additionnent. À courant identique, la plus grande résistance présente la plus grande chute de tension. Une coupure sur ce chemin interrompt le courant dans toute la série.",
+            "En série, la résistance totale est la somme des résistances : R un, plus R deux, et ainsi de suite."
+          ],
           "questionIds": [
             "q-37348bcd-da13-4a51-a4d3-3ad0c88b6baa",
             "q-ec283f3d-a062-4dee-b762-2706679b942b",
@@ -831,6 +1048,13 @@
           ],
           "formula": "Rtot = R1 × R2 / (R1 + R2)",
           "topic": "Circuits",
+          "narration": [
+            "Résistances en parallèle",
+            "Des résistances en parallèle sont reliées aux mêmes deux points : elles ont la même tension. Le courant total se répartit entre les branches.",
+            "On additionne les conductances : l’inverse de la résistance totale est égal à l’inverse de la première résistance plus l’inverse de la deuxième. Avec deux résistances, multiplie leurs valeurs, puis divise le produit par leur somme. Le résultat est inférieur à la plus petite résistance. Deux valeurs égales donnent la moitié de l’une.",
+            "En parallèle, chaque branche rejoint les mêmes deux points : la tension est donc commune, mais les courants se répartissent. La conductance totale est la somme des inverses des résistances. Pour deux branches, la résistance équivalente est le produit des deux résistances divisé par leur somme. Avec plusieurs résistances identiques, divise la valeur d’une résistance par leur nombre.",
+            "Pour deux résistances en parallèle, multiplie R un par R deux, puis divise ce produit par la somme de R un et R deux."
+          ],
           "questionIds": [
             "q-7d0a1df0-9748-413b-b288-54f6083fda3f",
             "q-4657ac1e-b0bc-4e8e-903c-2fcb82e4eb7b",
@@ -853,6 +1077,13 @@
           ],
           "formula": "Us = Ue × R2 / (R1 + R2)",
           "topic": "Circuits",
+          "narration": [
+            "Diviseur de tension et pont",
+            "Un diviseur de tension place deux résistances en série. Si la sortie est prise sur la deuxième résistance et n’est pas chargée, la tension de sortie est égale à la tension d’entrée multipliée par la deuxième résistance, puis divisée par la somme des deux résistances. Brancher une charge change la résistance équivalente de la deuxième branche, et donc la tension.",
+            "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Avec R1 en haut à gauche, R2 en bas à gauche, R3 en haut à droite et R4 en bas à droite : R1/R2 = R3/R4.",
+            "La formule du diviseur suppose que la sortie ne prélève pas un courant significatif. Une charge placée sur R2 lui est parallèle et diminue sa résistance équivalente : la tension de sortie descend. Dans un pont équilibré, les deux points de mesure ont le même potentiel, même si les branches restent parcourues par des courants.",
+            "La tension de sortie du diviseur est égale à la tension d’entrée multipliée par R deux, puis divisée par la somme de R un et R deux."
+          ],
           "questionIds": [
             "q-1464111a-efa1-40f4-aee1-c75d072d5c13",
             "q-afa27523-2b26-44a9-b005-8faccde1e546",
@@ -875,6 +1106,13 @@
           ],
           "formula": "Σ Ientrants = Σ Isortants ; Σ U dans une maille = 0",
           "topic": "Circuits",
+          "narration": [
+            "Les lois de Kirchhoff",
+            "À un nœud, la somme des courants entrants égale celle des courants sortants. Les charges ne s’accumulent pas indéfiniment : si 2 A arrivent et 0,7 A repartent dans une branche, 1,3 A prennent l’autre.",
+            "Dans une boucle fermée, la somme algébrique des tensions est nulle. Une source de 12 V peut alimenter deux chutes de 5 V et 7 V. Ces règles prolongent la loi d’Ohm aux circuits avec plusieurs branches.",
+            "Dessine des flèches de courant et choisis un sens de parcours pour la maille avant de poser les équations. Un résultat négatif dit que le courant réel est opposé à la flèche choisie, pas que le circuit est impossible. Aux nœuds, les charges ne s’accumulent pas durablement en régime établi.",
+            "À un nœud, la somme des courants entrants est égale à la somme des courants sortants. Dans une maille, la somme algébrique des tensions est nulle."
+          ],
           "questionIds": [
             "q-a654e051-9452-4460-b3ed-0e8819513908",
             "q-efb043ef-b9de-4ef4-8a89-aa4a60b4508b",
@@ -906,6 +1144,13 @@
           ],
           "formula": "R = (10 × chiffre1 + chiffre2) × multiplicateur",
           "topic": "Composants",
+          "narration": [
+            "Lire une résistance",
+            "Sur une résistance à quatre anneaux, les deux premiers donnent deux chiffres, le troisième un multiplicateur et le quatrième une tolérance. La tolérance est l’écart permis autour de la valeur nominale; l’anneau souvent espacé aide à trouver le sens.",
+            "Le code des chiffres est noir 0, brun 1, rouge 2, orange 3, jaune 4, vert 5, bleu 6, violet 7, gris 8, blanc 9. Pour le multiplicateur, ces couleurs donnent 10 à la puissance du chiffre. Or multiplie par 0,1 et argent par 0,01.",
+            "Pour quatre anneaux, lis deux chiffres significatifs, puis le multiplicateur et la tolérance. À cinq anneaux, trois chiffres précèdent le multiplicateur. Les anneaux or et argent correspondent souvent à la tolérance et donnent un repère de sens de lecture. Vérifie la valeur calculée par un ordre de grandeur.",
+            "Pour une résistance à quatre anneaux, multiplie le premier chiffre par dix, ajoute le deuxième chiffre, puis multiplie le résultat par le multiplicateur."
+          ],
           "questionIds": [
             "q-280453ab-a6e2-4267-84e2-a2ff7925af4f",
             "q-3530e07a-a961-4926-8326-2de2792a9171",
@@ -928,6 +1173,13 @@
           ],
           "formula": "Q = C × U ; Xc = 1 / (2πfC)",
           "topic": "Composants",
+          "narration": [
+            "Les condensateurs",
+            "Un condensateur stocke de l’énergie dans un champ électrique entre deux armatures. Sa capacité C se mesure en farads. Pour une même tension, une plus grande capacité stocke plus de charge : Q = C × U.",
+            "En continu, après la charge, un condensateur idéal ne laisse plus passer de courant. En alternatif, il présente une réactance qui diminue quand la fréquence augmente. Respecte la polarité d’un condensateur polarisé et sa tension nominale.",
+            "Un condensateur oppose une variation instantanée de tension; sa charge vaut Q = CU. Deux condensateurs en parallèle additionnent leurs capacités, alors qu’en série on additionne les inverses. Les modèles réels ont une tension maximale, des pertes et parfois une polarité à respecter.",
+            "La charge Q est égale à la capacité C multipliée par la tension U. La réactance capacitive vaut un divisé par le produit de deux, pi, la fréquence et la capacité."
+          ],
           "questionIds": [
             "q-e8920d4a-8dcf-46da-8233-a92d691ba851",
             "q-73f19ed6-03c2-4e23-8f6d-9b3557a7185c",
@@ -950,6 +1202,13 @@
           ],
           "formula": "XL = 2πfL",
           "topic": "Composants",
+          "narration": [
+            "Les bobines",
+            "Une bobine oppose les variations du courant et stocke de l’énergie dans un champ magnétique. Son inductance L se mesure en henrys. Le courant ne peut pas changer instantanément dans une inductance idéale.",
+            "En continu stable, une bobine idéale est un court-circuit. Une vraie bobine possède aussi la résistance de son fil. En alternatif, sa réactance inductive augmente avec la fréquence. Sans couplage mutuel, les inductances en série s’additionnent.",
+            "Une bobine oppose une variation rapide de courant. Sa réactance inductive vaut deux fois pi fois la fréquence fois l’inductance. Elle augmente avec la fréquence. En continu établi, le modèle idéal ressemble à un fil. Une bobine réelle possède aussi une résistance de cuivre et peut comporter un noyau magnétique qui sature.",
+            "La réactance inductive est le produit de deux, pi, la fréquence et l’inductance."
+          ],
           "questionIds": [
             "q-a87f61fc-1d2f-4e7a-98a1-2740b94a2a4a",
             "q-55729c53-d0b7-45a3-a9e7-ace3826b937c",
@@ -972,6 +1231,13 @@
           ],
           "formula": "τ = R × C",
           "topic": "Composants",
+          "narration": [
+            "Charge et décharge RC",
+            "Avec une résistance et un condensateur, les changements se font progressivement. La constante de temps τ vaut R × C, avec R en ohms et C en farads; le résultat est en secondes.",
+            "Après une constante de temps, la charge atteint environ 63 % de sa variation finale. Lors d’une décharge, il reste environ 37 % de la tension initiale. Après cinq constantes de temps, le changement est pratiquement achevé; vérifie quand même la tension avant toute intervention.",
+            "La constante τ = RC fixe l’échelle de temps d’une évolution exponentielle. À chaque τ, la part qui reste à parcourir est multipliée par environ 0,368. Après 5τ, la charge a atteint environ 99,3 % de sa valeur finale, et la décharge laisse environ 0,7 % de sa valeur initiale.",
+            "La constante de temps, appelée tau, est égale à la résistance multipliée par la capacité."
+          ],
           "questionIds": [
             "q-4196b177-06ef-4c1b-9b71-51fa60ecf436",
             "q-ca85a8e2-29a1-47a4-8b9e-08c94300539d",
@@ -1003,6 +1269,13 @@
           ],
           "formula": "Upp = 2 × Ucrête",
           "topic": "Courant alternatif",
+          "narration": [
+            "Une sinusoïde",
+            "Un signal alternatif change de sens. La sinusoïde est une forme régulière qui monte et descend périodiquement. Sa fréquence indique le nombre de cycles par seconde, en hertz; son amplitude décrit la valeur de crête.",
+            "Une sinusoïde centrée sur zéro a une moyenne nulle, mais peut chauffer une résistance. La valeur crête à crête est deux fois la valeur de crête pour cette sinusoïde symétrique.",
+            "Une sinusoïde peut se décrire par son amplitude, sa fréquence et sa phase. Une valeur moyenne nulle ne veut pas dire qu’elle ne transporte aucune énergie. Pour une résistance, les demi-alternances positive et négative dissipent toutes deux de la puissance. Lorsque les crêtes positive et négative sont symétriques autour de zéro, la valeur crête à crête vaut deux fois la crête.",
+            "Pour un signal symétrique autour de zéro, la tension crête à crête vaut deux fois la tension de crête."
+          ],
           "questionIds": [
             "q-fae65c97-1744-4efe-809f-34e78f51ed74",
             "q-3fc96b13-1983-4da2-8fa3-2418665c1e79",
@@ -1025,6 +1298,13 @@
           ],
           "formula": "f = 1 / T",
           "topic": "Courant alternatif",
+          "narration": [
+            "Période et fréquence",
+            "La période T est la durée d’un cycle. La fréquence f est le nombre de cycles par seconde. Elles sont inverses : f = 1/T et T = 1/f, avec T en secondes.",
+            "Pour 1 kHz, T = 1/1 000 = 0,001 s = 1 ms. Quand la fréquence augmente, les cycles sont plus serrés et la période raccourcit. Convertir les préfixes d’abord évite la plupart des erreurs.",
+            "La période se mesure sur deux points successifs de même phase, par exemple deux sommets. T = 1/f exige des secondes et des hertz. À l’oscilloscope, multiplie le nombre de divisions horizontales par le temps par division pour trouver T, puis prends l’inverse.",
+            "La fréquence est l’inverse de la période : f égale un divisé par T."
+          ],
           "questionIds": [
             "q-4ba1c5c6-37c3-4489-9d21-c26648c5affa",
             "q-c8d82c62-87b6-45c1-b077-e5fb7b49cda8",
@@ -1047,6 +1327,13 @@
           ],
           "formula": "Ueff = Ucrête / √2",
           "topic": "Courant alternatif",
+          "narration": [
+            "Valeur efficace et phase",
+            "La valeur efficace d’une tension est celle d’une tension continue produisant la même puissance moyenne dans une résistance. Pour une sinusoïde seule, Ueff = Ucrête/√2. Cette relation ne vaut pas pour toute forme de signal.",
+            "Deux signaux de même fréquence peuvent être décalés dans le temps : c’est un déphasage. Un cycle entier vaut 360°, un quart de cycle 90°. En résistance pure, tension et courant sont en phase.",
+            "La valeur efficace d’une tension produit la même puissance moyenne dans une résistance que la tension continue correspondante. Pour une sinusoïde sans composante continue, Ueff = Ucrête/√2. La phase est une avance ou un retard dans le cycle; elle n’est pas une fréquence supplémentaire.",
+            "Pour une sinusoïde, la tension efficace est égale à la tension de crête divisée par la racine carrée de deux."
+          ],
           "questionIds": [
             "q-097e9715-d10d-4d73-90ca-91582493bd7b",
             "q-95614f37-bf58-49fc-9ad4-4f3ed30437ac",
@@ -1069,6 +1356,13 @@
           ],
           "formula": "|Z| = √(R² + (XL − XC)²)",
           "topic": "Courant alternatif",
+          "narration": [
+            "Réactance et impédance",
+            "La résistance dissipe de l’énergie; la réactance idéale l’échange avec un champ. L’impédance Z combine résistance et réactance et se mesure aussi en ohms. Dans un montage série R et X, son module vaut √(R² + X²).",
+            "Pour une bobine idéale, le courant retarde la tension de quatre-vingt-dix degrés. Pour un condensateur idéal, il l’avance de quatre-vingt-dix degrés. Dans un circuit série associant résistance, bobine et condensateur, la réactance totale est la réactance inductive moins la réactance capacitive : les deux effets peuvent se compenser.",
+            "L’impédance rassemble la partie résistive et la partie réactive. En série, les réactances inductive et capacitive se soustraient avec leur signe : X = XL − XC. Le module vaut √(R² + X²), donc on n’additionne pas simplement R et X. À résonance série, X devient nul.",
+            "Le module de l’impédance est la racine carrée de la somme suivante : la résistance au carré, plus le carré de la différence entre réactance inductive et réactance capacitive."
+          ],
           "questionIds": [
             "q-5d028a94-cedd-4eaa-8b74-152262b75206",
             "q-1a6a395c-2dd4-4652-be0f-d939a66d4f34",
@@ -1100,6 +1394,13 @@
           ],
           "formula": "f0 = 1 / (2π√(LC))",
           "topic": "Circuits radio",
+          "narration": [
+            "La résonance LC",
+            "À la résonance, les réactances inductive et capacitive ont le même module. La fréquence propre d’un circuit idéal à bobine et condensateur est l’inverse du produit de deux, pi, et la racine carrée du produit de l’inductance par la capacité. Augmenter l’inductance ou la capacité abaisse cette fréquence. Multiplier la capacité par quatre divise la fréquence propre par deux.",
+            "À la résonance, un circuit RLC série présente son impédance minimale, fixée par la résistance. Un circuit parallèle résonant présente généralement une impédance maximale. Le facteur de qualité Q décrit notamment la finesse de sélection.",
+            "La résonance est la fréquence où les échanges entre champs électrique et magnétique compensent les réactances. f0 = 1/(2π√LC). Un circuit série devient surtout résistif à f0; un circuit parallèle idéal possède au contraire une impédance très grande. Les pertes réelles limitent toujours ces cas idéaux.",
+            "La fréquence de résonance est l’inverse du produit de deux, pi et la racine carrée du produit de l’inductance par la capacité."
+          ],
           "questionIds": [
             "q-0b502af3-ab9a-41b4-af8f-9beba7591440",
             "q-bd5271f6-ecbb-4c48-b826-6ef5f17bed54",
@@ -1122,6 +1423,13 @@
           ],
           "formula": "fc(RC) = 1 / (2πRC)",
           "topic": "Circuits radio",
+          "narration": [
+            "Des filtres pour nettoyer",
+            "Un filtre passe-bas laisse les fréquences basses et atténue les hautes; un passe-haut fait l’inverse. Un passe-bande conserve une plage autour d’une fréquence, tandis qu’un coupe-bande rejette une plage.",
+            "Le filtre n’a pas une frontière parfaite : son atténuation augmente progressivement. La fréquence de coupure usuelle à −3 dB correspond à une puissance divisée par deux. Un filtre passe-bas en sortie d’émetteur réduit les harmoniques au-dessus de la fréquence utile.",
+            "Un filtre laisse passer une zone de fréquence et atténue une autre; son action est progressive. La fréquence de coupure se définit souvent à −3 dB par rapport au niveau en bande passante. La pente s’exprime en dB par octave ou par décade. Un filtre n’améliore pas une émission déjà hors des limites légales.",
+            "Pour un filtre R C du premier ordre, la fréquence de coupure est l’inverse du produit de deux, pi, la résistance et la capacité."
+          ],
           "questionIds": [
             "q-d353d203-edcc-4945-8c80-e8ad04b151e3",
             "q-89595e5f-d827-415f-bb1c-a7756d3aa484",
@@ -1144,6 +1452,13 @@
           ],
           "formula": "Us / Up = Ns / Np",
           "topic": "Circuits radio",
+          "narration": [
+            "Le transformateur",
+            "Un transformateur utilise un champ magnétique variable pour transférer de l’énergie entre bobinages. Pour le transformateur idéal, la tension secondaire divisée par la tension primaire est égale au nombre de spires secondaires divisé par le nombre de spires primaires : la tension suit le rapport de spires.",
+            "La puissance se conserve dans le modèle idéal : une tension multipliée par deux s’accompagne d’un courant divisé par deux. Une impédance se transforme avec le carré du rapport de spires. Un transformateur classique ne fonctionne pas en continu stable.",
+            "Pour un transformateur idéal, le rapport de la tension secondaire à la tension primaire est égal au rapport du nombre de spires secondaires au nombre de spires primaires. Les puissances sont égales : la tension primaire fois le courant primaire est égale à la tension secondaire fois le courant secondaire. Le rapport des impédances est le carré du rapport des spires. Le modèle suppose un couplage parfait et aucune perte. Un vrai transformateur chauffe, et sa réponse dépend de la fréquence.",
+            "Dans un transformateur idéal, le rapport de la tension secondaire à la tension primaire est égal au rapport du nombre de spires secondaires au nombre de spires primaires."
+          ],
           "questionIds": [
             "q-d23d2a36-56bb-446f-911b-2b392d181d00",
             "q-72082cc7-e10b-40ca-9d81-508bc985e659",
@@ -1166,6 +1481,13 @@
           ],
           "formula": "GdB = 10 log10(P2 / P1)",
           "topic": "Circuits radio",
+          "narration": [
+            "Les décibels",
+            "Un décibel exprime un rapport logarithmique. Pour des puissances, le gain en décibels vaut dix fois le logarithme en base dix de la puissance de sortie divisée par la puissance d’entrée. Un rapport de deux vaut environ plus trois décibels. Un rapport de dix vaut plus dix décibels, et un rapport de cent vaut plus vingt décibels.",
+            "Pour des tensions sous la même impédance, on utilise 20 log10(U2/U1). Les gains d’une chaîne s’additionnent en dB, les pertes se soustraient. Le dBm est une puissance référencée à 1 mW : 0 dBm = 1 mW.",
+            "Le décibel compare deux puissances : 10 log10(P2/P1). Pour deux tensions à impédance identique, le rapport devient 20 log10(U2/U1). Les gains et pertes en dB s’additionnent. Un dBm est une puissance absolue référencée à 1 mW, alors qu’un dB seul est un rapport.",
+            "Le gain en décibels vaut dix fois le logarithme en base dix du rapport entre puissance de sortie et puissance d’entrée."
+          ],
           "questionIds": [
             "q-d79b116a-25c7-4d60-b96b-38665d0a24d2",
             "q-f1fe2441-fdae-4500-9ca3-4e7fcf297571",
@@ -1198,6 +1520,13 @@
           "formula": "EC = ½CU² · EL = ½LI²",
           "section": "technique",
           "id": "c17-l01",
+          "narration": [
+            "Énergie dans C et L",
+            "Le condensateur stocke de l’énergie dans un champ électrique. Cette énergie est égale à un demi fois la capacité fois la tension au carré. La bobine stocke de l’énergie dans un champ magnétique. Cette énergie est égale à un demi fois l’inductance fois l’intensité au carré. Le carré signifie que doubler la tension ou le courant multiplie cette énergie par quatre.",
+            "Un composant peut stocker une énergie dangereuse même si sa capacité ou son inductance paraît petite. Le modèle énergétique complète les relations suivantes : la charge d’un condensateur est égale à sa capacité fois sa tension. Pour une bobine, la tension est égale à l’inductance multipliée par le taux de variation de l’intensité au cours du temps. Ce modèle ne remplace pas les limites de tension et de courant des composants.",
+            "Dans un circuit oscillant, l’énergie passe entre condensateur et bobine. Les résistances dissipent une partie de cette énergie, ce qui amortit l’oscillation sans apport extérieur.",
+            "L’énergie stockée dans un condensateur vaut un demi fois la capacité fois la tension au carré. Dans une bobine, elle vaut un demi fois l’inductance fois l’intensité au carré."
+          ],
           "questionIds": [
             "q-06ac40bc-93b5-43f0-9c04-a570f2ad7a19",
             "q-8f19224b-ece0-44f8-a376-1a80bd0c3421",
@@ -1221,6 +1550,13 @@
           "formula": "XL = 2πfL · XC = 1/(2πfC)",
           "section": "technique",
           "id": "c17-l02",
+          "narration": [
+            "Réactances en nombres",
+            "La réactance inductive vaut deux fois pi fois la fréquence fois l’inductance. La réactance capacitive est l’inverse du produit de deux, pi, la fréquence et la capacité. Pour obtenir des ohms, la fréquence doit être en hertz, l’inductance en henrys, et la capacité en farads. La réactance inductive augmente avec la fréquence. La réactance capacitive diminue.",
+            "À la même fréquence, une bobine deux fois plus grande a une réactance double. Un condensateur deux fois plus grand a une réactance divisée par deux. Le changement de fréquence suit les mêmes rapports.",
+            "Ces calculs emploient les modèles idéaux. Aux fréquences élevées, les composants réels ont des capacités ou inductances parasites et peuvent rencontrer leur propre résonance.",
+            "La réactance inductive vaut deux fois pi fois la fréquence fois l’inductance. La réactance capacitive est l’inverse du produit de deux, pi, la fréquence et la capacité."
+          ],
           "questionIds": [
             "q-bd57061b-e808-49bb-ad4c-cb1812ee3bcd",
             "q-5ee7e999-2598-4b42-a1c3-8c00c3c511cb",
@@ -1244,6 +1580,13 @@
           "formula": "X = XL − XC · Z = √(R²+X²)",
           "section": "technique",
           "id": "c17-l03",
+          "narration": [
+            "Module et phase d’une impédance",
+            "Dans un circuit série avec résistance, bobine et condensateur, la partie réactive est égale à la réactance inductive moins la réactance capacitive. Le signe décide du caractère inductif ou capacitif. Le module de l’impédance est la racine carrée de la somme de la résistance au carré et de la réactance totale au carré. Il sert à calculer l’amplitude du courant.",
+            "La phase vérifie tan φ = X/R dans ce modèle. Un angle positif correspond à une tension en avance sur le courant, donc à un comportement inductif; un angle négatif correspond au comportement capacitif.",
+            "Quand |X| = R, l’angle a une amplitude de 45°. Quand X = 0, le courant et la tension sont en phase. Ces repères évitent de confondre phase et module.",
+            "La réactance totale est la réactance inductive moins la réactance capacitive. Le module de l’impédance est la racine carrée de la somme des carrés de la résistance et de la réactance totale."
+          ],
           "questionIds": [
             "q-1e53c703-d2ac-4313-89e8-7896cb53b829",
             "q-39671c97-d97a-4c34-a314-a29d00cca386",
@@ -1267,6 +1610,13 @@
           "formula": "f0 = 1/(2π√LC) · Q = f0/B",
           "section": "technique",
           "id": "c17-l04",
+          "narration": [
+            "Accorder et sélectionner",
+            "Un réglage de L ou C déplace la fréquence de résonance. Un circuit à fort Q possède une bande plus étroite, mais toute information modulée a besoin d’une certaine largeur. Une sélection trop étroite peut donc altérer le message.",
+            "Pour le modèle de bande étudié, Q = f0/B. Les pertes dissipatives réduisent le Q. En série à résonance, le courant peut être élevé et les tensions individuelles sur L et C peuvent dépasser celle de la source.",
+            "Une adaptation ou un couplage réel change le chargement du circuit. Le Q à vide et le Q chargé ne sont pas identiques : brancher le reste du montage modifie la sélectivité.",
+            "La fréquence de résonance vaut un divisé par le produit de deux, pi et la racine carrée du produit L C. Le facteur de qualité est la fréquence de résonance divisée par la largeur de bande."
+          ],
           "questionIds": [
             "q-424cd52b-f7bb-4f12-afe5-990d47fd8e49",
             "q-bb4a3ac0-49cf-43a1-b685-bdfc0c0e9942",
@@ -1297,6 +1647,13 @@
             "La diode réelle demande une tension directe et possède une limite de courant. Un pont de redressement utilise deux diodes conductrices à chaque alternance; un condensateur peut ensuite réduire l’ondulation. Une Zener fonctionne en inverse dans sa zone prévue avec une limitation de courant, pas comme un court-circuit magique."
           ],
           "topic": "Électronique",
+          "narration": [
+            "Diodes et redressement",
+            "Une diode conduit principalement dans le sens direct et bloque dans le sens inverse, dans ses limites. Pour une diode silicium ordinaire, la chute directe typique est voisine de 0,6 à 0,7 V; elle dépend du courant et de la température.",
+            "Un pont de quatre diodes redresse les deux alternances d’une tension. Un condensateur peut ensuite lisser la tension redressée. Une diode Zener est utilisée dans sa zone de claquage inverse contrôlée pour une référence de tension, avec limitation de courant.",
+            "La diode réelle demande une tension directe et possède une limite de courant. Un pont de redressement utilise deux diodes conductrices à chaque alternance; un condensateur peut ensuite réduire l’ondulation. Une Zener fonctionne en inverse dans sa zone prévue avec une limitation de courant, pas comme un court-circuit magique.",
+            ""
+          ],
           "questionIds": [
             "q-6b1687a1-8a56-4e34-ace2-724dcd6096e1",
             "q-2f9b884a-c298-4eff-bc0c-583f7dde1bf9",
@@ -1319,6 +1676,13 @@
           ],
           "formula": "β ≈ Ic / Ib",
           "topic": "Électronique",
+          "narration": [
+            "Transistors bipolaires et FET",
+            "Un transistor permet de commander un courant. Le transistor bipolaire possède une base, un collecteur et un émetteur. Dans une approche simple, un faible courant de base commande un courant collecteur plus grand.",
+            "Le transistor à effet de champ possède une grille, un drain et une source. Sa commande est surtout une tension de grille et son entrée a généralement une forte impédance. Amplifier demande aussi une polarisation et une alimentation adaptées.",
+            "La polarisation fixe le point de repos avant d’ajouter le signal. Le gain β d’un bipolaire n’est pas une constante universelle : il dépend du composant et du fonctionnement. Un FET est commandé par la tension grille-source. En amplification, il faut garder une marge pour éviter la coupure ou la saturation.",
+            "Le gain en courant du transistor, appelé bêta, est approximativement égal au courant de collecteur divisé par le courant de base."
+          ],
           "questionIds": [
             "q-e8ec6d09-8ad9-49f7-b32a-ffd75a49b365",
             "q-927f8f78-e4ff-4e27-988f-c0d6bfc7651c",
@@ -1341,6 +1705,13 @@
           ],
           "formula": "η = Putile / Palimentation",
           "topic": "Électronique",
+          "narration": [
+            "Amplificateurs et rendement",
+            "Un amplificateur reçoit de l’énergie de son alimentation et l’utilise pour augmenter un signal. Il ne crée pas l’énergie. Le rendement vaut Psortie utile/Pentrée alimentation. Le reste part notamment en chaleur.",
+            "La classe A conduit pendant tout le cycle et favorise la linéarité au prix du rendement. La classe C conduit moins d’un demi-cycle et convient à des usages RF adaptés; elle ne reproduit pas directement une BLU sans distorsion. Une contre-réaction négative peut améliorer stabilité et linéarité.",
+            "Le rendement compare la puissance utile à la puissance absorbée; il ne peut pas dépasser 100 % pour un amplificateur ordinaire. Les pertes deviennent surtout de la chaleur. La linéarité concerne la fidélité du signal, pas seulement le rendement. Une contre-réaction négative échange du gain contre une réponse souvent plus stable et moins déformée.",
+            "Le rendement, noté êta, est la puissance utile divisée par la puissance d’alimentation."
+          ],
           "questionIds": [
             "q-59514898-48a2-4e7f-9658-315ef2f3160e",
             "q-101b2463-d724-4cd9-baba-c3c2f32f36dd",
@@ -1362,6 +1733,13 @@
             "Un oscillateur entretenu compense ses pertes par un apport d’énergie. Un quartz apporte une résonance stable, mais sa température et son environnement ont encore un effet. En logique, ET demande deux entrées vraies; OU demande au moins une; NON inverse l’état. L’état logique ne décrit pas directement une tension universelle."
           ],
           "topic": "Électronique",
+          "narration": [
+            "Oscillateurs et logique",
+            "Un oscillateur produit un signal périodique grâce à une alimentation et une réaction entretenue. Un circuit LC ou un quartz fixe la fréquence. Le quartz présente une bonne stabilité et une sélection très fine.",
+            "Les circuits logiques manipulent des niveaux représentant 0 et 1. Une porte ET sort 1 seulement si ses deux entrées valent 1; une porte OU sort 1 si au moins une entrée vaut 1. Une porte NON inverse son entrée.",
+            "Un oscillateur entretenu compense ses pertes par un apport d’énergie. Un quartz apporte une résonance stable, mais sa température et son environnement ont encore un effet. En logique, ET demande deux entrées vraies; OU demande au moins une; NON inverse l’état. L’état logique ne décrit pas directement une tension universelle.",
+            ""
+          ],
           "questionIds": [
             "q-ae6d0adb-503c-4c3e-974c-41937e646253",
             "q-471fba70-e3b6-40c8-9452-ecbacf4c8052",
@@ -1393,6 +1771,13 @@
           ],
           "formula": "BAM ≈ 2 × Faudio max",
           "topic": "Modulation",
+          "narration": [
+            "La modulation d’amplitude",
+            "Moduler signifie faire porter une information par un signal radio. En AM, l’amplitude de la porteuse varie au rythme du message. Une modulation par un ton crée une bande latérale de chaque côté de la porteuse.",
+            "Avec une fréquence audio maximale F, l’AM double bande occupe environ 2F. Une modulation excessive déforme l’enveloppe et produit des émissions indésirables. L’AM phonie usuelle est désignée A3E.",
+            "Une AM sinusoïdale possède une porteuse à fc et des bandes latérales à fc − fm et fc + fm. Pour une bande audio de largeur Fmax, la largeur RF double bande vaut environ 2Fmax. Un taux de modulation supérieur à 100 % déforme l’enveloppe dans le modèle simple et crée un risque d’émission trop large.",
+            "En modulation d’amplitude, la largeur de bande est approximativement égale à deux fois la fréquence audio maximale."
+          ],
           "questionIds": [
             "q-a6119e22-15ef-4803-b89e-2440c32778be",
             "q-7cb0cfee-82bd-408e-9901-f7e19a404979",
@@ -1415,6 +1800,13 @@
           ],
           "formula": "BFM ≈ 2 × (Δf + Faudio max)",
           "topic": "Modulation",
+          "narration": [
+            "FM et modulation de phase",
+            "En FM, la fréquence instantanée de la porteuse varie avec le signal; en PM, c’est sa phase. La FM idéale garde une amplitude constante. L’excursion de fréquence est l’écart maximal autour de la fréquence centrale.",
+            "La règle de Carson estime la largeur de bande FM : B ≈ 2(Δf + Fmax). Avec une excursion de 2,5 kHz et une audio maximale de 3 kHz, cela donne environ 11 kHz. Une excursion excessive déborde dans les canaux voisins.",
+            "En modulation de fréquence, la fréquence instantanée suit le message, et l’amplitude idéale reste constante. L’indice de modulation sinusoïdale est égal à l’excursion de fréquence divisée par la fréquence de modulation. La règle de Carson estime la largeur de bande à deux fois la somme de l’excursion et de la fréquence maximale de modulation. Elle n’est pas la description exacte de toutes les raies du spectre. En modulation de phase, c’est la phase qui suit directement le message.",
+            "En modulation de fréquence, la règle de Carson donne une largeur de bande approximative : deux fois la somme de l’excursion maximale en fréquence et de la fréquence audio maximale."
+          ],
           "questionIds": [
             "q-9ddbd1c5-b211-48a0-886a-13132bcbef63",
             "q-477e149b-3ccc-4761-bfdf-97b66e6d714e",
@@ -1437,6 +1829,13 @@
           ],
           "formula": "BBLU ≈ largeur audio utile",
           "topic": "Modulation",
+          "narration": [
+            "BLU et CW",
+            "La BLU conserve une seule bande latérale et supprime normalement la porteuse. Elle utilise moins de bande passante et de puissance qu’une AM transmettant la même information audio. USB désigne la bande supérieure, LSB l’inférieure.",
+            "En CW, l’information Morse est portée par la mise en marche et l’arrêt d’une porteuse. Un récepteur utilise un oscillateur de battement pour rendre cette porteuse audible. Un amplificateur de BLU doit respecter les variations d’enveloppe.",
+            "La bande latérale unique économise de la puissance et de la bande en gardant une seule bande latérale, avec une porteuse fortement supprimée. Un signal audio de un kilohertz produit une composante située un kilohertz au-dessus de la fréquence porteuse en bande latérale supérieure, ou un kilohertz au-dessous en bande latérale inférieure. La télégraphie forme des symboles en manipulant une porteuse. Des fronts excessivement abrupts produisent des clics et élargissent le spectre.",
+            "En bande latérale unique, la largeur de bande est approximativement égale à la largeur de la bande audio utile."
+          ],
           "questionIds": [
             "q-82f93f23-41b2-4c56-b340-8d07c1cbc2b4",
             "q-a6ea29a9-b2ce-4807-abfa-66af712a6d68",
@@ -1459,6 +1858,13 @@
           ],
           "formula": "Débit binaire = débit symboles × bits par symbole",
           "topic": "Modulation",
+          "narration": [
+            "Les modes numériques",
+            "Les modes numériques transportent des symboles correspondant à des bits. En FSK, la fréquence commute entre des états; en PSK, c’est la phase. Le débit de symboles, en bauds, n’est pas toujours égal au débit de bits par seconde.",
+            "Un symbole peut coder plusieurs bits. Avec quatre états distincts, il peut représenter deux bits; 1 000 symboles/s transportent alors 2 000 bit/s avant les surcoûts. Le codage de données ne doit pas être confondu avec un chiffrement destiné à obscurcir le sens.",
+            "Le baud compte les symboles par seconde; le bit par seconde compte l’information binaire. M états distincts peuvent représenter log2(M) bits par symbole. Le débit utile tient ensuite compte de l’encodage, de la correction d’erreurs et des protocoles. Une constellation dense exige généralement une réception plus fiable.",
+            "Le débit binaire est égal au débit de symboles multiplié par le nombre de bits par symbole."
+          ],
           "questionIds": [
             "q-b39d580c-e55d-4e4f-a7e5-6530f84c6571",
             "q-6e406591-53ab-4dde-b633-3eafebd3fb06",
@@ -1491,6 +1897,13 @@
           "formula": "N bits → 2ᴺ états",
           "section": "technique",
           "id": "c20-l01",
+          "narration": [
+            "Penser en bits",
+            "Un bit possède deux états, 0 ou 1. Les positions d’un entier binaire portent les poids 1, 2, 4, 8, 16… en partant de la droite. Le nombre décimal est la somme des poids activés.",
+            "N bits permettent 2ᴺ combinaisons. En entier non signé, elles vont de 0 à 2ᴺ−1. Les zéros à gauche conservent la largeur du mot sans changer sa valeur.",
+            "Le code binaire ne garantit pas la fiabilité radio : il faut ensuite représenter ces états par une modulation et gérer les erreurs de réception.",
+            "Avec N bits, on dispose de deux puissance N états possibles."
+          ],
           "questionIds": [
             "q-6380a2db-8a31-4f79-8950-c37a3218764e",
             "q-f7eda2d7-8e37-4f6c-9fc3-fe335ca2f199",
@@ -1515,6 +1928,14 @@
           ],
           "formula": "1 octet = 8 bits · 1 chiffre hexadécimal = 4 bits",
           "visuals": [],
+          "narration": [
+            "Du binaire à l’hexadécimal",
+            "En binaire, chaque position vaut deux fois celle à sa droite. Pour huit bits, lis les poids 128, 64, 32, 16, 8, 4, 2 et 1. Additionne seulement les poids dont le bit vaut 1 : 00101101₂ = 32 + 8 + 4 + 1 = 45.",
+            "Un octet contient huit bits, soit 256 combinaisons ; un entier non signé sur un octet va de 0 à 255. Un zéro placé à gauche ne change pas la valeur, mais permet de garder une largeur fixe.",
+            "L’hexadécimal utilise seize chiffres : 0 à 9, puis A pour 10, B pour 11, C pour 12, D pour 13, E pour 14 et F pour 15. Chaque chiffre correspond exactement à quatre bits. Sépare donc 00101101₂ en 0010 et 1101 : tu obtiens 2D₁₆.",
+            "Attention aux unités : bit et octet diffèrent d’un facteur huit. Les préfixes SI sont décimaux (1 ko = 1 000 octets) ; les préfixes IEC sont binaires (1 Kio = 1 024 octets). Le cours ancien utilise parfois « ko » pour cette seconde valeur.",
+            "Un octet contient huit bits. Un chiffre hexadécimal représente quatre bits."
+          ],
           "questionIds": [
             "q-e1e21327-ae7a-401b-a1bf-558ebd47612e",
             "q-cd9f74e9-6f2b-4850-be0a-ac08b8c2615c",
@@ -1546,6 +1967,15 @@
             "logic:or",
             "logic:not"
           ],
+          "narration": [
+            "Lire ET, OU et NON",
+            "Une porte logique transforme des entrées binaires en une sortie binaire. 0 et 1 désignent des niveaux logiques ; les tensions réelles et leurs seuils dépendent de la famille du composant. Ne suppose pas que 1 signifie toujours exactement 5 V.",
+            "Les dessins de ce cours utilisent des formes distinctes, comme dans de nombreuses fiches techniques : ET arrondi à droite, OU courbé et NON triangulaire. Les entrées arrivent à gauche et la sortie S est à droite. Un petit cercle à une borne signifie une inversion logique. Tu peux aussi rencontrer des rectangles CEI avec une marque indiquant la fonction : les deux conventions décrivent les mêmes portes.",
+            "La porte ET a un côté gauche droit et un côté droit arrondi, comme un D. Elle donne 1 seulement si A ET B valent tous deux 1. Pour 00, 01 et 10, la sortie vaut 0 ; pour 11, elle vaut 1. Dans la notation rectangulaire CEI, sa marque est &.",
+            "La porte OU a une entrée courbe et une sortie en pointe : il suffit d’au moins une entrée à 1. Ses sorties pour 00, 01, 10 et 11 sont 0, 1, 1 et 1. Ce OU est inclusif : deux entrées à 1 donnent aussi 1. Sa marque rectangulaire CEI est ≥1.",
+            "La porte NON possède une seule entrée. Son triangle et le cercle en sortie indiquent que la sortie est le complément : 0 devient 1 et 1 devient 0. La notation rectangulaire CEI utilise la marque 1 avec le même cercle en sortie. Une table de vérité énumère les entrées possibles et la sortie correspondante.",
+            "La porte ET donne un si toutes ses entrées valent un. La porte OU donne un si au moins une entrée vaut un. La porte NON inverse l’entrée."
+          ],
           "questionIds": [
             "q-d0ccbff2-f21c-47be-beb1-4000b3079e5d",
             "q-e3abfa4f-2578-4ce0-8be0-b8721ded8997",
@@ -1574,6 +2004,15 @@
             "logic:nand",
             "logic:nor",
             "logic:xor"
+          ],
+          "narration": [
+            "Inverser et combiner les portes",
+            "NON ET, ou NAND, est une porte ET suivie d’une inversion. Son symbole garde la forme en D de ET avec un cercle en sortie. Elle vaut 0 seulement pour A = B = 1 ; elle vaut 1 pour les trois autres combinaisons.",
+            "NON OU, ou NOR, est une porte OU suivie d’une inversion. Son symbole garde le contour courbe de OU avec un cercle en sortie. Elle vaut 1 seulement pour A = B = 0 ; elle vaut 0 dès qu’une entrée vaut 1.",
+            "La porte OU exclusif, aussi appelée XOR, ajoute une seconde courbe du côté des entrées au symbole OU. Avec deux entrées, exactement une entrée doit valoir un pour que la sortie vaille un. Les combinaisons zéro un et un zéro donnent donc un. Les combinaisons zéro zéro et un un donnent zéro. Dans un symbole rectangulaire CEI, cette fonction est indiquée par un signe égal suivi du chiffre un. Les exemples de cette leçon utilisent toujours deux entrées.",
+            "Pour lire un circuit combiné, suis les fils de gauche à droite. Calcule chaque sortie intermédiaire, puis utilise-la comme entrée de la porte suivante. Par exemple, une porte ET recevant deux entrées à un donne un. Une porte NON placée ensuite inverse ce résultat et donne zéro. Ce montage équivaut à une porte NON ET recevant deux entrées à un.",
+            "Une inversion agit à l’endroit où son cercle est placé. Inverser A avant une porte ET n’est pas équivalent à inverser la sortie de ET. Pour A = 0 et B = 0, ET(NON A, B) vaut 0, alors que NON(ET(A, B)) vaut 1.",
+            "NAND est l’inverse de ET. NOR est l’inverse de OU. Avec deux entrées, XOR donne un lorsque les entrées sont différentes."
           ],
           "questionIds": [
             "q-dad59f03-8430-40e9-94d8-4d053476f285",
@@ -1607,6 +2046,13 @@
           "formula": "débit binaire = bauds × bits/symbole",
           "section": "technique",
           "id": "c20-l02",
+          "narration": [
+            "Du symbole au débit",
+            "Un symbole représente un état choisi dans une modulation. Avec quatre états, on peut associer deux bits par symbole; avec huit états, trois bits. Le baud compte les symboles transmis par seconde, même quand deux symboles successifs sont identiques.",
+            "Sans surcoût, le débit binaire vaut le débit de symboles multiplié par les bits par symbole. Des en-têtes et de la redondance consomment ensuite une part de ce débit; le débit de données utiles peut être inférieur.",
+            "Plus d’états ne donne pas toujours une meilleure liaison : les états deviennent plus difficiles à distinguer dans le bruit. Le mode choisi équilibre débit, largeur occupée et robustesse.",
+            "Le débit binaire, en bits par seconde, est le débit de symboles, en bauds, multiplié par le nombre de bits par symbole."
+          ],
           "questionIds": [
             "q-97374df6-dacf-4e5a-b881-d3c973e3e287",
             "q-f01c3e90-a5de-49f0-91db-ce939e2a5356",
@@ -1630,6 +2076,13 @@
           "formula": "bande de base idéale : fe > 2 × Fmax",
           "section": "technique",
           "id": "c20-l03",
+          "narration": [
+            "Échantillonner un signal",
+            "Un convertisseur prélève des valeurs du signal à une cadence d’échantillonnage fe. Pour un signal limité en bande de base, il faut fe strictement supérieure à deux fois sa fréquence maximale pour la reconstruction idéale.",
+            "Un filtre anti-repliement avant la conversion limite les composantes trop hautes. Sans lui, des fréquences au-delà de la zone prévue peuvent apparaître à d’autres fréquences dans les données échantillonnées.",
+            "Cette condition de fréquence ne règle pas la précision d’amplitude. Le nombre de bits du convertisseur détermine aussi ses niveaux de quantification; ces deux limites sont différentes.",
+            "Dans le cas idéal en bande de base, la fréquence d’échantillonnage doit être strictement supérieure à deux fois la fréquence maximale du signal."
+          ],
           "questionIds": [
             "q-d585a9b5-aa97-4b82-8654-1866c19b1e13",
             "q-dbf29c71-7a10-4350-91f6-a386d7389d50",
@@ -1653,6 +2106,13 @@
           "formula": "",
           "section": "technique",
           "id": "c20-l04",
+          "narration": [
+            "Détecter et corriger les erreurs",
+            "Un bit reçu peut différer du bit envoyé. Une parité ou un contrôle comme un CRC aide à détecter certaines erreurs, mais ne suffit pas toujours à corriger le contenu sans information supplémentaire.",
+            "Un code de correction ajoute une redondance organisée; selon le code et le nombre d’erreurs, le récepteur peut retrouver les données. Une autre stratégie demande la retransmission lorsque le contrôle échoue.",
+            "Le choix se fait avec un compromis entre débit utile, délai et robustesse. Une redondance n’est pas une garantie absolue : trop d’erreurs dépassent les capacités du système.",
+            ""
+          ],
           "questionIds": [
             "q-98533dba-f07b-4d86-a05e-9481a16ebeef",
             "q-01b1a777-cab1-45ef-aa13-62f19007ec0d",
@@ -1684,6 +2144,13 @@
           ],
           "formula": "fmélange = f1 + f2 ou |f1 − f2|",
           "topic": "Émetteurs et récepteurs",
+          "narration": [
+            "La chaîne d’émission",
+            "Le microphone transforme la voix en signal électrique audio. Le modulateur l’applique à un signal RF; les étages d’amplification fournissent la puissance et le filtre de sortie réduit les émissions indésirables avant l’antenne.",
+            "Un mélangeur produit notamment la somme et la différence de deux fréquences. Un filtre sélectionne le produit souhaité. Un changement de fréquence permet de travailler sur plusieurs bandes tout en gardant des étages internes à une fréquence pratique.",
+            "Le signal traverse plusieurs étages, chacun avec un rôle. La modulation crée le message RF; le mélangeur transpose des fréquences; l’amplificateur de puissance augmente l’énergie utile. Le filtre de sortie réduit les produits indésirables, et l’adaptation facilite le transfert vers la ligne. Un amplificateur saturé peut salir toute la chaîne.",
+            "Un mélangeur produit notamment la somme des deux fréquences, ainsi que la valeur absolue de leur différence."
+          ],
           "questionIds": [
             "q-35232c2e-8f1f-453c-91c7-cb893708bdd9",
             "q-15a4b494-f430-44b1-859b-50b3de2e1d6c",
@@ -1706,6 +2173,13 @@
           ],
           "formula": "FI = |fRF − fOL|",
           "topic": "Émetteurs et récepteurs",
+          "narration": [
+            "Le superhétérodyne",
+            "Un récepteur superhétérodyne mélange le signal reçu avec un oscillateur local. Le signal utile est transposé vers une fréquence intermédiaire fixe, où l’amplification et le filtrage sont plus faciles à réaliser.",
+            "Le détecteur ou démodulateur récupère ensuite l’information audio. Une fréquence image peut donner le même produit intermédiaire et doit être rejetée par la sélection d’entrée. Dans une SDR, une partie de ces opérations est effectuée numériquement.",
+            "Le superhétérodyne convertit la fréquence reçue vers une fréquence intermédiaire plus facile à filtrer. Le mélangeur répond à plusieurs combinaisons : une autre fréquence peut donner la même FI, appelée fréquence image. Un filtrage avant le mélangeur est donc nécessaire; la FI seule ne permet pas de les distinguer.",
+            "La fréquence intermédiaire est la valeur absolue de la différence entre la fréquence radio reçue et la fréquence de l’oscillateur local."
+          ],
           "questionIds": [
             "q-54f876a6-41ff-4fd6-97cf-0d2a1e29ae8b",
             "q-91095593-1d41-462e-9c42-1d352c87efce",
@@ -1727,6 +2201,13 @@
             "La sensibilité ne suffit pas si un fort signal voisin masque le faible signal recherché. La sélectivité vient notamment des filtres, et la dynamique décrit la capacité à gérer des niveaux très différents. Les non-linéarités fabriquent de l’intermodulation; atténuer l’entrée peut parfois améliorer une réception saturée."
           ],
           "topic": "Émetteurs et récepteurs",
+          "narration": [
+            "Sensibilité et sélectivité",
+            "La sensibilité décrit la capacité de recevoir un faible signal pour un critère de qualité donné. La sélectivité décrit la capacité de distinguer le signal voulu de signaux voisins en fréquence. Un bon chiffre dans l’une ne garantit pas l’autre.",
+            "La dynamique décrit la plage de niveaux gérables sans pertes excessives de performance. Des signaux forts peuvent produire de l’intermodulation dans des étages non linéaires. Une commande automatique de gain, AGC, adapte le gain aux niveaux reçus.",
+            "La sensibilité ne suffit pas si un fort signal voisin masque le faible signal recherché. La sélectivité vient notamment des filtres, et la dynamique décrit la capacité à gérer des niveaux très différents. Les non-linéarités fabriquent de l’intermodulation; atténuer l’entrée peut parfois améliorer une réception saturée.",
+            ""
+          ],
           "questionIds": [
             "q-4deeb265-8a09-43a0-b83e-960564517fec",
             "q-9cd2048f-1bdf-43b1-85cd-f52999deb08a",
@@ -1748,6 +2229,13 @@
             "Une mesure modifie toujours un peu le circuit. Un voltmètre doit prélever peu de courant, donc avoir une forte résistance d’entrée; un ampèremètre se place en série et présente une faible résistance. Pour mesurer une résistance, coupe l’alimentation et assure-toi que les condensateurs sont déchargés. Choisis un calibre et des cordons compatibles."
           ],
           "topic": "Émetteurs et récepteurs",
+          "narration": [
+            "Bien mesurer",
+            "Le voltmètre se branche en parallèle et possède idéalement une forte impédance. L’ampèremètre se place en série et possède une faible résistance. Un ohmmètre s’utilise sur un circuit hors tension, avec les précautions adaptées.",
+            "Un oscilloscope montre une tension dans le temps; un analyseur de spectre montre les composantes en fréquence. Une charge fictive non rayonnante adaptée permet de tester un émetteur en limitant le rayonnement. Il faut respecter sa puissance admissible.",
+            "Une mesure modifie toujours un peu le circuit. Un voltmètre doit prélever peu de courant, donc avoir une forte résistance d’entrée; un ampèremètre se place en série et présente une faible résistance. Pour mesurer une résistance, coupe l’alimentation et assure-toi que les condensateurs sont déchargés. Choisis un calibre et des cordons compatibles.",
+            ""
+          ],
           "questionIds": [
             "q-b98a319d-7038-44d6-b082-49f3add12036",
             "q-fe39f773-12c8-4594-ab86-ffe1f7fbde1c",
@@ -1780,6 +2268,13 @@
           "formula": "harmonique n : fn = n × f0",
           "section": "technique",
           "id": "c18-l01",
+          "narration": [
+            "Fondamentale et harmoniques",
+            "Une sinusoïde idéale ne comporte qu’une fréquence. Une forme périodique non sinusoïdale se décrit avec une fondamentale et des harmoniques, à des multiples entiers de sa fréquence.",
+            "L’écrêtage transforme la forme du signal et ajoute des composantes spectrales. Les filtres de sortie atténuent certains produits, mais limiter leur création dès l’amplificateur reste utile.",
+            "Ne confonds pas harmonique et intermodulation : les harmoniques partent d’un seul signal; l’intermodulation combine plusieurs signaux dans un étage non linéaire.",
+            "La fréquence de l’harmonique de rang N est égale à N fois la fréquence fondamentale."
+          ],
           "questionIds": [
             "q-3de053ad-63d6-44c8-909a-ba29640b76ba",
             "q-e1b38b13-fd89-492b-ab1d-639ef7f2b859",
@@ -1803,6 +2298,13 @@
           "formula": "f somme = f1+f2 · f différence = |f1−f2|",
           "section": "technique",
           "id": "c18-l02",
+          "narration": [
+            "Mélanger et choisir le bon produit",
+            "Le mélange idéal de deux signaux produit notamment leur somme et leur différence. Un filtre choisit le produit utile. Un vrai mélangeur peut aussi laisser passer les entrées et fabriquer d’autres combinaisons.",
+            "Pour une réception avec OL au-dessus du signal, la FI différence vaut OL − RF. Une fréquence située de l’autre côté de l’OL peut produire la même FI; le présélecteur doit la rejeter.",
+            "La fréquence image n’est pas une copie audio du message. C’est une fréquence RF distincte qui crée une conversion indésirable vers la même FI.",
+            "La fréquence somme est la somme des deux fréquences. La fréquence différence est la valeur absolue de leur différence."
+          ],
           "questionIds": [
             "q-46b84b2b-e81e-4d41-9f83-803dcdbbf6dd",
             "q-28fcf803-4237-401b-af1c-7b1dd4d818eb",
@@ -1826,6 +2328,13 @@
           "formula": "IM3 : 2f1−f2 et 2f2−f1",
           "section": "technique",
           "id": "c18-l03",
+          "narration": [
+            "Intermodulation et compression",
+            "Un amplificateur linéaire reproduit la forme avec un facteur de gain. La compression apparaît quand le gain diminue pour les niveaux élevés; l’écrêtage peut être plus visible encore.",
+            "Avec deux tons f1 et f2, des produits d’intermodulation de troisième ordre apparaissent à 2f1−f2 et 2f2−f1. Ils peuvent tomber près des signaux utiles, donc être difficiles à filtrer.",
+            "Diminuer le niveau d’entrée ou améliorer la linéarité aide à limiter ces produits. Un récepteur saturé peut parfois mieux fonctionner avec un atténuateur, malgré la baisse du signal utile.",
+            "Parmi les produits d’intermodulation d’ordre trois, on trouve deux fois f un moins f deux, ainsi que deux fois f deux moins f un."
+          ],
           "questionIds": [
             "q-410e3ab2-b3f9-4e51-8059-a03afdecf9b1",
             "q-95afa68c-0574-4008-a0a1-f2e0d56bdb62",
@@ -1849,6 +2358,13 @@
           "formula": "S/B(dB) = signal(dBm) − bruit(dBm)",
           "section": "technique",
           "id": "c18-l04",
+          "narration": [
+            "Des dBm jusqu’au bruit",
+            "Le dBm fixe une référence de 1 mW. 0 dBm vaut 1 mW, 10 dBm 10 mW, 20 dBm 100 mW et 30 dBm 1 W. Chaque ajout de 10 dB multiplie la puissance par dix.",
+            "Le rapport signal/bruit compare deux puissances dans une même largeur de mesure. Si les niveaux sont exprimés en dBm, leur différence donne le rapport en dB. Le bruit mesuré dépend de la bande passante.",
+            "Une réception utile ne dépend pas seulement du signal : un bruit plus fort, une bande trop large ou des perturbations peuvent faire perdre l’information.",
+            "Le rapport signal sur bruit en décibels est le niveau du signal en décibels milliwatt moins le niveau du bruit dans la même unité."
+          ],
           "questionIds": [
             "q-03e2461f-ffe7-42bb-94ad-7204c0577529",
             "q-539daa55-b15e-4d19-878c-a7362f1dc39f",
@@ -1880,6 +2396,13 @@
           ],
           "formula": "λ(m) ≈ 300 / f(MHz)",
           "topic": "Antennes",
+          "narration": [
+            "Longueur d’onde",
+            "Dans le vide, l’onde radio se propage à environ 300 000 000 m/s. Sa longueur d’onde λ vaut c/f. Une formule pratique est λ en mètres = 300/f en MHz.",
+            "Une fréquence plus haute correspond à une onde plus courte. À 150 MHz, λ est d’environ 2 m; à 30 MHz, 10 m. Dans un câble, la propagation est plus lente; son facteur de vélocité doit être pris en compte pour sa longueur électrique.",
+            "Dans l’air, λ = c/f, avec c proche de 300 millions de mètres par seconde. Une écriture pratique est λ(m) ≈ 300/f(MHz). Dans une ligne, la vitesse est plus faible : le facteur de vélocité multiplie la longueur d’onde correspondante. Toujours distinguer longueur d’onde dans l’air et longueur électrique dans un câble.",
+            "Dans l’air, la longueur d’onde en mètres est approximativement égale à trois cents divisés par la fréquence exprimée en mégahertz."
+          ],
           "questionIds": [
             "q-316ebb9d-661f-4f88-8722-91ffff908cf6",
             "q-b798136f-37d0-437d-bdb6-e4426fc996b7",
@@ -1902,6 +2425,13 @@
           ],
           "formula": "Dipôle théorique : Ltot ≈ λ / 2",
           "topic": "Antennes",
+          "narration": [
+            "Dipôle et quart d’onde",
+            "Un dipôle demi-onde possède deux bras d’environ un quart d’onde chacun. Sa longueur totale théorique est λ/2, mais les effets d’extrémité et l’environnement la raccourcissent légèrement; on ajuste avec des mesures.",
+            "Une antenne verticale quart d’onde utilise un plan de sol ou des radiales comme retour. Une antenne symétrique alimentée par un coaxial peut bénéficier d’un balun ou d’une self de mode commun pour réduire les courants indésirables sur l’extérieur de la ligne.",
+            "Les formules λ/2 et λ/4 donnent un point de départ idéal, pas la cote finale de toutes les antennes. Le diamètre, les isolateurs et les objets voisins modifient la résonance. Le dipôle est symétrique; le coaxial est asymétrique. Un balun adapté aide à gérer cette transition et les courants indésirables sur la gaine.",
+            "La longueur totale théorique d’un dipôle demi-onde est égale à la moitié de la longueur d’onde."
+          ],
           "questionIds": [
             "q-a9722c7c-48af-4db1-8275-25e1ad96ef7b",
             "q-cf9d1268-0ee7-46df-b55d-307a887a0457",
@@ -1924,6 +2454,13 @@
           ],
           "formula": "dBi ≈ dBd + 2,15 dB",
           "topic": "Antennes",
+          "narration": [
+            "Gain et polarisation",
+            "Le gain d’une antenne compare son rayonnement dans une direction à celui d’une antenne de référence. L’antenne ne crée pas de puissance : elle répartit l’énergie différemment. dBi se réfère à l’isotrope; dBd au dipôle demi-onde.",
+            "La polarisation décrit l’orientation du champ électrique. Deux antennes linéaires doivent avoir des polarisations compatibles pour bien échanger. Une Yagi dirige le rayonnement; une verticale rayonne généralement dans de nombreuses directions en azimut, selon son installation.",
+            "Le gain redistribue le rayonnement : il augmente l’intensité dans certaines directions au prix d’autres directions. dBi compare à l’isotrope; dBd compare au dipôle demi-onde et diffère d’environ 2,15 dB. La polarisation décrit l’orientation du champ électrique. Le diagramme, le gain et l’adaptation sont trois propriétés différentes.",
+            "Le gain exprimé en décibels par rapport à l’isotrope vaut approximativement le gain par rapport au dipôle demi-onde, plus deux virgule quinze décibels."
+          ],
           "questionIds": [
             "q-cfab6af4-6680-41f7-845e-945c2d44d57e",
             "q-3aaeecf8-4428-48ad-aaca-2e5df733fb86",
@@ -1946,6 +2483,13 @@
           ],
           "formula": "ROS = (1 + |Γ|) / (1 − |Γ|)",
           "topic": "Antennes",
+          "narration": [
+            "Coaxial et ROS",
+            "Une ligne possède une impédance caractéristique, souvent 50 Ω pour les installations amateur. Si la charge présente cette impédance au point de raccordement, il n’y a pas de réflexion dans le modèle idéal.",
+            "Le rapport d’ondes stationnaires, abrégé ROS, décrit une désadaptation. Un rapport égal à un correspond à l’adaptation. Pour le calculer, prends un plus le module du coefficient de réflexion, puis divise par un moins ce même module. Ce coefficient est noté gamma. Un rapport faible ne prouve pas à lui seul que l’antenne rayonne bien : une charge fictive peut aussi donner un rapport égal à un.",
+            "Le ROS compare les amplitudes maximale et minimale sur une ligne. Une adaptation idéale donne 1; une forte réflexion ne signifie pas que toute l’énergie est forcément dissipée dans l’antenne. Les pertes du câble peuvent masquer une mauvaise adaptation mesurée côté poste. Une charge fictive peut donner un excellent ROS sans rayonner utilement.",
+            "Le rapport d’ondes stationnaires vaut un plus le module du coefficient de réflexion, le tout divisé par un moins ce même module."
+          ],
           "questionIds": [
             "q-cf54e20d-59f9-4af0-bc66-8923228ec62b",
             "q-d1fc05f5-92c7-4838-919b-cade9ca77b53",
@@ -1978,6 +2522,13 @@
           "formula": "|Γ| = |(RL−Z0)/(RL+Z0)| · ROS = (1+|Γ|)/(1−|Γ|)",
           "section": "technique",
           "id": "c19-l01",
+          "narration": [
+            "Réflexion et ROS",
+            "Une discontinuité d’impédance renvoie une partie de l’onde. Pour une charge purement résistive, calcule la différence entre la résistance de charge et l’impédance de référence, puis divise ce résultat par leur somme. Tu obtiens le coefficient de réflexion en amplitude. La fraction de puissance réfléchie est le carré de la valeur absolue de ce coefficient.",
+            "Le ROS vaut (1+|Γ|)/(1−|Γ|). Avec une charge résistive, il se simplifie au rapport de la plus grande résistance sur la plus petite. Cette simplification ne convient pas directement à une charge réactive.",
+            "Le signe de Γ décrit aussi une phase de réflexion; il ne signifie pas une puissance négative. Le wattmètre direct/réfléchi mesure des puissances et doit être utilisé dans ses conditions prévues.",
+            "Pour une charge résistive, le module du coefficient de réflexion vaut la valeur absolue de la différence entre résistance de charge et impédance caractéristique, divisée par leur somme. Le rapport d’ondes stationnaires vaut un plus ce module, le tout divisé par un moins ce module."
+          ],
           "questionIds": [
             "q-10f936e7-74d3-4581-9171-84429ea9efd0",
             "q-be4dd68f-5ecf-472c-b295-aa23f971d3bc",
@@ -2001,6 +2552,13 @@
           "formula": "λligne = FV × 300/f(MHz)",
           "section": "technique",
           "id": "c19-l02",
+          "narration": [
+            "Longueur électrique du coaxial",
+            "Le facteur de vélocité décrit la vitesse relative dans une ligne. À fréquence fixée, λligne = FV × λair. Une même longueur physique ne représente donc pas la même fraction d’onde dans le câble et dans l’air.",
+            "Une ligne longue d’un quart d’onde peut transformer une impédance dans les conditions adaptées; une demi-onde idéale répète l’impédance de charge à l’entrée. Ces relations idéales supposent une ligne sans pertes.",
+            "Changer la longueur de câble peut changer la mesure au poste sans réparer la charge. Une mesure ou un calcul de transformation exige de préciser fréquence, Z0, charge et facteur de vélocité.",
+            "La longueur d’onde dans la ligne est égale au facteur de vélocité multiplié par la longueur d’onde dans l’air. En mètres, elle vaut le facteur de vélocité fois trois cents, divisés par la fréquence en mégahertz."
+          ],
           "questionIds": [
             "q-488b48ce-aac0-4102-8806-cd3c564f8ef0",
             "q-06d7a27f-f911-4f99-a0d5-749e4e1de9d4",
@@ -2024,6 +2582,13 @@
           "formula": "Psortie = Pentrée × 10^(−perte/10)",
           "section": "technique",
           "id": "c19-l03",
+          "narration": [
+            "Le câble mange des watts",
+            "Une perte positive en décibels correspond à un rapport de puissance égal à dix élevé à l’opposé de cette perte divisé par dix. Pour les repères usuels, trois décibels divisent environ la puissance par deux, six décibels par quatre, et dix décibels par dix.",
+            "Les pertes augmentent généralement avec la longueur et la fréquence pour un type de câble donné. Des connecteurs mal montés ou de l’humidité peuvent ajouter des défauts. Une ligne courte et de qualité n’est utile que si les autres éléments sont aussi adaptés.",
+            "Un faible ROS côté émetteur ne prouve pas que la puissance arrive à l’antenne. Un câble très atténuateur absorbe aussi les réflexions, ce qui peut masquer un défaut distant.",
+            "La puissance en sortie est la puissance d’entrée multipliée par dix à la puissance suivante : l’opposé de la perte en décibels, divisé par dix."
+          ],
           "questionIds": [
             "q-5c6a7b8a-79c5-4a9f-9933-0b5623dc2f7b",
             "q-97d36d0b-31b9-40f4-b1a8-5dad75c3ee59",
@@ -2047,6 +2612,13 @@
           "formula": "",
           "section": "technique",
           "id": "c19-l04",
+          "narration": [
+            "Mesurer avant de régler",
+            "Mesure d’abord une configuration connue : charge fictive, ligne, puis antenne. Une mauvaise mesure avec une charge connue oriente vers le câble, les connecteurs ou l’appareil. Conserve la fréquence et le point de mesure dans tes notes.",
+            "Un dispositif d’adaptation peut permettre au poste de voir une bonne impédance sans éliminer toutes les pertes sur la ligne. Un balun et un dispositif de mode commun ne servent pas automatiquement au même rapport d’impédance.",
+            "À la résonance d’un dipôle isolé simple, allonger les éléments tend à faire descendre sa fréquence et les raccourcir à la faire monter. Procède par petites modifications mesurées et respecte les contraintes mécaniques.",
+            ""
+          ],
           "questionIds": [
             "q-ea88366e-4da8-4c33-8837-475015dc6a88",
             "q-831cd2b8-c02d-4d4f-bebf-85183eeac994",
@@ -2077,6 +2649,13 @@
             "L’ionosphère évolue avec l’heure, la saison et l’activité solaire. La couche D absorbe surtout les fréquences HF basses de jour; les couches supérieures permettent de nombreux trajets lointains. La fréquence utilisable dépend du trajet et de l’angle, pas seulement du chiffre sur le cadran. Il n’existe pas une bande gagnante à toute heure."
           ],
           "topic": "Propagation",
+          "narration": [
+            "La propagation HF",
+            "Une onde peut arriver directement, suivre partiellement le sol ou revenir après interaction avec l’ionosphère. En HF, les couches ionisées peuvent réfracter le signal vers la Terre et permettre de longues distances.",
+            "Le comportement varie avec l’heure, la saison, la fréquence et l’activité solaire. La couche D absorbe notamment une partie des HF le jour; les couches F jouent un rôle majeur dans les liaisons lointaines. Une fréquence trop haute peut traverser l’ionosphère sans revenir vers la zone souhaitée.",
+            "L’ionosphère évolue avec l’heure, la saison et l’activité solaire. La couche D absorbe surtout les fréquences HF basses de jour; les couches supérieures permettent de nombreux trajets lointains. La fréquence utilisable dépend du trajet et de l’angle, pas seulement du chiffre sur le cadran. Il n’existe pas une bande gagnante à toute heure.",
+            ""
+          ],
           "questionIds": [
             "q-cf4f7d49-7ba2-415a-91fd-20d2d71bda74",
             "q-9ccd824e-1918-42c3-9dcb-e3409687b3bf",
@@ -2098,6 +2677,13 @@
             "En VHF et UHF, la visibilité et le dégagement prennent beaucoup d’importance, sans exclure les trajets par réflexion, diffraction ou propagation exceptionnelle. Un satellite en déplacement crée un décalage Doppler : l’approche augmente la fréquence reçue, l’éloignement la diminue. Un contact satellite demande de suivre à la fois le passage et les fréquences."
           ],
           "topic": "Propagation",
+          "narration": [
+            "VHF, UHF et satellites",
+            "Les liaisons VHF/UHF ordinaires dépendent souvent de la visibilité radio, de la hauteur des antennes et du relief. Des phénomènes comme la troposphère, le sporadique E ou des réflexions peuvent étendre la portée dans certaines conditions.",
+            "Un satellite change rapidement de position et parfois de fréquence apparente par effet Doppler. Quand il se rapproche, la fréquence reçue augmente; quand il s’éloigne, elle baisse. Une liaison satellite possède une montée vers l’espace et une descente vers la Terre.",
+            "En VHF et UHF, la visibilité et le dégagement prennent beaucoup d’importance, sans exclure les trajets par réflexion, diffraction ou propagation exceptionnelle. Un satellite en déplacement crée un décalage Doppler : l’approche augmente la fréquence reçue, l’éloignement la diminue. Un contact satellite demande de suivre à la fois le passage et les fréquences.",
+            ""
+          ],
           "questionIds": [
             "q-88890d3b-c759-4ca4-89dd-c07749bebcfb",
             "q-c05f254b-728d-41b6-8de4-1898ca7b2618",
@@ -2120,6 +2706,13 @@
           ],
           "formula": "Pr(dBm) = Pt(dBm) + Gt + Gr − pertes",
           "topic": "Propagation",
+          "narration": [
+            "Le bilan de liaison",
+            "Un bilan de liaison additionne les puissances et gains en unités logarithmiques. Puissance reçue = puissance émise + gains des antennes − pertes de lignes − pertes de propagation, lorsque tous ces termes sont exprimés de façon cohérente.",
+            "Ce calcul donne une estimation; l’environnement et les pertes de polarisation peuvent ajouter des écarts. La PIRE combine la puissance livrée à l’antenne et son gain par rapport à l’isotrope. Une puissance de 1 W avec 3 dBi de gain donne environ 2 W PIRE, si les pertes en amont sont déjà prises en compte.",
+            "Pose le bilan en dB pour additionner les contributions : puissance émise, gains d’antenne et pertes. Soustrais aussi les pertes de ligne. La PIRE utilise le gain par rapport à l’isotrope, alors que la PAR utilise le gain par rapport au dipôle. Le bilan estime un niveau; il ne garantit pas une qualité sans connaître bruit et largeur de réception.",
+            "Pour le bilan de liaison en unités logarithmiques, pars de la puissance émise, ajoute les gains des deux antennes, puis soustrais toutes les pertes. Les puissances absolues sont ici en décibels milliwatt, les gains et les pertes en décibels."
+          ],
           "questionIds": [
             "q-b25bf915-575c-492f-9454-afbe812961f3",
             "q-a4718f50-ddc5-43b9-a19a-47a7e59c4609",
@@ -2141,6 +2734,13 @@
             "La bande choisie doit permettre le trajet, le mode et la largeur souhaités, tout en restant autorisée. Les appellations en mètres sont des noms historiques arrondis : 20 m désigne par exemple une zone proche de 14 MHz, pas exactement 15 MHz. Les plans de bande organisent la cohabitation des modes à l’intérieur des limites nationales."
           ],
           "topic": "Propagation",
+          "narration": [
+            "Choisir une bande et un mode",
+            "En France métropolitaine, les bandes HF courantes incluent notamment 3,5–3,8 MHz, 7–7,2 MHz et 14–14,35 MHz. Les bandes VHF/UHF courantes comprennent 144–146 MHz et 430–440 MHz. Les conditions d’utilisation varient selon la bande et le territoire.",
+            "Le plan de bande aide à trouver les zones recommandées pour CW, BLU, numérique ou relais. Il faut garder toute la largeur de son signal dans la bande autorisée : régler la porteuse exactement à une limite peut laisser une bande latérale dépasser.",
+            "La bande choisie doit permettre le trajet, le mode et la largeur souhaités, tout en restant autorisée. Les appellations en mètres sont des noms historiques arrondis : 20 m désigne par exemple une zone proche de 14 MHz, pas exactement 15 MHz. Les plans de bande organisent la cohabitation des modes à l’intérieur des limites nationales.",
+            ""
+          ],
           "questionIds": [
             "q-2843181c-e6c1-49e7-aa2c-8735d551ca41",
             "q-6645b2df-7588-4a5f-bfc4-ddc4ba442f4f",
@@ -2171,6 +2771,13 @@
             "Le danger ne se résume pas à un appareil branché : une capacité chargée peut conserver de l’énergie après coupure. Pour apprendre, privilégie la très basse tension et une alimentation limitée en courant. Un fusible protège surtout contre les surintensités; il ne remplace ni les protections de personnes ni une procédure de mise en sécurité."
           ],
           "topic": "Station et sécurité",
+          "narration": [
+            "La sécurité électrique",
+            "Une installation radio peut associer secteur, fortes intensités, tensions élevées et énergie stockée. Un fusible protège principalement le circuit contre une surintensité; il ne remplace pas les protections des personnes. La terre de protection relie les masses prévues à cet effet.",
+            "Une intervention exige de couper les alimentations et d’appliquer les procédures adaptées de vérification et de mise en sécurité. Un condensateur peut rester chargé après débranchement. Ne pas improviser sur le secteur ou la haute tension : l’apprentissage du schéma peut se faire sur une maquette basse tension sûre.",
+            "Le danger ne se résume pas à un appareil branché : une capacité chargée peut conserver de l’énergie après coupure. Pour apprendre, privilégie la très basse tension et une alimentation limitée en courant. Un fusible protège surtout contre les surintensités; il ne remplace ni les protections de personnes ni une procédure de mise en sécurité.",
+            ""
+          ],
           "questionIds": [
             "q-264d94f0-70b1-40cd-97a1-830d830d0061",
             "q-d038a39f-02a4-45c6-ac9c-71466d22ef15",
@@ -2192,6 +2799,13 @@
             "L’installation d’une antenne doit considérer la mécanique, les distances aux lignes, la météo et l’exposition radio. Le champ reçu dépend de la puissance, du gain, du trajet et du temps d’émission. Une bonne orientation ne suffit pas à elle seule pour vérifier les limites. Prépare l’accès et l’arrêt d’émission avant un travail près des antennes."
           ],
           "topic": "Station et sécurité",
+          "narration": [
+            "Antennes et exposition",
+            "Une antenne en émission crée des champs électromagnétiques. L’installation doit respecter les limites d’exposition du public et empêcher l’accès aux zones où ces limites seraient dépassées. La puissance, le gain, la fréquence et le temps d’émission influencent l’évaluation.",
+            "L’installation mécanique compte aussi : solidité du mât, accès, lignes électriques et conditions météorologiques. Une antenne ne doit jamais pouvoir entrer en contact avec une ligne électrique, même en tombant. Prépare les travaux avec les protections et compétences nécessaires.",
+            "L’installation d’une antenne doit considérer la mécanique, les distances aux lignes, la météo et l’exposition radio. Le champ reçu dépend de la puissance, du gain, du trajet et du temps d’émission. Une bonne orientation ne suffit pas à elle seule pour vérifier les limites. Prépare l’accès et l’arrêt d’émission avant un travail près des antennes.",
+            ""
+          ],
           "questionIds": [
             "q-dce2ce7d-d742-4b7d-b6e6-c8c84be3979a",
             "q-830d55f1-e8e9-4cb0-86c1-5f3c6986bbda",
@@ -2213,6 +2827,13 @@
             "Un brouillage peut provenir d’une émission indésirable ou de l’immunité insuffisante d’un équipement voisin. Il faut rechercher le chemin du problème : rayonnement, câbles, alimentation ou courants de mode commun. Filtres, blindage et ferrites ont des rôles différents; choisir au hasard n’assure pas la résolution."
           ],
           "topic": "Station et sécurité",
+          "narration": [
+            "Compatibilité électromagnétique",
+            "Un brouillage peut venir d’harmoniques, d’un signal trop large, d’un mauvais blindage ou de courants de mode commun. Un équipement voisin peut aussi être sensible à des signaux pourtant correctement émis. Il faut rechercher le mécanisme, pas deviner une cause unique.",
+            "En présence d’un brouillage préjudiciable, interromps ou adapte l’émission pour le faire cesser puis analyse. Filtres, blindage, découplage et ferrites peuvent aider selon le trajet perturbateur. Une station automatique doit pouvoir cesser immédiatement ses émissions par télécommande.",
+            "Un brouillage peut provenir d’une émission indésirable ou de l’immunité insuffisante d’un équipement voisin. Il faut rechercher le chemin du problème : rayonnement, câbles, alimentation ou courants de mode commun. Filtres, blindage et ferrites ont des rôles différents; choisir au hasard n’assure pas la résolution.",
+            ""
+          ],
           "questionIds": [
             "q-95f1e4f6-1f96-4e1b-8044-69ba079919ce",
             "q-21d975c3-1f66-40dd-96e4-0abcba645d51",
@@ -2234,6 +2855,13 @@
             "Le carnet sert à retrouver un échange : date, heure, indicatif correspondant, fréquence ou bande et autres informations requises. Un déplacement n’étend pas les bandes autorisées. Pour un voyage, vérifie les règles du pays hôte, les conditions de reconnaissance du certificat et les préfixes applicables; n’infère pas une autorisation depuis une application."
           ],
           "topic": "Station et sécurité",
+          "narration": [
+            "Le carnet et les déplacements",
+            "Le journal de bord consigne chaque communication : date, heure, indicatifs, fréquence, classe d’émission et lieu d’émission. Il peut être numérique. Il doit être conservé au moins un an après la dernière inscription et présenté sur demande des autorités de contrôle.",
+            "Une installation amateur dont la PAR dépasse 5 W est à déclarer à l’ANFR dans les conditions applicables. Pour émettre en voyage, vérifie l’accord de réciprocité ou l’application de T/R 61-01, le préfixe et les règles du pays visité : ton certificat n’autorise pas automatiquement les mêmes bandes partout.",
+            "Le carnet sert à retrouver un échange : date, heure, indicatif correspondant, fréquence ou bande et autres informations requises. Un déplacement n’étend pas les bandes autorisées. Pour un voyage, vérifie les règles du pays hôte, les conditions de reconnaissance du certificat et les préfixes applicables; n’infère pas une autorisation depuis une application.",
+            ""
+          ],
           "questionIds": [
             "q-1129adb7-dbd1-4025-a14c-f2ea0aaaccdc",
             "q-836bb05e-3387-42e5-91cf-997116c95b80",
@@ -2266,6 +2894,13 @@
           "formula": "RS en phonie · RST en télégraphie",
           "section": "technique",
           "id": "c21-l01",
+          "narration": [
+            "Choisir un report honnête",
+            "Un report doit décrire ce que tu reçois, pas seulement répéter une formule. R va de 1 à 5 pour la lisibilité, S de 1 à 9 pour la force. En CW, T de 1 à 9 décrit la qualité de tonalité.",
+            "Un signal faible peut rester lisible, et un signal fort peut être déformé ou masqué. Le report sépare ces observations. Les indications d’un S-mètre dépendent aussi du récepteur et de sa calibration.",
+            "Annonce des informations utiles : une difficulté de compréhension, du fading ou une tonalité altérée peut aider le correspondant à adapter la liaison.",
+            "En phonie, on donne un report R S. En télégraphie, on donne un report R S T."
+          ],
           "questionIds": [
             "q-2308eff0-b21c-4533-b0d5-4fdc1f94f1a3",
             "q-a293049b-25e2-4c17-a85c-d54cf0d0bb63",
@@ -2289,6 +2924,13 @@
           "formula": "",
           "section": "technique",
           "id": "c21-l02",
+          "narration": [
+            "Diagnostiquer avec méthode",
+            "Un diagnostic commence par décrire le symptôme et les conditions : fréquence, mode, puissance, alimentation et éléments connectés. Reproduire une configuration connue évite de chercher au hasard.",
+            "Change une variable à la fois, puis compare la mesure. Pour un problème RF, une charge fictive connue peut isoler l’émetteur de la ligne et de l’antenne. Une note avant/après conserve l’information utile.",
+            "Une absence de résultat n’est pas une raison de dépasser tes compétences de sécurité. Les circuits à tension dangereuse et les installations mécaniques demandent les compétences et protections adaptées.",
+            ""
+          ],
           "questionIds": [
             "q-b073f3db-af43-4ea3-a1ba-dbcf52bbaac1",
             "q-66626f29-57d2-4435-baad-e7da6e4a5980",
@@ -2312,6 +2954,13 @@
           "formula": "",
           "section": "technique",
           "id": "c21-l03",
+          "narration": [
+            "Régler un émetteur propre",
+            "Un micro trop fort peut conduire à l’écrêtage et élargir l’émission. Le réglage se fait avec une procédure et des mesures compatibles avec le poste, pas seulement en cherchant un maximum de puissance affichée.",
+            "Commence les essais sur une charge adaptée supportant la durée et la puissance. Vérifie ensuite la ligne, l’antenne et les conditions de bande avant le trafic. Une puissance suffisante est préférable à une hausse sans besoin.",
+            "En BLU, la puissance varie avec le contenu audio; en FM idéale, l’enveloppe reste constante. Les modes ne se règlent pas tous en regardant le même indicateur.",
+            ""
+          ],
           "questionIds": [
             "q-5c5427d3-fc68-4b00-bbf7-a7d6d2b73e2f",
             "q-7c996462-b80b-4812-b70f-bdd85f03bc4b",
@@ -2335,6 +2984,13 @@
           "formula": "",
           "section": "technique",
           "id": "c21-l04",
+          "narration": [
+            "Créer sa routine radio",
+            "Une routine efficace alterne quelques rappels anciens avec une notion nouvelle. Vérifier une erreur le lendemain teste le rappel à distance; relire immédiatement la solution est utile mais ne prouve pas encore la mémorisation durable.",
+            "Pour les calculs, change les valeurs et explique la formule à voix haute. Pour les codes et le Morse, mélange l’ordre et ajoute l’écoute. Pour la station, conserve une configuration mesurée avant de modifier.",
+            "Le progrès ne se mesure pas seulement à la vitesse du parcours. Une notion solide se reconnaît à sa capacité à être utilisée dans une autre situation et après un délai.",
+            ""
+          ],
           "questionIds": [
             "q-f08df675-e6fd-4caf-b5e2-8e4006583c5d",
             "q-9b8a6335-6f5f-44f8-b140-d0f9fff3e77e",
@@ -2365,6 +3021,13 @@
             "Les questions de réglementation demandent autant de précision que les calculs. Repère le pays, le statut de service, le type de station et les mots qui restreignent la situation. Une bonne habitude de trafic ne remplace pas une condition légale. Ce défi vérifie les principes; les textes datés restent la référence."
           ],
           "topic": "Examen",
+          "narration": [
+            "Défi réglementation",
+            "Le certificat et l’indicatif répondent à deux exigences différentes. Les obligations d’identification, de journal et de respect des bandes s’appliquent même si l’on émet peu ou seulement entre amis.",
+            "Les échanges amateur doivent rester dans l’objet du service et dans les remarques personnelles. Il est interdit d’obscurcir le sens des transmissions par codage, hors exception de commandes de satellites prévue par les textes. Les communications pour des tiers non amateurs sont limitées aux situations d’urgence ou aux secours en catastrophe.",
+            "Les questions de réglementation demandent autant de précision que les calculs. Repère le pays, le statut de service, le type de station et les mots qui restreignent la situation. Une bonne habitude de trafic ne remplace pas une condition légale. Ce défi vérifie les principes; les textes datés restent la référence.",
+            ""
+          ],
           "questionIds": [
             "q-cacf7487-7bbb-4179-a7a2-1bcbe83a0f14",
             "q-d20cd391-da81-4528-8454-2e0689c5ecee",
@@ -2386,6 +3049,13 @@
             "Pour réussir une question technique, commence par la grandeur demandée et vérifie les unités. Calcule ensuite, puis teste l’ordre de grandeur. Une résistance équivalente en parallèle doit être inférieure à la plus petite branche; une perte de ligne doit réduire la puissance; une fréquence plus grande doit réduire la longueur d’onde."
           ],
           "topic": "Examen",
+          "narration": [
+            "Défi technique",
+            "Les problèmes techniques cachent souvent les mêmes relations sous des unités différentes. Convertis d’abord, identifie le montage, puis choisis la formule. Après le calcul, compare l’ordre de grandeur au résultat attendu.",
+            "Une valeur plus grande en parallèle, une longueur d’onde qui augmente avec la fréquence ou un rendement supérieur à 100 % indiquent généralement une erreur. Ton but est de comprendre le lien entre les grandeurs, pas de mémoriser un chiffre isolé.",
+            "Pour réussir une question technique, commence par la grandeur demandée et vérifie les unités. Calcule ensuite, puis teste l’ordre de grandeur. Une résistance équivalente en parallèle doit être inférieure à la plus petite branche; une perte de ligne doit réduire la puissance; une fréquence plus grande doit réduire la longueur d’onde.",
+            ""
+          ],
           "questionIds": [
             "q-f5a68c7a-3ba9-4c00-beed-45e5994d18c3",
             "q-cacf115d-cb74-400a-9606-9c320828133e",
@@ -2407,6 +3077,13 @@
             "Un entraînement chronométré apprend à décider quand continuer et quand revenir sur un calcul. Vérifie les questions laissées sans réponse avant l’échéance. Les exemples d’Hamigo ne sont pas une garantie de questions identiques à l’examen; le but est de reconnaître les relations et les règles même avec d’autres valeurs."
           ],
           "topic": "Examen",
+          "narration": [
+            "Le jour de l’examen",
+            "L’entraînement doit alterner questions de notions et examens complets. Lors d’un QCM, lis précisément les unités, les conditions et ce que l’on te demande. Une valeur de crête n’est pas une valeur efficace; PAR et puissance de sortie ne sont pas interchangeables.",
+            "Commence par les réponses que tu connais, réserve du temps aux calculs et reviens aux questions difficiles. Puisque les erreurs ne retirent pas de points, une réponse raisonnée peut être utile. L’inscription, le matériel admis et les aménagements se vérifient auprès de ton centre ANFR.",
+            "Un entraînement chronométré apprend à décider quand continuer et quand revenir sur un calcul. Vérifie les questions laissées sans réponse avant l’échéance. Les exemples d’Hamigo ne sont pas une garantie de questions identiques à l’examen; le but est de reconnaître les relations et les règles même avec d’autres valeurs.",
+            ""
+          ],
           "questionIds": [
             "q-01d4113a-2e98-4811-b79e-3c0b90f3fcef",
             "q-57d72ab2-60d4-4ffb-8dd2-ce3befb6e525",
@@ -2428,6 +3105,13 @@
             "Une première station gagne à rester simple, mesurable et sûre. Vérifie l’alimentation, la charge de test, la ligne puis l’antenne avant le trafic. Monte progressivement la puissance et écoute ton environnement radio. Un carnet de réglages aide à retrouver ce qui a changé et à éviter les corrections aveugles."
           ],
           "topic": "Examen",
+          "narration": [
+            "Construire sa première station",
+            "Commence avec un objectif réaliste : écouter un relais local, préparer un dipôle ou réussir un premier contact. Vérifie l’alimentation, la protection, l’antenne, la ligne et les conditions de puissance avant de transmettre.",
+            "Une charge fictive aide à tester le poste, puis une mesure d’adaptation vérifie l’installation. Sur l’air, écoute, identifie-toi et laisse des pauses. Après chaque contact, remplis le journal et note ce que tu as appris. La pratique et les révisions se renforcent l’une l’autre.",
+            "Une première station gagne à rester simple, mesurable et sûre. Vérifie l’alimentation, la charge de test, la ligne puis l’antenne avant le trafic. Monte progressivement la puissance et écoute ton environnement radio. Un carnet de réglages aide à retrouver ce qui a changé et à éviter les corrections aveugles.",
+            ""
+          ],
           "questionIds": [
             "q-3fcfcbec-89f7-4d66-a676-4f95a4fa2615",
             "q-34d23d2f-6ea6-4f98-aa57-325290e36eea",

@@ -927,6 +927,17 @@ for(const lesson of lessons) {
     if(q.kind==='match' && (new Set(q.pairs.map(p=>p.left)).size!==q.pairs.length || new Set(q.pairs.map(p=>p.right)).size!==q.pairs.length)) throw Error('Ambiguous match '+q.id);
   }
 }
+// Editorial spoken versions are independent of question identities and displayed content.
+const spoken=JSON.parse(fs.readFileSync('data/lesson-narration.json','utf8'));
+for(const id of Object.keys(spoken))if(!lessons.some(l=>l.id===id))throw Error('Unknown narrated lesson '+id);
+for(const lesson of lessons) {
+  const overrides=spoken[lesson.id] || {};
+  for(const entry of overrides.body || []) {
+    if(lesson.body[entry.index]!==entry.source)throw Error('Stale spoken paragraph '+lesson.id+':'+entry.index);
+  }
+  if(overrides.formula && overrides.formula.source!==lesson.formula)throw Error('Stale spoken formula '+lesson.id);
+  lesson.narration=[lesson.title,...lesson.body.map((text,i)=>overrides.body?.find(e=>e.index===i)?.speech || text),overrides.formula?.speech || lesson.formula || ''];
+}
 persistCourseQuestions(data);
 console.log(`${data.chapters.length} chapters, ${lessons.length} lessons, ${all.length} questions.`);
 console.log(JSON.stringify(Object.fromEntries([...new Set(all.map(q=>q.kind))].sort().map(kind=>[kind,all.filter(q=>q.kind===kind).length]))));

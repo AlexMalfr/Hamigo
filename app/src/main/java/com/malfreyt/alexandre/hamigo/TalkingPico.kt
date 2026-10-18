@@ -16,7 +16,10 @@ internal val PicoBodyCenter=HorizontalAlignmentLine {a,b->minOf(a,b)}
 /** The same speech motion in questions and course introductions. Idle drawings retain their face. */
 @Composable internal fun TalkingPico(modifier:Modifier,talking:Boolean,mood:MascotMood=MascotMood.HAPPY,
     pose:MascotPose=MascotPose.POINT,mirrored:Boolean=false,pointLeft:Boolean=false,eyesClosed:Boolean=false,
-    idleMotion:Boolean=false,reaction:Int=0) {
+    idleMotion:Boolean=false,reaction:Int=0,mouthActivity:Float=1f,speechActive:Boolean=talking) {
+    val activity by animateFloatAsState(if(talking)mouthActivity.coerceIn(0f,1f) else 0f,
+        // Preserve velocity on retarget: small voice variations must not jerk the oval.
+        spring(dampingRatio=1f,stiffness=1000f,visibilityThreshold=.001f),label="audible speech")
     val (pulse,mouthPhase)=if(talking) {
         val transition=rememberInfiniteTransition(label="Pico talks")
         val phase by transition.animateFloat(0f,1f,infiniteRepeatable(tween(2200,easing=LinearEasing),RepeatMode.Restart),label="syllable")
@@ -46,7 +49,8 @@ internal val PicoBodyCenter=HorizontalAlignmentLine {a,b->minOf(a,b)}
         // Ground stays put; only the figure breathes, sways and speaks. Insets protect the antenna.
         PicoRenderer.drawShadow(canvas,bounds)
         val body=if(talking)sin(pulse*2*Math.PI).toFloat() else 0f
-        val mouth=if(talking)(sin(mouthPhase*2*Math.PI).toFloat()+1f)/2f else null
+        // Preparation and every pause still use the speech drawing, never the resting smile.
+        val mouth=if(speechActive||talking)activity*(.25f+.75f*(sin(mouthPhase*2*Math.PI).toFloat()+1f)/2f) else null
         val save=canvas.save()
         canvas.translate(size.width/2f,size.height/2f-sway*lift)
         canvas.rotate(sway*.9f)

@@ -16,14 +16,14 @@ internal object MathFormula {
     private val equality=Regex("(?<![\\p{L}\\d])[UIRPWELSCZVAFXYTQHufrtlsωΩπλρτ](?:eff|max|min|moy)?\\d*\\s*=")
     private val proseBoundary=Regex("\\n|[?!;:]|(?<!\\d)[.,]|[.,](?!\\d)|\\s+·\\s+(?=[UIRPWELSCZVAFXYTQHufrtlsωΩπλρτ](?:eff|max|min|moy)?\\d*\\s*=)|\\s+(?:et|puis|pour|soit|avec|donne|alors|quelle|quel|calculer|calcule|en|est|vaut|à)\\b",RegexOption.IGNORE_CASE)
     fun hasPossibleEquality(text:String)=equality.containsMatchIn(text)
-    fun fragments(text:String):List<Fragment> {
+    fun fragments(text:String,parseCandidate:(String)->Formula?=::parse):List<Fragment> {
         val result=mutableListOf<Fragment>();var end=0
         for(match in equality.findAll(text)) {
             if(match.range.first<end)continue
             val afterEquals=match.range.last+1
             val stop=proseBoundary.find(text,afterEquals)?.range?.first ?: text.length
             val candidate=text.substring(match.range.first,stop).trimEnd()
-            val formula=parse(candidate) ?: continue
+            val formula=parseCandidate(candidate) ?: continue
             if(match.range.first>end)result+=Fragment(text.substring(end,match.range.first))
             result+=Fragment(candidate,formula);end=match.range.first+candidate.length
         }

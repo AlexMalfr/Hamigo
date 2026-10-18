@@ -32,8 +32,16 @@ internal object PicoFace {
         // Mouth: speech replaces the resting mouth and tongue rather than covering them.
         if(mouthOpen!=null) {
             val opening=mouthOpen.coerceIn(0f,1f)
-            if(opening<.15f)arc(46f,69f,61f,77f,5f,165f)
-            else {oval(46f,71f-opening*3f,61f,74f+opening*7f);if(opening>.55f)oval(50f,76f,59f,79f,coral)}
+            // Keep the original speech oval and tongue. Only the former closed smile is removed.
+            val top=71f-opening*3f;val bottom=74f+opening*7f
+            oval(46f,top,61f,bottom)
+            val tongue=((opening-.45f)/.2f).coerceIn(0f,1f).let {it*it*(3f-2f*it)}
+            if(tongue>0f) {
+                val save=canvas.save()
+                canvas.clipPath(android.graphics.Path().apply {addOval(46f,top,61f,bottom,android.graphics.Path.Direction.CW)})
+                oval(50f,76f,59f,79f,Color.argb((255*tongue).toInt(),Color.red(coral),Color.green(coral),Color.blue(coral)))
+                canvas.restoreToCount(save)
+            }
         } else when(mood) {
             MascotMood.CELEBRATE -> {oval(44f,66f,62f,80f);oval(49f,74f,59f,79f,coral)}
             MascotMood.GOOFY -> {arc(44f,65f,62f,76f,0f,180f);oval(54f,70f,62f,82f,coral);line(57f,75f,57f,80f,1.3f,Color.rgb(230,80,85))}

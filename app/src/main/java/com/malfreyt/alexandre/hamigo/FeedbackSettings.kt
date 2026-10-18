@@ -14,8 +14,27 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.widget.Toast
+
+internal fun openSystemSpeechSettings(context:Context) {
+    for(action in listOf("com.android.settings.TTS_SETTINGS",Settings.ACTION_ACCESSIBILITY_SETTINGS,Settings.ACTION_SETTINGS)) {
+        try {
+            context.startActivity(Intent(action))
+            return
+        } catch(_:android.content.ActivityNotFoundException) {
+            // Some manufacturers do not expose the dedicated TTS page.
+        } catch(_:SecurityException) {
+            // Try the public settings page if a manufacturer restricts this activity.
+        }
+    }
+    Toast.makeText(context,"Impossible d’ouvrir les paramètres système.",Toast.LENGTH_SHORT).show()
+}
 
 @Composable internal fun FeedbackSettings(model:AppModel) {
+    val context=androidx.compose.ui.platform.LocalContext.current
     val feedback=model.interactionFeedback
     val settings=feedback.settings
     Panel(Modifier.testTag("feedback-settings")) {
@@ -32,6 +51,17 @@ import androidx.compose.ui.unit.sp
                     },Modifier.testTag(if(sound)"feedback-sound" else "feedback-haptics").semantics {contentDescription=if(sound)"Sons" else "Vibrations"})
                 }
             }
+        }
+        TextButton(feedbackClick {openSystemSpeechSettings(context)},
+            Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("system-tts-settings"),
+            contentPadding=PaddingValues(horizontal=4.dp,vertical=4.dp)) {
+            Icon(Icons.Rounded.RecordVoiceOver,null,Modifier.size(20.dp),tint=Teal)
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Voix de synthèse",color=Teal,fontSize=14.sp)
+                Text("Hamigo utilise le TTS système.",color=Muted,fontSize=12.sp,lineHeight=16.sp)
+            }
+            Icon(Icons.Rounded.Settings,null,Modifier.size(18.dp),tint=Teal)
         }
     }
 }

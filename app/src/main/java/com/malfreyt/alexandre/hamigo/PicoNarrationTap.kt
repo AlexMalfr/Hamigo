@@ -3,6 +3,7 @@ package com.malfreyt.alexandre.hamigo
 import android.os.SystemClock
 import androidx.compose.runtime.*
 import kotlinx.coroutines.delay
+import androidx.compose.ui.platform.LocalContext
 
 /** The first tap always controls narration. A burst has its own short-lived visual state. */
 internal class PicoNarrationTap {
@@ -23,6 +24,18 @@ internal class PicoNarrationTap {
     }
     fun audio(toggle:()->Unit) {reset();toggle()}
     fun reset(){playful=false;closedEyes=false;taps=0;lastTap=Long.MIN_VALUE}
+}
+
+@Composable internal fun rememberTouchExploration():Boolean {
+    val context=LocalContext.current
+    val manager=remember(context){context.getSystemService(android.view.accessibility.AccessibilityManager::class.java)}
+    var enabled by remember(manager){mutableStateOf(manager?.isTouchExplorationEnabled==true)}
+    DisposableEffect(manager) {
+        val listener=android.view.accessibility.AccessibilityManager.TouchExplorationStateChangeListener {enabled=it}
+        manager?.addTouchExplorationStateChangeListener(listener)
+        onDispose {manager?.removeTouchExplorationStateChangeListener(listener)}
+    }
+    return enabled
 }
 
 @Composable internal fun rememberPicoNarrationTap(key:String):PicoNarrationTap {

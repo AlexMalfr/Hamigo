@@ -15,7 +15,7 @@ Hamigo est une application Android en français pour préparer le **certificat d
 ## Ce qu’on peut faire
 
 - **Apprendre** avec un parcours de 22 chapitres et 97 leçons : réglementation, électricité, radio, Morse et binaire/portes logiques. Le menu de chaque leçon permet de relire le cours et ses fiches mémo sans lancer les questions.
-- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse. Pico lit les énoncés avec une préparation des signaux Morse, formules et unités. Les formules reconnues affichent leurs fractions, racines et indices. Le réglage de fréquence peut mêler souffle et voix, comme un petit récepteur.
+- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse. Pico lit les questions, les consignes et les choix avec des phrases adaptées à l’oral ; sa bouche suit les pauses de l’audio. Les introductions ont des adaptations orales des formules et notations. Les formules reconnues affichent leurs fractions, racines et indices. Le réglage de fréquence peut mêler souffle et voix, comme un petit récepteur.
 - **Préparer ses réponses** avec une calculatrice scientifique et un brouillon au clavier, au doigt ou au stylet, remis à zéro à chaque question.
 - **Réviser** avec 40 fiches mémo, des flashcards et des outils interactifs : calculatrice, résistances, décibels, traducteur Morse, portes logiques… Pico accompagne les cours et les flashcards avec des expressions et des réactions discrètes.
 - **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions aléatoires des notions étudiées, qui mélangent les rappels de la répétition espacée.

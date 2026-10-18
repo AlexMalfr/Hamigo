@@ -1,6 +1,12 @@
 package com.malfreyt.alexandre.hamigo
 
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -248,6 +254,60 @@ class QuestionDesignInstrumentedTest {
             }
         }
     }
+    @Test fun preparingOrWaitingForAudioNeverRestoresTheRestingSmile() {
+        val active=mutableStateOf(true)
+        ui.mainClock.autoAdvance=false
+        try {
+            ui.activity.setContent {HamigoTheme {
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()
+                    .background(androidx.compose.ui.graphics.Color(0xFFFAF8F2)),contentAlignment=androidx.compose.ui.Alignment.Center) {
+                    TalkingPico(androidx.compose.ui.Modifier.size(240.dp).testTag("protected-speech-mouth"),
+                        talking=false,speechActive=active.value,mouthActivity=0f)
+                }
+            }}
+            ui.mainClock.advanceTimeBy(32)
+            val waiting=ui.onNodeWithTag("protected-speech-mouth").captureToImage().asAndroidBitmap()
+            ui.mainClock.advanceTimeBy(1600)
+            val later=ui.onNodeWithTag("protected-speech-mouth").captureToImage().asAndroidBitmap()
+            assertTrue("Silence preserves the closed speech face",waiting.sameAs(later))
+            ui.runOnIdle {active.value=false};ui.mainClock.advanceTimeBy(32)
+            val resting=ui.onNodeWithTag("protected-speech-mouth").captureToImage().asAndroidBitmap()
+            assertFalse("The resting smile only returns after the narration ends",waiting.sameAs(resting))
+            val directory=File(context.getExternalFilesDir(null),"mouth-0.53").apply {mkdirs()}
+            File(directory,"protected-pause.png").outputStream().use {waiting.compress(Bitmap.CompressFormat.PNG,100,it)}
+            File(directory,"resting-after-stop.png").outputStream().use {resting.compress(Bitmap.CompressFormat.PNG,100,it)}
+            listOf(waiting,later,resting).forEach(Bitmap::recycle)
+        }finally {ui.mainClock.autoAdvance=true}
+    }
+
+    @Test fun speechMotionFramesKeepASimpleOvalAndCloseDuringAPause() {
+        val activity=mutableFloatStateOf(1f)
+        ui.mainClock.autoAdvance=false
+        try {
+            ui.activity.setContent {HamigoTheme {
+                androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()
+                    .background(androidx.compose.ui.graphics.Color(0xFFFAF8F2)),contentAlignment=androidx.compose.ui.Alignment.Center) {
+                    TalkingPico(androidx.compose.ui.Modifier.size(240.dp).testTag("mouth-motion"),talking=true,mouthActivity=activity.floatValue)
+                }
+            }}
+            val directory=File(context.getExternalFilesDir(null),"mouth-0.53").apply {mkdirs()}
+            val frames=mutableListOf<Bitmap>()
+            repeat(24) {frame->
+                ui.runOnIdle {activity.floatValue=when(frame){in 10..15->0f;else->if(frame%2==0).92f else 1f}}
+                ui.mainClock.advanceTimeBy(80)
+                val bitmap=ui.onNodeWithTag("mouth-motion").captureToImage().asAndroidBitmap()
+                File(directory,"frame-%02d.png".format(frame)).outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}
+                frames+=bitmap
+            }
+            assertFalse("The regular speech cycle remains animated",frames[3].sameAs(frames[6]))
+            val sheet=Bitmap.createBitmap(frames[0].width*6,frames[0].height*4,Bitmap.Config.ARGB_8888)
+            val canvas=android.graphics.Canvas(sheet)
+            frames.forEachIndexed {i,frame->canvas.drawBitmap(frame,(i%6*frame.width).toFloat(),(i/6*frame.height).toFloat(),null)}
+            File(directory,"motion-sheet.png").outputStream().use {sheet.compress(Bitmap.CompressFormat.PNG,100,it)}
+            sheet.recycle();frames.forEach(Bitmap::recycle)
+        }finally {ui.mainClock.autoAdvance=true}
+    }
+
     @Test fun mascotReadsTheQuestionAndStopsWhenQuestionChanges() {
         val first=Question("spoken","Une résistance de dix ohms est parcourue par un courant de deux ampères. Quelle tension est présente à ses bornes ?",emptyList(),0,"Vingt volts.",kind="number",value=20.0,unit="V")
         ui.runOnIdle {model.startQuestions("Lecture",listOf(first,first.copy(id="spoken-next",prompt="Et maintenant, trois ampères ?")))}
@@ -276,6 +336,28 @@ class QuestionDesignInstrumentedTest {
             pico.assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription,"Pico présente la question"))
             capture("pico-next-question-stopped")
         } finally {ui.mainClock.autoAdvance=true}
+    }
+
+    @Test fun narrationHasAnAccessibleReadStopActionWithoutAnswerSideEffects() {
+        val question=model.content!!.courseQuestions.first {it.kind=="cloze"}
+        ui.runOnIdle {model.startQuestions("Narration accessible",listOf(question))}
+        val action=ui.onNodeWithTag("question-narration-actions",useUnmergedTree=true)
+        val read=action.fetchSemanticsNode().config[SemanticsActions.CustomActions].single()
+        assertEquals("Lire la question et les choix",read.label)
+        ui.runOnIdle {assertTrue(read.action())}
+        ui.waitUntil(10000) {action.fetchSemanticsNode().config[SemanticsActions.CustomActions].single().label=="Arrêter la lecture"}
+        val stop=action.fetchSemanticsNode().config[SemanticsActions.CustomActions].single()
+        ui.runOnIdle {assertTrue(stop.action())}
+        assertNull(model.session!!.feedback)
+        capture("tts-accessible-cloze")
+        ui.onNodeWithTag("question-answers").performTouchInput {swipeUp()}
+        ui.waitForIdle()
+        val tools=ui.onNodeWithTag("question-tools").fetchSemanticsNode().boundsInRoot
+        question.choices.forEach {text->
+            val tile=ui.onNodeWithText(text,useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+            assertTrue("Every choice can clear the floating tools at the end of the scroll",tile.bottom<=tools.top||tile.right<=tools.left)
+        }
+        capture("tts-accessible-cloze-end")
     }
 
     @Test fun compactScreensKeepTheMainInteractionsAboveTheTools() {

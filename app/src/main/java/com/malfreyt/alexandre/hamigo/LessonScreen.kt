@@ -48,6 +48,7 @@ private object LessonIntroNavigation {
     val context=LocalContext.current
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context,lesson.id,returnTarget) {if(returnTarget==null)LessonSpeech(context) else null}
+    val accessibleTap=rememberTouchExploration()
     val diagnosticsCovered=LocalDiagnosticsCovered.current
     LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered){speech?.stop();stopMorsePlayback()}}
     val companion=rememberPicoCompanion("lesson-${lesson.id}-${model.lessonOpening}",enabled=returnTarget==null)
@@ -84,10 +85,14 @@ private object LessonIntroNavigation {
             item {
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                 val picoSize=if(maxWidth<340.dp)108.dp else 124.dp
-                Row(Modifier.fillMaxWidth().testTag("lesson-narration-band").clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.audio {speech?.toggle(lesson)}},verticalAlignment=Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().testTag("lesson-narration-band").semantics {
+                    contentDescription="Lecture vocale du cours"
+                    stateDescription=if(speech?.preparing==true)"Préparation de l’audio" else if(speech?.speaking==true)"Lecture en cours" else "Lecture arrêtée"
+                    customActions=listOf(CustomAccessibilityAction(if(speech?.reading==true)"Arrêter la lecture" else "Lire le cours") {touch.audio {speech?.toggle(lesson)};true})
+                }.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.audio {speech?.toggle(lesson)}},verticalAlignment=Alignment.CenterVertically) {
                     TalkingPico(Modifier.size(picoSize).alignBy(PicoBodyCenter).testTag("lesson-pico")
                         .semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours avec Pico" else "Écouter le cours avec Pico";stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(speech?.preparing==true)"Pico prépare la lecture" else if(speech?.speaking==true)"Pico parle" else companion.mood.description}
-                        .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},talking=speech?.speaking==true,
+                        .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {if(accessibleTap)touch.audio {speech?.toggle(lesson)} else touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},talking=speech?.speaking==true,speechActive=speech?.reading==true,mouthActivity=speech?.mouthActivity ?: 0f,
                         mood=if(touch.playful)touch.mood else if(speech?.preparing==true)MascotMood.THINKING else if(speech?.reading==true)MascotMood.HAPPY else companion.mood,pose=if(touch.playful)MascotPose.HUG else companion.pose,mirrored=true,pointLeft=true,eyesClosed=touch.closedEyes,idleMotion=companion.active||speech?.preparing==true,reaction=if(touch.playful)touch.burst else 0)
                     Spacer(Modifier.width(12.dp))
                     Text(if(model.lessonPreviewOnly)"Les notions du cours,\nà relire à ton rythme." else "D'abord le déclic.\nEnsuite, à toi de jouer.",Modifier.weight(1f).alignBy {it.measuredHeight/2},fontWeight=FontWeight.Bold,color=Teal)
