@@ -41,6 +41,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -57,6 +58,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -89,6 +91,7 @@ fun HamigoBottomBar(
     modifier: Modifier = Modifier,
     onDestinationBounds: (String, Rect) -> Unit = { _, _ -> },
     friendRequestCount: Int = 0,
+    allowedDestinations:Set<String>? = null,
 ) {
     // Reserve the raised part rather than offsetting it outside Scaffold's measured bottom bar.
     // Only the labels grow with text size; the icons, notch and touch targets stay predictable.
@@ -140,6 +143,7 @@ fun HamigoBottomBar(
                 bottomDestinations.forEach { destination ->
                     val selected = route == destination.route
                     val central = destination.route == "path"
+                    val available=allowedDestinations==null||destination.route in allowedDestinations
                     val interactionSource = remember(destination.route) { MutableInteractionSource() }
                     val iconColor by animateColorAsState(
                         if (central && selected) Ink else if (central) Color.White else if (selected) Teal else Muted,
@@ -153,14 +157,15 @@ fun HamigoBottomBar(
                         Modifier
                             .weight(1f)
                             .height((if (central) 94.dp else 76.dp) + labelGrowth)
-                            .selectable(
+                            .hamigoTourTarget("nav-${destination.route}").selectable(
                                 selected = selected,
                                 interactionSource = interactionSource,
                                 indication = null,
                                 role = Role.Tab,
                                 onClick = feedbackClick { onDestination(destination.route) },
                             )
-                            .semantics(mergeDescendants = true) {}
+                            .alpha(if(central||available)1f else .4f)
+                            .semantics(mergeDescendants = true) {if(allowedDestinations!=null&&destination.route !in allowedDestinations)stateDescription="Indisponible pendant le tutoriel"}
                             .padding(bottom = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Bottom,
@@ -185,7 +190,7 @@ fun HamigoBottomBar(
                                 .testTag("navigation-icon-${destination.route}"),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(destination.icon, contentDescription = null, Modifier.size(if (central) 30.dp else 24.dp), tint = iconColor)
+                            Icon(destination.icon, contentDescription = null, Modifier.size(if (central) 30.dp else 24.dp).alpha(if(central&&!available).45f else 1f), tint = iconColor)
                             if (destination.route == "friends" && friendRequestCount > 0) {
                                 Box(Modifier.align(Alignment.TopEnd).padding(end = 3.dp, top = 3.dp).size(18.dp)
                                     .background(Color(0xFFB3261E), CircleShape)
@@ -201,7 +206,7 @@ fun HamigoBottomBar(
                         Spacer(Modifier.height(6.dp))
                         Text(
                             destination.label,
-                            modifier = Modifier.height(14.dp + labelGrowth).offset(y=if(central)4.dp else (-3).dp)
+                            modifier = Modifier.height(14.dp + labelGrowth).offset(y=if(central)4.dp else (-3).dp).alpha(if(central&&!available).45f else 1f)
                                 .padding(horizontal=4.dp)
                                 .testTag("navigation-label-${destination.route}"),
                             color = if (selected) Teal else Muted,

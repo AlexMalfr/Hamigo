@@ -40,6 +40,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,6 +70,12 @@ import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+/** Only confirmation visibility is saved; friends and their data stay in the model. */
+internal val FriendActionUiSaver=listSaver<FriendActionState,Boolean>(
+    save={listOf(it.removal,it.request)},
+    restore={values->FriendActionState().apply {removal=values[0];request=values[1]}}
+)
 
 fun openLink(context: Context, url: String) {
     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
@@ -98,7 +107,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
     val automatic = remember(model.revision) { model.progress.prefs.getBoolean("autoSync", true) }
     val backupGist = remember(model.revision) { model.sync.savedBackupUrl }
     val socialGist = remember(model.revision) { model.sync.savedGistUrl }
-    var details by remember { mutableStateOf(false) }
+    var details by rememberSaveable { mutableStateOf(false) }
     SyncPanel(modifier, controlsOnly) {
         if (!controlsOnly || !connected) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             if(connected) GitHubAvatar(identity,login ?: model.progress.name,Modifier.size(36.dp))
@@ -178,20 +187,22 @@ fun FriendsScreen(model: AppModel) {
     val accountLogin = remember(model.revision) { model.sync.accountLogin }
     val lastSync = remember(model.revision) { model.sync.lastSyncedAt }
     val lastSyncError = remember(model.revision) { model.sync.lastSyncError }
-    var syncExpanded by remember { mutableStateOf(false) }
-    var selectedFriend by remember {mutableStateOf<String?>(null)}
-    var showQr by remember { mutableStateOf(false) }
-    var addOpen by remember { mutableStateOf(false) }
-    var receivedLink by remember { mutableStateOf("") }
-    var inviteError by remember { mutableStateOf<String?>(null) }
-    var scanOpen by remember { mutableStateOf(false) }
-    var cameraDenied by remember { mutableStateOf(false) }
+    var syncExpanded by rememberSaveable { mutableStateOf(false) }
+    var selectedFriend by rememberSaveable {mutableStateOf<String?>(null)}
+    val friendPageStates=rememberSaveableStateHolder()
+    var showQr by rememberSaveable { mutableStateOf(false) }
+    var addOpen by rememberSaveable { mutableStateOf(false) }
+    var receivedLink by rememberSaveable { mutableStateOf("") }
+    var inviteError by rememberSaveable { mutableStateOf<String?>(null) }
+    var scanOpen by rememberSaveable { mutableStateOf(false) }
+    var cameraDenied by rememberSaveable { mutableStateOf(false) }
     val cameraPermission=rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {granted ->
         cameraDenied=!granted
         if(granted)scanOpen=true
         else inviteError="Autorise la caméra pour scanner un QR, ou utilise le lien d’invitation."
     }
     val listState = rememberLazyListState()
+    val tourClearance=tourContentClearance(model)
     val pullState=rememberPullToRefreshState()
     val ranking = (listOf(own) + model.friends.map { it.progress }).sortedByDescending {com.malfreyt.alexandre.hamigo.platform.SocialActivity.weeklyXp(it)}
     PullToRefreshBox(isRefreshing=model.socialRefreshing,onRefresh={model.refreshSocial(manual=true)},
@@ -199,7 +210,7 @@ fun FriendsScreen(model: AppModel) {
             PullToRefreshDefaults.Indicator(state=pullState,isRefreshing=model.socialRefreshing,
                 modifier=Modifier.align(Alignment.TopCenter),containerColor=Mist,color=Teal)
         }) {
-    LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), state = listState, contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    LazyColumn(Modifier.fillMaxSize().testTag("friends-list"), state = listState, contentPadding = PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current+tourClearance), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         stickyHeader(key = "friends-header") {
             Column(Modifier.fillMaxWidth().testTag("friends-header").stickyHeaderShadow(listState).background(Cream).padding(vertical = 8.dp)) {
                 BigTitle("Sur la même fréquence", "En équipe, on garde le signal.")
@@ -242,11 +253,11 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(feedbackClick { showQr = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = invitation != null && !model.busy) {
+                    Button(tourNavigation { showQr = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = invitation != null && !model.busy) {
                         Icon(Icons.Rounded.QrCode2, null, Modifier.size(19.dp))
                         Spacer(Modifier.width(6.dp)); Text("Inviter")
                     }
-                    OutlinedButton(feedbackClick { addOpen = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = !model.busy) {
+                    OutlinedButton(tourNavigation { addOpen = true }, Modifier.weight(1f).heightIn(min = 48.dp), enabled = !model.busy) {
                         Icon(Icons.Rounded.PersonAdd, null, Modifier.size(19.dp))
                         Spacer(Modifier.width(6.dp)); Text("Ajouter")
                     }
@@ -263,7 +274,7 @@ fun FriendsScreen(model: AppModel) {
                 }
                 ranking.forEachIndexed { index, profile ->
                     val isOwn = profile === own
-                    Row(Modifier.fillMaxWidth().testTag("team-rank-${index+1}").background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).clickable(onClickLabel="Voir la progression de ${profile.name}",onClick=feedbackClick {if(isOwn)model.route="profile" else selectedFriend=model.friends.firstOrNull {it.progress===profile}?.gist}).padding(horizontal = 10.dp, vertical = 8.dp),
+                    Row(Modifier.fillMaxWidth().testTag("team-rank-${index+1}").background(if (isOwn) Mist else Color.Transparent, RoundedCornerShape(12.dp)).clickable(onClickLabel="Voir la progression de ${profile.name}",onClick=tourNavigation {if(isOwn)model.route="profile" else selectedFriend=model.friends.firstOrNull {it.progress===profile}?.gist}).padding(horizontal = 10.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Text("${index + 1}", fontSize = 19.sp, fontWeight = FontWeight.ExtraBold,
                             color = if (index == 0) Coral else Teal, modifier = Modifier.width(22.dp))
@@ -278,7 +289,7 @@ fun FriendsScreen(model: AppModel) {
                     }
                 }
                 if (model.friends.isEmpty()) Text("Invite un équipier pour suivre vos progrès et vous encourager.", fontSize = 12.sp, color = Muted, lineHeight = 18.sp)
-                OutlinedButton(feedbackClick { NativeShare.teamImage(context, own, model.friends.map { it.progress },model.sync.accountIdentity,model.friends.map {it.githubIdentity}) },
+                OutlinedButton(tourNavigation { NativeShare.teamImage(context, own, model.friends.map { it.progress },model.sync.accountIdentity,model.friends.map {it.githubIdentity}) },
                     Modifier.fillMaxWidth().heightIn(min = 44.dp)) {
                     Icon(Icons.Rounded.Share, null, Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp)); Text("Partager le classement")
@@ -292,9 +303,9 @@ fun FriendsScreen(model: AppModel) {
             }
         }
         items(model.friends, key = { it.gist.ifBlank { it.progress.name } }) { friend ->
-            var menuOpen by remember { mutableStateOf(false) }
-            val actions=remember(friend.gist){FriendActionState()}
-            Panel(Modifier.testTag("friend-card-${friend.gist}").clickable(onClickLabel="Voir la progression de ${friend.progress.name}",onClick=feedbackClick {selectedFriend=friend.gist})) {
+            var menuOpen by rememberSaveable { mutableStateOf(false) }
+            val actions=rememberSaveable(friend.gist,saver=FriendActionUiSaver){FriendActionState()}
+            Panel(Modifier.testTag("friend-card-${friend.gist}").clickable(onClickLabel="Voir la progression de ${friend.progress.name}",onClick=tourNavigation {selectedFriend=friend.gist})) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     GitHubAvatar(friend.githubIdentity,friend.progress.name,Modifier.size(44.dp))
                     Spacer(Modifier.width(10.dp))
@@ -304,7 +315,7 @@ fun FriendsScreen(model: AppModel) {
                     }
                     Icon(Icons.Rounded.ChevronRight,null,tint=Muted,modifier=Modifier.size(18.dp))
                     Box {
-                        IconButton(feedbackClick { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
+                        IconButton(tourNavigation { menuOpen = true }) { Icon(Icons.Rounded.MoreVert, "Options de ${friend.progress.name}") }
                         DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                             FriendActionItems(model,friend,actions,asMenu=true,onAction={menuOpen=false})
                         }
@@ -312,7 +323,7 @@ fun FriendsScreen(model: AppModel) {
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("Mis à jour le ${syncDate(friend.progress.updatedAt)}", fontSize = 11.sp, color = Muted, modifier = Modifier.weight(1f))
-                    TextButton(feedbackClick { NativeShare.nudge(context, friend.progress.name,own.name,model.sync.accountIdentity,friend.githubIdentity,friend.progress) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
+                    TextButton(tourNavigation { NativeShare.nudge(context, friend.progress.name,own.name,model.sync.accountIdentity,friend.githubIdentity,friend.progress) }, contentPadding = PaddingValues(horizontal = 8.dp)) {
                         Icon(Icons.Rounded.WavingHand, null, Modifier.size(18.dp)); Spacer(Modifier.width(5.dp)); Text("Encourager", fontSize = 12.sp)
                     }
                 }
@@ -327,7 +338,9 @@ fun FriendsScreen(model: AppModel) {
         }
     }
     }
-    selectedFriend?.let {gist->model.friends.firstOrNull {it.gist==gist}?.let {friend->FriendProgressScreen(model,friend){selectedFriend=null}}}
+    selectedFriend?.let {gist->model.friends.firstOrNull {it.gist==gist}?.let {friend->
+        friendPageStates.SaveableStateProvider(gist) {FriendProgressScreen(model,friend){selectedFriend=null}}
+    }}
     if (scanOpen) FriendQrScanner(onDismiss={scanOpen=false},onInvite={id ->
         scanOpen=false;addOpen=false;receivedLink="";inviteError=null;model.pendingInvite=id
     })
@@ -379,8 +392,8 @@ fun FriendsScreen(model: AppModel) {
 @Composable
 private fun FriendRequestsPanel(model: AppModel) {
     val pendingOutgoing = model.outgoingRequests.filter { it.status != "accepted" }
-    var allIncoming by remember { mutableStateOf(false) }
-    var outgoingOpen by remember { mutableStateOf(false) }
+    var allIncoming by rememberSaveable { mutableStateOf(false) }
+    var outgoingOpen by rememberSaveable { mutableStateOf(false) }
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
         if(model.friendRequests.isNotEmpty()) Panel(color=Color(0xFFFFF4D6)) {
             Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -437,6 +450,7 @@ private fun FriendRequestsPanel(model: AppModel) {
 @Composable
 fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
+    val feedbackViewport=rememberFeedbackViewport()
     val animatedBack = LocalAnimatedBack.current
     val p = model.displayedProgress ?: model.progress
     val listState=rememberLazyListState()
@@ -450,13 +464,16 @@ fun SettingsScreen(model: AppModel) {
             goalHighlight.animateTo(1f,tween(110));goalHighlight.animateTo(0f,tween(650))
         } finally {if(model.settingsGoalFocusRequest==request)model.settingsGoalFocusRequest=null}
     }
-    var name by remember { mutableStateOf(p.name) }
-    var hour by remember { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
-    var minute by remember { mutableStateOf(p.prefs.getInt("reminderMinute", 0).toString().padStart(2, '0')) }
-    var reminderEnabled by remember { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
+    var name by rememberSaveable { mutableStateOf(p.name) }
+    var hour by rememberSaveable { mutableStateOf(p.prefs.getInt("reminderHour", 20).toString()) }
+    var minute by rememberSaveable { mutableStateOf(p.prefs.getInt("reminderMinute", 0).toString().padStart(2, '0')) }
+    var reminderEnabled by rememberSaveable { mutableStateOf(p.prefs.getBoolean("reminderEnabled", false)) }
     val pickerWindowContext=androidx.compose.ui.platform.LocalView.current.context
-    var permissionForTest by remember { mutableStateOf(false) }
-    var backupExpanded by remember { mutableStateOf(false) }
+    var timePickerOpen by rememberSaveable {mutableStateOf(false)}
+    var pickerHour by rememberSaveable {mutableIntStateOf(hour.toIntOrNull() ?: 20)}
+    var pickerMinute by rememberSaveable {mutableIntStateOf(minute.toIntOrNull() ?: 0)}
+    var permissionForTest by rememberSaveable { mutableStateOf(false) }
+    var backupExpanded by rememberSaveable { mutableStateOf(false) }
     var versionTaps by remember { mutableIntStateOf(0) }
     var lastVersionTap by remember { mutableLongStateOf(0L) }
     var versionMoment by remember { mutableIntStateOf(0) }
@@ -472,6 +489,25 @@ fun SettingsScreen(model: AppModel) {
         DailyReminder.configure(context, on, h!!, m!!)
         p.prefs.edit().putLong("preferencesUpdatedAt", System.currentTimeMillis()).apply()
         model.refresh(); model.refreshSocial()
+    }
+    if(timePickerOpen) DisposableEffect(pickerWindowContext) {
+        val dialog=object:TimePickerDialog(pickerWindowContext,{_,h,m->
+            hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled);timePickerOpen=false
+        },pickerHour,pickerMinute,DateFormat.is24HourFormat(context)) {
+            override fun onTimeChanged(view:android.widget.TimePicker,hourOfDay:Int,minuteOfHour:Int) {
+                super.onTimeChanged(view,hourOfDay,minuteOfHour)
+                pickerHour=hourOfDay;pickerMinute=minuteOfHour
+            }
+        }
+        dialog.setTitle("Heure du rappel")
+        dialog.setOnDismissListener {timePickerOpen=false}
+        dialog.show()
+        onDispose {
+            // A recreated Activity will reopen the saved picker. Its old Window must
+            // disappear without turning that recreation into a user dismissal.
+            dialog.setOnDismissListener(null)
+            dialog.dismiss()
+        }
     }
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) { if (permissionForTest) DailyReminder.showTest(context) else configure(true) }
@@ -491,7 +527,7 @@ fun SettingsScreen(model: AppModel) {
                     GitHubAvatar(model.sync.accountIdentity,p.name,Modifier.size(44.dp))
                     Text("Ton profil", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                 }
-                OutlinedTextField(name, { name = it.take(40) }, label = { Text("Pseudo") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(name, { name = it.take(40) }, label = { Text("Pseudo") }, singleLine = true, modifier = Modifier.fillMaxWidth().testTag("settings-name"))
                 Action("Enregistrer le pseudo", enabled = name.isNotBlank()) {
                     p.name = name.trim(); model.refresh(); model.refreshSocial(); model.message = "Pseudo enregistré."
                 }
@@ -523,7 +559,7 @@ fun SettingsScreen(model: AppModel) {
                     })
                 }
                 FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(feedbackClick {TimePickerDialog(pickerWindowContext,{_,h,m->hour=h.toString();minute=m.toString().padStart(2,'0');configure(reminderEnabled)},hour.toInt(),minute.toInt(),DateFormat.is24HourFormat(context)).apply {setTitle("Heure du rappel")}.show()},Modifier.widthIn(min=(128*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
+                    OutlinedButton(feedbackClick {pickerHour=hour.toIntOrNull() ?: 20;pickerMinute=minute.toIntOrNull() ?: 0;timePickerOpen=true},Modifier.widthIn(min=(128*androidx.compose.ui.platform.LocalDensity.current.fontScale).dp).weight(1f).heightIn(min=48.dp).testTag("reminder-time-picker")) {
                         Icon(Icons.Rounded.Schedule,null,Modifier.size(22.dp));Spacer(Modifier.width(8.dp))
                         Text("${hour.padStart(2,'0')}:${minute.padStart(2,'0')}",fontSize=20.sp,fontWeight=FontWeight.Bold,maxLines=1,softWrap=false)
                     }
@@ -598,7 +634,7 @@ fun SettingsScreen(model: AppModel) {
             OutlinedButton(feedbackClick {NativeShare.application(context)},Modifier.fillMaxWidth().testTag("share-application")) {
                 Icon(Icons.Rounded.Share,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Partager Hamigo",fontSize=14.sp)
             }
-            OutlinedButton(feedbackClick { openLink(context, ContentFeedback.FORM_URL) },
+            OutlinedButton(feedbackClick { openLink(context, ContentFeedback.app(context,"settings",feedbackViewport)) },
                 Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Rounded.MailOutline, null, Modifier.size(18.dp))
@@ -661,8 +697,33 @@ fun SettingsScreen(model: AppModel) {
 }
 
 @Composable private fun GameplaySettings(model:AppModel,progress:Progress) {
+    val systemContext=LocalSpeechInputHost.current?.context ?: LocalContext.current
     val settings=remember(model.revision){GameplayPreferences.read(progress.prefs)}
+    val speechMode=remember(model.revision){SpeechInputPreferences.read(progress.prefs)}
     fun save(value:MorseInputSettings){GameplayPreferences.save(progress.prefs,value);model.refresh();model.refreshSocial()}
+    Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    Panel(Modifier.testTag("speech-gameplay")) {
+        Text("Réponse vocale",fontSize=18.sp,fontWeight=FontWeight.Bold)
+        Text("Choisis le geste du bouton micro. Attends le passage en écoute avant de parler.",fontSize=13.sp,color=Muted,lineHeight=19.sp)
+        listOf(SpeechInputMode.PUSH_TO_TALK to ("Maintenir pour parler" to "Relâcher termine la réponse."),
+            SpeechInputMode.TOGGLE to ("Appuyer pour démarrer" to "Un second appui termine la réponse.")).forEach {(mode,labels)->
+            Surface(onClick=feedbackClick {SpeechInputPreferences.save(progress.prefs,mode);model.refresh();model.refreshSocial()},
+                modifier=Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("speech-mode-"+mode.name),
+                color=if(speechMode==mode)Mist else Color.White,shape=RoundedCornerShape(14.dp)) {
+                Row(Modifier.padding(horizontal=8.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically) {
+                    RadioButton(selected=speechMode==mode,onClick=null)
+                    Column(Modifier.padding(start=8.dp)) {
+                        Text(labels.first,fontSize=14.sp,fontWeight=FontWeight.Bold)
+                        Text(labels.second,fontSize=12.sp,color=Muted)
+                    }
+                }
+            }
+        }
+        Text("Le clavier reste disponible. Le geste choisi est synchronisé avec ta progression ; les autorisations restent propres à chaque appareil.",fontSize=12.sp,color=Muted)
+        ActionLinks {
+            ActionLink("Autorisation du microphone",Modifier.testTag("system-microphone-settings"),icon=Icons.Rounded.Mic){openMicrophoneAppSettings(systemContext)}
+        }
+    }
     Panel(Modifier.testTag("morse-gameplay")) {
         Text("Saisie du Morse",fontSize=18.sp,fontWeight=FontWeight.Bold)
         MorseSettingsControls(settings,::save)
@@ -672,5 +733,6 @@ fun SettingsScreen(model: AppModel) {
         }
         Text("Essaie ici",fontWeight=FontWeight.Bold,fontSize=13.sp)
         Surface(color=Mist,shape=RoundedCornerShape(14.dp)){MorseSettingsPreview(settings)}
+    }
     }
 }

@@ -3,26 +3,15 @@
     "formula": {
       "source": "I = Q / t",
       "speech": "L’intensité du courant, notée I, est égale à la charge électrique Q divisée par la durée t."
-    }
+    },
+    "body": []
   },
   "c03-l03": {
     "formula": {
       "source": "U = R × I",
       "speech": "La loi d’Ohm s’écrit : U égale R fois I. Autrement dit, la tension est égale à la résistance multipliée par l’intensité."
-    }
-  },
-  "c03-l04": {
-    "formula": {
-      "source": "P = U × I ; E = P × t",
-      "speech": "La puissance électrique P est égale à la tension U multipliée par l’intensité I. L’énergie E est égale à la puissance P multipliée par la durée t."
     },
-    "body": [
-      {
-        "index": 2,
-        "source": "La puissance est un débit d’énergie : le watt vaut un joule par seconde. Une facture ou une batterie emploie souvent des Wh; pour des joules, le temps doit être en secondes. Pour une résistance ohmique, P = UI = RI² = U²/R. La puissance nominale doit laisser une marge de température.",
-        "speech": "La puissance est un débit d’énergie : le watt vaut un joule par seconde. Une facture ou une batterie emploie souvent des wattheures. Pour obtenir des joules, le temps doit être exprimé en secondes. Pour une résistance ohmique, la puissance est égale à la tension fois l’intensité. Elle est aussi égale à la résistance fois l’intensité au carré, ou à la tension au carré divisée par la résistance. La puissance nominale doit laisser une marge de température."
-      }
-    ]
+    "body": []
   },
   "c04-l01": {
     "formula": {
@@ -65,6 +54,11 @@
         "index": 0,
         "source": "Un diviseur de tension place deux résistances en série. Si la sortie est prise sur R2 et n’est pas chargée, Us = Ue × R2/(R1+R2). Brancher une charge change l’équivalent de R2 et donc la tension.",
         "speech": "Un diviseur de tension place deux résistances en série. Si la sortie est prise sur la deuxième résistance et n’est pas chargée, la tension de sortie est égale à la tension d’entrée multipliée par la deuxième résistance, puis divisée par la somme des deux résistances. Brancher une charge change la résistance équivalente de la deuxième branche, et donc la tension."
+      },
+      {
+        "index": 1,
+        "source": "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Avec R1 en haut à gauche, R2 en bas à gauche, R3 en haut à droite et R4 en bas à droite : R1/R2 = R3/R4.",
+        "speech": "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Appelons R un la résistance en haut à gauche, R deux celle du bas à gauche, R trois celle du haut à droite et R quatre celle du bas à droite. À l’équilibre, le rapport R un divisé par R deux est égal au rapport R trois divisé par R quatre."
       }
     ]
   },
@@ -72,19 +66,22 @@
     "formula": {
       "source": "Σ Ientrants = Σ Isortants ; Σ U dans une maille = 0",
       "speech": "À un nœud, la somme des courants entrants est égale à la somme des courants sortants. Dans une maille, la somme algébrique des tensions est nulle."
-    }
+    },
+    "body": []
   },
   "c05-l01": {
     "formula": {
       "source": "R = (10 × chiffre1 + chiffre2) × multiplicateur",
       "speech": "Pour une résistance à quatre anneaux, multiplie le premier chiffre par dix, ajoute le deuxième chiffre, puis multiplie le résultat par le multiplicateur."
-    }
+    },
+    "body": []
   },
   "c05-l02": {
     "formula": {
       "source": "Q = C × U ; Xc = 1 / (2πfC)",
       "speech": "La charge Q est égale à la capacité C multipliée par la tension U. La réactance capacitive vaut un divisé par le produit de deux, pi, la fréquence et la capacité."
-    }
+    },
+    "body": []
   },
   "c05-l03": {
     "formula": {
@@ -108,25 +105,29 @@
     "formula": {
       "source": "τ = R × C",
       "speech": "La constante de temps, appelée tau, est égale à la résistance multipliée par la capacité."
-    }
+    },
+    "body": []
   },
   "c06-l01": {
     "formula": {
       "source": "Upp = 2 × Ucrête",
       "speech": "Pour un signal symétrique autour de zéro, la tension crête à crête vaut deux fois la tension de crête."
-    }
+    },
+    "body": []
   },
   "c06-l02": {
     "formula": {
       "source": "f = 1 / T",
       "speech": "La fréquence est l’inverse de la période : f égale un divisé par T."
-    }
+    },
+    "body": []
   },
   "c06-l03": {
     "formula": {
       "source": "Ueff = Ucrête / √2",
       "speech": "Pour une sinusoïde, la tension efficace est égale à la tension de crête divisée par la racine carrée de deux."
-    }
+    },
+    "body": []
   },
   "c06-l04": {
     "formula": {
@@ -150,7 +151,17 @@
       {
         "index": 0,
         "source": "À la résonance, XL et XC ont le même module. La fréquence propre d’un circuit LC idéal vaut f0 = 1/(2π√LC). Augmenter L ou C abaisse cette fréquence; multiplier C par quatre divise f0 par deux.",
-        "speech": "À la résonance, les réactances inductive et capacitive ont le même module. La fréquence propre d’un circuit idéal à bobine et condensateur est l’inverse du produit de deux, pi, et la racine carrée du produit de l’inductance par la capacité. Augmenter l’inductance ou la capacité abaisse cette fréquence. Multiplier la capacité par quatre divise la fréquence propre par deux."
+        "speech": "À la résonance, les réactances inductive et capacitive ont le même module. La fréquence propre d’un circuit LC idéal est l’inverse de deux fois pi fois la racine carrée du produit de l’inductance par la capacité. Augmenter l’inductance ou la capacité abaisse cette fréquence. Multiplier la capacité par quatre divise la fréquence propre par deux."
+      },
+      {
+        "index": 2,
+        "source": "La résonance est la fréquence où les échanges entre champs électrique et magnétique compensent les réactances. f0 = 1/(2π√LC). Un circuit série devient surtout résistif à f0; un circuit parallèle idéal possède au contraire une impédance très grande. Les pertes réelles limitent toujours ces cas idéaux.",
+        "speech": "La résonance est la fréquence où les échanges entre champs électrique et magnétique compensent les réactances. La fréquence propre est l’inverse de deux fois pi fois la racine carrée du produit de l’inductance par la capacité. Un circuit série devient surtout résistif à cette fréquence. Un circuit parallèle idéal possède au contraire une impédance très grande. Les pertes réelles limitent toujours ces cas idéaux."
+      },
+      {
+        "index": 3,
+        "source": "Pour un même type de résonateur à une fréquence f0 donnée, le facteur Q compare la fréquence centrale à la largeur de bande B : Q = f0/B, avec les deux fréquences dans la même unité. Un Q plus élevé correspond donc à une bande plus étroite. Le couplage et les pertes réels modifient ce facteur.",
+        "speech": "Pour un même type de résonateur à une fréquence centrale donnée, le facteur de qualité est la fréquence centrale divisée par la largeur de bande. Les deux fréquences doivent être exprimées dans la même unité. Un facteur de qualité plus élevé correspond donc à une bande plus étroite. Le couplage et les pertes réels modifient ce facteur."
       }
     ]
   },
@@ -158,7 +169,8 @@
     "formula": {
       "source": "fc(RC) = 1 / (2πRC)",
       "speech": "Pour un filtre R C du premier ordre, la fréquence de coupure est l’inverse du produit de deux, pi, la résistance et la capacité."
-    }
+    },
+    "body": []
   },
   "c07-l03": {
     "formula": {
@@ -183,13 +195,7 @@
       "source": "GdB = 10 log10(P2 / P1)",
       "speech": "Le gain en décibels vaut dix fois le logarithme en base dix du rapport entre puissance de sortie et puissance d’entrée."
     },
-    "body": [
-      {
-        "index": 0,
-        "source": "Un décibel exprime un rapport logarithmique. Pour des puissances, GdB = 10 log10(Psortie/Pentrée). Un rapport de 2 vaut environ +3 dB, de 10 +10 dB et de 100 +20 dB.",
-        "speech": "Un décibel exprime un rapport logarithmique. Pour des puissances, le gain en décibels vaut dix fois le logarithme en base dix de la puissance de sortie divisée par la puissance d’entrée. Un rapport de deux vaut environ plus trois décibels. Un rapport de dix vaut plus dix décibels, et un rapport de cent vaut plus vingt décibels."
-      }
-    ]
+    "body": []
   },
   "c17-l01": {
     "formula": {
@@ -239,25 +245,41 @@
     "formula": {
       "source": "f0 = 1/(2π√LC) · Q = f0/B",
       "speech": "La fréquence de résonance vaut un divisé par le produit de deux, pi et la racine carrée du produit L C. Le facteur de qualité est la fréquence de résonance divisée par la largeur de bande."
-    }
+    },
+    "body": [
+      {
+        "index": 1,
+        "source": "Pour le modèle de bande étudié, Q = f0/B. Les pertes dissipatives réduisent le Q. En série à résonance, le courant peut être élevé et les tensions individuelles sur L et C peuvent dépasser celle de la source.",
+        "speech": "Pour le modèle de bande étudié, le facteur de qualité est la fréquence centrale divisée par la largeur de bande. Les pertes dissipatives réduisent le facteur de qualité. En série à résonance, le courant peut être élevé et les tensions individuelles sur la bobine et le condensateur peuvent dépasser celle de la source."
+      }
+    ]
   },
   "c08-l02": {
     "formula": {
       "source": "β ≈ Ic / Ib",
       "speech": "Le gain en courant du transistor, appelé bêta, est approximativement égal au courant de collecteur divisé par le courant de base."
-    }
+    },
+    "body": []
   },
   "c08-l03": {
     "formula": {
       "source": "η = Putile / Palimentation",
       "speech": "Le rendement, noté êta, est la puissance utile divisée par la puissance d’alimentation."
-    }
+    },
+    "body": []
   },
   "c09-l01": {
     "formula": {
       "source": "BAM ≈ 2 × Faudio max",
       "speech": "En modulation d’amplitude, la largeur de bande est approximativement égale à deux fois la fréquence audio maximale."
-    }
+    },
+    "body": [
+      {
+        "index": 2,
+        "source": "Une AM sinusoïdale possède une porteuse à fc et des bandes latérales à fc − fm et fc + fm. Pour une bande audio de largeur Fmax, la largeur RF double bande vaut environ 2Fmax. Un taux de modulation supérieur à 100 % déforme l’enveloppe dans le modèle simple et crée un risque d’émission trop large.",
+        "speech": "Une modulation d’amplitude sinusoïdale possède une porteuse à la fréquence porteuse, et des bandes latérales situées à la fréquence porteuse moins la fréquence de modulation, et à la fréquence porteuse plus la fréquence de modulation. Pour une bande audio de largeur donnée, la largeur radio en double bande vaut environ deux fois cette largeur audio. Un taux de modulation supérieur à cent pour cent déforme l’enveloppe dans le modèle simple et crée un risque d’émission trop large."
+      }
+    ]
   },
   "c09-l02": {
     "formula": {
@@ -289,25 +311,29 @@
     "formula": {
       "source": "Débit binaire = débit symboles × bits par symbole",
       "speech": "Le débit binaire est égal au débit de symboles multiplié par le nombre de bits par symbole."
-    }
+    },
+    "body": []
   },
   "c20-l01": {
     "formula": {
       "source": "N bits → 2ᴺ états",
       "speech": "Avec N bits, on dispose de deux puissance N états possibles."
-    }
+    },
+    "body": []
   },
   "c22-l02": {
     "formula": {
       "source": "1 octet = 8 bits · 1 chiffre hexadécimal = 4 bits",
       "speech": "Un octet contient huit bits. Un chiffre hexadécimal représente quatre bits."
-    }
+    },
+    "body": []
   },
   "c22-l03": {
     "formula": {
       "source": "ET : toutes les entrées à 1 · OU : au moins une à 1 · NON : inverse",
       "speech": "La porte ET donne un si toutes ses entrées valent un. La porte OU donne un si au moins une entrée vaut un. La porte NON inverse l’entrée."
-    }
+    },
+    "body": []
   },
   "c22-l04": {
     "formula": {
@@ -331,67 +357,78 @@
     "formula": {
       "source": "débit binaire = bauds × bits/symbole",
       "speech": "Le débit binaire, en bits par seconde, est le débit de symboles, en bauds, multiplié par le nombre de bits par symbole."
-    }
+    },
+    "body": []
   },
   "c20-l03": {
     "formula": {
       "source": "bande de base idéale : fe > 2 × Fmax",
       "speech": "Dans le cas idéal en bande de base, la fréquence d’échantillonnage doit être strictement supérieure à deux fois la fréquence maximale du signal."
-    }
+    },
+    "body": []
   },
   "c10-l01": {
     "formula": {
       "source": "fmélange = f1 + f2 ou |f1 − f2|",
       "speech": "Un mélangeur produit notamment la somme des deux fréquences, ainsi que la valeur absolue de leur différence."
-    }
+    },
+    "body": []
   },
   "c10-l02": {
     "formula": {
       "source": "FI = |fRF − fOL|",
       "speech": "La fréquence intermédiaire est la valeur absolue de la différence entre la fréquence radio reçue et la fréquence de l’oscillateur local."
-    }
+    },
+    "body": []
   },
   "c18-l01": {
     "formula": {
       "source": "harmonique n : fn = n × f0",
       "speech": "La fréquence de l’harmonique de rang N est égale à N fois la fréquence fondamentale."
-    }
+    },
+    "body": []
   },
   "c18-l02": {
     "formula": {
       "source": "f somme = f1+f2 · f différence = |f1−f2|",
       "speech": "La fréquence somme est la somme des deux fréquences. La fréquence différence est la valeur absolue de leur différence."
-    }
+    },
+    "body": []
   },
   "c18-l03": {
     "formula": {
       "source": "IM3 : 2f1−f2 et 2f2−f1",
       "speech": "Parmi les produits d’intermodulation d’ordre trois, on trouve deux fois f un moins f deux, ainsi que deux fois f deux moins f un."
-    }
+    },
+    "body": []
   },
   "c18-l04": {
     "formula": {
       "source": "S/B(dB) = signal(dBm) − bruit(dBm)",
       "speech": "Le rapport signal sur bruit en décibels est le niveau du signal en décibels milliwatt moins le niveau du bruit dans la même unité."
-    }
+    },
+    "body": []
   },
   "c11-l01": {
     "formula": {
       "source": "λ(m) ≈ 300 / f(MHz)",
       "speech": "Dans l’air, la longueur d’onde en mètres est approximativement égale à trois cents divisés par la fréquence exprimée en mégahertz."
-    }
+    },
+    "body": []
   },
   "c11-l02": {
     "formula": {
       "source": "Dipôle théorique : Ltot ≈ λ / 2",
       "speech": "La longueur totale théorique d’un dipôle demi-onde est égale à la moitié de la longueur d’onde."
-    }
+    },
+    "body": []
   },
   "c11-l03": {
     "formula": {
       "source": "dBi ≈ dBd + 2,15 dB",
       "speech": "Le gain exprimé en décibels par rapport à l’isotrope vaut approximativement le gain par rapport au dipôle demi-onde, plus deux virgule quinze décibels."
-    }
+    },
+    "body": []
   },
   "c11-l04": {
     "formula": {
@@ -403,6 +440,11 @@
         "index": 1,
         "source": "Le ROS, rapport d’ondes stationnaires, décrit une désadaptation. ROS = 1 correspond à l’adaptation. ROS = (1+|Γ|)/(1−|Γ|), où Γ est le coefficient de réflexion en tension. Un ROS faible ne prouve pas à lui seul que l’antenne rayonne bien : une charge fictive peut avoir ROS = 1.",
         "speech": "Le rapport d’ondes stationnaires, abrégé ROS, décrit une désadaptation. Un rapport égal à un correspond à l’adaptation. Pour le calculer, prends un plus le module du coefficient de réflexion, puis divise par un moins ce même module. Ce coefficient est noté gamma. Un rapport faible ne prouve pas à lui seul que l’antenne rayonne bien : une charge fictive peut aussi donner un rapport égal à un."
+      },
+      {
+        "index": 3,
+        "source": "Pour une ligne idéale d’impédance caractéristique Z0 et une charge purement résistive RL, on peut calculer le ROS sans passer par Γ : divise la plus grande des deux résistances par la plus petite. Si RL est supérieure à Z0, c’est RL/Z0 ; si RL est inférieure à Z0, c’est Z0/RL. Cette simplification ne s’applique pas telle quelle à une charge possédant une partie réactive.",
+        "speech": "Considérons une ligne idéale et une charge purement résistive. On peut calculer le rapport d’ondes stationnaires en divisant la plus grande valeur entre résistance de charge et impédance caractéristique par la plus petite. Cette simplification ne s’applique pas telle quelle à une charge possédant une partie réactive."
       }
     ]
   },
@@ -423,7 +465,8 @@
     "formula": {
       "source": "λligne = FV × 300/f(MHz)",
       "speech": "La longueur d’onde dans la ligne est égale au facteur de vélocité multiplié par la longueur d’onde dans l’air. En mètres, elle vaut le facteur de vélocité fois trois cents, divisés par la fréquence en mégahertz."
-    }
+    },
+    "body": []
   },
   "c19-l03": {
     "formula": {
@@ -442,18 +485,20 @@
     "formula": {
       "source": "Pr(dBm) = Pt(dBm) + Gt + Gr − pertes",
       "speech": "Pour le bilan de liaison en unités logarithmiques, pars de la puissance émise, ajoute les gains des deux antennes, puis soustrais toutes les pertes. Les puissances absolues sont ici en décibels milliwatt, les gains et les pertes en décibels."
-    }
+    },
+    "body": []
   },
   "c21-l01": {
     "formula": {
       "source": "RS en phonie · RST en télégraphie",
       "speech": "En phonie, on donne un report R S. En télégraphie, on donne un report R S T."
-    }
+    },
+    "body": []
   },
   "c15-l01": {
     "body": [
       {
-        "index": 0,
+        "index": 1,
         "source": "Cette étape travaille E, T, I, M. Compare le point E au trait T, puis les deux points I aux deux traits M. Écoute le caractère entier, puis prononce son nom : l’objectif est de reconnaître un rythme, sans compter chaque élément à haute vitesse.",
         "speech": "Cette étape travaille les lettres E, T, I et M. Compare le point de la lettre E au trait de la lettre T. Compare ensuite les deux points de la lettre I aux deux traits de la lettre M. Écoute chaque caractère en entier, puis prononce son nom. L’objectif est de reconnaître un rythme, sans compter chaque élément à haute vitesse."
       }
@@ -528,11 +573,6 @@
         "index": 0,
         "source": "Cette étape travaille ?, /, ., =, ,, @. Ces signes servent aux groupes usuels et aux messages. La barre de fraction est elle-même un caractère; elle n’est pas la pause entre mots. Écoute le caractère entier, puis prononce son nom : l’objectif est de reconnaître un rythme, sans compter chaque élément à haute vitesse.",
         "speech": "Cette étape présente le point d’interrogation, la barre oblique, le point final, le signe égal, la virgule et l’arobase. Ces signes servent aux groupes usuels et aux messages. La barre oblique est elle-même un caractère. Son signal ne doit pas être confondu avec la pause entre deux mots. Écoute chaque caractère en entier, puis prononce son nom pour reconnaître son rythme."
-      },
-      {
-        "index": 2,
-        "source": "L’exercice alterne la lecture d’un code, l’écoute d’un son et la composition avec points et traits. La réponse à l’écoute est une lettre; à la composition, utilise les séparateurs uniquement entre les lettres d’un groupe. Rejoue le son si nécessaire.",
-        "speech": "Les exercices alternent lecture d’un code, écoute du signal et composition en points et traits. Pour un exercice d’écoute, choisis le caractère entendu. Pour composer plusieurs caractères, sépare-les bien. Tu peux réécouter le signal autant que nécessaire."
       }
     ]
   },
@@ -557,7 +597,7 @@
   "c16-l01": {
     "body": [
       {
-        "index": 0,
+        "index": 1,
         "source": "Une notation scientifique écrit a × 10ⁿ. Les préfixes déplacent l’exposant : kilo 10³, milli 10⁻³, micro 10⁻⁶, nano 10⁻⁹, pico 10⁻¹². Une conversion conserve la grandeur physique.",
         "speech": "En notation scientifique, on écrit un nombre multiplié par une puissance de dix. Le préfixe kilo correspond à dix puissance trois. Milli correspond à dix puissance moins trois, micro à dix puissance moins six, nano à dix puissance moins neuf et pico à dix puissance moins douze. Une conversion conserve la même grandeur physique."
       }
@@ -574,20 +614,6 @@
         "index": 1,
         "source": "Les unités aident à contrôler une formule : V/Ω donne A, et W/V donne A. Une somme ne mélange pas des grandeurs incompatibles. Les racines et carrés peuvent modifier les unités et les rapports.",
         "speech": "Les unités aident à vérifier une formule. Des volts divisés par des ohms donnent des ampères. Des watts divisés par des volts donnent aussi des ampères. On ne peut pas additionner des grandeurs incompatibles. Attention, une racine carrée ou un carré change aussi les unités et les rapports."
-      }
-    ]
-  },
-  "c16-l03": {
-    "body": [
-      {
-        "index": 0,
-        "source": "Une grandeur au carré réagit plus fortement à un facteur. Si U est multipliée par trois à R fixe, U²/R est multipliée par neuf. Une racine carrée agit dans l’autre sens : multiplier LC par neuf divise la résonance par trois.",
-        "speech": "Une grandeur au carré amplifie l’effet d’un facteur. Si la tension est multipliée par trois avec une résistance fixe, la puissance, égale à U au carré divisé par R, est multipliée par neuf. Une racine carrée agit dans l’autre sens. Si le produit de l’inductance par la capacité est multiplié par neuf, la fréquence de résonance est divisée par trois."
-      },
-      {
-        "index": 1,
-        "source": "Pour deux composantes orthogonales, le module √(a²+b²) ne se calcule pas par a+b. Les triangles 3–4–5 et 6–8–10 donnent des repères faciles.",
-        "speech": "Pour deux composantes perpendiculaires, calcule la racine carrée de la somme de leurs carrés. Il ne suffit pas d’ajouter leurs valeurs. Les triangles dont les côtés mesurent trois, quatre et cinq, ou six, huit et dix, sont des repères faciles."
       }
     ]
   },
@@ -611,6 +637,69 @@
         "index": 1,
         "source": "La méthode d’espacement dite Farnsworth peut garder des caractères rapides tout en allongeant les espaces pour laisser le temps de reconnaître. Cela ne change pas le rapport point/trait à l’intérieur d’un caractère.",
         "speech": "La méthode d’espacement dite Farnsworth peut garder des caractères rapides tout en allongeant les espaces pour laisser le temps de reconnaître. Cela ne change pas le rapport des durées entre un point et un trait à l’intérieur d’un caractère."
+      }
+    ]
+  },
+  "l-quartz-pll": {
+    "body": [
+      {
+        "index": 3,
+        "source": "Dans une PLL simple à diviseur entier, une partie de la sortie est divisée par un nombre N avant comparaison à la référence. Au verrouillage, fsortie/N = fréférence, donc fsortie = N × fréférence. L’oscillateur commandé, souvent nommé VCO, est l’élément que la boucle corrige. Cette relation décrit le modèle donné ; toutes les synthèses réelles n’ont pas la même architecture.",
+        "speech": "Dans une boucle à verrouillage de phase simple à diviseur entier, une partie de la sortie est divisée par un nombre N avant comparaison à la référence. Au verrouillage, la fréquence de sortie divisée par N est égale à la fréquence de référence. La fréquence de sortie est donc N fois la fréquence de référence. L’oscillateur commandé en tension, souvent nommé VCO, est l’élément que la boucle corrige. Cette relation décrit le modèle donné. Toutes les synthèses réelles n’ont pas la même architecture."
+      }
+    ]
+  },
+  "l-projet-experience": {
+    "body": [
+      {
+        "index": 3,
+        "source": "Un retour A/B/A aide à voir si la référence dérive pendant l’essai : si A a beaucoup changé, attribuer tout l’écart à B devient fragile. La même méthode vaut ailleurs : comparer les tensions d’un câble sous le même courant, ou décoder plusieurs fois le même audio SSTV en changeant un seul réglage. La référence doit conserver les conditions utiles à la question posée.",
+        "speech": "Comparer la configuration A, puis la configuration B, puis revenir à la configuration A aide à voir si la référence dérive pendant l’essai. Si la première configuration a beaucoup changé, attribuer tout l’écart à la deuxième devient fragile. La même méthode vaut ailleurs : comparer les tensions d’un câble sous le même courant, ou décoder plusieurs fois le même audio SSTV en changeant un seul réglage. La référence doit conserver les conditions utiles à la question posée."
+      }
+    ]
+  },
+  "l-morse-mots-etim": {
+    "body": [
+      {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont ETE, MIMI, TETE. Les exercices n’utilisent que les caractères indiqués ici : ETIM. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont été, Mimi et tête. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      }
+    ]
+  },
+  "l-morse-mots-anso": {
+    "body": [
+      {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont SIMON, MAISON, SON. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSO. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Simon, maison et son. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      }
+    ]
+  },
+  "l-morse-mots-durk": {
+    "body": [
+      {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont MARTIN, RADIO, TROIS. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSODURK. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Martin, radio et trois. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O, D, U, R, K. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      }
+    ]
+  },
+  "l-morse-mots-longs": {
+    "body": [
+      {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont LOUIS, PARIS, VIVE. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSODURKGWBVFLPJ. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Louis, Paris et vive. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O, D, U, R, K, G, W, B, V, F, L, P, J. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      }
+    ]
+  },
+  "l-filtre-coupure": {
+    "body": [
+      {
+        "index": 1,
+        "source": "Pour un simple RC du premier ordre, la fréquence de coupure vaut 1/(2πRC). Au point de coupure, la puissance est moitié de la référence, soit environ −3 dB, sous les hypothèses de charge du modèle.",
+        "speech": "Dans un filtre résistance condensateur du premier ordre, la fréquence de coupure est l’inverse de deux fois pi fois la résistance fois la capacité. Au point de coupure, la puissance est moitié de la référence, soit environ moins trois décibels, sous les hypothèses de charge du modèle."
       }
     ]
   }

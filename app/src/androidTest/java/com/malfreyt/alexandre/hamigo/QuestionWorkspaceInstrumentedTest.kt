@@ -53,6 +53,7 @@ class QuestionWorkspaceInstrumentedTest {
     @get:Rule val rules:RuleChain=RuleChain.outerRule(fixture).around(ui)
     private lateinit var model:AppModel
     @Before fun load() {
+        ui.prepareTestWindow()
         model=ViewModelProvider(ui.activity)[AppModel::class.java]
         ui.waitUntil(60_000) {model.content!=null}
         ui.runOnIdle {
@@ -84,17 +85,17 @@ class QuestionWorkspaceInstrumentedTest {
         field().performTextInput("20")
         ui.onNodeWithText("Utiliser dans ma réponse").performScrollTo().performClick()
         openNotes()
-        ui.onNodeWithText("Texte",substring=false).performClick()
+        ui.onNodeWithContentDescription("Texte").performClick()
         ui.onNodeWithTag("scratchpad-text").performTextInput("U = R × I\n10 × 2 = 20")
         capture("scratchpad-text-keyboard")
         closeNotes();openNotes()
         ui.onNodeWithTag("scratchpad-text").assertTextContains("10 × 2 = 20",substring=true)
-        ui.onNodeWithText("Dessin",substring=false).performClick()
+        ui.onNodeWithContentDescription("Dessin").performClick()
         awaitNoIme()
         ui.onNodeWithTag("scratchpad-ink").performTouchInput { swipe(Offset(width*.2f,height*.25f),Offset(width*.75f,height*.5f)) }
         ui.runOnIdle { assertEquals(1,inkView().state.strokes.size) }
         capture("scratchpad-drawing")
-        ui.onNodeWithText("Stylet seul").performClick()
+        ui.onNodeWithContentDescription("Stylet seul").performClick()
         val panel=ui.onNodeWithTag("scratchpad-surface",useUnmergedTree=true)
         val opened=panel.fetchSemanticsNode().boundsInRoot
         val origin=ui.onNodeWithContentDescription("Ouvrir le brouillon").fetchSemanticsNode().boundsInRoot
@@ -121,7 +122,7 @@ class QuestionWorkspaceInstrumentedTest {
         ui.onNodeWithContentDescription("Fermer la calculatrice").performClick()
         openNotes()
         ui.runOnIdle { assertTrue(inkView().state.strokes.isEmpty());assertEquals("",inkView().state.text.text);assertTrue(inkView().state.stylusOnly) }
-        ui.onNodeWithContentDescription("Annuler le dernier trait").assertIsNotEnabled()
+        ui.onNodeWithContentDescription("Annuler la dernière modification").assertIsNotEnabled()
         capture("scratchpad-next-question-empty")
     }
 
@@ -172,13 +173,14 @@ class QuestionWorkspaceInstrumentedTest {
             send(event(MotionEvent.ACTION_UP,MotionEvent.TOOL_TYPE_ERASER,.5f,.4f))
             assertEquals(1,view.state.strokes.size)
         }
-        ui.onNodeWithContentDescription("Annuler le dernier trait").performClick()
+        ui.onNodeWithContentDescription("Annuler la dernière modification").performClick()
         ui.runOnIdle {assertEquals(2,inkView().state.strokes.size)}
-        ui.onNodeWithText("Stylet seul").performClick()
+        ui.onNodeWithContentDescription("Stylet seul").performClick()
         ui.onNodeWithTag("scratchpad-ink").performTouchInput { swipe(Offset(width*.2f,height*.6f),Offset(width*.8f,height*.8f)) }
         ui.runOnIdle {assertEquals("Finger drawing is disabled in stylus-only mode",2,inkView().state.strokes.size)}
         capture("scratchpad-stylus")
         ui.onNodeWithContentDescription("Effacer le brouillon").performClick()
+        ui.onNodeWithText("Tout effacer",substring=false).performClick()
         ui.runOnIdle {assertTrue(inkView().state.strokes.isEmpty())}
     }
 
@@ -192,7 +194,7 @@ class QuestionWorkspaceInstrumentedTest {
         ui.waitUntil(10_000) {
             val field=ui.onNodeWithTag("question-number-input").fetchSemanticsNode().boundsInRoot
             val tools=listOf("Ouvrir la calculatrice","Ouvrir le brouillon").map {ui.onNodeWithContentDescription(it).fetchSemanticsNode().boundsInRoot}
-            field.bottom<=tools.minOf {it.top}
+            tools.all {tool->field.right<=tool.left||field.left>=tool.right||field.bottom<=tool.top||field.top>=tool.bottom}
         }
         ui.onNodeWithContentDescription("Ouvrir la calculatrice").assertIsDisplayed()
         ui.onNodeWithContentDescription("Ouvrir le brouillon").assertIsDisplayed()
@@ -200,10 +202,14 @@ class QuestionWorkspaceInstrumentedTest {
         val scratch=ui.onNodeWithContentDescription("Ouvrir le brouillon").fetchSemanticsNode().boundsInRoot
         assertEquals("Opening the keyboard preserves the tools' window-based arrangement",stackedBeforeIme,scratch.bottom<calculator.top)
         val answer=ui.onNodeWithTag("question-number-input").fetchSemanticsNode().boundsInRoot
-        assertTrue("Floating tools must not cover the focused answer field",answer.bottom<=minOf(scratch.top,calculator.top))
+        assertTrue("Floating tools must not cover the focused answer field",
+            listOf(scratch,calculator).all {tool->answer.right<=tool.left||answer.left>=tool.right||answer.bottom<=tool.top||answer.top>=tool.bottom})
+        val fullAnswer=ui.onNodeWithTag("question-number-input").getUnclippedBoundsInRoot()
+        val stage=ui.onNodeWithTag("question-stage").getUnclippedBoundsInRoot()
+        assertTrue("The entire input remains in the viewport above the real keyboard",fullAnswer.top>=stage.top&&fullAnswer.bottom<=stage.bottom)
         capture("question-keyboard-tools")
         Espresso.closeSoftKeyboard()
-        openNotes();ui.onNodeWithText("Texte",substring=false).performClick()
+        openNotes();ui.onNodeWithContentDescription("Texte").performClick()
         awaitIme()
         ui.onNodeWithTag("scratchpad-text").assertIsFocused().performTextInput("P = U × I")
         ui.onNodeWithContentDescription("Fermer le brouillon").assertIsDisplayed()

@@ -19,7 +19,7 @@ import java.util.Locale
 
 /** Only content and environment metadata; no answers, account or backup identifiers. */
 object ContentFeedback {
-    const val FORM_URL = "https://alexandre-malfreyt.notion.site/3f1dbe8ec53680e18e5bd7682e0661c0"
+    const val FORM_URL = "https://tally.so/r/9NqlpK"
     const val EXAM1_CONTACT_PAGE = "https://f6kgl-f5kff.fr/exam1/"
 
     private fun questionMetadata(q: Question, index: Int, count: Int, lessonId: String?, sessionTitle: String?) = linkedMapOf(
@@ -27,20 +27,39 @@ object ContentFeedback {
         "question_count" to count.toString(), "question_type" to q.kind, "topic" to q.topic,
         "section" to q.section, "source" to q.source, "lesson_id" to lessonId.orEmpty(),
         "image" to q.image.orEmpty(), "visual" to q.visual,
-        "title" to q.prompt, "session_title" to sessionTitle.orEmpty()
+        "question_variant" to QuestionUiVariants.ids(q).joinToString(","), "source_kind" to if(isExam1(q))"exam1" else "hamigo",
+        "title" to reportTitle(q), "page" to "question", "entry_point" to "question_flag", "session_title" to sessionTitle.orEmpty()
     )
 
-    fun question(q: Question, index: Int, count: Int, lessonId: String?, sessionTitle: String? = null): String =
-        url(questionMetadata(q, index, count, lessonId, sessionTitle))
+    private fun reportTitle(q:Question):String {
+        val template=runCatching {org.json.JSONObject(q.template)}.getOrNull()
+        val source=template?.optString("sourceText").orEmpty()
+        return if(source.contains("{{name}}")||template?.optString("type")?.endsWith("name")==true)
+            source.ifBlank {runCatching {org.json.JSONObject(q.rawJson).optString("prompt")}.getOrDefault("Question personnalisée")}
+                .replace("{{name}}","une personne").replace("{{value}}","le groupe à retrouver").replace("{{call}}","un indicatif") else q.prompt
+    }
+    fun question(q: Question, index: Int, count: Int, lessonId: String?, sessionTitle: String? = null,context:Context?=null,viewport:Map<String,String> = emptyMap()): String =
+        url(questionMetadata(q, index, count, lessonId, sessionTitle),context=context,viewport=viewport)
+    fun app(context:Context?,page:String="app",viewport:Map<String,String> = emptyMap()):String=url(mapOf("content" to "app","page" to page,"entry_point" to "contact"),context=context,viewport=viewport)
+    fun lesson(lesson:Lesson,context:Context?,viewport:Map<String,String> = emptyMap()):String=url(mapOf("content" to "lesson","lesson_id" to lesson.id,"title" to lesson.title,"topic" to lesson.topic,"page" to "lesson","entry_point" to "lesson_flag"),context=context,viewport=viewport)
+    private fun environment(context:Context?):Map<String,String> {
+        if(context==null)return emptyMap()
+        val resources=context.resources;val metrics=resources.displayMetrics;val config=resources.configuration
+        val bounds=if(Build.VERSION.SDK_INT>=30)runCatching {context.getSystemService(android.view.WindowManager::class.java).maximumWindowMetrics.bounds}.getOrNull() else null
+        return mapOf("screen_width_px" to (bounds?.width() ?: metrics.widthPixels).toString(),"screen_height_px" to (bounds?.height() ?: metrics.heightPixels).toString(),
+            "window_width_dp" to config.screenWidthDp.toString(),"window_height_dp" to config.screenHeightDp.toString(),"density_dpi" to metrics.densityDpi.toString(),
+            "font_scale" to config.fontScale.toString(),"orientation" to if(config.orientation==android.content.res.Configuration.ORIENTATION_LANDSCAPE)"landscape" else "portrait",
+            "diagnostic_mode" to (context is DiagnosticContext).toString())
+    }
 
-    fun memo(cat: RefCategory): String = url(linkedMapOf(
-        "content" to "memo", "memo_id" to cat.id, "title" to cat.title, "source" to cat.source
-    ))
+    fun memo(cat: RefCategory,context:Context?=null,viewport:Map<String,String> = emptyMap()): String = url(linkedMapOf(
+        "content" to "memo", "memo_id" to cat.id, "title" to cat.title, "source" to cat.source,"page" to "memo","entry_point" to "memo_flag"
+    ),context=context,viewport=viewport)
 
-    private fun url(metadata: Map<String, String>, base: String = FORM_URL): String = Uri.parse(base).buildUpon().apply {
-        (metadata + linkedMapOf("app_version" to BuildConfig.VERSION_NAME,
+    private fun url(metadata: Map<String, String>, base: String = FORM_URL,context:Context?=null,viewport:Map<String,String> = emptyMap()): String = Uri.parse(base).buildUpon().apply {
+        (metadata + environment(context) + viewport + linkedMapOf("app_version" to BuildConfig.VERSION_NAME,
             "app_version_code" to BuildConfig.VERSION_CODE.toString(), "android_api" to Build.VERSION.SDK_INT.toString(),
-            "device_model" to Build.MODEL, "locale" to Locale.getDefault().toLanguageTag()))
+            "device_model" to Build.MODEL,"device_manufacturer" to Build.MANUFACTURER,"android_version" to Build.VERSION.RELEASE, "locale" to Locale.getDefault().toLanguageTag()))
             .filterValues { it.isNotBlank() }.forEach { (key, value) -> appendQueryParameter(key, value) }
     }.build().toString()
 
@@ -61,34 +80,37 @@ object ContentFeedback {
 @Composable
 fun QuestionFeedbackButton(q: Question, index: Int, count: Int, lessonId: String?, sessionTitle: String? = null) {
     val context = LocalContext.current
-    var explainSource by remember(q.id, index) { mutableStateOf(false) }
-    IconButton(feedbackClick {
-        if (ContentFeedback.isExam1(q)) explainSource = true
-        else openLink(context, ContentFeedback.question(q, index, count, lessonId, sessionTitle))
-    }, Modifier.testTag("question-feedback")) {
-        Icon(Icons.Rounded.Flag, "Signaler un problème sur cette question", tint = Muted)
+    val viewport=rememberFeedbackViewport()
+    IconButton(feedbackClick {openLink(context,ContentFeedback.question(q,index,count,lessonId,sessionTitle,context,viewport))},Modifier.testTag("question-feedback")) {
+        Icon(Icons.Rounded.Flag,"Signaler un problème sur cette question",tint=Muted)
     }
-    if (explainSource) AlertDialog(
-        onDismissRequest = { explainSource = false },
-        title = { Text("Question Exam1") },
-        text = { Text("Cette question vient d’Exam1 et n’a pas été écrite pour Hamigo. Pour une erreur d’énoncé ou de réponse, contacte Jean-Luc F6GPX, responsable de la banque.\n\nPour un problème d’affichage ou d’interaction dans l’app, fais un retour à Hamigo.",Modifier.verticalScroll(rememberScrollState())) },
-        confirmButton = {
-            ActionLinks {
-                Button(feedbackClick { explainSource = false; ContentFeedback.openExam1Contact(context, q,index,count,lessonId,sessionTitle) }, Modifier.fillMaxWidth()) { Text("Contacter Exam1") }
-                ActionLink("Signaler à Hamigo"){explainSource=false;openLink(context,ContentFeedback.question(q,index,count,lessonId,sessionTitle))}
-                ActionLink("Annuler"){explainSource=false}
-            }
-        }
-    )
 }
 
 @Composable
 fun MemoFeedbackButton(cat: RefCategory) {
     val context = LocalContext.current
-    TextButton(feedbackClick { openLink(context, ContentFeedback.memo(cat)) },
+    val viewport=rememberFeedbackViewport()
+    TextButton(feedbackClick { openLink(context, ContentFeedback.memo(cat,context,viewport)) },
         Modifier.fillMaxWidth().testTag("memo-feedback")) {
         Icon(Icons.Rounded.Flag, null, Modifier.size(18.dp))
         Spacer(Modifier.width(8.dp))
         Text("Signaler un problème")
     }
+}
+
+@Composable internal fun LessonFeedbackButton(lesson:Lesson,enabled:Boolean=true) {
+    val context=LocalContext.current
+    val viewport=rememberFeedbackViewport()
+    IconButton(feedbackClick {openLink(context,ContentFeedback.lesson(lesson,context,viewport))},enabled=enabled,modifier=Modifier.testTag("lesson-feedback")) {
+        Icon(Icons.Rounded.Flag,"Signaler un problème sur cette introduction",tint=Muted)
+    }
+}
+
+/** Compose supplies the actual window even when LocalContext is an application-only diagnostic wrapper. */
+@Composable internal fun rememberFeedbackViewport():Map<String,String> {
+    val window=androidx.compose.ui.platform.LocalWindowInfo.current.containerSize
+    val density=androidx.compose.ui.platform.LocalDensity.current
+    val configuration=androidx.compose.ui.platform.LocalConfiguration.current
+    return mapOf("window_width_dp" to (window.width/density.density).toInt().toString(),"window_height_dp" to (window.height/density.density).toInt().toString(),
+        "orientation" to if(window.width>window.height)"landscape" else "portrait","font_scale" to configuration.fontScale.toString(),"diagnostic_mode" to (LocalContext.current is DiagnosticContext).toString())
 }

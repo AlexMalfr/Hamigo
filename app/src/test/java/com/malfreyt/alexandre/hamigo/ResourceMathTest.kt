@@ -83,4 +83,26 @@ class ResourceMathTest {
         assertEquals(listOf("💡"), MorseReference.encode("💡").unsupported)
         assertEquals(listOf("......."), MorseReference.decode(".......").unsupported)
     }
+
+    @Test fun punctuationAnswerNamesRequireTheirSignRatherThanTheirSpellingLetters() {
+        val punctuation = listOf(".", ",", "?", "/", "=", "+", "-", "(", ")", ":", "@", "'", "\"")
+        punctuation.forEach { sign ->
+            val name = MorseReference.characterName(sign)
+            assertTrue(name, MorseReference.answerWithinKnownCharacters(name, setOf(sign.single())))
+            assertFalse(name, MorseReference.answerWithinKnownCharacters(name, name.uppercase().toSet()))
+        }
+        assertTrue(MorseReference.answerWithinKnownCharacters("Point final", setOf('.')))
+        assertTrue(MorseReference.answerWithinKnownCharacters("Égal", setOf('=')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("Égal", setOf('.')))
+    }
+
+    @Test fun punctuationNamesDoNotTurnArbitraryProseOrRealWordsIntoKnownSignals() {
+        assertTrue(MorseReference.answerWithinKnownCharacters("ET TE", setOf('E', 'T')))
+        assertTrue(MorseReference.answerWithinKnownCharacters("PLUS", setOf('P', 'L', 'U', 'S')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("PLUS", setOf('+')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("Plus", setOf('P', 'L', 'U', 'S')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("Le signe Égal", setOf('=')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("Point final ?", setOf('.', '?')))
+        assertFalse(MorseReference.answerWithinKnownCharacters("F", setOf('E', 'T')))
+    }
 }

@@ -20,6 +20,7 @@ internal object PicoFace {
         if(eyesClosed) {
             arc(38f,55f,48f,63f,10f,160f);arc(57f,55f,67f,63f,10f,160f)
         } else when(mood) {
+            MascotMood.LISTENING -> {dot(44f,58f,3.2f);dot(63f,58f,3.2f);line(59f,50f,66f,49f,2f)}
             MascotMood.CELEBRATE -> {arc(38f,55f,48f,65f,190f,160f);arc(57f,55f,67f,65f,190f,160f)}
             MascotMood.GOOFY -> {dot(lx,60f,3f);arc(57f,56f,67f,65f,10f,160f)}
             MascotMood.THINKING -> {dot(44f,59f,3f);dot(63f,58f,3f);line(39f,52f,46f,50f,2.5f);line(59f,50f,66f,53f,2.5f)}
@@ -28,6 +29,15 @@ internal object PicoFace {
             MascotMood.SLEEPY -> {line(39f,60f,47f,60f,2.5f);line(58f,60f,66f,60f,2.5f)}
             MascotMood.SHOCKED -> {dot(lx,60f,4.3f);dot(rx,60f,4.3f);dot(42f,58f,1.5f,Color.WHITE);dot(61f,58f,1.5f,Color.WHITE);line(39f,50f,46f,49f,2f);line(59f,49f,66f,50f,2f)}
             MascotMood.HAPPY -> {dot(lx,60f,3f);dot(rx,60f,3f)}
+            MascotMood.COOL -> {
+                fill(ink)
+                canvas.drawRoundRect(33f,54f,51f,66f,4f,4f,p)
+                canvas.drawRoundRect(55f,54f,73f,66f,4f,4f,p)
+                line(50f,57f,56f,57f,2.5f)
+                line(30f,53f,76f,53f,2.5f)
+                line(37f,57f,42f,57f,1.3f,Color.argb(155,255,255,255))
+                line(59f,57f,64f,57f,1.3f,Color.argb(155,255,255,255))
+            }
         }
         // Mouth: speech replaces the resting mouth and tongue rather than covering them.
         if(mouthOpen!=null) {
@@ -50,7 +60,8 @@ internal object PicoFace {
             MascotMood.DETERMINED -> arc(45f,65f,60f,75f,10f,145f)
             MascotMood.SLEEPY -> oval(49f,69f,57f,78f)
             MascotMood.SHOCKED -> oval(49f,69f,58f,81f)
-            MascotMood.HAPPY -> arc(44f,65f,62f,79f,0f,180f)
+            MascotMood.LISTENING -> arc(47f,68f,59f,75f,20f,130f)
+            MascotMood.HAPPY,MascotMood.COOL -> arc(44f,65f,62f,79f,0f,180f)
         }
         // Cheeks remain independent of eye and mouth states.
         dot(35f,72f,if(eyesClosed)4f else 3f,coral);dot(70f,72f,if(eyesClosed)4f else 3f,coral)

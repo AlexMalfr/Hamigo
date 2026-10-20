@@ -5,6 +5,17 @@ import org.junit.Test
 
 class QuestionNarrationTest {
     private val q=Question("narration-test","L’opérateur annonce son ___.",listOf("numéro de téléphone","niveau dans Hamigo","indicatif","mot de passe"),2,"SECRET CORRECTION",kind="cloze",value=98765.0)
+    @Test fun rowsReadVisiblePromptsAndAlternativesWithoutRevealingTextAnswersOrMarkingTheCorrectChoice() {
+        val rows=q.copy(kind="rows",prompt="Complète ces lignes.",choices=emptyList(),rows=listOf(
+            AnswerRow("letter","B",acceptedAnswers=listOf("SECRET ANSWER")),
+            AnswerRow("method","Quelle opération ?",choices=listOf("U/R","U × R","R/U"),answer=1)))
+        val text=QuestionNarration.text(rows)
+        assertTrue(text.contains("Ligne 1. La lettre B. Écris ta réponse."))
+        assertTrue(text.contains("Ligne 2. Quelle opération ? Choisis parmi :"))
+        assertTrue(text.contains("u divisé par ère"));assertTrue(text.contains("u fois ère"));assertTrue(text.contains("ère divisé par u"))
+        assertFalse(text.contains("SECRET"));assertFalse(text.contains("98765"))
+        assertEquals(text,QuestionNarration.text(rows.copy(rows=listOf(rows.rows[0].copy(acceptedAnswers=listOf("ANOTHER HIDDEN ANSWER")),rows.rows[1].copy(answer=2)))))
+    }
     @Test fun clozeIsAnOralSentenceWithAllChoicesAndNoAnswerMarker() {
         val text=FrenchSpeech.prepare(QuestionNarration.text(q))
         assertEquals("L’opérateur annonce son quelque chose. Complète avec une réponse parmi : numéro de téléphone, niveau dans Hamigo, indicatif, ou mot de passe.",text)

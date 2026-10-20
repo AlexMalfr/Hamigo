@@ -168,6 +168,7 @@ class DiagnosticsInstrumentedTest {
         capture("onboarding54-profiles-expanded")
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithText("Diagnostics").assertIsDisplayed()
         assertEquals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap())
     }
@@ -175,6 +176,7 @@ class DiagnosticsInstrumentedTest {
         val before=context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).all.toMap()
         ui.runOnIdle {model.debugToolsOpen=true}
         ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText("Moi · objectif atteint"))
         ui.onNodeWithText("Moi · objectif atteint").performClick()
         ui.onNodeWithTag("profile-level-stats").assertIsDisplayed()
         capture("interactive52-profile-large-stats")
@@ -219,11 +221,11 @@ class DiagnosticsInstrumentedTest {
     }
     @Test fun catalogFindsChoiceTextAndTestsTheOpaqueIdWithoutTouchingRealProgress() {
         val before=raw()
-        val target=model.content!!.courseQuestions.first {"Vendre des communications" in it.choices}
-        assertFalse(target.prompt.contains("vendre",true))
+        val target=model.content!!.courseQuestions.first {"Dans le classement d’Équipe" in it.choices}
+        assertFalse(target.prompt.contains("classement",true))
         ui.runOnIdle {model.debugToolsOpen=true}
         ui.onNodeWithTag("diagnostic-tab-Questions").performClick()
-        ui.onNodeWithTag("diagnostic-search").performTextInput("vendre communications")
+        ui.onNodeWithTag("diagnostic-search").performTextInput("classement Équipe")
         ui.waitUntil(10000) {ui.onAllNodesWithTag("diagnostic-question-${target.id}").fetchSemanticsNodes().isNotEmpty()}
         androidx.test.espresso.Espresso.pressBack() // Browse the full result after typing, keeping the query.
         val location=DiagnosticData.courseLocations(model.content!!).getValue(target.id).first()
@@ -438,9 +440,146 @@ class DiagnosticsInstrumentedTest {
         } finally {demo.disposeDiagnostics()}
         assertEquals(before,raw())
     }
+    @Test fun personalizationInspectorReceivesOnlyNamesWithoutAccountLinksOrPersonalStatistics() {
+        val before=model.progress.prefs.all.toMap()
+        ui.runOnIdle {
+            model.friends=listOf(Friend(ShareProgress("Sam",98_765,91,57,4_321),"https://gist.github.com/00000000000000000000000000000099"))
+            val inspector=AppModel().apply {initializeDiagnostics(context,model,model.content!!);DiagnosticData.copyLearningNames(this,model)}
+            try {
+                assertEquals(model.progress.name,inspector.progress.name)
+                val friend=inspector.friends.single()
+                assertEquals("Sam",friend.progress.name)
+                assertTrue(friend.gist.isBlank())
+                assertEquals(0,friend.progress.xp);assertEquals(0,friend.progress.streak);assertEquals(0,friend.progress.lessons)
+                assertEquals("[]",inspector.progress.prefs.getString("friends",null))
+                assertFalse(inspector.sync.tokens.hasToken())
+                assertNull(inspector.sync.savedGistUrl)
+            } finally {inspector.disposeDiagnostics()}
+        }
+        assertEquals(before,model.progress.prefs.all.toMap())
+    }
+
+    @Test fun realSkillValuesAreReadableWhileTheInspectorKeepsItsOwnProgressUntouched() {
+        val question=model.content!!.lessons.flatMap {it.questions}.first {model.content!!.skillsFor(it).isNotEmpty()}
+        val skill=model.content!!.skillsFor(question).first()
+        ui.runOnIdle {
+            model.progress.recordSkillAnswer(question,model.content!!,false,1,"diagnostic-real-fixture")
+            model.refresh();model.debugToolsOpen=true
+        }
+        val before=raw()
+        ui.onNodeWithTag("diagnostic-tab-Compétences").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-skill-search").performTextInput(skill)
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("diagnostic-skills").performScrollToNode(hasTestTag("diagnostic-skill-$skill"))
+        ui.onNode(hasText("Tentatives ≥ 1 · justes ≥ 0") and hasAnyAncestor(hasTestTag("diagnostic-skill-$skill"))).performScrollTo().assertIsDisplayed()
+        capture("path55-diagnostic-skills")
+        assertEquals(before,raw())
+    }
+
+    @Test fun rawQuestionAndResolvedSessionJsonCanBeInspectedCopiedAndRegeneratedInIsolation() {
+        val target=model.content!!.courseQuestions.first {it.template.contains("name")}
+        ui.runOnIdle {model.diagnostics.enable(true);model.debugToolsOpen=true}
+        val before=raw()
+        ui.onNodeWithTag("diagnostic-tab-Questions").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput(target.id)
+        ui.waitUntil(10_000){ui.onAllNodesWithTag("diagnostic-question-${target.id}").fetchSemanticsNodes().isNotEmpty()}
+        androidx.test.espresso.Espresso.pressBack()
+        ui.onNodeWithTag("diagnostic-question-${target.id}").performClick()
+        ui.onNodeWithTag("diagnostic-detail-json").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-json-dialog").assertIsDisplayed()
+        capture("path55-diagnostic-definition-json")
+        ui.onNodeWithTag("diagnostic-json-copy").performClick()
+        ui.runOnIdle {
+            val json=org.json.JSONObject(context.getSystemService(android.content.ClipboardManager::class.java).primaryClip!!.getItemAt(0).text.toString())
+            assertEquals(target.id,json.getJSONObject("definition").getString("id"))
+            assertEquals(target.id,json.getJSONObject("session").getString("id"))
+            assertFalse(json.getJSONObject("session").getString("prompt").contains("{{"))
+        }
+        ui.onNodeWithTag("diagnostic-json-close").performClick()
+        ui.onNodeWithText("Tester cette question").performScrollTo().performClick()
+        fun sessionJson():org.json.JSONObject {
+            ui.onNodeWithTag("diagnostic-session-json").performClick()
+            val value=ui.onNodeWithTag("diagnostic-question-json").fetchSemanticsNode().config[SemanticsProperties.Text].joinToString(" "){it.text}
+            val json=org.json.JSONObject(value).getJSONObject("session")
+            capture("path55-diagnostic-session-json")
+            ui.onNodeWithTag("diagnostic-json-close").performClick()
+            return json
+        }
+        val first=sessionJson()
+        ui.onNodeWithTag("diagnostic-regenerate").performClick()
+        val second=sessionJson()
+        assertEquals(first.getString("id"),second.getString("id"))
+        assertNotEquals(first.getInt("presentationSeed"),second.getInt("presentationSeed"))
+        assertEquals(before,raw())
+        assertNull(model.session)
+    }
+
+    @Test fun theHamigoGuideRunsInRamAndLeavesTheRealProfileAndTourUnchanged() {
+        val before=model.progress.prefs.all.toMap()
+        val tour=model.tour.step
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
+        ui.onNodeWithText("Guide Hamigo").performClick()
+        ui.onNodeWithTag("diagnostic-hamigo-guide").assertIsDisplayed()
+        fun guide(matcher:SemanticsMatcher)=ui.onNode(matcher and hasAnyAncestor(hasTestTag("diagnostic-hamigo-guide")))
+        ui.waitUntil(10_000){ui.onAllNodesWithTag("path-lesson-$HamigoWelcomeLesson").fetchSemanticsNodes().isNotEmpty()}
+        capture("path55-guide-start")
+        guide(hasTestTag("lesson-copy-$HamigoWelcomeLesson")).performTouchInput {click(center)}
+        guide(hasTestTag("lesson-introduction")).assertIsDisplayed()
+        capture("path55-guide-read")
+        guide(hasTestTag("hamigo-tour-next")).performClick()
+        guide(hasTestTag("question-pico")).assertIsDisplayed()
+        ui.onNodeWithTag("hamigo-tour").assertDoesNotExist()
+        ui.onNodeWithTag("diagnostic-guide-restart").performClick()
+        ui.onNodeWithTag("hamigo-tour").assertIsDisplayed()
+        ui.onNodeWithTag("hamigo-tour-skip-all").performClick()
+        ui.onNodeWithTag("hamigo-tour").assertDoesNotExist()
+        ui.onNodeWithTag("diagnostic-guide-close").performClick()
+        assertEquals(before,model.progress.prefs.all.toMap())
+        assertEquals(tour,model.tour.step)
+        assertNull(model.session)
+    }
+
     private fun inside(matcher:SemanticsMatcher)=ui.onNode(matcher and hasAnyAncestor(hasTestTag("diagnostics-screen")))
     private fun text(value:String)=inside(hasText(value))
     private fun raw()=model.progress.prefs.getString("progress",null)
+    @Test fun questionSearchAndScrollSurviveOpeningAndLeavingADetail() {
+        val before=raw()
+        val targets=DiagnosticData.search(model.content!!.allQuestions.values.toList(),"proc-ohm-","","Variante",DiagnosticData.courseLocations(model.content!!))
+        assertTrue(targets.size>10)
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Questions").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-search").performTextInput("proc-ohm-")
+        ui.runOnIdle {ui.activity.window.decorView.windowInsetsController?.hide(android.view.WindowInsets.Type.ime())}
+        ui.waitUntil(15_000){ui.onAllNodesWithTag("diagnostic-question-${targets.first().id}").fetchSemanticsNodes().isNotEmpty()}
+        val id=targets[10].id
+        ui.onNodeWithTag("diagnostic-catalog").performScrollToNode(hasTestTag("diagnostic-question-$id"))
+        val row=ui.onNodeWithTag("diagnostic-question-$id")
+        val position=row.fetchSemanticsNode().boundsInRoot.top
+        row.performClick()
+        ui.onNodeWithTag("diagnostic-question-detail").assertIsDisplayed()
+        ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+        ui.onNodeWithTag("diagnostic-search").assertTextContains("proc-ohm-")
+        row.assertIsDisplayed()
+        assertEquals(position,row.fetchSemanticsNode().boundsInRoot.top,2f)
+        capture("finishing-diagnostic-search-return")
+        assertEquals(before,raw())
+    }
+    @Test fun organizedPreviewsShowEmptyInsufficientAndReadyExamHistoryWithoutWritingProgress() {
+        val before=model.progress.prefs.all.toMap()
+        ui.runOnIdle {model.debugToolsOpen=true}
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-preview-search").performTextInput("historique")
+        for((index,label) in listOf("Historique · aucun examen","Historique · deux examens","Historique · trois examens").withIndex()) {
+            ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText(label))
+            ui.onNodeWithText(label,substring=false).performClick()
+            ui.onNodeWithTag("diagnostic-interactive-preview").assertIsDisplayed()
+            capture("finishing-history-$index")
+            ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
+            ui.onNodeWithTag("diagnostic-preview-search").assertTextContains("historique")
+        }
+        assertEquals(before,model.progress.prefs.all.toMap())
+    }
     private fun capture(name:String) {
         ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {
             val v=if(Build.VERSION.SDK_INT>=29)android.view.inspector.WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()} ?: ui.activity.window.decorView else ui.activity.window.decorView
@@ -566,10 +705,12 @@ class DiagnosticsInstrumentedTest {
         val before=raw()
         ui.runOnIdle {model.debugToolsOpen=true}
         ui.onNodeWithTag("diagnostic-tab-Types").performClick();capture("types")
-        text("Tester tous les types").performClick();inside(hasTestTag("question-pico")).assertIsDisplayed()
+        inside(hasContentDescription("Tester tous les types")).performClick();inside(hasTestTag("question-pico")).assertIsDisplayed()
         // Dialog back discards only this isolated test session.
         androidx.test.espresso.Espresso.pressBack()
-        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick();text("Moi · objectif atteint").performClick();capture("mock-profile")
+        ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
+        ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText("Moi · objectif atteint"))
+        text("Moi · objectif atteint").performClick();capture("mock-profile")
         ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
         ui.onNodeWithTag("diagnostic-tab-Infos").performScrollTo().performClick();capture("stats")
         assertEquals(before,raw())
@@ -619,6 +760,7 @@ class DiagnosticsInstrumentedTest {
             assertEquals(android.app.Activity.RESULT_CANCELED,result!!.resultCode);assertEquals(0,outgoing.get())
             ui.runOnIdle {model.debugToolsOpen=true}
             ui.onNodeWithTag("diagnostic-tab-Aperçus").performScrollTo().performClick()
+            ui.onNodeWithTag("diagnostic-preview-list").performScrollToNode(hasText("Équipe · deux amis"))
             text("Équipe · deux amis").performClick()
             ui.onNodeWithTag("diagnostic-interactive-preview").assertIsDisplayed()
             capture("mock-team-top")

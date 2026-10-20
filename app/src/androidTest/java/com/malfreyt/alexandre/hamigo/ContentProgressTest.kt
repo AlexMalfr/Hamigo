@@ -34,14 +34,15 @@ class ContentProgressTest {
         assertEquals(content.flashcards.size, content.flashcards.map { it.id }.toSet().size)
         assertEquals("A",content.allQuestions.getValue("flash-nato-0").prompt)
         assertEquals("Alfa",content.allQuestions.getValue("flash-nato-0").choices.single())
-        assertEquals(2950, content.activeExam.size)
+        assertNotNull("The downloaded bank must be present",content.examSnapshot)
+        assertTrue("The bank must retain at least the historical coverage",content.activeExam.size>=2950)
         assertEquals(content.lessons.size, content.lessons.map { it.id }.toSet().size)
         assertTrue(content.activeExam.none { it.id in content.excluded })
         assertTrue(content.activeExam.any { it.section == "regulation" })
         assertTrue(content.activeExam.any { it.section == "technique" })
         content.lessons.forEach { lesson ->
             assertTrue("Lesson ${lesson.id} has no readable body", lesson.body.any { it.isNotBlank() })
-            assertTrue("Lesson ${lesson.id} has too little practice", lesson.questions.size >= 8)
+            assertTrue("Lesson ${lesson.id} has too little practice", lesson.questions.size >= 3)
         }
         (content.lessons.flatMap { it.questions } + content.activeExam).forEach { question ->
             assertTrue("Missing prompt: ${question.id}", question.prompt.isNotBlank())

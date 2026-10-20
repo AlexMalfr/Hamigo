@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -35,12 +36,13 @@ internal enum class LogicGate(val label: String, val mark: String, val inverted:
 }
 
 @Composable internal fun LogicGateTool() {
-    var gate by remember { mutableStateOf(LogicGate.AND) }
-    var a by remember { mutableStateOf(false) }
-    var b by remember { mutableStateOf(false) }
+    var gateName by rememberSaveable {mutableStateOf(LogicGate.AND.name)}
+    val gate=LogicGate.entries.firstOrNull {it.name==gateName} ?: LogicGate.AND
+    var a by rememberSaveable { mutableStateOf(false) }
+    var b by rememberSaveable { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            LogicGate.entries.forEach { choice -> FilterChip(gate == choice, feedbackClick { gate = choice }, { Text(choice.label) }) }
+            LogicGate.entries.forEach { choice -> FilterChip(gate == choice, feedbackClick { gateName=choice.name }, { Text(choice.label) }) }
         }
         LogicGateDiagram(gate)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {

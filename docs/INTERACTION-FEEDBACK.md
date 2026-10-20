@@ -22,7 +22,7 @@ Les contrôles vérifient le PCM synthétisé, le mixage et les ressources Andro
 | Réponse à corriger | Deux frappes sourdes | Deux impulsions légères |
 | Fin de séance validée | Courte résonance ascendante | Trois impulsions alignées sur les attaques |
 | Fin à consolider | Accord plus sobre | Deux impulsions douces |
-| Grimace de Pico et surprise de Version | Petit ressort élastique | Rebond doux, temporisé |
+| Grimace de Pico et surprise de Version | Deux petites cordes pincées, son doux partagé avec le Pico du Parcours | Rebond doux, temporisé |
 
 Les évaluations de flashcards ont un feedback de pose, sans verdict sonore de justesse. Les brouillons d'examen ne produisent **aucun indice sonore/haptique de bonne ou mauvaise réponse**. Le bilan conserve les règles de réussite existantes.
 
@@ -34,7 +34,7 @@ Les actions ordinaires passent par `feedbackClick`, les gestes utiles par `feedb
 
 Six WAV mono 16 bits à 32 kHz, 80 à 980 ms, représentent environ **175 Ko**. Ils sont préchargés dans SoundPool ; aucune bibliothèque sonore, aucun téléchargement ni synthèse audio en temps réel n'est nécessaire pour les interactions.
 
-`tools/make_ui_sounds.py` recrée les fichiers avec Python et NumPy : contacts irréguliers excitant un boîtier amorti, cordes pincées par modèle Karplus–Strong et délai élastique pour Pico. Il s'agit de créations par modélisation physique et bruit filtré, **pas d'enregistrements de matériel réel**, ni d'une succession de sinus purs ou de samples provenant d'une banque tierce. Le Morse pédagogique conserve évidemment son signal tonal.
+`tools/make_ui_sounds.py` recrée les fichiers avec Python et NumPy : contacts irréguliers excitant un boîtier amorti, cordes pincées par modèle Karplus–Strong et deux cordes pincées pour Pico. Il s'agit de créations par modélisation physique et bruit filtré, **pas d'enregistrements de matériel réel**, ni d'une succession de sinus purs ou de samples provenant d'une banque tierce. Le Morse pédagogique conserve évidemment son signal tonal.
 
 Le contrôleur coupe les effets en arrière-plan ou lorsque le volume média est nul. Les sons suivent le volume média (usage GAME), indépendamment du mode de sonnerie, avec le mute propre à Hamigo. Le Morse et les voix réservent la priorité audio et interrompent les sons d’interface ; ceux-ci ne sont pas mis en attente pour être joués tardivement. Les petits clics ne prennent pas le focus audio et n'interrompent donc pas une musique extérieure.
 

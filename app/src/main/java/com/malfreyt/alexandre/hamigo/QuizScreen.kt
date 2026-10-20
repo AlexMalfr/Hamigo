@@ -32,11 +32,13 @@ import com.malfreyt.alexandre.hamigo.platform.ShareResults
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.*
 import kotlin.random.Random
 
 @Composable fun QuizScreen(model:AppModel) {
@@ -47,32 +49,42 @@ import kotlin.random.Random
     if(s.examIntroPending) {ExamIntroduction(model,s);return}
     if(s.examReviewing) {ExamPartReview(model,s,timer);return}
     val q=s.current ?: return
-    val key="${q.id}-${s.index}"
+    val key="${s.attemptId}-${q.id}-${s.index}"
     val context=LocalContext.current
     val focus=LocalFocusManager.current
+    val keyboard=LocalSoftwareKeyboardController.current
     val density=LocalDensity.current
     val imeVisible=WindowInsets.ime.getBottom(density)>0
     val horizontalTools=questionToolsHorizontal()
+    val spokenBottomMargin=spokenControlsBottomMargin()
+    val spokenHeight=spokenControlsHeight()
     val scroll=rememberScrollState()
     val answerVisibility=remember(key){BringIntoViewRequester()}
     var answerFocused by remember(key){mutableStateOf(false)}
     var answerSize by remember(key){mutableStateOf(androidx.compose.ui.unit.IntSize.Zero)}
-    LaunchedEffect(key,imeVisible,answerFocused,answerSize,horizontalTools) {
-        if(imeVisible&&answerFocused&&answerSize.height>0) {
-            delay(180)
-            // Automatic focus scrolling knows the keyboard, but not the transparent floating tools.
-            val clearance=with(density){(if(horizontalTools)96.dp else 160.dp).toPx()}
-            answerVisibility.bringIntoView(Rect(0f,0f,answerSize.width.toFloat(),answerSize.height+clearance))
-        }
-    }
     var choice by rememberSaveable(key){mutableIntStateOf(s.responses[s.index]?.choiceIndex ?: -1)}
-    var numeric by rememberSaveable(key){mutableStateOf(s.responses[s.index]?.display?.substringBeforeLast(" ").orEmpty())}
-    var ordered by remember(key){mutableStateOf(initialQuestionOrder(q))}
-    var matches by remember(key){mutableStateOf(emptyMap<Int,Int>())}
+    val signedNumber=q.kind=="number"&&(q.value ?: 0.0)<0
+    val previousNumeric=s.responses[s.index]?.display?.removeSuffix(" "+q.unit)?.trim().orEmpty()
+    var numeric by rememberSaveable(key){mutableStateOf(if(signedNumber)previousNumeric.trimStart('-','−','+') else previousNumeric)}
+    var numericNegative by rememberSaveable(key){mutableStateOf(signedNumber&&(previousNumeric.startsWith("-")||previousNumeric.startsWith("−")))}
+    val numericAnswer=if(signedNumber&&numericNegative&&numeric.isNotBlank())"-$numeric" else numeric
+    fun updateNumeric(text:String) {
+        if(!signedNumber){numeric=text;return}
+        val trimmed=text.trim()
+        if(trimmed.startsWith("-")||trimmed.startsWith("−"))numericNegative=true
+        else if(trimmed.startsWith("+"))numericNegative=false
+        numeric=trimmed.trimStart('-','−','+')
+    }
+    var written by rememberSaveable(key){mutableStateOf(s.responses[s.index]?.display.orEmpty())}
+    val writtenState=if(q.kind in setOf("text","spoken"))rememberWrittenAnswerState(key,q,{written=it},s.feedback==null) else null
+    var placements by rememberSaveable(key){mutableStateOf(emptyMap<Int,String>())}
+    var rowAnswers by rememberSaveable(key){mutableStateOf(emptyMap<String,String>())}
+    var ordered by rememberSaveable(key){mutableStateOf(initialQuestionOrder(q))}
+    var matches by rememberSaveable(key){mutableStateOf(emptyMap<Int,Int>())}
     var flipped by rememberSaveable(key){mutableStateOf(false)}
     var revealed by rememberSaveable(key){mutableStateOf(false)}
     var frequency by rememberSaveable(key){mutableFloatStateOf(144f)}
-    var selectedMany by remember(key){mutableStateOf(emptySet<Int>())}
+    var selectedMany by rememberSaveable(key){mutableStateOf(emptySet<Int>())}
     var morse by rememberSaveable(key){mutableStateOf("")}
     var binary by rememberSaveable(key){mutableIntStateOf(0)}
     val estimateMin=q.bands.getOrNull(0)?.toFloatOrNull() ?: 0f
@@ -89,9 +101,12 @@ import kotlin.random.Random
     val feedback=s.feedback
     val receiver=rememberFrequencyReceiver(q.kind=="frequency" && feedback==null && !s.exam && !LocalDiagnosticsCovered.current,key,q.value ?: 0.0)
     LaunchedEffect(receiver,key){receiver?.tune(frequency)}
-    LaunchedEffect(key){scroll.scrollTo(0);focus.clearFocus()}
+    var shownQuestion by rememberSaveable {mutableStateOf<String?>(null)}
+    var shownFeedback by rememberSaveable(key){mutableStateOf(false)}
+    LaunchedEffect(key){if(shownQuestion!=key){shownQuestion=key;scroll.scrollTo(0);focus.clearFocus()}}
     LaunchedEffect(key,feedback) {
-        if(feedback!=null) {
+        if(feedback!=null&&!shownFeedback) {
+            shownFeedback=true
             // Once answer widgets have laid out their feedback, make the explanation visible.
             delay(120)
             if(q.kind in setOf("match","order","sort"))scroll.scrollTo(0) else scroll.animateScrollTo(scroll.maxValue)
@@ -101,12 +116,17 @@ import kotlin.random.Random
     val artwork=rememberExamArtwork(q.image)
     val clozeDrag=rememberClozeDragState(key)
     val canAnswer=when(q.kind) {
-        "number"->numeric.isNotBlank();"order","sort"->ordered.size==q.choices.size
+        "number"->numeric.isNotBlank();"text","spoken"->written.isNotBlank()&&writtenState?.recognition?.active!=true;"circuit"->placements.size==q.pairs.size
+        "rows"->RowAnswers.complete(q.rows,rowAnswers)
+        "order","sort"->ordered.size==q.choices.size
         "match"->matches.size==q.pairs.size;"frequency","binary","estimate"->true
         "multiselect"->selectedMany.isNotEmpty();"morseEncode"->morse.isNotBlank();else->choice>=0
     }
     fun check()=when(q.kind) {
-        "number"->LearningRules.numericCorrect(numeric,q.value ?: 0.0,q.tolerance)
+        "number"->LearningRules.numericCorrect(numericAnswer,q.value ?: 0.0,q.tolerance)
+        "text","spoken"->WrittenAnswers.correct(written,q.acceptedAnswers)
+        "rows"->RowAnswers.correct(q.rows,rowAnswers)
+        "circuit"->q.pairs.indices.all {WrittenAnswers.correct(placements[it].orEmpty(),listOf(q.pairs[it].right))}
         "frequency"->LearningRules.sliderCorrect(frequency,q.value ?: 0.0,q.tolerance,.05)
         "estimate"->kotlin.math.abs(estimate-(q.value ?: 0.0)) <= q.tolerance
         "binary"->binary==(q.value ?: 0.0).toInt()
@@ -117,7 +137,10 @@ import kotlin.random.Random
         else->choice==q.answer
     }
     fun responseText()=when(q.kind) {
-        "number"->"$numeric ${q.unit}".trim()
+        "number"->"$numericAnswer ${q.unit}".trim()
+        "text","spoken"->written
+        "rows"->q.rows.joinToString("\n") {"${it.prompt} → ${rowAnswers[it.id].orEmpty()}"}
+        "circuit"->q.pairs.indices.joinToString("\n") {"${q.pairs[it].left} → ${placements[it].orEmpty()}"}
         "frequency"->"${formatMeasuredNumber(frequency.toDouble(),q.tolerance)} MHz"
         "estimate"->"${formatMeasuredNumber(estimate.toDouble(),q.tolerance)} ${q.unit}".trim()
         "binary"->binary.toString(2).padStart(q.unit.toIntOrNull() ?: 4,'0')
@@ -131,9 +154,23 @@ import kotlin.random.Random
         if(canAnswer)model.answer(check(),display=responseText(),choiceIndex=choice)
         else if(s.exam)model.answer(false,omitted=true)
     }
-    Box(Modifier.fillMaxSize().imePadding()) {
+    BoxWithConstraints(Modifier.fillMaxSize().imePadding()) {
+    // Keep a full input line above the unchanged tools on compact screens with a real IME.
+    val tightInput=imeVisible&&maxHeight<400.dp
+    val wideTyping=maxWidth>=520.dp
+    val compactTyping=imeVisible&&maxHeight<300.dp&&feedback==null&&q.kind in setOf("number","text","spoken")
+    LaunchedEffect(key,imeVisible,answerFocused,answerSize,horizontalTools,spokenBottomMargin,compactTyping) {
+        if(imeVisible&&answerFocused&&answerSize.height>0) {
+            delay(180)
+            val clearance=with(density){(if(compactTyping&&horizontalTools)0.dp else if(q.kind=="spoken"&&!compactTyping)maxOf(if(horizontalTools)96.dp else 160.dp,spokenBottomMargin+spokenHeight+12.dp) else if(horizontalTools)96.dp else 160.dp).toPx()}
+            answerVisibility.bringIntoView(Rect(0f,0f,answerSize.width.toFloat(),answerSize.height+clearance))
+        }
+    }
+    val hideKeyboard={focus.clearFocus();keyboard?.hide();Unit}
+    val verifyInput={if(canAnswer){focus.clearFocus();keyboard?.hide();model.answer(check(),display=responseText(),choiceIndex=choice)}}
     Column(Modifier.fillMaxSize()) {
-        Row(Modifier.fillMaxWidth().padding(horizontal=14.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically) {
+        if(!compactTyping) {
+        Row(Modifier.fillMaxWidth().padding(horizontal=14.dp,vertical=if(tightInput)0.dp else 8.dp),verticalAlignment=Alignment.CenterVertically) {
             IconButton(feedbackClick {if(model.diagnosticModel&&s.testing)model.leaveSession() else quit=true}){Icon(Icons.Rounded.Close,"Quitter la séance")}
             Column(Modifier.weight(1f)) {Text(s.title,maxLines=1,fontSize=13.sp,fontWeight=FontWeight.Bold,color=Muted);Spacer(Modifier.height(7.dp));LinearProgressIndicator(progress={(s.index.toFloat()/s.questions.size).coerceIn(0f,1f)},modifier=Modifier.fillMaxWidth().height(8.dp),color=Teal,trackColor=Mist)}
             Spacer(Modifier.width(10.dp));Column(horizontalAlignment=Alignment.End) {
@@ -143,6 +180,7 @@ import kotlin.random.Random
             QuestionFeedbackButton(q,s.index,s.questions.size,s.lessonId,s.title)
             SoundFeedbackButton()
         }
+        }
         if(q.kind=="flash")BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp)) {
             val preferred=maxHeight
             Column(Modifier.fillMaxSize().verticalScroll(scroll)) {
@@ -151,7 +189,9 @@ import kotlin.random.Random
                 }
             }
         } else QuestionStage(Modifier.weight(1f).fillMaxWidth(),scroll,compact=imeVisible,illustrated=q.image!=null,
-            prompt={QuestionPrompt(q,key,feedback,stacked=q.image!=null,spokenOrder=ordered.map(q.choices::get)) {picoOnLeft ->
+            answerEndPadding=if(compactTyping)if(!horizontalTools)96.dp else if(wideTyping)160.dp else 144.dp else 16.dp,
+            promptAttachment=if(q.visual.startsWith("sstv:"))({SstvLearningVisual(q.visual)}) else null,
+            prompt={QuestionPrompt(q,key,feedback,listening=writtenState?.recognition?.listening==true,reservePreferredHeight=!q.visual.startsWith("sstv:"),stacked=q.image!=null,spokenOrder=ordered.map(q.choices::get)) {picoOnLeft ->
                 if(artwork!=null)ExamIllustration(artwork,{enlarged=true})
                 else if(q.kind=="cloze")ClozeSentence(q,choice,feedback==null,feedback,clozeDrag,textAlign=if(picoOnLeft)androidx.compose.ui.text.style.TextAlign.Start else androidx.compose.ui.text.style.TextAlign.End){choice=it}
                 else QuestionText(q.prompt,towardsLeft=picoOnLeft)
@@ -163,13 +203,35 @@ import kotlin.random.Random
                 FloatingActionButton(feedbackClick {focus.clearFocus();calculatorOpen=true},Modifier.onGloballyPositioned{calculatorAnchor=it.screenBounds(view)},containerColor=Teal,contentColor=Color.White) {
                     Icon(Icons.Rounded.Calculate,"Ouvrir la calculatrice",Modifier.size(28.dp))
                 }
-            })else null) {
-            if(q.visual.isNotBlank() && q.kind!="flash")LogicLearningVisual(q.visual,showNames=false,showCaption=false)
+            })else null,
+            bottomControls=if(q.kind=="spoken"&&feedback==null&&writtenState!=null&&!compactTyping)({SpokenAnswerControls(writtenState,true)}) else null) {
+            if(q.studyToolsHint)StudyToolsHint()
+            if(q.visual.isNotBlank() && !q.visual.startsWith("sstv:") && q.kind!="flash")LogicLearningVisual(q.visual,showNames=false,showCaption=false)
             if(q.kind=="resistor")Resistor(q.bands,showLabels=false)
             when(q.kind) {
+                "text","spoken" -> WrittenAnswerInput(q,written,{written=it},feedback==null,writtenState!!,
+                    Modifier.bringIntoViewRequester(answerVisibility).onSizeChanged {answerSize=it}.onFocusChanged {answerFocused=it.hasFocus},
+                    fieldLayout={field->QuizTypedAnswerRow(compactTyping,wideTyping,canAnswer,hideKeyboard,verifyInput){field()}})
+                "circuit" -> CircuitBoard(q,placements,feedback==null,feedback){placements=it}
+                "rows" -> RowAnswerBoard(q,rowAnswers,feedback==null,feedback){rowAnswers=it}
                 "number" -> {
-                    OutlinedTextField(numeric,{if(feedback==null)numeric=it},label={Text("Ta réponse en ${q.unit}")},trailingIcon={Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,modifier=Modifier.fillMaxWidth().testTag("question-number-input").bringIntoViewRequester(answerVisibility).onSizeChanged {answerSize=it}.onFocusChanged {answerFocused=it.isFocused},enabled=feedback==null)
-                    if((q.value ?: 0.0)<0) OutlinedButton(feedbackClick {numeric=if(numeric.startsWith("-"))numeric.drop(1) else "-$numeric"},enabled=feedback==null){Text("± Changer le signe")}
+                    QuizTypedAnswerRow(compactTyping,wideTyping,canAnswer,hideKeyboard,verifyInput) {
+                    Row(Modifier.fillMaxWidth().testTag("question-number-answer").bringIntoViewRequester(answerVisibility).onSizeChanged {answerSize=it}.onFocusChanged {answerFocused=it.hasFocus},
+                        verticalAlignment=Alignment.Bottom,horizontalArrangement=Arrangement.spacedBy(2.dp)) {
+                        if(signedNumber)FilledTonalIconButton(feedbackClick {numericNegative=!numericNegative},
+                            Modifier.width(52.dp).height(56.dp).testTag("question-number-sign").semantics {
+                                contentDescription=if(numericNegative)"Signe moins : passer au plus" else "Signe plus : passer au moins"
+                                stateDescription=if(numericNegative)"Négatif" else "Positif"
+                            },enabled=feedback==null,shape=RoundedCornerShape(topStart=16.dp,bottomStart=16.dp,topEnd=4.dp,bottomEnd=4.dp)) {
+                            Text(if(numericNegative)"−" else "+",fontSize=27.sp,fontWeight=FontWeight.Bold)
+                        }
+                        OutlinedTextField(numeric,{if(feedback==null)updateNumeric(it)},label={Text(if(q.unit.isBlank())"Ta réponse" else "Ta réponse en "+q.unit)},
+                            trailingIcon=if(q.unit.isNotBlank())({Text(q.unit,Modifier.padding(end=12.dp),fontWeight=FontWeight.Bold)}) else null,
+                            keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Decimal),singleLine=true,
+                            shape=if(signedNumber)RoundedCornerShape(topStart=4.dp,bottomStart=4.dp,topEnd=16.dp,bottomEnd=16.dp) else MaterialTheme.shapes.extraSmall,
+                            modifier=Modifier.weight(1f).testTag("question-number-input"),enabled=feedback==null)
+                    }
+                    }
                     Text(toleranceLabel(q.tolerance,q.unit),fontSize=12.sp,color=Muted)
                 }
                 "frequency" -> {
@@ -200,7 +262,7 @@ import kotlin.random.Random
                             Icon(Icons.Rounded.Hearing,null,tint=Color(0xFF547FCD),modifier=Modifier.size(30.dp))
                             Text("Signal Morse",fontSize=14.sp,fontWeight=FontWeight.Bold)
                         }
-                        Action("Écouter le signal"){playMorse(q.bands.firstOrNull().orEmpty())}
+                        MorseListeningButton(q.bands.firstOrNull().orEmpty())
                         if(feedback!=null)MorseSymbols(q.bands.firstOrNull().orEmpty())
                     }
                     q.choices.forEachIndexed{i,text->AnswerTile(text,choice==i,feedback==null,feedback!=null&&i==q.answer){choice=i}}
@@ -239,12 +301,11 @@ import kotlin.random.Random
                     if(!feedback && q.kind!="morseEncode")MorseAwareText(solution(q),fontWeight=FontWeight.Bold,fontSize=16.sp,lineHeight=23.sp)
                     if(!feedback&&q.kind=="morseEncode")MorseSymbols(q.bands.firstOrNull().orEmpty())
                     if(q.explanation.isNotBlank())MorseAwareText(q.explanation,fontSize=14.sp,lineHeight=21.sp)
-                    if(q.source.startsWith("http"))TextButton(feedbackClick {openLink(context,q.source)}){Text("Consulter la question source")}
                 }
             }
         }
-        Surface(color=Cream,modifier=Modifier.questionFooterShadow()) {
-            Column(Modifier.navigationBarsPadding().padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
+        if(!compactTyping)Surface(color=Cream,modifier=Modifier.questionFooterShadow()) {
+            Column(Modifier.navigationBarsPadding().padding(horizontal=20.dp,vertical=if(tightInput)2.dp else 12.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
                 if(q.kind=="flash") {
                     if(!revealed)Action("Retourner la carte"){flipped=true;revealed=true}
                     else {
@@ -260,7 +321,12 @@ import kotlin.random.Random
                     Action(if(s.exam)if(s.index+1<s.examPartEnd)"Enregistrer et continuer" else "Enregistrer et relire" else "Vérifier",enabled=canAnswer){focus.clearFocus();model.answer(check(),display=responseText(),choiceIndex=choice)}
                     if(s.exam) {
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                            TextButton(feedbackClick {val previous=s.index-1;focus.clearFocus();saveDraft();model.revisitExamQuestion(previous)},enabled=s.index>s.examPartStart,contentPadding=PaddingValues(horizontal=4.dp)) {Icon(Icons.Rounded.ArrowBack,null,modifier=Modifier.size(16.dp));Text("Précédent",fontSize=12.sp)}
+                            TextButton(feedbackClick {
+                                val previous=s.index-1
+                                focus.clearFocus()
+                                saveDraft()
+                                model.revisitExamQuestion(previous)
+                            },enabled=s.index>s.examPartStart,contentPadding=PaddingValues(horizontal=4.dp)) {Icon(Icons.Rounded.ArrowBack,null,modifier=Modifier.size(16.dp));Text("Précédent",fontSize=12.sp)}
                             TextButton(feedbackClick {saveDraft();model.reviewExamPart()},contentPadding=PaddingValues(horizontal=4.dp)) {Text("Relire",fontSize=12.sp)}
                             TextButton(feedbackClick {focus.clearFocus();if(canAnswer)saveDraft() else model.answer(false,omitted=true)},contentPadding=PaddingValues(horizontal=4.dp)) {Text("Suivant",fontSize=12.sp);Icon(Icons.Rounded.ArrowForward,null,modifier=Modifier.size(16.dp))}
                         }
@@ -270,13 +336,32 @@ import kotlin.random.Random
         }
     }
     }
-    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numeric=CalculatorEngine.format(value)}) else null,anchorBounds=calculatorAnchor,resetKey=s to key)
+    FloatingCalculator(calculatorOpen,{calculatorOpen=false},if(q.kind=="number"&&feedback==null)({value:Double->numericNegative=value<0;numeric=CalculatorEngine.format(if(signedNumber)kotlin.math.abs(value) else value)}) else null,anchorBounds=calculatorAnchor,resetKey=s to key)
     key(s,key) { FloatingScratchpad(scratchpadOpen,{scratchpadOpen=false},scratchpad,scratchpadAnchor) }
     if(quit)AlertDialog(onDismissRequest={quit=false},title={Text("Faire une pause ?")},text={Text(if(s.testing)"Cette séance de test ne modifie pas la progression." else if(s.exam)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},confirmButton={TextButton(feedbackClick {model.leaveSession();quit=false}){Text("Quitter")}},dismissButton={TextButton(feedbackClick {quit=false}){Text("Revenir au défi")}})
     if(enlarged && artwork!=null)FullscreenExamIllustration(artwork.original){enlarged=false}
 }
 
+/** On a very short IME viewport the input stays beside the unchanged right-hand tool row. */
+@Composable private fun QuizTypedAnswerRow(compact:Boolean,wide:Boolean,enabled:Boolean,hideKeyboard:()->Unit,verify:()->Unit,content:@Composable ()->Unit) {
+    // Keep the editor at the same composition position while the keyboard resizes its host.
+    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=if(compact&&!wide)Alignment.Top else Alignment.CenterVertically) {
+        Box(Modifier.weight(1f)){content()}
+        if(compact) {
+            @Composable fun Actions() {
+                Button(verify,Modifier.heightIn(min=48.dp),enabled=enabled,contentPadding=PaddingValues(horizontal=8.dp,vertical=10.dp)) {Text("Vérifier",fontSize=13.sp)}
+                IconButton(hideKeyboard,Modifier.size(48.dp)){Icon(Icons.Rounded.KeyboardArrowDown,"Masquer le clavier")}
+            }
+            if(wide)Row(horizontalArrangement=Arrangement.spacedBy(6.dp),verticalAlignment=Alignment.CenterVertically){Actions()}
+            else Column(horizontalAlignment=Alignment.CenterHorizontally){Actions()}
+        }
+    }
+}
+
 fun solution(q:Question):String=when(q.kind){
+    "text","spoken"->"Réponse : ${q.acceptedAnswers.firstOrNull().orEmpty()}"
+    "circuit"->q.pairs.joinToString("\n"){"${it.left} → ${it.right}"}
+    "rows"->q.rows.joinToString("\n"){"${it.prompt} → ${RowAnswers.solution(it)}"}
     "number","frequency","estimate"->"Réponse : ${formatMeasuredNumber(q.value ?: 0.0,q.tolerance)} ${q.unit}"
     "binary"->"Réponse : ${(q.value ?: 0.0).toInt().toString(2).padStart(q.unit.toIntOrNull() ?: 4,'0')} en binaire = ${(q.value ?: 0.0).toInt()} en décimal"
     "morseEncode"->"Réponse : ${normalizeMorse(q.bands.firstOrNull().orEmpty()).replace(".","●").replace("-","━")}"
@@ -353,7 +438,7 @@ fun solution(q:Question):String=when(q.kind){
         item(key="results-goal") {val p=model.displayedProgress ?: model.progress;DailyGoalSummary(p.todayXp,p.dailyGoal)}
         item {
             Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                Action(when(s.returnRoute) { "practice" -> "Revenir aux défis"; "resources" -> "Revenir aux mémos"; else -> "Revenir au parcours" }){model.leaveSession()}
+                Action(when(s.returnRoute) { "practice" -> "Revenir aux défis"; "exam-history"->"Revenir à l’historique"; "resources" -> "Revenir aux mémos"; else -> "Revenir au parcours" },Modifier.hamigoTourTarget("tour-return-path")){model.leaveSession()}
                 if(!s.exam&&s.lessonId!=null&&!passed)model.content?.lessons?.firstOrNull{it.id==s.lessonId}?.let{lesson->Action("Reprendre le cours"){model.startLesson(lesson)}}
                 if(s.missed.isNotEmpty())OutlinedButton(feedbackClick {model.startQuestions("On consolide le signal",s.missed.values.toList())},Modifier.fillMaxWidth(),contentPadding=PaddingValues(vertical=9.dp,horizontal=12.dp)){Text("Revoir les ${s.missed.size} questions manquées")}
                 OutlinedButton(feedbackClick {
@@ -409,7 +494,6 @@ fun solution(q:Question):String=when(q.kind){
                 MorseVisual(q.bands.firstOrNull().orEmpty(),compact=true)
             } else MorseAwareText(solution(q),color=Teal,fontSize=14.sp,lineHeight=20.sp,fontWeight=FontWeight.Bold)
             if(q.explanation.isNotBlank())MorseAwareText(q.explanation,fontSize=13.sp,lineHeight=18.sp,color=Muted)
-            if(q.source.startsWith("http"))TextButton(feedbackClick {openLink(context,q.source)},modifier=Modifier.height(30.dp),contentPadding=PaddingValues(0.dp)) {Text("Voir la source",fontSize=12.sp)}
         }
     }
     if(enlarged && artwork!=null)FullscreenExamIllustration(artwork.original){enlarged=false}

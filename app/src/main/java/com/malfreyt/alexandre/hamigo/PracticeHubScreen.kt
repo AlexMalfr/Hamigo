@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -27,22 +29,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
+private val MixTopicSelectionSaver=listSaver<Set<String>,String>(save={it.toList()},restore={it.toSet()})
+
 /** Distinct modes; subthemes belong to the mix they configure. */
 @OptIn(ExperimentalLayoutApi::class,ExperimentalFoundationApi::class)
 @Composable fun PracticeHubScreen(model:AppModel,content:Content) {
     val index=content.mixIndex
     val groups=index.groups
     val keys=index.keys
-    var selected by remember {mutableStateOf(keys)}
-    var previousKeys by remember {mutableStateOf(keys)}
-    LaunchedEffect(keys) {
-        selected=if(selected==previousKeys)keys else selected.intersect(keys)
-        previousKeys=keys
-    }
+    var selected by rememberSaveable(stateSaver=MixTopicSelectionSaver) {mutableStateOf(keys)}
+    var previousKeys by rememberSaveable(stateSaver=MixTopicSelectionSaver) {mutableStateOf(keys)}
     val bankReady=content.examSnapshot!=null
-    var count by remember {mutableIntStateOf(20)}
-    var themesOpen by remember {mutableStateOf(false)}
-    var customSelected by remember {mutableStateOf(false)}
+    LaunchedEffect(keys,bankReady) {
+        // A restored selection can contain Exam1 themes while its bank is loading.
+        // Reconcile only against the complete index, rather than dropping them early.
+        if(bankReady) {
+            selected=if(selected==previousKeys)keys else selected.intersect(keys)
+            previousKeys=keys
+        }
+    }
+    var count by rememberSaveable {mutableIntStateOf(20)}
+    var themesOpen by rememberSaveable {mutableStateOf(false)}
+    var customSelected by rememberSaveable {mutableStateOf(false)}
     val available=remember(index,selected) {index.available(selected)}
     val listState=rememberLazyListState()
     var headerHeight by remember {mutableIntStateOf(0)}
@@ -64,13 +72,14 @@ import kotlin.random.Random
             highlight.animateTo(1f,tween(110));highlight.animateTo(0f,tween(650))
         } finally {if(model.practiceFocusRequest==request)model.practiceFocusRequest=null}
     }
-    var reviewCount by remember {mutableIntStateOf(10)}
-    var reviewCustomSelected by remember {mutableStateOf(false)}
+    var reviewCount by rememberSaveable {mutableIntStateOf(10)}
+    var reviewCustomSelected by rememberSaveable {mutableStateOf(false)}
     val progress=model.displayedProgress ?: model.progress
     val reviews=progress.reviews
+    val skills=progress.skillReviews
     val completed=progress.completed
     val due=progress.due(content)
-    val reviewPool=remember(content,completed,reviews,due) {CourseRevisionBuilder.eligible(content.lessons,completed,reviews,due)}
+    val reviewPool=remember(content,completed,reviews,skills,due) {CourseRevisionBuilder.eligible(content,completed,reviews,skills,due)}
     val dueCount=due.size
     val effectiveReviewCount=if(reviewPool.isEmpty())0 else reviewCount.coerceIn(1,reviewPool.size)
     val reviewOptions=questionCountOptions(reviewPool.size)
@@ -84,7 +93,8 @@ import kotlin.random.Random
             else if(reviewCount !in reviewOptions)reviewCustomSelected=true
         }
     }
-    LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+    val tourClearance=tourContentClearance(model)
+    LazyColumn(Modifier.fillMaxSize().testTag("practice-list"),state=listState,contentPadding=PaddingValues(start=16.dp,top=16.dp,end=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current+tourClearance),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         stickyHeader {Column(Modifier.fillMaxWidth().onSizeChanged {headerHeight=it.height}.stickyHeaderShadow(listState).padding(vertical=8.dp)) {BigTitle("À toi de jouer","Entraînement, révisions et examen blanc.")}}
         if(!bankReady)item {Panel(color=Mist) {ExamBankLoading(model)}}
         item {Panel(color=Color(0xFFFFE8E0)) {
@@ -93,6 +103,10 @@ import kotlin.random.Random
             Action("Lancer un examen blanc",enabled=bankReady) {
                 val questions=content.activeExam.filter {it.section=="regulation"}.shuffled().take(20)+content.activeExam.filter {it.section=="technique"}.shuffled().take(20)
                 model.startQuestions("Examen blanc",questions,exam=true)
+            }
+            ActionLinks {
+                ActionLink("Voir l’historique et les statistiques",modifier=Modifier.testTag("open-exam-history"),icon=Icons.Rounded.ShowChart,
+                    trailingIcon=Icons.Rounded.ChevronRight) {model.route="exam-history"}
             }
         }}
         item {Panel {
@@ -132,7 +146,7 @@ import kotlin.random.Random
                 QuestionCountSelector(effectiveReviewCount,effectiveReviewCustom,{n,isCustom ->reviewCount=n;reviewCustomSelected=isCustom},"review-question-count","custom-review-question-count",availableCount=reviewPool.size,minimumInlineWidth=sharedInlineWidth)
             }
             Action("Lancer les révisions",enabled=reviewPool.isNotEmpty()) {
-                model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,effectiveReviewCount))
+                model.startQuestions("Révisions",CourseRevisionBuilder.create(reviewPool,reviews,skills,content::skillsFor,effectiveReviewCount))
             }
         }}
         item {Panel(color=Mist) {

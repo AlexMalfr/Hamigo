@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -52,7 +53,7 @@ import kotlinx.coroutines.launch
     val weekHistory=rememberPagerState(pageCount={weeks})
     val listState=rememberLazyListState()
     val scope=rememberCoroutineScope()
-    val actions=remember(friend.gist){FriendActionState()}
+    val actions=rememberSaveable(friend.gist,saver=FriendActionUiSaver){FriendActionState()}
     val gistId=remember(friend.gist){runCatching {GitHubSync.gistId(friend.gist)}.getOrNull()}
     val refreshing=gistId!=null&&model.refreshingFriend==gistId
     val pullState=rememberPullToRefreshState()
@@ -63,7 +64,7 @@ import kotlinx.coroutines.launch
                 Row(Modifier.fillMaxWidth().testTag("friend-progress-header").zIndex(1f).stickyHeaderShadow(listState).padding(horizontal=8.dp,vertical=8.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                     IconButton(feedbackClick(dismiss)){Icon(Icons.AutoMirrored.Rounded.ArrowBack,"Revenir à l’équipe")}
                     GitHubAvatar(friend.githubIdentity,profile.name,Modifier.size(52.dp))
-                    Column(Modifier.weight(1f)){Text(profile.name,fontWeight=FontWeight.ExtraBold,fontSize=22.sp);Text("${profile.xp} XP · ${dayCount(profile.streak)} de série",fontSize=12.sp,color=Muted)}
+                    Column(Modifier.weight(1f)){Text(profile.name,fontWeight=FontWeight.ExtraBold,fontSize=22.sp);Text("Niveau ${1+profile.xp/250} · ${profile.xp} XP",fontSize=12.sp,color=Muted)}
                 }
                 PullToRefreshBox(isRefreshing=refreshing,onRefresh={if(gistId!=null)model.refreshFriend(friend.gist)},
                     state=pullState,modifier=Modifier.fillMaxSize().testTag("friend-profile-refresh"),indicator={
@@ -72,6 +73,7 @@ import kotlinx.coroutines.launch
                     }) {
                 LazyColumn(Modifier.fillMaxSize().testTag("friend-progress-list"),state=listState,contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                     model.friendRefreshError?.takeIf {it.first==gistId}?.let { error -> item {Text(error.second,color=Muted,fontSize=12.sp)} }
+                    item(key="friend-path-progress") { FriendPathProgress(profile) }
                     item {
                         val today=SocialActivity.todayXp(profile,date)
                         if(today!=null&&profile.dailyGoal!=null)DailyGoalSummary(today,profile.dailyGoal)
@@ -152,6 +154,33 @@ import kotlinx.coroutines.launch
             FriendActionDialogs(model,friend,actions,onRemoved=dismiss)
         }
     }
+}
+
+@Composable private fun FriendPathProgress(profile:ShareProgress) {
+    Panel(modifier=Modifier.testTag("friend-path-progress")) {
+        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            Icon(Icons.Rounded.Route,null,Modifier.size(20.dp),tint=Teal)
+            Text("Dans le parcours",fontWeight=FontWeight.Bold,fontSize=19.sp)
+        }
+        val section=friendPathSectionLabel(profile)
+        val lessons=friendPathLessonLabel(profile)
+        if(section!=null)Text(section,fontSize=16.sp,fontWeight=FontWeight.Bold,color=Teal)
+        if(lessons!=null)Text(lessons,fontSize=13.sp,color=Muted)
+        if(section==null&&lessons==null)Text("La progression détaillée sera disponible après une synchronisation depuis une version récente de Hamigo.",fontSize=13.sp,lineHeight=19.sp,color=Muted)
+    }
+}
+
+internal fun friendPathSectionLabel(profile:ShareProgress):String? = when {
+    profile.pathSectionNumber!=null&&profile.pathSectionTitle!=null->"Section ${profile.pathSectionNumber} · ${profile.pathSectionTitle}"
+    profile.pathSectionTitle!=null->profile.pathSectionTitle
+    profile.pathSectionNumber!=null->"Section ${profile.pathSectionNumber}"
+    else->null
+}
+
+internal fun friendPathLessonLabel(profile:ShareProgress):String? = when {
+    profile.pathCompletedLessons!=null&&profile.pathTotalLessons!=null->"${profile.pathCompletedLessons} / ${profile.pathTotalLessons} cours validés"
+    profile.pathCompletedLessons!=null->"${profile.pathCompletedLessons} cours validés"
+    else->null
 }
 
 @Composable private fun FriendStatistic(value:Int,label:String,icon:androidx.compose.ui.graphics.vector.ImageVector,tint:Color,modifier:Modifier) {

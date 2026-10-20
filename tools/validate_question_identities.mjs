@@ -18,4 +18,5 @@ assert.deepEqual(digest(),before,'The dry-run fixture must not modify authoring 
 const aliases=JSON.parse(fs.readFileSync('data/question-identities.json','utf8')).entries;
 assert.equal(Object.values(aliases).filter(e=>e.legacyId).length,850);
 assert.equal(new Set(Object.values(aliases).filter(e=>e.legacyId).map(e=>e.legacyId)).size,850);
-console.log('842 active UUIDs, 850 unique historical aliases; deterministic regeneration and move/reorder checks passed.');
+const bank=JSON.parse(fs.readFileSync('data/course-questions.json','utf8'));
+console.log(`${bank.questions.length} active UUIDs, ${bank.archivedQuestions?.length||0} archived, 850 unique historical aliases; deterministic regeneration and move/reorder checks passed.`);

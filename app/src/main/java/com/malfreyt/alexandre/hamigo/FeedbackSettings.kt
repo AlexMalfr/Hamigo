@@ -22,7 +22,7 @@ import android.widget.Toast
 internal fun openSystemSpeechSettings(context:Context) {
     for(action in listOf("com.android.settings.TTS_SETTINGS",Settings.ACTION_ACCESSIBILITY_SETTINGS,Settings.ACTION_SETTINGS)) {
         try {
-            context.startActivity(Intent(action))
+            context.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             return
         } catch(_:android.content.ActivityNotFoundException) {
             // Some manufacturers do not expose the dedicated TTS page.
@@ -35,6 +35,7 @@ internal fun openSystemSpeechSettings(context:Context) {
 
 @Composable internal fun FeedbackSettings(model:AppModel) {
     val context=androidx.compose.ui.platform.LocalContext.current
+    val speechContext=LocalSpeechInputHost.current?.context ?: context
     val feedback=model.interactionFeedback
     val settings=feedback.settings
     Panel(Modifier.testTag("feedback-settings")) {
@@ -47,12 +48,13 @@ internal fun openSystemSpeechSettings(context:Context) {
                     }
                     Switch(if(sound)settings.sound else settings.haptics,{value->
                         FeedbackPreferences.save(model.progress.prefs,if(sound)feedback.settings.copy(sound=value) else feedback.settings.copy(haptics=value))
+                        model.refreshSocial()
                         if(value)feedback.event(if(sound)FeedbackCue.CLICK else FeedbackCue.SNAP)
                     },Modifier.testTag(if(sound)"feedback-sound" else "feedback-haptics").semantics {contentDescription=if(sound)"Sons" else "Vibrations"})
                 }
             }
         }
-        TextButton(feedbackClick {openSystemSpeechSettings(context)},
+        TextButton(feedbackClick {openSystemSpeechSettings(speechContext)},
             Modifier.fillMaxWidth().heightIn(min=48.dp).testTag("system-tts-settings"),
             contentPadding=PaddingValues(horizontal=4.dp,vertical=4.dp)) {
             Icon(Icons.Rounded.RecordVoiceOver,null,Modifier.size(20.dp),tint=Teal)
@@ -72,6 +74,7 @@ internal fun openSystemSpeechSettings(context:Context) {
     val sound=feedback.settings.sound
     IconToggleButton(sound,{enabled->
         FeedbackPreferences.save(context.getSharedPreferences("hamigo",android.content.Context.MODE_PRIVATE),feedback.settings.copy(sound=enabled))
+        if(context !is DiagnosticContext)com.malfreyt.alexandre.hamigo.platform.ProgressSyncScheduler.enqueue(context)
     },Modifier.testTag("question-sound-toggle").semantics {stateDescription=if(sound)"Sons activés" else "Sons désactivés"}) {
         Icon(if(sound)Icons.Rounded.VolumeUp else Icons.Rounded.VolumeOff,if(sound)"Couper les sons" else "Activer les sons",tint=if(sound)Muted else Teal,modifier=Modifier.size(22.dp))
     }

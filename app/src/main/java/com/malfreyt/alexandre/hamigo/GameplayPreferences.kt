@@ -40,8 +40,7 @@ object GameplayPreferences {
         val previous = read(prefs)
         prefs.edit().putBoolean(SINGLE_KEY, settings.singleKey)
             .putInt(THRESHOLD, settings.thresholdMs.coerceIn(150, 600))
-            .putBoolean(LIVE_SOUND, settings.liveSound) // Like Sons: a local audio choice, excluded from Gists.
-            .putBoolean(AUTO_SPACES,settings.autoSpaces) // Local input choice: older cloud readers whitelist preference keys.
+            .also {SyncedAppSettings.stage(it,prefs,mapOf(LIVE_SOUND to settings.liveSound,AUTO_SPACES to settings.autoSpaces))}
             .apply {
                 if (previous.singleKey != settings.singleKey || previous.thresholdMs != settings.thresholdMs.coerceIn(150, 600))
                     putLong("preferencesUpdatedAt", System.currentTimeMillis())

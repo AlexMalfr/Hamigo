@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,8 +41,10 @@ internal data class DiagnosticCourseEntry(val lesson:Lesson,val location:String)
 }
 
 internal object NarrationAudit {
-    fun fold(text:String)=Normalizer.normalize(text,Normalizer.Form.NFD).replace(Regex("\\p{M}+"),"").lowercase(Locale.ROOT)
-    fun entries(chapters:List<Chapter>)=chapters.flatMapIndexed {ci,ch->ch.lessons.mapIndexed {li,lesson->
+    private val diacritics=Regex("\\p{M}+")
+    fun fold(text:String)=Normalizer.normalize(text,Normalizer.Form.NFD).replace(diacritics,"").lowercase(Locale.ROOT)
+    fun entries(chapters:List<Chapter>,checkActive:()->Unit={})=chapters.flatMapIndexed {ci,ch->ch.lessons.mapIndexed {li,lesson->
+        checkActive()
         DiagnosticCourseEntry(lesson,"${ci+1}. ${ch.title} → ${li+1}. ${lesson.title}")
     }}
     fun search(entries:List<DiagnosticCourseEntry>,query:String,filter:String=""):List<DiagnosticCourseEntry> {
@@ -59,28 +64,28 @@ internal object NarrationAudit {
 @Composable internal fun DiagnosticCourseCatalog(entries:List<DiagnosticCourseEntry>,loading:Boolean,query:String,changeQuery:(String)->Unit,
     filter:String,changeFilter:(String)->Unit,listState:LazyListState,choose:(DiagnosticCourseEntry)->Unit) {
     val matches=remember(entries,query,filter){NarrationAudit.search(entries,query,filter)}
-    Column(Modifier.fillMaxSize().imePadding().padding(horizontal=14.dp)) {
+    Column(Modifier.fillMaxSize().imePadding().padding(horizontal=8.dp)) {
         OutlinedTextField(query,changeQuery,label={Text("ID, titre, texte, formule ou TTS")},leadingIcon={Icon(Icons.Rounded.Search,null)},
             trailingIcon=if(query.isNotEmpty())({IconButton({changeQuery("")}){Icon(Icons.Rounded.Close,"Effacer la recherche")}}) else null,
             singleLine=true,modifier=Modifier.fillMaxWidth().testTag("diagnostic-course-search"))
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-            listOf("" to "Toutes","formula" to "Formules","warning" to "À contrôler").forEach {(value,label)->
+            listOf("" to "Toutes","formula" to "Formules","warning" to "Repères TTS").forEach {(value,label)->
                 FilterChip(filter==value,{changeFilter(value)},label={Text(label,fontSize=11.sp)},modifier=Modifier.testTag("diagnostic-course-filter-${value.ifBlank {"all"}}"))
             }
         }
         Text("${matches.size} / ${entries.size} introductions",fontSize=12.sp,color=Muted)
-        if(filter=="warning")Text("Repérage automatique des notations, pas une liste d’erreurs confirmées.",fontSize=11.sp,lineHeight=15.sp,color=Muted)
+        if(filter=="warning")Text("Repérage automatique des notations, sans action attendue de ta part. Un repère n’est pas une erreur de prononciation confirmée.",fontSize=11.sp,lineHeight=15.sp,color=Muted)
         if(loading)LinearProgressIndicator(Modifier.fillMaxWidth().padding(vertical=8.dp))
-        LazyColumn(Modifier.weight(1f).testTag("diagnostic-course-catalog"),state=listState,contentPadding=PaddingValues(top=8.dp,bottom=24.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-            items(matches,key={it.lesson.id}) {entry->Surface(onClick={choose(entry)},shape=RoundedCornerShape(15.dp),color=Color.White,modifier=Modifier.testTag("diagnostic-course-${entry.lesson.id}")) {
-                Column(Modifier.fillMaxWidth().padding(12.dp),verticalArrangement=Arrangement.spacedBy(3.dp)) {
+        LazyColumn(Modifier.weight(1f).testTag("diagnostic-course-catalog"),state=listState,contentPadding=PaddingValues(top=4.dp,bottom=12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+            items(matches,key={it.lesson.id}) {entry->Surface(onClick={choose(entry)},shape=RoundedCornerShape(10.dp),color=Color.White,modifier=Modifier.testTag("diagnostic-course-${entry.lesson.id}")) {
+                Column(Modifier.fillMaxWidth().padding(8.dp),verticalArrangement=Arrangement.spacedBy(2.dp)) {
                     Text(entry.lesson.title,fontWeight=FontWeight.Bold)
                     Text(entry.location,fontSize=11.sp,lineHeight=15.sp,color=Teal)
                     Text("${entry.lesson.id} · ${entry.lesson.questions.size} questions · ${entry.spoken.size} morceaux audio",fontSize=11.sp,color=Muted)
                     val terms=NarrationAudit.fold(query).split(Regex("\\s+")).filter(String::isNotBlank)
                     val excerpt=(entry.lesson.body+entry.lesson.formula+entry.spoken).firstOrNull {line->terms.isNotEmpty()&&terms.any {it in NarrationAudit.fold(line)}} ?: entry.lesson.summary
                     MorseAwareText(excerpt.take(220)+(if(excerpt.length>220)"…" else ""),fontSize=13.sp,lineHeight=18.sp)
-                    if(entry.warnings.isNotEmpty())Text("${entry.warnings.size} notation${if(entry.warnings.size>1)"s" else ""} à contrôler",fontSize=11.sp,color=Coral)
+                    if(entry.warnings.isNotEmpty())Text("${entry.warnings.size} repère${if(entry.warnings.size>1)"s" else ""} automatique${if(entry.warnings.size>1)"s" else ""} TTS",fontSize=11.sp,color=Coral)
                 }
             }}
             if(!loading&&matches.isEmpty())item {Text("Aucune introduction trouvée.",Modifier.padding(vertical=16.dp),color=Muted)}
@@ -88,10 +93,10 @@ internal object NarrationAudit {
     }
 }
 
-@Composable internal fun DiagnosticCourseDetail(entry:DiagnosticCourseEntry,open:()->Unit,test:()->Unit) {
+@Composable internal fun DiagnosticCourseDetail(entry:DiagnosticCourseEntry,listState:LazyListState,open:()->Unit,test:()->Unit) {
     val context=LocalContext.current
-    LazyColumn(Modifier.fillMaxSize().testTag("diagnostic-course-detail"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        item {Panel {
+    LazyColumn(Modifier.fillMaxSize().testTag("diagnostic-course-detail"),state=listState,contentPadding=PaddingValues(8.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+        item {DiagnosticPanel {
             Text(entry.lesson.title,fontSize=20.sp,fontWeight=FontWeight.Bold)
             Text(entry.location,fontSize=12.sp,lineHeight=17.sp,color=Teal)
             SelectionContainer {Text(entry.lesson.id,fontFamily=FontFamily.Monospace,fontSize=12.sp,lineHeight=16.sp)}
@@ -102,8 +107,8 @@ internal object NarrationAudit {
             }
         }}
         item {DiagnosticNarrationPanel(entry.spoken)}
-        if(entry.warnings.isNotEmpty())item {Panel {Text("Notations à contrôler",fontWeight=FontWeight.Bold);entry.warnings.forEach {Text(it,fontSize=12.sp,color=Coral)}}}
-        item {Panel {Text("Texte affiché dans l’app",fontWeight=FontWeight.Bold);SelectionContainer {Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
+        if(entry.warnings.isNotEmpty())item {DiagnosticPanel {Text("Repères automatiques TTS",fontWeight=FontWeight.Bold);Text("Ces indices servent à la revue du contenu ; aucune validation n’est attendue de ta part. Ils ne remplacent pas l’écoute de la voix de l’appareil.",fontSize=12.sp,color=Muted);entry.warnings.forEach {Text(it,fontSize=12.sp,color=Coral)}}}
+        item {DiagnosticPanel {Text("Texte affiché dans l’app",fontWeight=FontWeight.Bold);SelectionContainer {Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
             (entry.lesson.body+entry.lesson.formula).filter(String::isNotBlank).forEach {MorseAwareText(it,fontSize=14.sp,lineHeight=20.sp)}
         }}}}
     }
@@ -118,13 +123,15 @@ internal object NarrationAudit {
         lifecycle.addObserver(observer)
         onDispose {lifecycle.removeObserver(observer);speech.close()}
     }
-    Panel {
+    DiagnosticPanel {
         Text("Texte exact envoyé au TTS",fontWeight=FontWeight.Bold)
         Row(verticalAlignment=Alignment.CenterVertically) {
-            TalkingPico(Modifier.size(72.dp),talking=speech.speaking,speechActive=speech.active,mouthActivity=speech.mouthActivity,
+            TalkingPico(Modifier.size(56.dp),talking=speech.speaking,speechActive=speech.active,mouthActivity=speech.mouthActivity,
                 mood=if(speech.preparing)MascotMood.THINKING else MascotMood.HAPPY)
             Column(Modifier.weight(1f)) {
                 Text("${segments.size} morceau${if(segments.size>1)"x" else ""} · ${segments.sumOf(String::length)} caractère${if(segments.sumOf(String::length)>1)"s" else ""}",fontSize=11.sp,lineHeight=15.sp,color=Muted)
+                Text(when {speech.speaking->"État : lecture";speech.active->"État : préparation audio";else->"État : au repos"},
+                    modifier=Modifier.testTag("diagnostic-narration-status").semantics {liveRegion=LiveRegionMode.Polite},fontSize=12.sp,color=Teal)
                 Row(verticalAlignment=Alignment.CenterVertically) {
                     TextButton({if(speech.active)speech.stop() else speech.start(segments)},Modifier.testTag("diagnostic-narration-toggle"),enabled=segments.isNotEmpty()) {
                         if(speech.preparing)CircularProgressIndicator(Modifier.size(16.dp),strokeWidth=2.dp)
@@ -139,10 +146,10 @@ internal object NarrationAudit {
     }
 }
 
-@Composable internal fun DiagnosticTtsLab() {
-    var text by remember {mutableStateOf("E = ½LI²")}
+@Composable internal fun DiagnosticTtsLab(state:DiagnosticUiState) {
+    var text by state::ttsText
     val segments=remember(text){LessonNarration.segments(listOf(text),4000)}
-    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("diagnostic-tts-lab"),contentPadding=PaddingValues(14.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+    LazyColumn(Modifier.fillMaxSize().imePadding().testTag("diagnostic-tts-lab"),state=state.ttsList,contentPadding=PaddingValues(8.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
         item {Text("Essai de prononciation",fontSize=20.sp,fontWeight=FontWeight.Bold);Text("Même préparation et même moteur que dans les cours. Aucun effet sur les données.",fontSize=12.sp,lineHeight=17.sp,color=Muted)}
         item {Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
             listOf("LI" to "E = ½LI²","Morse" to "@ : .--.-.","Unités" to "2,2 µF et 145,05 MHz").forEach {(label,value)->AssistChip({text=value},label={Text(label)})}
@@ -150,7 +157,7 @@ internal object NarrationAudit {
         item {OutlinedTextField(text,{text=it.take(16000)},label={Text("Texte à lire")},minLines=3,maxLines=7,modifier=Modifier.fillMaxWidth().testTag("diagnostic-tts-input"))}
         item {DiagnosticNarrationPanel(segments)}
         val warnings=NarrationAudit.warnings(text,segments.joinToString(" "))
-        if(warnings.isNotEmpty())item {Panel {Text("À contrôler",fontWeight=FontWeight.Bold);warnings.forEach {Text(it,fontSize=12.sp,color=Coral)}}}
+        if(warnings.isNotEmpty())item {DiagnosticPanel {Text("Repères automatiques TTS",fontWeight=FontWeight.Bold);Text("Indices de notation, sans action requise. Écouter permet d’observer le moteur de cet appareil.",fontSize=12.sp,color=Muted);warnings.forEach {Text(it,fontSize=12.sp,color=Coral)}}}
     }
 }
 

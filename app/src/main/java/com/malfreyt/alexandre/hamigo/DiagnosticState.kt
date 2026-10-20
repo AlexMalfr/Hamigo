@@ -95,6 +95,27 @@ internal class MemoryPreferences:SharedPreferences {
 }
 
 internal object DiagnosticData {
+    /** Names are the only personal data needed to exercise personalization. */
+    fun copyLearningNames(model:AppModel,owner:AppModel) {
+        check(model.diagnosticModel)
+        model.progress.name=owner.progress.name
+        model.friends=owner.friends.map {Friend(ShareProgress(it.progress.name,0,0,0))}
+        model.progress.prefs.edit().putString("friends","[]").putString("friendTombstones","{}").commit()
+    }
+    fun testQuestion(model:AppModel,question:Question) {
+        check(model.diagnosticModel)
+        val content=model.content ?: return
+        val source=content.allQuestions[question.id] ?: question
+        val lessonId=content.lessons.firstOrNull {lesson->lesson.questions.any {it.id==source.id}}?.id
+        model.startQuestions("Test · ${source.id}",listOf(source),lessonId=lessonId)
+    }
+    fun resolvedQuestion(model:AppModel,question:Question):Question {
+        check(model.diagnosticModel)
+        val content=model.content
+        val source=content?.allQuestions?.get(question.id) ?: question
+        val characters=content?.lessons?.firstOrNull {lesson->lesson.questions.any {it.id==source.id}}?.knownCharacters.orEmpty()
+        return QuestionVariants.create(source,model.progress.name,model.friends.map {it.progress.name},characters)
+    }
     /** Rebase this RAM-only ledger so arbitrary checks/unchecks do not earn XP or get re-added by old events. */
     fun setCompleted(model:AppModel,ids:Set<String>) {
         check(model.diagnosticModel)
@@ -136,12 +157,14 @@ internal object DiagnosticData {
         val relations=JSONArray(model.friends.map {f->JSONObject().put("gist",f.gist).put("modifiedAt",f.modifiedAt).put("progress",JSONObject(f.progress.toJson()))})
         model.progress.saveFriendRecords(com.malfreyt.alexandre.hamigo.platform.CloudProgress.localFriends(relations,JSONObject()))
     }
-    fun origin(q:Question)=when {q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.image?.startsWith("exam-bank/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
+    fun origin(q:Question)=when {q.id.startsWith("diagnostic-ui-")->"Exemple";q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.image?.startsWith("exam-bank/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
     fun typeName(kind:String)=when(kind) {
         "choice"->"Choix unique";"truefalse"->"Vrai / faux";"match"->"Associations";"order"->"Ordre";"sort"->"Classement"
         "number"->"Calcul numérique";"frequency"->"Fréquence";"estimate"->"Estimation";"binary"->"Binaire"
         "multiselect"->"Choix multiples";"morseEncode"->"Composer du Morse";"morseListen"->"Écouter du Morse"
-        "cloze"->"Texte à trou";"resistor"->"Résistance";"waveform"->"Signal";"flash"->"Flashcard";else->kind
+        "cloze"->"Texte à trou";"resistor"->"Résistance";"waveform"->"Signal";"flash"->"Flashcard"
+        "text"->"Réponse écrite";"spoken"->"Réponse orale ou écrite";"circuit"->"Montage à compléter";"rows"->"Réponses par ligne"
+        else->kind
     }
     fun representatives(content:Content)=content.allQuestions.values.groupBy {it.kind}.toSortedMap().map {(_,items)->items.firstOrNull {it.image==null} ?: items.first()}
     fun courseLocations(content:Content):Map<String,List<String>> {
@@ -159,8 +182,9 @@ internal object DiagnosticData {
             if(kind.isNotBlank()&&q.kind!=kind)return@filter false
             if(bank.isNotBlank()&&origin(q)!=bank)return@filter false
             val corpus=(listOf(q.id,q.prompt,q.explanation,q.topic,q.section,q.kind,q.source,q.image.orEmpty(),q.unit,
-                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString())+
-                q.choices+q.bands+q.pairs.flatMap {listOf(it.left,it.right)}+courseLocations[q.id].orEmpty()).joinToString(" ").lowercase()
+                q.visual,q.value?.toString().orEmpty(),q.tolerance.toString(),q.answer.toString(),q.template)+
+                q.choices+q.bands+q.skillIds+q.acceptedAnswers+q.distractors+q.pairs.flatMap {listOf(it.left,it.right)}+
+                q.rows.flatMap {listOf(it.id,it.prompt)+it.choices+it.acceptedAnswers}+courseLocations[q.id].orEmpty()).joinToString(" ").lowercase()
             words.all(corpus::contains)
         }
     }

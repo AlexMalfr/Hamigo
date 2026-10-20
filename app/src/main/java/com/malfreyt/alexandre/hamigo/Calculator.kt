@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -46,18 +47,33 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 
+/** Optional in-memory owner for hosts which leave composition while consulting another screen. */
+class CalculatorState {
+    internal val input=mutableStateOf(TextFieldValue(""))
+    internal val result=mutableStateOf<Double?>(null)
+    internal val previousAnswer=mutableDoubleStateOf(0.0)
+    internal val error=mutableStateOf<String?>(null)
+    internal val degrees=mutableStateOf(true)
+}
+
 /** A floating calculator that leaves the question and its current answer intact beneath it. */
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
-fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null, resetKey: Any? = null) {
-    val compact=with(LocalDensity.current){LocalWindowInfo.current.containerSize.height.toDp()}<700.dp
+fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: ((Double) -> Unit)? = null, anchorBounds: Rect? = null, resetKey: Any? = null, state:CalculatorState?=null) {
+    val window=LocalWindowInfo.current.containerSize
+    val windowWidth=with(LocalDensity.current){window.width.toDp()}
+    val windowHeight=with(LocalDensity.current){window.height.toDp()}
+    val compact=windowHeight<700.dp
+    val landscape=windowWidth>=600.dp&&windowWidth>windowHeight
+    val shortLandscape=landscape&&windowHeight<400.dp
     val numberHeight=if(compact)48.dp else 50.dp
-    var input by rememberSaveable(resetKey, stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var input by (state?.input ?: rememberSaveable(resetKey, stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) })
     val expression = input.text
-    var result by rememberSaveable(resetKey) { mutableStateOf<Double?>(null) }
-    var previousAnswer by rememberSaveable(resetKey) { mutableDoubleStateOf(0.0) }
-    var error by rememberSaveable(resetKey) { mutableStateOf<String?>(null) }
-    var degrees by rememberSaveable { mutableStateOf(true) }
+    var result by (state?.result ?: rememberSaveable(resetKey) { mutableStateOf<Double?>(null) })
+    var previousAnswer by (state?.previousAnswer ?: rememberSaveable(resetKey) { mutableDoubleStateOf(0.0) })
+    var error by (state?.error ?: rememberSaveable(resetKey) { mutableStateOf<String?>(null) })
+    val degreeState:MutableState<Boolean> = state?.degrees ?: rememberSaveable { mutableStateOf(true) }
+    var degrees by degreeState
     val visibility = remember { Animatable(0f) }
     var rendered by remember { mutableStateOf(false) }
     var dismissalRequested by remember { mutableStateOf(false) }
@@ -144,7 +160,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
         }; onDispose {} }
         var panelBounds by remember { mutableStateOf(Rect.Zero) }
         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha=.32f*visibility.value)).pointerInput(Unit) { detectTapGestures { requestDismiss() } }.testTag("calculator-backdrop").imePadding().safeDrawingPadding(),contentAlignment=Alignment.Center) {
-        Box(Modifier.padding(horizontal=14.dp).widthIn(max=430.dp).fillMaxWidth()
+        Box(Modifier.padding(horizontal=14.dp).widthIn(max=if(landscape)900.dp else 430.dp).fillMaxWidth()
             .onGloballyPositioned { panelBounds=it.screenBounds(view) }) {
         Surface(modifier=Modifier.fillMaxWidth().pointerInput(Unit) { detectTapGestures {} }.graphicsLayer {
             val fraction = visibility.value
@@ -161,34 +177,47 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
             Box {
             // Insets belong to the scrollable content, so a shortened IME viewport
             // does not retain a fixed cream band that masks the bottom key row.
-            Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.verticalScroll(rememberScrollState()).padding(if(compact)12.dp else 14.dp), verticalArrangement = Arrangement.spacedBy(if(compact)5.dp else 7.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text("Calculatrice",Modifier.weight(1f),fontSize=20.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
-                    IconButton(::requestDismiss, modifier = Modifier.size(40.dp), enabled = isOpen && !dismissalRequested) { Icon(Icons.Rounded.Close, "Fermer la calculatrice") }
-                }
+            @Composable fun expressionEditor() {
                 Surface(Modifier.fillMaxWidth(),shape=RoundedCornerShape(12.dp),border=androidx.compose.foundation.BorderStroke(1.dp,Muted.copy(alpha=.4f)),color=Color.White) {
-                    CalculatorExpressionField(input,::change,Modifier.fillMaxWidth().height(54.dp).testTag("calculator-expression"))
+                    CalculatorExpressionField(input,::change,Modifier.fillMaxWidth().height(if(shortLandscape)44.dp else 54.dp).testTag("calculator-expression"))
                 }
-                Row(Modifier.fillMaxWidth().padding(vertical=if(compact)0.dp else 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(result?.let(CalculatorEngine::format) ?: "=", Modifier.weight(1f).testTag("calculator-result"), fontSize = 27.sp, fontWeight = FontWeight.ExtraBold, color = Teal)
-                    IconButton(feedbackClick {val next=CalculatorEditing.move(CalculatorEdit(input.text,input.selection.start,input.selection.end),-1);change(TextFieldValue(next.text,TextRange(next.start)))},Modifier.size(40.dp)){Icon(Icons.Rounded.ArrowLeft,"Curseur à gauche")}
-                    IconButton(feedbackClick {val next=CalculatorEditing.move(CalculatorEdit(input.text,input.selection.start,input.selection.end),1);change(TextFieldValue(next.text,TextRange(next.start)))},Modifier.size(40.dp)){Icon(Icons.Rounded.ArrowRight,"Curseur à droite")}
+            }
+            @Composable fun cursorKeys() {
+                IconButton(feedbackClick {val next=CalculatorEditing.move(CalculatorEdit(input.text,input.selection.start,input.selection.end),-1);change(TextFieldValue(next.text,TextRange(next.start)))},Modifier.size(40.dp)){Icon(Icons.Rounded.ArrowLeft,"Curseur à gauche")}
+                IconButton(feedbackClick {val next=CalculatorEditing.move(CalculatorEdit(input.text,input.selection.start,input.selection.end),1);change(TextFieldValue(next.text,TextRange(next.start)))},Modifier.size(40.dp)){Icon(Icons.Rounded.ArrowRight,"Curseur à droite")}
+            }
+            @Composable fun resultText(modifier:Modifier=Modifier) {
+                Text(result?.let(CalculatorEngine::format) ?: "=",modifier.testTag("calculator-result"),fontSize=if(shortLandscape)23.sp else 27.sp,fontWeight=FontWeight.ExtraBold,color=Teal,textAlign=if(landscape)TextAlign.End else TextAlign.Start)
+            }
+            @Composable fun editor() {
+                Column(verticalArrangement=Arrangement.spacedBy(if(compact)5.dp else 7.dp)) {
+                    expressionEditor()
+                    Row(Modifier.fillMaxWidth().padding(vertical=if(compact)0.dp else 4.dp),verticalAlignment=Alignment.CenterVertically) {
+                        resultText(Modifier.weight(1f))
+                        cursorKeys()
+                    }
+                    error?.let {Text(it,color=Coral,fontSize=12.sp,lineHeight=16.sp)}
                 }
-                error?.let { Text(it, color = Coral, fontSize = 12.sp, lineHeight = 16.sp) }
+            }
+            @Composable fun scientificKeys() {
                 val rows = listOf(
                     listOf("sin", "cos", "tan", "(", ")"),
                     listOf("asin", "acos", "atan", "x²", "√"),
                     listOf("log", "ln", "10ˣ", "eˣ", "1/x"),
                     listOf("π", "EXP", if(degrees)"DEG" else "RAD", "Ans", "%")
                 )
-                rows.forEachIndexed { rowIndex, labels ->
+                Column(Modifier.testTag("calculator-scientific"),verticalArrangement=Arrangement.spacedBy(if(landscape||compact)5.dp else 7.dp)) {
+                rows.forEach { labels ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                         labels.forEach { label ->
-                            key(label,Modifier.weight(1f).height(if(compact)32.dp else 36.dp),small=true)
+                            key(label,Modifier.weight(1f).height(if(landscape)numberHeight else if(compact)32.dp else 36.dp),small=true)
                         }
                     }
                 }
-                BoxWithConstraints(Modifier.fillMaxWidth().padding(top=if(compact)0.dp else 8.dp)) {
+                }
+            }
+            @Composable fun numberKeys() {
+                BoxWithConstraints(Modifier.fillMaxWidth().padding(top=if(landscape||compact)0.dp else 8.dp).testTag("calculator-numbers")) {
                     val cell=(maxWidth-20.dp)/5
                     Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
                         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) {
@@ -199,7 +228,9 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                         Column(Modifier.width(cell),verticalArrangement=Arrangement.spacedBy(5.dp)) {key("⌫",Modifier.fillMaxWidth().height(numberHeight));key("C",Modifier.fillMaxWidth().height(numberHeight));key("=",Modifier.fillMaxWidth().height(numberHeight*2+5.dp))}
                     }
                 }
-                if (onInsertResult != null) {
+            }
+            @Composable fun insertResult(modifier:Modifier=Modifier,label:String="Utiliser dans ma réponse") {
+                if(onInsertResult!=null) {
                     Button(feedbackClick {
                         if (currentOpen && !dismissalRequested) (result ?: calculate())?.let { value ->
                             // Lock before the callback: two taps in the same frame still insert only once.
@@ -207,9 +238,44 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
                             currentInsert?.invoke(value)
                             currentDismiss()
                         }
-                    }, enabled = isOpen && !dismissalRequested && expression.isNotBlank(), modifier = Modifier.fillMaxWidth()) {
-                        Text("Utiliser dans ma réponse")
+                    }, enabled = isOpen && !dismissalRequested && expression.isNotBlank(), modifier = modifier.testTag("calculator-insert")) {
+                        Text(label)
                     }
+                }
+            }
+            Column(Modifier.graphicsLayer { alpha=((visibility.value-.15f)/.45f).coerceIn(0f,1f) }.verticalScroll(rememberScrollState())
+                .padding(horizontal=if(shortLandscape)10.dp else if(compact)12.dp else 14.dp,vertical=if(shortLandscape)4.dp else if(compact)12.dp else 14.dp),verticalArrangement=Arrangement.spacedBy(if(shortLandscape)4.dp else if(compact)5.dp else 7.dp)) {
+                if(landscape) {
+                    Row(Modifier.fillMaxWidth().testTag("calculator-landscape-header"),horizontalArrangement=Arrangement.spacedBy(if(shortLandscape)10.dp else 16.dp)) {
+                        Column(Modifier.weight(1f).testTag("calculator-editor-left")) {
+                            Box(Modifier.height(48.dp),contentAlignment=Alignment.CenterStart) {
+                                Text("Calculatrice",Modifier.testTag("calculator-title"),fontSize=if(shortLandscape)18.sp else 20.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
+                            }
+                            expressionEditor()
+                        }
+                        Column(Modifier.weight(1f).testTag("calculator-result-actions")) {
+                            Row(Modifier.fillMaxWidth().height(48.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+                                if(onInsertResult!=null)insertResult(Modifier.weight(1f),if(shortLandscape)"Insérer" else "Utiliser le résultat")
+                                else Spacer(Modifier.weight(1f))
+                                IconButton(::requestDismiss,modifier=Modifier.size(48.dp).testTag("calculator-close"),enabled=isOpen&&!dismissalRequested){Icon(Icons.Rounded.Close,"Fermer la calculatrice")}
+                            }
+                            Row(Modifier.fillMaxWidth().heightIn(min=if(shortLandscape)44.dp else 54.dp).testTag("calculator-output-row"),verticalAlignment=Alignment.CenterVertically) {
+                                resultText(Modifier.weight(1f))
+                                cursorKeys()
+                            }
+                        }
+                    }
+                    error?.let {Text(it,color=Coral,fontSize=12.sp,lineHeight=16.sp)}
+                    Row(Modifier.fillMaxWidth().testTag("calculator-landscape"),horizontalArrangement=Arrangement.spacedBy(if(shortLandscape)10.dp else 16.dp)) {
+                        Column(Modifier.weight(1f)){scientificKeys()}
+                        Column(Modifier.weight(1f)){numberKeys()}
+                    }
+                } else {
+                    Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                        Text("Calculatrice",Modifier.weight(1f),fontSize=20.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
+                        IconButton(::requestDismiss,modifier=Modifier.size(40.dp),enabled=isOpen&&!dismissalRequested){Icon(Icons.Rounded.Close,"Fermer la calculatrice")}
+                    }
+                    editor();scientificKeys();numberKeys();insertResult(Modifier.fillMaxWidth())
                 }
             }
             Box(Modifier.matchParentSize().graphicsLayer { alpha=((.4f-visibility.value)/.25f).coerceIn(0f,1f) }.background(Teal),contentAlignment=Alignment.Center) {

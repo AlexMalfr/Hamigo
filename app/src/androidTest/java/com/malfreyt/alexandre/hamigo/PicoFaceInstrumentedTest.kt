@@ -41,7 +41,7 @@ class PicoFaceInstrumentedTest {
     }
     @Test fun sharedPortraitsCoverRestingTalkingAndTongueWithClosedEyes() {
         check(android.os.Build.HARDWARE in listOf("ranchu","goldfish"))
-        val sheet=Bitmap.createBitmap(1120,1600,Bitmap.Config.ARGB_8888);val c=Canvas(sheet)
+        val sheet=Bitmap.createBitmap(1120,200*MascotMood.entries.size,Bitmap.Config.ARGB_8888);val c=Canvas(sheet)
         c.drawColor(Color.rgb(250,248,242))
         val label=Paint(Paint.ANTI_ALIAS_FLAG).apply {color=Color.rgb(23,63,66);textSize=15f}
         val variants=listOf("Repos","Parle fermé","Parle ouvert","Yeux fermés")

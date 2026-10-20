@@ -26,6 +26,7 @@ internal object PicoLimbs {
     fun arms(canvas:Canvas,pose:MascotPose,phase:Float,pointLeft:Boolean,coral:Int,gold:Int) {
         val p=Pen(canvas,coral)
         when(pose) {
+            MascotPose.LISTEN -> {p.line(23f,68f,14f,82f,7f);p.path(listOf(105f to 69f,119f to 62f,116f to (47f+phase*1.5f),109f to 43f),7f)}
             MascotPose.HUG -> {p.path(listOf(22f to 66f,10f to 77f,34f to 82f),7f);p.path(listOf(105f to 66f,117f to 77f,96f to 83f),7f)}
             MascotPose.POINT -> if(pointLeft) {p.line(105f,67f,116f,78f,7f);p.line(23f,64f,8f,54f,7f);p.line(8f,54f,3f,54f,5f)} else {p.line(23f,67f,12f,78f,7f);p.line(105f,64f,120f,54f,7f);p.line(120f,54f,125f,54f,5f)}
             MascotPose.WAVE -> {

@@ -14,15 +14,17 @@ Hamigo est une application Android en français pour préparer le **certificat d
 
 ## Ce qu’on peut faire
 
-- **Apprendre** avec un parcours de 22 chapitres et 97 leçons : réglementation, électricité, radio, Morse et binaire/portes logiques. Le menu de chaque leçon permet de relire le cours et ses fiches mémo sans lancer les questions.
-- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, résistances, fréquences, calculs et écoute ou composition de Morse. Pico lit les questions, les consignes et les choix avec des phrases adaptées à l’oral ; sa bouche suit les pauses de l’audio. Les introductions ont des adaptations orales des formules et notations. Les formules reconnues affichent leurs fractions, racines et indices. Le réglage de fréquence peut mêler souffle et voix, comme un petit récepteur.
-- **Préparer ses réponses** avec une calculatrice scientifique et un brouillon au clavier, au doigt ou au stylet, remis à zéro à chaque question.
+- **Apprendre** avec un parcours unique de 13 sections, 64 chapitres et 173 leçons. Les nombres et l’électricité précèdent leurs applications ; le certificat arrive avant la fin des explorations radio. Des applications graduées et des reprises dans d’autres contextes consolident les notions. Le Morse revient par étapes, des premières lettres aux échanges. Deux cours pratiques aident à préparer l’inscription et le jour de l’examen, avec des liens ANFR. Le menu de chaque leçon permet de relire le cours et ses fiches mémo sans lancer les questions.
+- **Manipuler** des quiz variés : associations et étapes à glisser, textes à trous, réponses indépendantes par ligne, résistances, fréquences, calculs, circuits à compléter et Morse. Les rappels libres et certaines réponses à l’oral entraînent la mémorisation ; le clavier reste toujours disponible. Le micro propose l’appui maintenu ou la bascule, avec un repère d’écoute et le niveau de voix fourni par Android. Des indicatifs, prénoms et distracteurs peuvent varier à chaque séance. Pico lit les questions, les consignes et les choix avec des phrases adaptées à l’oral ; sa bouche suit les pauses de l’audio. Les formules reconnues affichent leurs fractions, racines et indices.
+- **Préparer ses réponses** avec une calculatrice scientifique adaptée au portrait et au paysage, et un brouillon au clavier, au doigt ou au stylet. Ils sont accessibles dans Mémo, les questions et les examens blancs ; leur contenu reste local à la fiche, au cours ou à la question.
 - **Réviser** avec 40 fiches mémo, des flashcards et des outils interactifs : calculatrice, résistances, décibels, traducteur Morse, portes logiques… Pico accompagne les cours et les flashcards avec des expressions et des réactions discrètes.
-- **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions aléatoires des notions étudiées, qui mélangent les rappels de la répétition espacée.
+- **S’entraîner** en examen blanc, avec un mix sur mesure ou des révisions des compétences étudiées. L’historique conserve les résultats, les corrections et les sujets à retravailler ; trois examens complets ouvrent un examen personnalisé. Deux barres dans Moi suivent séparément les cours utiles au certificat et à l’exploration.
 - **Garder le rythme** avec un objectif quotidien, des XP, une série de jours, un calendrier, des rappels et des widgets redimensionnables, avec un fond transparent facultatif par widget.
 - **Ressentir les interactions** avec de petits sons inspirés des commandes radio, des vibrations mesurées et des confettis de fin de séance. Sons et vibrations se désactivent séparément ; la composition Morse peut être écoutée en direct, avec un réglage dédié.
 - **Jouer en équipe** : consulter le calendrier et les semaines d’un ami, son objectif et sa progression d’aujourd’hui, les ajouter par lien ou QR, comparer les XP dans un widget social avec Pico et partager un bilan avec les photos GitHub. Encourager partage une petite carte et ses statistiques. L’historique disponible dépend de son dernier résumé synchronisé. Les fins de séance montrent aussi l’objectif du jour et proposent leur propre image de résultats.
-- **Faire un retour** depuis une question ou une fiche mémo : son identifiant accompagne le lien de contact ; pour Exam1, l’app propose aussi le contact de la banque originale.
+- **Faire un retour** depuis une question ou une fiche mémo : son identifiant et le contexte technique accompagnent le formulaire Tally commun, avec pièces jointes facultatives. Les introductions disposent aussi d’un drapeau.
+
+Les cours peuvent être ignorés depuis leur menu, ou par appui long sur un chapitre. Après confirmation, ils comptent comme faits pour avancer, sans donner d’XP ni de preuve de maîtrise. Il faut les réintégrer pour les suivre et gagner les récompenses habituelles ; les révisions restent basées sur les réponses réelles.
 
 Les révisions s’adaptent aux réponses. Une leçon demande au moins 80 % de bonnes réponses au premier essai et la correction des erreurs pour être validée.
 
@@ -51,6 +53,8 @@ Captures de l’application sur émulateur, avec des profils de démonstration. 
 
 Au premier lancement, tu choisis ton pseudo, ton objectif, l’heure de ton rappel et ta façon de saisir le Morse. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. La banque Exam’1 se télécharge automatiquement pendant l’accueil, puis reste disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
 
+Un guide avec Pico présente ensuite le cours de bienvenue et les autres onglets. La première étape assombrit la page, puis le dernier encouragement se détache sur un voile léger ; le guide laisse lire le cours et répondre aux questions, puis reprend au bilan. La visite des onglets avance en les touchant. Le tutoriel peut être passé après confirmation. Un essai du micro dans l’accueil explique la permission ; le clavier reste disponible en cas de refus. Le service Android traite l’audio, sans enregistrement par Hamigo. Le mode appui maintenu ou bascule est synchronisé avec les autres réglages de jeu.
+
 ## Sauvegarde et équipe
 
 GitHub sert à retrouver sa progression sur plusieurs appareils et à partager ses statistiques avec ses amis, sans serveur applicatif Hamigo.
@@ -75,7 +79,7 @@ Pour tester directement un identifiant de question, parcourir les formats ou ins
 
 Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; la conversion temporaire des sauvegardes 0.47–0.51 a été retirée en 0.52, comme prévu.
 
-Le parcours s’édite dans `data/curriculum.json`, avec les questions complètes. `node tools/expand_curriculum.mjs` génère `app/src/main/assets/curriculum.json` (introductions et références `questionIds`) et la banque `course-questions.json` lue par Android. Les deux fichiers `curriculum.json` ont donc des rôles différents et doivent être conservés ; ne pas modifier directement la version distribuée.
+Le parcours s’édite dans `data/curriculum.json`, avec les questions complètes. `node tools/expand_curriculum.mjs` génère `app/src/main/assets/curriculum.json` (introductions et références `questionIds`) et la banque `course-questions.json` lue par Android. Les deux fichiers `curriculum.json` ont donc des rôles différents et doivent être conservés ; ne pas modifier directement la version distribuée. La [présentation des introductions](docs/LESSON-PRESENTATION.md) s’édite séparément dans `data/lesson-presentation.json` : sous-titres, idées clés, astuces et aperçus de cours, sans balises dans la narration.
 
 ## Sources et documentation
 

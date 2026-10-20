@@ -18,7 +18,11 @@ import java.time.Instant
 
 data class Friend(val progress: ShareProgress, val gist: String = "", val modifiedAt: Long = 1L,
     val githubIdentity: GitHubIdentity? = null, val githubIdentityCheckedAt: Long = 0L)
-class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path", val testing:Boolean=false) {
+class Session(val title: String, val questions: MutableList<Question>, val lessonId: String? = null, val exam: Boolean = false, val returnRoute: String = "path", val testing:Boolean=false,
+              val bankGeneration:String?=null) {
+    val attemptId=java.util.UUID.randomUUID().toString()
+    val examAttemptId get()=attemptId
+    val examStartedAt=System.currentTimeMillis()
     private var scratchpadKey: String? = null
     private var scratchpad = ScratchpadState()
     internal fun scratchpadFor(key: String): ScratchpadState {
@@ -39,6 +43,7 @@ class Session(val title: String, val questions: MutableList<Question>, val lesso
     var techniqueScore = 0
     var unanswered = 0
     val responses = linkedMapOf<Int, SessionResponse>()
+    internal val recordedSkillQuestions=hashSetOf<String>()
     var examPart = 0
     var examIntroPending = exam
     var examReviewing = false
@@ -70,9 +75,38 @@ class AppModel internal constructor(
     lateinit var progress: Progress
     internal lateinit var interactionFeedback: AppFeedback
     internal lateinit var diagnostics:DiagnosticSettings
+    private var tourState:HamigoTourState?=null
+    internal var tour:HamigoTourState
+        get()=tourState ?: HamigoTourState(progress.prefs).also {tourState=it}
+        set(value){tourState=value}
     internal var diagnosticModel=false;private set
     internal var diagnosticAwards=false
     internal var debugToolsOpen by mutableStateOf(false)
+    internal val diagnosticUiState=DiagnosticUiState()
+    internal var pathNavigationState:PathNavigationState?=null
+    internal var lessonIntroNavigationState:LessonIntroNavigationState?=null
+    internal var memoNavigationState:MemoLibraryState?=null
+    internal var ignoredLessonRequest by mutableStateOf<Pair<Lesson,()->Unit>?>(null)
+    internal fun confirmIgnoredLessonLaunch() {
+        val request=ignoredLessonRequest ?: return
+        ignoredLessonRequest=null
+        setLessonsIgnored(setOf(request.first.id),false)
+        request.second()
+    }
+    private fun deferIgnoredLesson(l:Lesson,open:()->Unit):Boolean {
+        if(l.id !in ignoredLessons)return false
+        ignoredLessonRequest=l to open
+        return true
+    }
+    internal val ignoredLessons:Set<String> get()=progress.ignored
+    internal val pathCompletedLessons:Set<String> get()=progress.pathCompleted
+    internal fun setLessonsIgnored(ids:Set<String>,ignored:Boolean) {
+        if(!allowTourNavigation())return
+        if(diagnostics.frozen&&!diagnosticModel) {message="La progression est gelée dans Diagnostics.";return}
+        val valid=content?.lessons?.map {it.id}?.toSet().orEmpty()
+        progress.setIgnored(ids.intersect(valid),ignored)
+        refresh();refreshSocial()
+    }
     private val recordsLearning get()=!diagnostics.frozen&&(!diagnosticModel||diagnosticAwards)&&session?.testing!=true
     var displayedProgress by mutableStateOf<Progress?>(null)
         private set
@@ -96,14 +130,32 @@ class AppModel internal constructor(
     var error by mutableStateOf<String?>(null)
     var message by mutableStateOf<String?>(null)
     var revision by mutableIntStateOf(0)
-    var route by mutableStateOf("path")
-    var lesson by mutableStateOf<Lesson?>(null)
+    private var tourNavigation=false
+    internal fun allowTourNavigation():Boolean {
+        if(tourState?.navigationPhase!=true||tourNavigation)return true
+        android.widget.Toast.makeText(context,"Cette action est désactivée pendant le tutoriel. Termine-le pour y accéder.",android.widget.Toast.LENGTH_SHORT).show()
+        return false
+    }
+    private var routeState by mutableStateOf("path")
+    var route:String
+        get()=routeState
+        set(value){if(value==routeState||allowTourNavigation())routeState=value}
+    private var lessonState by mutableStateOf<Lesson?>(null)
+    var lesson:Lesson?
+        get()=lessonState
+        set(value){if(value==null||allowTourNavigation())lessonState=value}
     var lessonPreviewOnly by mutableStateOf(false)
         private set
     var lessonOpening by mutableIntStateOf(0)
         private set
-    var session by mutableStateOf<Session?>(null)
-    var resource by mutableStateOf<RefCategory?>(null)
+    private var sessionState by mutableStateOf<Session?>(null)
+    var session:Session?
+        get()=sessionState
+        set(value){if(value==null||allowTourNavigation())sessionState=value}
+    private var resourceState by mutableStateOf<RefCategory?>(null)
+    var resource:RefCategory?
+        get()=resourceState
+        set(value){if(value==null||allowTourNavigation())resourceState=value}
     var friends by mutableStateOf<List<Friend>>(emptyList())
     var friendRequests by mutableStateOf<List<FriendRequest>>(emptyList())
     var outgoingRequests by mutableStateOf<List<OutgoingFriendRequestState>>(emptyList())
@@ -115,7 +167,7 @@ class AppModel internal constructor(
     private var friendRefreshJob: Job? = null
     private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key in setOf("progress", "friends", "socialInbox", "friendIncomingCache", "name", "dailyGoal", "reminderEnabled", "reminderHour", "reminderMinute",
-                "lastSyncedAt", "lastSyncError", "ownerLogin", "ownerId", "ownGistUrl") || key?.startsWith("friendRead_")==true) {
+                "syncedAppSettings", "lastSyncedAt", "lastSyncError", "ownerLogin", "ownerId", "ownGistUrl") || key?.startsWith("friendRead_")==true) {
             // Workers can finish while a screen remains open. Reload data without starting another sync.
             scope.launch { refresh() }
         }
@@ -164,6 +216,7 @@ class AppModel internal constructor(
         progress = Progress(context); sync = GitHubSync(context)
         interactionFeedback = AppFeedback(context)
         diagnostics = DiagnosticSettings(context)
+        tour=HamigoTourState(progress.prefs)
         friendInbox = FriendInboxCoordinator(context,progress,sync,friendInboxGateway)
         pendingAuthorization = PendingGitHubAuthorization(context)
         val savedAuthorization = pendingAuthorization.restore()
@@ -183,7 +236,7 @@ class AppModel internal constructor(
                 Content(context,repository.status.value.snapshot)
             } }
                 .onSuccess {
-                    content = it;examBank=examRepository!!.status.value
+                    content = it;progress.prepareLearning(it);examBank=examRepository!!.status.value
                     loadFriends(); loadFriendRequests(); ProgressSyncScheduler.schedule(context); refreshSocial()
                     scope.launch {examRepository!!.status.collect {state->
                         examBank=state
@@ -197,12 +250,35 @@ class AppModel internal constructor(
         // Scheduled immediately, including during onboarding; it survives closing the app.
         if(startExamUpdates)ExamBankScheduler.schedule(context)
     }
-    fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false; revision++ }
+    fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false;beginTour();revision++ }
+    internal fun beginTour(){tour.finish();lesson=null;resource=null;session=null;route="path";tour.start();revision++}
+    internal fun navigateTab(destination:String) {
+        if(tour.step==8)tour.finish()
+        if(tour.navigationPhase) {
+            if(destination==tour.currentRoute)return
+            if(destination!=tour.destination){allowTourNavigation();return}
+            tourNavigation=true
+            try {route=destination;tour.move(tour.step+1)} finally {tourNavigation=false}
+        } else route=destination
+    }
+    internal fun restoreTourLocation(){if(tour.navigationPhase)routeState=tour.currentRoute ?: "path"}
+    internal fun nextTourStep() {
+        when(tour.step) {
+            0->content?.lessons?.firstOrNull {it.id==HamigoWelcomeLesson}?.let {startLesson(it)}
+            1->content?.lessons?.firstOrNull {it.id==HamigoWelcomeLesson}?.let {startQuestions(it.title,LessonSessionBuilder.create(it),it.id)}
+            2->leaveSession()
+            in 3..7->tour.destination?.let(::navigateTab)
+            else->{tour.finish();revealNextPathLesson()}
+        }
+        revision++
+    }
     internal fun initializeDiagnostics(base:Context,parent:AppModel,loaded:Content) {
         diagnosticModel=true;context=DiagnosticContext(base.applicationContext)
         progress=Progress(context,sideEffects=false);displayedProgress=progress
+        tour=HamigoTourState(progress.prefs)
         FeedbackPreferences.save(progress.prefs,FeedbackPreferences.read(parent.progress.prefs))
         GameplayPreferences.save(progress.prefs,GameplayPreferences.read(parent.progress.prefs))
+        SpeechInputPreferences.save(progress.prefs,SpeechInputPreferences.read(parent.progress.prefs))
         interactionFeedback=parent.interactionFeedback;diagnostics=parent.diagnostics;content=loaded;examBank=parent.examBank
         sync=GitHubSync(context,object:GitHubGateway {
             override suspend fun api(method:String,path:String,token:String?,body:String?):String=error("Diagnostic hors réseau")
@@ -224,13 +300,21 @@ class AppModel internal constructor(
         diagnostics.sandbox?.disposeDiagnostics();diagnostics.useSandbox(null)
         ProgressSyncScheduler.schedule(context);ProgressSyncScheduler.enqueue(context);refresh()
     }
-    fun startLesson(l: Lesson) { lesson=l; resource=null; session=null; lessonPreviewOnly=false; lessonOpening++ }
-    fun previewLesson(l: Lesson) { startLesson(l); lessonPreviewOnly=true }
+    fun startLesson(l: Lesson) { if(!allowTourNavigation())return;if(deferIgnoredLesson(l){startLesson(l)})return;if(tour.step==8)tour.finish();lesson=l; resource=null; session=null; lessonPreviewOnly=false; lessonOpening++;if(tour.step==0&&l.id==HamigoWelcomeLesson)tour.move(1) }
+    fun previewLesson(l: Lesson) { if(!allowTourNavigation())return;if(deferIgnoredLesson(l){previewLesson(l)})return;startLesson(l); lessonPreviewOnly=true }
     fun startQuestions(title: String, questions: List<Question>, lessonId: String? = null, exam: Boolean = false) {
+        if(!allowTourNavigation())return
         require(questions.isNotEmpty())
-        lesson=null; resource=null; lessonPreviewOnly=false; session=Session(title, questions.toMutableList(), lessonId, exam,
-            returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile") } ?: "path",
-            testing=diagnostics.frozen||(diagnosticModel&&!diagnosticAwards))
+        val ignoredCourse=content?.lessons?.firstOrNull {it.id==lessonId && it.id in ignoredLessons}
+        if(ignoredCourse!=null && deferIgnoredLesson(ignoredCourse){startQuestions(title,questions,lessonId,exam)})return
+        val characters=content?.lessons?.firstOrNull {it.id==lessonId}?.knownCharacters.orEmpty()
+        val presented=questions.map {QuestionVariants.create(it,progress.name,friends.map {friend->friend.progress.name},characters)}
+        val shuffled=LessonSessionBuilder.shuffleAnswers(presented,kotlin.random.Random.Default)
+        lesson=null; resource=null; lessonPreviewOnly=false; session=Session(title, shuffled.toMutableList(), lessonId, exam,
+            returnRoute=route.takeIf { it in setOf("path", "practice", "resources", "friends", "profile", "exam-history") } ?: "path",
+            testing=diagnostics.frozen||(diagnosticModel&&!diagnosticAwards),
+            bankGeneration=if(exam)content?.examSnapshot?.generation else null)
+        if(tour.step==1&&lessonId==HamigoWelcomeLesson)tour.move(2)
     }
     fun answer(correct: Boolean, quality: Int = if(correct) 4 else 1, omitted: Boolean = false,
                display: String = "", choiceIndex: Int = -1) {
@@ -243,7 +327,13 @@ class AppModel internal constructor(
             if(s.index+1 < s.examPartEnd) s.index++ else s.examReviewing=true
             revision++; return
         }
-        if (!omitted&&recordsLearning) s.gain += progress.answer(q.id, correct, quality)
+        if (!omitted&&recordsLearning) {
+            s.gain += content?.let {catalog->
+                progress.answer(q,catalog,correct,quality,"${s.attemptId}:${q.id}",q.id !in s.recordedSkillQuestions)
+                    .also {s.recordedSkillQuestions+=q.id}
+            }
+                ?: progress.answer(q.id,correct,quality)
+        }
         if (correct) {
             if(s.index<s.firstCount) s.firstCorrect++
             s.correct++; s.unresolved.remove(q.id)
@@ -263,7 +353,7 @@ class AppModel internal constructor(
     fun next() {
         val s=session ?: return
         val q=s.current
-        if (!s.exam && s.feedback == false && q != null && s.questions.count { it.id == q.id } < 3) s.questions.add(q)
+        if (!s.exam && s.feedback == false && q != null && s.questions.count { it.id == q.id } < 3) s.questions.add(q.copy(presentationSeed=kotlin.random.Random.nextInt()))
         s.index++; s.feedback=null
         if(s.done) {
             interactionFeedback.silence()
@@ -302,7 +392,10 @@ class AppModel internal constructor(
             val q=s.questions[index]
             val response=s.responses[index] ?: SessionResponse(false,omitted=true)
             s.responses[index]=response
-            if(!response.omitted&&recordsLearning) s.gain+=progress.answer(q.id,response.correct,response.quality)
+            if(!response.omitted&&recordsLearning) {
+                s.gain+=content?.let {progress.answer(q,it,response.correct,response.quality,"${s.attemptId}:${q.id}")}
+                    ?: progress.answer(q.id,response.correct,response.quality)
+            }
             if(response.correct) {
                 s.correct++; s.firstCorrect++
                 if(s.examPart==0) s.regulationScore++ else s.techniqueScore++
@@ -315,20 +408,36 @@ class AppModel internal constructor(
         if(s.examPart==0 && s.questions.size>20) {
             s.examPart=1; s.index=20; s.examIntroPending=true
         } else {
-            interactionFeedback.silence();s.index=s.questions.size; s.examIntroPending=false; refreshSocial()
+            interactionFeedback.silence();s.index=s.questions.size; s.examIntroPending=false
+            if(recordsLearning&&s.questions.size==40&&s.finalizedExamParts.containsAll(setOf(0,1)))
+                progress.recordExam(ExamHistory.fromSession(s))
+            refreshSocial()
         }
         if(!diagnosticModel&&recordsLearning)ProgressSyncScheduler.enqueue(context); revision++
     }
     fun refresh() {
         if(diagnosticModel){progress.reload();displayedProgress=Progress(context,sideEffects=false);revision++;return}
         if(::progress.isInitialized) {
-            progress.reload(); loadFriends(); loadFriendRequests()
+            progress.reload();content?.let {progress.prepareLearning(it)}; loadFriends(); loadFriendRequests()
             // Compose also needs a new display value, rather than a mutated cached Progress instance.
             displayedProgress=Progress(context)
         }
         revision++
     }
-    fun leaveSession() { session?.let { route=it.returnRoute }; session=null; lesson=null; refreshSocial() }
+    internal fun revealNextPathLesson(){val catalog=content ?: return;val next=catalog.nextLesson(pathCompletedLessons) ?: return;val chapter=catalog.chapters.firstOrNull {c->c.lessons.any {it.id==next.id}} ?: return;val state=pathNavigationState ?: PathNavigationState(chapter.id).also {pathNavigationState=it};state.revealLesson(chapter.id,next.id)}
+    internal fun backFromLesson(){if(tour.step==1)tour.requestSkip(exitToPath=true) else lesson=null}
+    fun leaveSession() {
+        val revealNext=session?.let {it.done&&it.lessonId!=null&&it.returnRoute=="path"}==true
+        val guided=tour.step==2&&session!=null
+        val done=session?.done==true
+        session?.let {route=it.returnRoute};session=null;lesson=null
+        if(guided){
+            route="path";tour.move(if(done)3 else 1)
+            if(!done)content?.lessons?.firstOrNull {it.id==HamigoWelcomeLesson}?.let(::startLesson)
+        }
+        if(revealNext)revealNextPathLesson()
+        refreshSocial()
+    }
     private var cachedFriendsJson:String?=null
     private var cachedTombstonesJson:String?=null
     private var cachedFriends:List<Friend>?=null
@@ -378,7 +487,7 @@ class AppModel internal constructor(
         }
         ProgressSyncScheduler.enqueue(context)
     }
-    fun startGitHubConnection() = connectGitHub()
+    fun startGitHubConnection() {if(allowTourNavigation())connectGitHub()}
     private fun connectGitHub(savedAuthorization: GitHubPkce.Session? = null) = task {
         try {
             route="friends"
@@ -430,7 +539,7 @@ class AppModel internal constructor(
         }
     }
     fun disconnectGitHub() { taskJob?.cancel();socialJob?.cancel();friendRefreshJob?.cancel();sync.disconnect(); ProgressSyncScheduler.cancel(context); busy=false;refresh() }
-    fun setAutoSync(enabled:Boolean) { progress.prefs.edit().putBoolean("autoSync",enabled).apply(); ProgressSyncScheduler.schedule(context); refresh() }
+    fun setAutoSync(enabled:Boolean) { SyncedAppSettings.save(progress.prefs,mapOf("autoSync" to enabled)); ProgressSyncScheduler.schedule(context); refresh() }
     fun acceptInvite(sendReciprocal:Boolean=false) {
         val invite=pendingInvite ?: return
         pendingInvite=null
@@ -549,8 +658,12 @@ class AppModel internal constructor(
         taskJob=scope.launch { try { action() } catch(e: CancellationException) {throw e} catch(e:Exception){message=e.message ?: "Opération impossible."} finally {busy=false;revision++} }
     }
     fun cancelTask() { taskJob?.cancel() }
-    fun restore(json: String) { runCatching { progress.import(json);revision++;message="Sauvegarde restaurée." }.onFailure {message=it.message} }
+    fun restore(json: String) { runCatching { progress.import(json);content?.let {progress.prepareLearning(it)};refresh();message="Sauvegarde restaurée." }.onFailure {message=it.message} }
     override fun onCleared() {
+        diagnosticUiState.disposeInspector()
+        pathNavigationState=null
+        lessonIntroNavigationState=null
+        memoNavigationState=null
         if(::diagnostics.isInitialized&&!diagnosticModel)diagnostics.sandbox?.disposeDiagnostics()
         if(::interactionFeedback.isInitialized&&!diagnosticModel)interactionFeedback.close()
         if(::progress.isInitialized&&!diagnosticModel) {

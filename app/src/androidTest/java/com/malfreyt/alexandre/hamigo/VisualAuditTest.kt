@@ -41,7 +41,7 @@ class VisualAuditTest {
     private val snapshots = linkedMapOf<String, Map<String, *>>()
     private val fixtures = object : ExternalResource() {
         override fun before() {
-            for (name in listOf("hamigo", "hamigo_social", "hamigo_secure")) {
+            for (name in listOf("hamigo", "hamigo_social", "hamigo_secure", "hamigo_microphone")) {
                 val prefs = context.getSharedPreferences(name, Context.MODE_PRIVATE)
                 snapshots[name] = prefs.all.mapValues { (_, value) -> if (value is Set<*>) value.toSet() else value }
                 check(prefs.edit().clear().commit())
@@ -171,7 +171,7 @@ class VisualAuditTest {
         capture("requests-all-accepted")
     }
 
-    @Test fun onboardingHasFiveFullscreenStepsAndKeepsChoicesWhenGoingBack() {
+    @Test fun onboardingHasSixFullscreenStepsAndKeepsChoicesWhenGoingBack() {
         beginOnboarding()
         ui.onNodeWithTag("navigation-label-path").assertDoesNotExist()
         ui.onNodeWithTag("onboarding-continue").assertIsNotEnabled()
@@ -207,6 +207,9 @@ class VisualAuditTest {
         ui.onNodeWithTag("morse-preview-text").assertTextEquals("E")
         ui.onNodeWithTag("morse-auto-spaces").performScrollTo().performClick()
         capture("54-onboarding-morse-advanced")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("5/6 · Micro")
+        capture("55-onboarding-microphone")
         ui.onNodeWithTag("onboarding-continue").performClick()
         capture("55-onboarding-github")
         ui.onNodeWithTag("onboarding-skip").performClick()
@@ -261,6 +264,7 @@ class VisualAuditTest {
         ui.runOnIdle {check(!model.progress.prefs.getBoolean("reminderEnabled",false))}
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {check(model.progress.prefs.getBoolean("welcomed",false));check(model.progress.xp==760)}
@@ -275,41 +279,84 @@ class VisualAuditTest {
         ui.runOnIdle {model.showWelcome=false}
         ui.onNodeWithTag("onboarding").assertDoesNotExist()
         ui.runOnIdle {model.showWelcome=true}
-        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/5 · Rappel")
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("3/6 · Rappel")
         ui.onNodeWithContentDescription("Étape précédente").performClick()
         ui.onNodeWithTag("onboarding-goal-100").assertIsSelected()
         ui.onNodeWithContentDescription("Étape précédente").performClick()
         ui.onNodeWithTag("onboarding-name").assertTextContains("F4Alex")
     }
 
-    private fun beginOnboarding(step:Int=0) {
+    /** Run with RECORD_AUDIO revoked and its permission flags cleared, on the emulator only. */
+    @Test fun onboardingMicrophoneCanBeDeclinedWithoutRepeatingThePromptAfterRecreation() {
+        check(android.os.Build.HARDWARE in listOf("ranchu","goldfish")) {"Emulator-only permission fixture"}
+        assertEquals("RECORD_AUDIO must be revoked before this native prompt test",android.content.pm.PackageManager.PERMISSION_DENIED,
+            androidx.core.content.ContextCompat.checkSelfPermission(context,android.Manifest.permission.RECORD_AUDIO))
+        beginOnboarding(4,awaitVisible=false)
+        // Entering this page requests the native permission automatically.
+        ui.runOnIdle {check(MicrophonePermissionHistory.requested(context,MicrophonePermissionOccasion.ONBOARDING)) {"The authorisation action did not request the native permission"}}
+        clickNativePermissionButton("permission_deny_button")
+        ui.onNodeWithTag("question-microphone").performScrollTo().assertIsNotEnabled()
+        ui.onNodeWithTag("question-use-keyboard").assertIsEnabled()
+        capture("onboarding-microphone-denied")
+        ui.activityRule.scenario.recreate()
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("5/6 · Micro")
+        ui.onNodeWithTag("question-microphone").performScrollTo().assertIsNotEnabled()
+        ui.onNodeWithTag("question-microphone-settings").performScrollTo().assertIsDisplayed()
+        ui.runOnIdle {
+            check(MicrophonePermissionHistory.requested(context,MicrophonePermissionOccasion.ONBOARDING))
+            check(!MicrophonePermissionHistory.requested(context,MicrophonePermissionOccasion.QUESTION))
+        }
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("6/6 · GitHub")
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding").assertDoesNotExist()
+    }
+
+    private fun beginOnboarding(step:Int=0,awaitVisible:Boolean=true) {
         ui.runOnIdle {
             model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",step)
                 .remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute")
                 .putString("name",if(step==0)"" else "Alex").putBoolean("reminderEnabled",false).commit()
             model.route="path";model.showWelcome=true
         }
-        ui.onNodeWithTag("onboarding").assertIsDisplayed()
+        if(awaitVisible)ui.onNodeWithTag("onboarding").assertIsDisplayed()
     }
 
     private fun clickNativePermissionButton(suffix:String) {
         val automation=InstrumentationRegistry.getInstrumentation().uiAutomation
         val info=automation.serviceInfo
-        info.flags=info.flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+        info.flags=info.flags or android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
+            android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS
         automation.serviceInfo=info
         fun find(node:android.view.accessibility.AccessibilityNodeInfo?):android.view.accessibility.AccessibilityNodeInfo? {
             if(node==null)return null
-            if(node.viewIdResourceName?.endsWith(":id/$suffix")==true)return node
+            val permissionController=node.packageName?.toString()?.endsWith("permissioncontroller")==true
+            val denied=suffix=="permission_deny_button"&&permissionController&&node.isClickable&&
+                (node.viewIdResourceName?.endsWith(":id/permission_deny_and_dont_ask_again_button")==true||
+                    node.text?.toString()?.lowercase(java.util.Locale.ROOT) in setOf("don’t allow","don't allow","ne pas autoriser","refuser"))
+            if(node.viewIdResourceName?.endsWith(":id/$suffix")==true||denied)return node
             for(i in 0 until node.childCount) find(node.getChild(i))?.let {return it}
             return null
         }
-        val deadline=SystemClock.elapsedRealtime()+5000
+        fun roots()=(automation.windows.mapNotNull {it.root}+listOfNotNull(automation.rootInActiveWindow)).distinctBy {it.windowId}
+        val deadline=SystemClock.elapsedRealtime()+8000
         while(SystemClock.elapsedRealtime()<deadline) {
-            val button=find(automation.rootInActiveWindow)
+            val button=roots().firstNotNullOfOrNull(::find)
             if(button!=null) {check(button.performAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK));return}
             SystemClock.sleep(50)
         }
-        error("Native permission button not found: $suffix")
+        val details=StringBuilder()
+        fun describe(node:android.view.accessibility.AccessibilityNodeInfo?,depth:Int=0) {
+            if(node==null)return
+            details.append(" ".repeat(depth)).append(node.packageName).append(' ').append(node.viewIdResourceName)
+                .append(" text=").append(node.text).append(" description=").append(node.contentDescription).append('\n')
+            for(i in 0 until node.childCount)describe(node.getChild(i),depth+1)
+        }
+        roots().forEach {describe(it)}
+        File(folder,"permission-$suffix-timeout.txt").writeText(details.toString())
+        val bitmap=automation.takeScreenshot()
+        try {File(folder,"permission-$suffix-timeout.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)}} finally {bitmap.recycle()}
+        error("Native permission button not found: $suffix; window tree and screenshot saved in visual-audit")
     }
 
     @Test fun teamAddOffersQrAndCameraCanBeClosedWithoutAddingAnInvitation() {
@@ -465,6 +512,8 @@ class VisualAuditTest {
 
     @Test fun gameplaySettingsExposeTheLiveMorseControls() {
         navigate("settings")
+        scrollTo("Réponse vocale")
+        capture("42-parametres-reponse-vocale")
         scrollTo("Saisie du Morse")
         ui.onNodeWithText("Un bouton").performClick()
         scrollTo("Essaie ici")
@@ -511,6 +560,7 @@ class VisualAuditTest {
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-continue").performClick()
         ui.onNodeWithTag("onboarding-skip").performClick()
         val first = model.content!!.lessons.first()

@@ -36,6 +36,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.*
 import org.junit.Rule
+import org.junit.Before
 import org.junit.Test
 import org.junit.Assume.assumeTrue
 import org.junit.runner.RunWith
@@ -45,6 +46,7 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 class CalculatorMotionInstrumentedTest {
     @get:Rule val ui = createAndroidComposeRule<ComponentActivity>()
+    @Before fun prepareWindow(){ui.prepareTestWindow()}
 
     private class Harness(initialOpen: Boolean) {
         var open by mutableStateOf(initialOpen)

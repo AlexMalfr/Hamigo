@@ -85,8 +85,13 @@ def palette():
     error = mix(.28, [(0, string(146.83, .24, .976, 650), 1.2), (.075, contact(.12), .28), (.08, string(130.81, .2, .974, 600), .9)])
     complete = mix(.98, [(0, contact(), .18)] + [(i * .13, string(f, .78-i*.1, .998, 2700), .78) for i, f in enumerate([587.33, 739.99, 880, 1174.66])])
     finish = mix(.54, [(0, contact(), .12), (0, string(440, .49, .994, 1400), .8), (.1, string(587.33, .43, .994, 1400), .55)])
-    pico = mix(.34, [(0, spring(), .85), (.03, contact(.12), .1)])
-    return {"ui_click": (click, .19), "ui_success": (success, .48), "ui_error": (error, .34), "ui_complete": (complete, .46), "ui_finish": (finish, .38), "ui_pico": (pico, .32)}
+    pico = mix(.30, [(0, string(293.66, .23, .989, 900), .5), (.07, string(440, .21, .986, 1100), .3)])
+    # Dry contacts and a brief squelch tail; recognisable radio cues, not alert beeps.
+    mic_open = mix(.11, [(0, contact(.06), .7), (.025, string(360, .08, .95, 900), .25)])
+    mic_close = mix(.13, [(0, string(220, .09, .94, 700), .2), (.025, contact(.095), .55)])
+    # All Pico easter eggs share the gentle plucked sample approved in questions.
+    pico_footer = pico.copy()
+    return {"ui_click": (click, .19), "ui_success": (success, .48), "ui_error": (error, .34), "ui_complete": (complete, .46), "ui_finish": (finish, .38), "ui_pico": (pico, .18), "ui_pico_footer": (pico_footer, .18), "ui_mic_open": (mic_open, .27), "ui_mic_close": (mic_close, .25)}
 
 
 if __name__ == "__main__":

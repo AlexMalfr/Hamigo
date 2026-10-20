@@ -3,7 +3,6 @@ package com.malfreyt.alexandre.hamigo
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -13,13 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.util.WeakHashMap
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -40,7 +39,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 private const val courseUrl = "http://f6kgl.free.fr/COURS.html"
-private class MemoLibraryState(val list: LazyListState = LazyListState()) {
+internal class MemoLibraryState(val list: LazyListState = LazyListState()) {
     var search by mutableStateOf("")
     var searching by mutableStateOf(false)
     fun previewCopy() = MemoLibraryState(LazyListState(list.firstVisibleItemIndex, list.firstVisibleItemScrollOffset)).also {
@@ -49,8 +48,7 @@ private class MemoLibraryState(val list: LazyListState = LazyListState()) {
     }
 }
 private object MemoNavigation {
-    private val states = WeakHashMap<AppModel, MemoLibraryState>()
-    fun state(model: AppModel) = states.getOrPut(model) { MemoLibraryState() }
+    fun state(model: AppModel) = model.memoNavigationState ?: MemoLibraryState().also {model.memoNavigationState=it}
 }
 
 /** The preview has its own list state; only a completed return adopts its revealed row position. */
@@ -77,24 +75,6 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         it.term.contains(search, true) || it.description.contains(search, true) || it.extra.contains(search, true)
     }
 
-@Composable private fun MemoCalculatorLayout(content: @Composable () -> Unit) {
-    var calculator by remember { mutableStateOf(false) }
-    var anchor by remember { mutableStateOf<Rect?>(null) }
-    val view = androidx.compose.ui.platform.LocalView.current
-    val overlap = LocalNavigationContentOverlap.current
-    val focus = LocalFocusManager.current
-    val keyboard = LocalSoftwareKeyboardController.current
-    Box(Modifier.fillMaxSize().imePadding().pointerInput(focus, keyboard) {
-        detectTapGestures(onTap = { focus.clearFocus(); keyboard?.hide() })
-    }) {
-        content()
-        FloatingActionButton(feedbackClick { calculator = true }, Modifier.align(Alignment.BottomEnd).padding(end = 18.dp, bottom = 18.dp + overlap).onGloballyPositioned { anchor = it.screenBounds(view) }, containerColor = Teal, contentColor = Color.White) {
-            Icon(Icons.Rounded.Calculate, "Ouvrir la calculatrice", Modifier.size(28.dp))
-        }
-    }
-    FloatingCalculator(calculator, { calculator = false }, anchorBounds = anchor)
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable internal fun ResourceLibraryScreen(model: AppModel, content: Content, returnTarget: MemoReturnTarget? = null) {
     val savedState = remember(model) { MemoNavigation.state(model) }
@@ -113,6 +93,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     var focusRequested by remember { mutableStateOf(false) }
     var keyboardWasVisible by remember { mutableStateOf(false) }
     val keyboardVisible = WindowInsets.ime.getBottom(density) > 0
+    val compactSearch=keyboardVisible&&questionToolsHorizontal()&&state.searching
     LaunchedEffect(focusRequested, state.searching) {
         if (focusRequested && state.searching && returnTarget == null) {
             withFrameNanos { }
@@ -132,12 +113,14 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }
     }
     val overlap = LocalNavigationContentOverlap.current
+    val toolsClearance=learningToolsBottomClearance(overlap)
+    val tourClearance=tourContentClearance(model)
     var viewportBounds by remember { mutableStateOf<Rect?>(null) }
     var headerBounds by remember { mutableStateOf<Rect?>(null) }
     val categories = remember(content, state.search) {
         content.references.filter { matchesMemo(it, state.search) }.groupBy { it.group.ifBlank { "Repères radio" } }
     }
-    DisposableEffect(returnTarget, state, categories, overlap) {
+    DisposableEffect(returnTarget, state, categories, toolsClearance) {
         returnTarget?.let { target ->
             var index = 1 // Sticky header, then one heading per family and its actual filtered rows.
             var targetIndex = -1
@@ -152,7 +135,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 val row = target.rowBounds ?: return null
                 val viewport = viewportBounds ?: return null
                 val header = headerBounds ?: return null
-                val bottomClearance = with(density) { (84.dp + overlap).toPx() }
+                val bottomClearance = with(density) { toolsClearance.toPx() }
                 val stillLaidOut = state.list.layoutInfo.visibleItemsInfo.any { it.key == target.categoryId }
                 return row.takeIf {
                     stillLaidOut && row.height >= target.fullRowHeight - 1f && row.top >= header.bottom - 1f &&
@@ -176,10 +159,11 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }
         onDispose {}
     }
-    MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + overlap), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    LearningToolsLayout(model to "memo-library",enabled=returnTarget==null,toolsState=LearningToolsNavigation.library(model)) {bottomClearance->
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = bottomClearance+tourClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
-                Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
+                Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(top=if(compactSearch)16.dp else 0.dp,end=if(compactSearch)144.dp else 0.dp,bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
+                    if(!compactSearch) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("Mémo", Modifier.weight(1f).testTag("memo-library-title"), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
                         IconButton(feedbackClick {
@@ -190,7 +174,10 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                             Icon(if (state.searching) Icons.Rounded.Close else Icons.Rounded.Search, if (state.searching) "Fermer la recherche des mémos" else "Rechercher un mémo")
                         }
                     }
-                    if (state.searching) OutlinedTextField(state.search, { state.search = it }, label = { Text("Rechercher un mémo") }, leadingIcon = { Icon(Icons.Rounded.Search, null) }, modifier = Modifier.fillMaxWidth().focusRequester(searchFocus).testTag("memo-search-input"), singleLine = true)
+                    }
+                    if (state.searching) OutlinedTextField(state.search, { state.search = it }, label = { Text("Rechercher un mémo") }, leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                        trailingIcon=if(compactSearch)({IconButton(feedbackClick {focus.clearFocus();keyboard?.hide()}){Icon(Icons.Rounded.KeyboardArrowDown,"Masquer le clavier")}})else null,
+                        modifier = Modifier.fillMaxWidth().focusRequester(searchFocus).testTag("memo-search-input"), singleLine = true)
                 }
             }
             categories.forEach { (group, fiches) ->
@@ -218,18 +205,21 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable fun ReferenceDetailScreen(model: AppModel, cat: RefCategory) {
-    val listState=remember(cat.id) { LazyListState() }
-    var search by remember(cat.id) { mutableStateOf("") }
-    var searching by remember(cat.id) { mutableStateOf(false) }
-    var region by remember(cat.id) { mutableStateOf("1") }
+    val listState=rememberSaveable(cat.id,saver=LazyListState.Saver) {LazyListState()}
+    var search by rememberSaveable(cat.id) { mutableStateOf("") }
+    var searching by rememberSaveable(cat.id) { mutableStateOf(false) }
+    var region by rememberSaveable(cat.id) { mutableStateOf("1") }
+    var openedTool by rememberSaveable(cat.id) { mutableStateOf<String?>(null) }
+    // Keep form registries outside lazy items: save/restore must also retain tools scrolled off screen.
+    val toolStates=rememberSaveableStateHolder()
     val audio = rememberReferenceAudio()
     val rows = remember(cat, search, region) {
         (if (cat.id == "bands") bandRowsForRegion(cat.rows, region) else cat.rows).filter {
             it.kind != "flashcard-only" && (it.term.contains(search, true) || it.description.contains(search, true) || it.extra.contains(search, true) || it.group.contains(search, true))
         }.groupBy { it.group }
     }
-    MemoCalculatorLayout {
-        LazyColumn(Modifier.fillMaxSize().testTag("memo-detail-list"), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 84.dp + LocalNavigationContentOverlap.current), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    LearningToolsLayout(model to cat.id,toolsState=LearningToolsNavigation.fiche(model,cat.id)) {bottomClearance->
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-detail-list"), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = bottomClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -249,7 +239,7 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
             if (cat.intro.isNotBlank()) item { Text(cat.intro, fontSize = 13.sp, lineHeight = 19.sp, color = Muted) }
             if (cat.id == "bands") item { BandRegionPicker(region) { region = it } }
             if (cat.id == "resistors") item { ResistorReadingGuide() }
-            if (hasReferenceTools(cat.id)) item { ResourceInteractiveTools(cat.id) }
+            if (hasReferenceTools(cat.id)) item(key = "interactive-tools") { ResourceInteractiveTools(cat.id,openedTool,{openedTool=it},toolStates) }
             if (cat.id == "itu-regions") item { ItuRegionsMap() }
             rows.forEach { (group, entries) ->
                 if (group.isNotBlank()) item(key = "section-$group") { Text(group, Modifier.padding(top = 12.dp, bottom = 3.dp), color = Teal, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold) }
@@ -359,8 +349,8 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         val target=courseSource.ifBlank {courseUrl}
-        if (source.isNotBlank() && source != target) TextButton(feedbackClick { openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
-        TextButton(feedbackClick { openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
+        if (source.isNotBlank() && source != target) TextButton(tourNavigation { openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
+        TextButton(tourNavigation { openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
     }
 }
 

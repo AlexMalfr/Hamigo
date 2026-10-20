@@ -1,23 +1,24 @@
-# Signalements de contenu
+# Signalements et contact
 
-Le drapeau à droite du compteur/progress bar ouvre un signalement de question. Sur une fiche Mémo, « Signaler un problème » se trouve tout en bas, après les liens de cours, avec la même icône. L’ouverture du formulaire ne change ni réponse, ni SRS, ni progression.
+Les questions (Hamigo et Exam1), les fiches Mémo, les introductions de cours et Contact dans les réglages ouvrent le même formulaire : https://tally.so/r/9NqlpK. Le drapeau des questions reste près du compteur ; celui des introductions se trouve dans la ligne de navigation ; Mémo conserve son action en bas de fiche. L’ouverture ne change ni réponse, ni SRS, ni progression.
 
-Le formulaire reste celui de Contact & Projet. Son URL contient des paramètres préparant un futur outil de feedback ; **Notion ne les exploite pas automatiquement** et aucun préremplissage n’est revendiqué.
+Le formulaire Tally est publié et prend en charge les champs d’URL. Selon l’origine, il préremplit le titre et l’ID concernés ; les détails supplémentaires dépendent du choix Bug, Erreur de contenu, Suggestion, Question ou Autre. Captures et fichiers facultatifs : cinq pièces au plus, 10 Mo chacune. L’e-mail n’est demandé que si une réponse par e-mail est souhaitée. Configuration complète, neuf règles et 33 paramètres : [guide Tally](tally/FORMULAIRE-HAMIGO.md).
 
-| Contexte | Paramètres |
+| Contexte | Métadonnées |
 | --- | --- |
-| Tous | `content`, `app_version`, `app_version_code`, `android_api`, `device_model`, `locale` |
-| Question | `question_id`, `question_number` (position à partir de 1), `question_count`, `question_type`, `topic`, `section`, `source`, `lesson_id`, `image`, `visual`, `title` (énoncé), `session_title` (mode/séance) |
-| Mémo | `memo_id`, `title`, `source` |
+| Tous | Version de l’app/Android, fabricant/modèle, langue, taille physique de l’écran, dimensions réelles de la fenêtre, densité, police, orientation, mode Diagnostics, point d’entrée/page |
+| Question | ID stable, type/variante d’interface, position dans la séance, nombre de questions, thème/section, type de source, cours/séance et références d’image/schéma |
+| Mémo | ID, titre et provenance documentaire |
+| Introduction | ID du cours, titre et thème |
 
-Les valeurs vides sont omises et les valeurs restantes encodées avec le constructeur d’URI Android. Identifiants de contenu, noms publics et environnement uniquement : pas de pseudo de joueur, réponses, jeton, lien de Gist ou sauvegarde. L’identifiant reste utile pour une question procédurale sans modifier sa banque ni enregistrer de nouveau schéma.
+Les valeurs vides sont omises et les autres encodées avec le constructeur d’URI Android. Aucun jeton, mot de passe, lien de Gist, sauvegarde, liste d’amis ou réponse de l’utilisateur n’est ajouté. Les prénoms insérés dans un énoncé personnalisé sont remplacés par un repère dans le titre envoyé. Les fichiers sont choisis volontairement dans Tally. La clé API Tally reste uniquement locale aux outils d’administration, hors Git et hors APK.
 
-## Questions Exam1
+## Questions Exam1 et origines documentaires
 
-Un lien source dont l’hôte exact est `exam1.r-e-f.org` déclenche d’abord une popup : la question vient d’Exam1. Une erreur d’énoncé/réponse est à adresser à Jean-Luc F6GPX ; un défaut d’affichage ou d’interaction peut être envoyé à Hamigo.
+Exam1 ouvre directement ce même formulaire, avec source_kind=exam1 et l’ID numérique officiel ; aucune popup de choix ni application de courrier ne s’interpose. Les questions natives utilisent leur propre ID stable. Leur provenance documentaire est une référence de rédaction, pas une affirmation de reproduction de la question ; les imports Exam1 sont distingués dans Diagnostics. Les liens génériques ne sont plus affichés dans les corrections. Les liens contextuels utiles, comme l’inscription ANFR dans une introduction, restent disponibles.
 
-« Contacter Exam1 » ouvre **un brouillon**, via `ACTION_SENDTO` : destinataire public `jfortin@club.fr`, sujet avec l’ID et corps contenant le lien source, la version et un lien de contexte avec les mêmes paramètres. Aucun mail n’est envoyé par l’app. Si aucun logiciel de courrier n’est disponible, la page officielle du radio-club est ouverte avec les métadonnées en paramètres, comme le formulaire Hamigo. « Signaler à Hamigo » ouvre le formulaire habituel avec les métadonnées de la question.
+Mix, Parcours et Révisions partagent le constructeur de lien. L’identifiant ne dépend jamais de sa position ni de la version : déplacer une question ou mélanger ses choix conserve son ID. La version sert au diagnostic et ne le remplace pas.
 
-Mix, Parcours et Révisions partagent le même constructeur de lien. Les IDs identifient le contenu, indépendamment de sa position dans la séance. Les questions fixes gardent leur ID lors d'un déplacement ; les variantes procédurales ont un ID reproductible. Un changement futur du générateur doit conserver ses anciennes variantes ou créer de nouveaux IDs. La version accompagne toujours le contexte, sans remplacer l'identifiant.
+## Vérifications et limites
 
-Contact vérifié le 8 octobre 2026 sur la [page officielle Exam1 du radio-club](https://f6kgl-f5kff.fr/exam1/), rubrique d’amélioration de la base, et dans l’archive de l’interface web Exam1. Le mainteneur du site web et celui de la banque sont distincts ; ce contact concerne la banque.
+Schéma et conditions du formulaire relus par API, préremplissage d’une question fictive observé sur le lien public, branches Bug/Suggestion et e-mail observées dans le navigateur. Aucune soumission ni pièce jointe envoyée pendant cette préparation. Les scénarios Android interceptent les intents et contrôlent métadonnées, conservation de la séance et absence de données personnelles ; ils n’envoient aucun retour réel. La validation d’un envoi et des limites de fichiers reste une recette volontaire du compte Tally.

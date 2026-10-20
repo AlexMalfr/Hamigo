@@ -162,7 +162,6 @@ class ReminderFeedbackInstrumentedTest {
             ui.runOnIdle {session.index=index;model.refresh()}
             val q=session.current!!
             ui.onNodeWithTag("question-feedback").performClick()
-            if(ContentFeedback.isExam1(q))ui.onNodeWithText("Signaler à Hamigo").performClick()
             val uri=intents.last().data!!
             assertEquals(q.id,uri.getQueryParameter("question_id"))
             assertEquals(q.prompt,uri.getQueryParameter("title"))
@@ -191,28 +190,25 @@ class ReminderFeedbackInstrumentedTest {
         capture("actual-mix-feedback")
     }
 
-    @Test fun exam1FeedbackExplainsSourceAndOpensContactDraftOrHamigoFormWithoutLeavingSession() {
+    @Test fun exam1AndCourseIntroductionsUseTheSameFormWithoutLeavingTheScreen() {
         val q=model.content!!.exam.first()
-        assertTrue(ContentFeedback.isExam1(q))
         ui.runOnIdle {model.startQuestions("Exam1",listOf(q))}
+        val presented=checkNotNull(model.session!!.current)
         ui.onNodeWithTag("question-feedback").performClick()
-        ui.onNodeWithText("Question Exam1").assertIsDisplayed();assertTrue(intents.isEmpty())
-        capture("exam1-feedback-dialog")
-        ui.onNodeWithText("Annuler").performClick()
-        ui.runOnIdle {assertEquals(q,model.session!!.current)}
-        ui.onNodeWithTag("question-feedback").performClick()
-        ui.onNodeWithText("Contacter Exam1").performClick()
-        assertEquals(Intent.ACTION_SENDTO,intents.last().action)
-        val draft=intents.last().data!!
-        assertEquals("mailto",draft.scheme);assertEquals("jfortin@club.fr",draft.schemeSpecificPart.substringBefore('?'))
-        // Mailto URIs are opaque: query decoded through the complete address string.
-        assertTrue(Uri.decode(draft.toString()).contains(q.source));assertTrue(Uri.decode(draft.toString()).contains(q.id))
-        assertTrue(Uri.decode(draft.toString()).contains(BuildConfig.VERSION_NAME))
-        assertTrue(Uri.decode(draft.toString()).contains("question_id="))
-        ui.onNodeWithTag("question-feedback").performClick()
-        ui.onNodeWithText("Signaler à Hamigo").performClick()
-        assertEquals(q.id,intents.last().data!!.getQueryParameter("question_id"))
-        ui.runOnIdle {assertEquals(q,model.session!!.current);assertTrue(model.session!!.responses.isEmpty())}
+        assertEquals(Intent.ACTION_VIEW,intents.single().action)
+        assertEquals("tally.so",intents.last().data!!.host)
+        assertEquals("exam1",intents.last().data!!.getQueryParameter("source_kind"))
+        ui.runOnIdle {assertSame(presented,model.session!!.current);assertEquals(q.id,presented.id);assertTrue(model.session!!.responses.isEmpty())}
+        val lesson=model.content!!.lessons.first()
+        ui.runOnIdle {model.session=null;model.startLesson(lesson)}
+        ui.onNodeWithTag("lesson-feedback").performClick()
+        val uri=intents.last().data!!
+        assertEquals("lesson",uri.getQueryParameter("content"));assertEquals(lesson.id,uri.getQueryParameter("lesson_id"))
+        assertEquals(lesson.title,uri.getQueryParameter("title"))
+        assertTrue(uri.getQueryParameter("screen_width_px")!!.toInt()>0)
+        assertTrue(uri.getQueryParameter("window_height_dp")!!.toInt()>0)
+        assertNotNull(uri.getQueryParameter("orientation"))
+        ui.runOnIdle {assertEquals(lesson,model.lesson)}
     }
 
     @Test fun goalCompletionAndCompactTeamDateAreVisibleWithoutDuplicatingSyncSubtitle() {

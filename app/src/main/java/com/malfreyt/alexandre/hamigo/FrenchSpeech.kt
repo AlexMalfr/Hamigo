@@ -110,6 +110,19 @@ internal object FrenchSpeech {
         val stored=mutableListOf<String>()
         fun keep(text:String):String {stored+=text;return "\uE000${stored.lastIndex}\uE001"}
         var text=source.replace(pattern("https?://\\S+")) {keep("lien vers la source")}.replace(pattern("_{2,}"),"quelque chose")
+        // Emission designators are labels, not quantities: A1A must not become « 1 ampère ».
+        // Protect them before formula and SI-unit parsing. Ordinary 1 A and 1 mA stay quantities.
+        text=text.replace(pattern("\\b[AFGHRJBCDNP][0-9][A-Z]\\b")) {m->keep(m.value.map {if(it.isDigit())digits[it.digitToInt()] else letters.getValue(it.toString())}.joinToString(" "))}
+        text=text.replace(pattern("(?<![\\p{L}\\d])[A-Z]{1,3}\\d[A-Z]{1,5}(?:/[A-Z0-9]+)?\\b")) {m->
+            keep(m.value.map {when {it=='/'->"barre oblique";it.isDigit()->digits[it.digitToInt()];else->letters[it.toString()] ?: it.toString()}}.joinToString(" "))
+        }
+        // A standalone portable/mobile suffix names a slash. Do not consume a slash between
+        // mathematical operands (U/P, P/MM) or the suffix of a complete callsign (F4ABC/P).
+        text=text.replace(pattern("(?<![\\p{L}\\d])/(MM|M|P)(?![\\p{L}\\d])")) {m->
+            val prefix=text.substring(0,m.range.first)
+            val followsOperand=pattern("(?:^|[^\\p{L}\\d])(?:[UIRPWELSCZVAFXYTQHfrtul]|\\d+(?:[.,]\\d+)?|\\))\\s*$").containsMatchIn(prefix)
+            if(followsOperand)m.value else keep("barre oblique "+m.groupValues[1].map {letters.getValue(it.toString())}.joinToString(" "))
+        }
         text=text.replace(pattern("\\|([^|\\n]{1,100})\\|")) {keep("la valeur absolue de "+prepare(it.groupValues[1]))}
             .replace(pattern("(?<=\\))\\.")) {keep(".")}
         text=text.replace(pattern("\\b([A-Z](?:,\\s*[A-Z]){2,})(?=[.!?;:])")) {m->
@@ -174,16 +187,13 @@ internal object FrenchSpeech {
             val symbol=m.value
             when {symbol.length>1 || symbol in listOf("Ω","%","°")->keep(units.getValue(symbol));else->m.value}
         }
-        text=text.replace(pattern("(?<![\\p{L}\\d])[A-Z]{1,3}\\d[A-Z]{1,5}(?:/[A-Z0-9]+)?\\b")) {m->
-            keep(m.value.map {when {it=='/'->"barre oblique";it.isDigit()->digits[it.digitToInt()];else->letters[it.toString()] ?: it.toString()}}.joinToString(" "))
-        }
-        text=text.replace(pattern("\\b(?:Q[A-Z]{2}|CQ|RST|RS|VHF|UHF|HF|BF|RF|CW|SSB|BLU|AM|FM|FSK|PSK|DSP|ADC|DAC|AOP|UTC|ANFR|ARCEP|UIT|CEPT|IARU|QCM|ROS|PAR|RF|FI|OL|RC|LC|FV|CAN|CNA|BPSK|QPSK|RLC|FET|PM|USB|LSB|SI|IEC|CEI|CRC|SDR|AGC|PIRE|LNA|BFO|VFO|SWR|PTT|SNR|RTTY|OFDM|NRZ)\\b")) {m->keep(m.value.map {letters[it.toString()] ?: it.toString()}.joinToString(" "))}
-        text=text.replace(pattern("\\b[AFGHRJBCDNP][0-9][A-Z]\\b")) {m->keep(m.value.map {if(it.isDigit())digits[it.digitToInt()] else letters.getValue(it.toString())}.joinToString(" "))}
+        text=text.replace(pattern("\\b(?:Q[A-Z]{2}|CQ|RST|RS|VHF|UHF|HF|BF|RF|CW|SSB|BLU|AM|FM|FSK|PSK|DSP|ADC|DAC|AOP|UTC|ANFR|ARCEP|UIT|CEPT|IARU|QCM|ROS|PAR|FI|OL|RC|LC|FV|CAN|CNA|BPSK|QPSK|RLC|FET|PM|USB|LSB|SI|IEC|CEI|CRC|SDR|AGC|PIRE|LNA|BFO|VFO|SWR|PTT|SNR|RTTY|OFDM|NRZ|DEL|LED|AB|PLL|VCO|ASK|MUF|POTA|SOTA|ISS|ARISS|SSTV|APRS|DE|UR|PSE)\\b")) {m->keep(m.value.map {letters[it.toString()] ?: it.toString()}.joinToString(" "))}
         text=text.replace(pattern("\\b(?:ET|OU|NON|NAND|NOR|XOR)\\b")) {m->when(m.value){"NAND"->"non et";"NOR"->"non ou";"XOR"->"ou exclusif";else->m.value.lowercase()}}
         val indexed=mapOf("XL" to "ixe indice elle","XC" to "ixe indice cé","EC" to "e indice cé","EL" to "e indice elle",
             "Rtot" to "résistance totale","Req" to "résistance équivalente","Us" to "tension de sortie","Ue" to "tension d’entrée",
             "Up" to "tension primaire","Ns" to "nombre de spires secondaires","Np" to "nombre de spires primaires",
-            "Ip" to "courant primaire","Is" to "courant secondaire","fc" to "fréquence porteuse","fm" to "fréquence de modulation",
+            "Ip" to "courant primaire","Is" to "courant secondaire","fc" to "effe indice cé","fm" to "fréquence de modulation",
+            "RL" to "résistance de charge","fsortie" to "fréquence de sortie","fréférence" to "fréquence de référence",
             "Fmax" to "fréquence maximale","f0" to "fréquence propre","GdB" to "gain en décibels")
         text=text.replace(pattern("(?<![\\p{L}\\d])("+indexed.keys.joinToString("|")+")(?![\\p{L}\\d])")) {keep(indexed.getValue(it.value))}
         // Never leave M. to be expanded as « Monsieur », or S as seconds outside a unit context.

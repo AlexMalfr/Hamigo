@@ -12,6 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -22,8 +25,10 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -90,11 +95,21 @@ object ResourceMath {
 }
 
 object MorseReference {
-    fun characterName(value: String): String = when (value) {
-        "." -> "Point final"; "," -> "Virgule"; "?" -> "Point d’interrogation"; "/" -> "Barre oblique"
-        "=" -> "Égal"; "+" -> "Plus"; "-" -> "Tiret"; "(" -> "Parenthèse ouvrante"; ")" -> "Parenthèse fermante"
-        ":" -> "Deux-points"; "@" -> "Arobase"; "'" -> "Apostrophe"; "\"" -> "Guillemet"
-        else -> value
+    private val punctuationNames = mapOf(
+        "." to "Point final", "," to "Virgule", "?" to "Point d’interrogation", "/" to "Barre oblique",
+        "=" to "Égal", "+" to "Plus", "-" to "Tiret", "(" to "Parenthèse ouvrante", ")" to "Parenthèse fermante",
+        ":" to "Deux-points", "@" to "Arobase", "'" to "Apostrophe", "\"" to "Guillemet"
+    )
+    fun characterName(value: String): String = punctuationNames[value] ?: value
+
+    /** Canonical punctuation labels name their sign; ordinary characters and words stay literal. */
+    fun answerWithinKnownCharacters(answer: String, knownCharacters: Set<Char>): Boolean {
+        val punctuation = punctuationNames.entries.firstOrNull { it.value == answer.trim() }?.key
+        return if (punctuation != null) {
+            punctuation.single() in knownCharacters
+        } else {
+            answer.uppercase(Locale.ROOT).all { it.isWhitespace() || it in knownCharacters }
+        }
     }
     val alphabet: Map<Char, String> = linkedMapOf(
         'A' to ".-", 'B' to "-...", 'C' to "-.-.", 'D' to "-..", 'E' to ".", 'F' to "..-.",
@@ -187,23 +202,23 @@ private fun categoryTools(category: String): List<ReferenceTool> = when (categor
 
 fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNotEmpty()
 
-@Composable fun ResourceInteractiveTools(category: String) {
+@Composable fun ResourceInteractiveTools(category: String, opened: String?, onOpenedChange: (String?) -> Unit, toolStates: SaveableStateHolder) {
     val tools = remember(category) { categoryTools(category) }
     if (tools.isEmpty()) return
-    var opened by remember(category) { mutableStateOf<String?>(null) }
     Surface(Modifier.fillMaxWidth().padding(vertical = 12.dp),color=Mist,shape=RoundedCornerShape(22.dp)) {
     Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("À toi de manipuler", fontSize = 12.sp, color = Teal, fontWeight = FontWeight.Bold)
         tools.forEach { tool ->
             Surface(color = Color.White, shape = RoundedCornerShape(14.dp)) {
                 Column {
-                Row(Modifier.fillMaxWidth().clickable(onClick=feedbackClick { opened = if (opened == tool.id) null else tool.id })
+                Row(Modifier.fillMaxWidth().testTag("memo-tool-toggle-${tool.id}").semantics {stateDescription=if(opened==tool.id)"Déplié" else "Replié"}.clickable(onClick=feedbackClick { onOpenedChange(if (opened == tool.id) null else tool.id) })
                     .padding(horizontal = 12.dp, vertical = 6.dp).heightIn(min = 40.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Science, null, tint = Teal, modifier = Modifier.size(22.dp))
                     Text(tool.subtitle, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.weight(1f).padding(horizontal = 10.dp))
                     Icon(if (opened == tool.id) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore, "Afficher ou réduire l’outil")
                 }
-                if (opened == tool.id) Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if(opened==tool.id)toolStates.SaveableStateProvider("$category:${tool.id}") {
+                Column(Modifier.fillMaxWidth().testTag("memo-tool-${tool.id}").padding(start = 12.dp, end = 12.dp, bottom = 12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
                 when (tool.id) {
                     "logic" -> LogicGateTool()
                     "resistor" -> ResistorCalculator()
@@ -213,6 +228,7 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
                     "ohm" -> OhmCalculator()
                     "wavelength" -> WavelengthCalculator()
                     "networks" -> ResistanceNetworkCalculator()
+                }
                 }
                 }
                 }
@@ -247,7 +263,7 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
 }
 
 @Composable private fun BandSelector(label: String, names: List<String>, selected: String, onSelect: (String) -> Unit, modifier: Modifier = Modifier) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         Text(label, color = Muted, fontSize = 11.sp)
         Box {
@@ -262,13 +278,15 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
     }
 }
 
+private val ResistorDigitsSaver=listSaver<List<Int>,Int>(save={it},restore={it})
+
 @Composable private fun ResistorCalculator() {
-    var mode by remember { mutableIntStateOf(0) }
-    var fiveBands by remember { mutableStateOf(false) }
-    var input by remember { mutableStateOf("4700") }
-    var digits by remember { mutableStateOf(listOf(4, 7, 0)) }
-    var exponent by remember { mutableIntStateOf(2) }
-    var tolerance by remember { mutableStateOf("Or") }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var fiveBands by rememberSaveable { mutableStateOf(false) }
+    var input by rememberSaveable { mutableStateOf("4700") }
+    var digits by rememberSaveable(stateSaver=ResistorDigitsSaver) {mutableStateOf(listOf(4,7,0))}
+    var exponent by rememberSaveable { mutableIntStateOf(2) }
+    var tolerance by rememberSaveable { mutableStateOf("Or") }
     val digitCount = if (fiveBands) 3 else 2
     val encoding = ResourceMath.positive(input)?.let { ResourceMath.encodeResistance(it, digitCount) }
     val usedDigits = if (mode == 0) digits.take(digitCount) else encoding?.digits ?: digits.take(digitCount)
@@ -319,9 +337,9 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable private fun MorseTranslator() {
-    var mode by remember { mutableIntStateOf(0) }
-    var text by remember { mutableStateOf("CQ HAMIGO") }
-    var code by remember { mutableStateOf("... --- ...") }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var text by rememberSaveable { mutableStateOf("CQ HAMIGO") }
+    var code by rememberSaveable { mutableStateOf("... --- ...") }
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val translation = if (mode == 0) MorseReference.encode(text) else MorseReference.decode(code)
@@ -380,10 +398,10 @@ fun hasReferenceTools(category: String): Boolean = categoryTools(category).isNot
 }
 
 @Composable private fun DecibelCalculator() {
-    var kind by remember { mutableIntStateOf(0) }
-    var mode by remember { mutableIntStateOf(0) }
-    var input by remember { mutableStateOf("2") }
-    var negative by remember { mutableStateOf(false) }
+    var kind by rememberSaveable { mutableIntStateOf(0) }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var input by rememberSaveable { mutableStateOf("2") }
+    var negative by rememberSaveable { mutableStateOf(false) }
     val voltage = kind == 1
     val magnitude = ResourceMath.number(input)?.takeIf { it >= 0 }
     val number = if (mode == 0) ResourceMath.positive(input) else magnitude?.let { if (negative) -it else it }
@@ -423,13 +441,13 @@ private fun powerToolDisplay(value: Double) = ResourceMath.display(java.math.Big
 
 /** Editable measurements and stages share one live schematic; no stored answer is required. */
 @Composable private fun PowerChainCalculator() {
-    var mode by remember { mutableIntStateOf(0) }
-    var unit by remember { mutableIntStateOf(0) }
-    var input by remember { mutableStateOf("10") }
-    var output by remember { mutableStateOf("20") }
-    var gain by remember { mutableStateOf("6") }
-    var gainNegative by remember { mutableStateOf(false) }
-    var loss by remember { mutableStateOf("3") }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var unit by rememberSaveable { mutableIntStateOf(0) }
+    var input by rememberSaveable { mutableStateOf("10") }
+    var output by rememberSaveable { mutableStateOf("20") }
+    var gain by rememberSaveable { mutableStateOf("6") }
+    var gainNegative by rememberSaveable { mutableStateOf(false) }
+    var loss by rememberSaveable { mutableStateOf("3") }
     val unitName = listOf("W", "mW", "µW")[unit]
     val inValue = ResourceMath.positive(input)
     val outValue = ResourceMath.positive(output)
@@ -489,9 +507,9 @@ private fun powerToolDisplay(value: Double) = ResourceMath.display(java.math.Big
 }
 
 @Composable private fun OhmCalculator() {
-    var target by remember { mutableIntStateOf(0) }
-    var first by remember { mutableStateOf("470") }
-    var second by remember { mutableStateOf("0,02") }
+    var target by rememberSaveable { mutableIntStateOf(0) }
+    var first by rememberSaveable { mutableStateOf("470") }
+    var second by rememberSaveable { mutableStateOf("0,02") }
     val labels = when (target) { 0 -> "Résistance R (Ω)" to "Courant I (A)"; 1 -> "Tension U (V)" to "Résistance R (Ω)"; else -> "Tension U (V)" to "Courant I (A)" }
     val a = ResourceMath.positive(first)
     val b = ResourceMath.positive(second)
@@ -507,9 +525,9 @@ private fun powerToolDisplay(value: Double) = ResourceMath.display(java.math.Big
 }
 
 @Composable private fun WavelengthCalculator() {
-    var mode by remember { mutableIntStateOf(0) }
-    var unit by remember { mutableIntStateOf(2) }
-    var input by remember { mutableStateOf("145") }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var unit by rememberSaveable { mutableIntStateOf(2) }
+    var input by rememberSaveable { mutableStateOf("145") }
     val number = ResourceMath.positive(input)
     val scale = listOf(1.0, 1e3, 1e6, 1e9)[unit]
     val result = number?.let { if (mode == 0) 299_792_458.0 / (it * scale) else 299_792_458.0 / it / scale }?.takeIf { it.isFinite() && it > 0 }
@@ -527,9 +545,9 @@ private fun powerToolDisplay(value: Double) = ResourceMath.display(java.math.Big
 }
 
 @Composable private fun ResistanceNetworkCalculator() {
-    var mode by remember { mutableIntStateOf(0) }
-    var first by remember { mutableStateOf("100") }
-    var second by remember { mutableStateOf("100") }
+    var mode by rememberSaveable { mutableIntStateOf(0) }
+    var first by rememberSaveable { mutableStateOf("100") }
+    var second by rememberSaveable { mutableStateOf("100") }
     val a = ResourceMath.positive(first)
     val b = ResourceMath.positive(second)
     val value = if (a != null && b != null) (if (mode == 0) a + b else ResourceMath.parallel(listOf(a, b))).takeIf { it.isFinite() && it > 0 } else null

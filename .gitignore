@@ -14,3 +14,6 @@ captures/
 .codex-remote-attachments/
 *.iml
 .DS_Store
+
+# Local Tally credential supplied by the owner
+tools/.env

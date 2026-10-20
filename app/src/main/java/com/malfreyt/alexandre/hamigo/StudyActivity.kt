@@ -14,14 +14,23 @@ internal object StudyActivity {
         val prefix=when {key.startsWith("answer3:")->"answer3:";key.startsWith("answer:")->"answer:";else->return null}
         return key.takeIf {it.endsWith(suffix)}?.removePrefix(prefix)?.removeSuffix(suffix)
     }
+    /** A real completion suppressed by the old shared skip award still deserves its normal finish bonus. */
+    fun rewardXp(event:JSONObject,legacySkipped:Set<String>):Int = when {
+        IgnoredLessons.legacyBonusLesson(event)!=null -> 0
+        event.optInt("xp")==0 && event.optString("completed").let {it.isNotBlank()&&it in legacySkipped} &&
+            event.optInt("answers")==0 && event.optInt("correct")==0 -> 6
+        else -> event.optInt("xp")
+    }
     fun earnedEvents(state:JSONObject):List<JSONObject> {
         val base=state.optJSONObject("syncBase") ?: JSONObject()
         val completed=base.optJSONArray("completed")?.let {a->(0 until a.length()).map {a.getString(it)}.toSet()}.orEmpty()
         val historical=base.optJSONObject("awarded") ?: JSONObject()
         val events=state.optJSONObject("syncEvents") ?: JSONObject()
+        val legacySkipped=IgnoredLessons.legacyBonusLessons(events)
         val awards=linkedMapOf<String,JSONObject>()
         events.keys().asSequence().sorted().forEach {id->
-            val e=events.getJSONObject(id);val xp=e.optInt("xp");if(xp<=0)return@forEach
+            val original=events.getJSONObject(id);val xp=rewardXp(original,legacySkipped);if(xp<=0)return@forEach
+            val e=if(xp==original.optInt("xp"))original else JSONObject(original.toString()).put("xp",xp)
             val lesson=e.optString("completed");if(lesson.isNotBlank()&&lesson in completed)return@forEach
             val rawDay=e.getString("day")
             val key=if(lesson.isNotBlank())"lesson:$lesson" else e.optString("awardKey").ifBlank {"event:$id"}

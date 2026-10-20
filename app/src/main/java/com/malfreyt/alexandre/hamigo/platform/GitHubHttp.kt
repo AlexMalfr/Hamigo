@@ -54,7 +54,7 @@ internal class GitHubHttpClient(
             parts[1].equals(gist,true) && parts[2]=="raw" && Regex("[a-fA-F0-9]{40,64}").matches(parts[3]) && parts[4]==fileName) {
             "Adresse de sauvegarde GitHub inattendue."
         }
-        return request(rawUrl,"GET",null,null,"application/json",8*1024*1024,false)
+        return request(rawUrl,"GET",null,null,"application/json",CloudProgress.MAX_BACKUP_BYTES,false)
     }
     private suspend fun request(url:String,method:String,token:String?,body:String?,type:String,limit:Int,oauth:Boolean):String =
         withContext(Dispatchers.IO) {

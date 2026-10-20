@@ -26,7 +26,11 @@ data class ShareProgress(
     val activityHistory:PublicActivityHistory? = null,
     val appVersion:String?=null,
     val appVersionCode:Int?=null,
-    val dayStartHour:Int=0
+    val dayStartHour:Int=0,
+    val pathSectionNumber:Int?=null,
+    val pathSectionTitle:String?=null,
+    val pathCompletedLessons:Int?=null,
+    val pathTotalLessons:Int?=null
 ) {
     fun toJson(): String {
         val json=JSONObject()
@@ -48,6 +52,10 @@ data class ShareProgress(
         .put("appVersion",appVersion)
         .put("appVersionCode",appVersionCode)
         .put("dayStartHour",dayStartHour)
+        .put("pathSectionNumber",pathSectionNumber)
+        .put("pathSectionTitle",pathSectionTitle?.trim()?.take(120))
+        .put("pathCompletedLessons",pathCompletedLessons)
+        .put("pathTotalLessons",pathTotalLessons)
         var history=activityHistory?.forPublication()
         if(history!=null)json.put("activityHistory",history.toJson())
         var result=json.toString(2)
@@ -114,6 +122,13 @@ data class ShareProgress(
             } as String else null
             val appVersionCode=if(data.has("appVersionCode"))number("appVersionCode").also {require(it>0)} else null
             val dayStartHour=if(data.has("dayStartHour"))number("dayStartHour").also {require(it==0||it==3)} else 0
+            val pathSectionNumber=if(data.has("pathSectionNumber"))number("pathSectionNumber").also {require(it<=10_000)} else null
+            val pathSectionTitle=if(data.has("pathSectionTitle"))data.get("pathSectionTitle").also {value->
+                require(value is String&&value.isNotBlank()&&value.length<=120) {"Nom de section invalide."}
+            } as String else null
+            val pathCompletedLessons=if(data.has("pathCompletedLessons"))number("pathCompletedLessons") else null
+            val pathTotalLessons=if(data.has("pathTotalLessons"))number("pathTotalLessons").also {require(it>0)} else null
+            if(pathCompletedLessons!=null&&pathTotalLessons!=null)require(pathCompletedLessons<=pathTotalLessons) {"Progression de parcours invalide."}
             points.forEach {p->history?.xp(LocalDate.parse(p.day))?.let {require(it==p.xp)}}
             require(hours.isEmpty()||hourlyDay!=null)
             if(complete) {
@@ -121,7 +136,8 @@ data class ShareProgress(
                 require(points.firstOrNull {it.day==hourlyDay}?.xp?.toLong()==hours.sumOf {it.xp.toLong()})
             }
             return ShareProgress(name, number("xp"), number("streak"), number("lessons"),
-                number("weeklyXp", optional = true), date, points,goal,hourlyDay,hours,complete,zone,history,appVersion,appVersionCode,dayStartHour)
+                number("weeklyXp", optional = true), date, points,goal,hourlyDay,hours,complete,zone,history,appVersion,appVersionCode,dayStartHour,
+                pathSectionNumber,pathSectionTitle,pathCompletedLessons,pathTotalLessons)
         }
     }
 }

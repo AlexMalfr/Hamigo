@@ -1,0 +1,3302 @@
+{
+  "schema": 1,
+  "sourceBaseline": "37ccc612e339d481ff22657a1691a613b8914721",
+  "candidateBaseline": [
+    {
+      "lessonId": "l-hamigo-bienvenue",
+      "questionIds": [
+        "q-6df48b73-1d15-4561-8a3b-8f769f727e46",
+        "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
+        "q-43915fda-a73a-4fe8-bc90-7605a230e502",
+        "q-81b000df-b465-4abc-be6c-c46d60eff363",
+        "q-ad90e949-9411-48b0-be42-8608e7ebc9f0"
+      ]
+    },
+    {
+      "lessonId": "c01-l01",
+      "questionIds": [
+        "q-f39b165e-c14d-43f1-be43-a5084daf9db4",
+        "q-eb65542e-1ed8-4e54-9bdc-6bf695b1fd29",
+        "q-d64a0b27-feea-48dd-87e6-36a2ebff6a40",
+        "q-76d57161-e6c1-4d56-8c49-04c348923c80",
+        "q-66b05a68-c881-45c2-80a6-399723a64d3c",
+        "q-08e46ab6-24f3-4cc6-a23b-a0d8661cfee4",
+        "q-8d34dd1b-fc49-483b-901a-59e44e0d54af",
+        "q-1dc485d7-88a6-4ae7-b19c-389809a0d64b"
+      ]
+    },
+    {
+      "lessonId": "c01-l02",
+      "questionIds": [
+        "q-9012e718-1235-4d85-ab98-b883f9d574d6",
+        "q-7d5bed41-0d21-47d4-8983-6a9eff2cdc61",
+        "q-d7ed215b-49c4-4ae8-9c5e-9bf87c664ad8",
+        "q-20fa8fb4-6f4d-4527-a3d5-149b3a4ba0bd",
+        "q-d106b874-31ac-4ba1-9c74-62fa5d0d04f2",
+        "q-472af1a3-5f94-463b-af09-dec6be268eb3",
+        "q-fba02eae-4dcc-4f4e-b32b-daebfeb21ef1",
+        "q-8dc6ff85-64f1-4e1a-9ea3-ddd9684a44d6"
+      ]
+    },
+    {
+      "lessonId": "l-examen-inscription",
+      "questionIds": [
+        "q-e139b942-6aeb-42bc-8064-868c7a43e73d",
+        "q-6293bc63-60c6-48c6-9940-ba41ec2c5c94",
+        "q-e1cf5baf-0e07-405d-8a69-17f013a9fb09",
+        "q-2ea7a6cf-eef2-4492-8c0a-54605f736314",
+        "q-fee171e4-4f18-4b13-b99f-3f47193368f2"
+      ]
+    },
+    {
+      "lessonId": "l-math-decimaux",
+      "questionIds": [
+        "q-2430d215-5830-4714-a996-00be8de5160f",
+        "q-f8d2c483-f8e8-44ab-9c99-90fac7d88336",
+        "q-42beac52-659a-4ee0-ade9-e2ee19721a37",
+        "q-25e410e5-ae12-440f-96dc-c588a48727f2"
+      ]
+    },
+    {
+      "lessonId": "l-math-rapports",
+      "questionIds": [
+        "q-4c856adf-d8ce-445f-a38b-f9c06c077413",
+        "q-a33a5088-0893-47d3-8db9-b56fced55131",
+        "q-047c40cd-ca27-465b-8e40-cf57743469d7",
+        "q-54946a36-28ea-46df-933a-cf1d5729fa54"
+      ]
+    },
+    {
+      "lessonId": "l-math-formules",
+      "questionIds": [
+        "q-5bbd73d7-51b1-48e7-b8ff-5d11e210c241",
+        "q-b111b36a-be3e-427a-a499-18562d6b0a67",
+        "q-3ee18ecb-b82e-4072-b21b-83fb0ee6ce7a",
+        "q-b2a56756-3b4d-40a5-b3e2-1285be314f85"
+      ]
+    },
+    {
+      "lessonId": "c16-l03",
+      "questionIds": [
+        "q-cc44a411-7f85-4b84-a876-1b5a287ad2c0",
+        "q-907c517f-2e0b-405f-8a27-6629b516d191",
+        "q-3cb103f6-cd68-4117-884e-7baf7afa6734",
+        "q-d8ee79ab-02ec-45e6-8004-2d84142b8cf3",
+        "q-fecd0b74-8bcd-4490-9197-9cb5ee921491"
+      ]
+    },
+    {
+      "lessonId": "c16-l01",
+      "questionIds": [
+        "q-6d61861b-7276-4267-a8e0-a9b2a4477a69",
+        "q-c7c5d9e8-8dc4-4eb2-9338-69a4f0b12bf2",
+        "q-67a8998e-7753-4e11-8f84-2298ff4a49ec",
+        "q-64a87deb-0970-471f-b69c-c4285383ecda",
+        "q-74ead11f-1ed0-404f-8357-fd8bd6be6280",
+        "q-1fdc2a02-4e46-4ebf-9024-003e87c1642f",
+        "q-38568869-9853-40af-9c76-8016d002532a",
+        "q-0c0db3b6-fc3c-4f5e-9e0c-41f497e0121c"
+      ]
+    },
+    {
+      "lessonId": "c03-l01",
+      "questionIds": [
+        "q-36d81c7b-fd0b-4a92-8440-0d9f9cc0b440",
+        "q-0c3dac0a-3979-4c3e-8d8d-f89933147b59",
+        "q-47ec6912-e0fa-49f3-a4a9-84f82c9fc2f6",
+        "q-6936aa36-0d49-472a-a6d8-ddbabebe0965",
+        "q-b85da6d6-23b9-47cb-a023-0e6a96777cdf",
+        "q-66c4ddde-9bc2-4641-b53c-f78fdc17e274",
+        "q-69ce3c23-bb2c-4de9-a0c4-8a5acdf3df97",
+        "q-b58f9c77-6a8c-40b2-90c2-cd605369e494"
+      ]
+    },
+    {
+      "lessonId": "l-radio-ondes",
+      "questionIds": [
+        "q-e8990c2d-1050-4165-afac-f1579b434dbc",
+        "q-4884e013-18d5-4a31-9e90-c61258fedb08",
+        "q-f0dee206-8c73-43d3-8722-252d7b6814eb",
+        "q-37d18d25-0b47-4056-959d-624848d2999b"
+      ]
+    },
+    {
+      "lessonId": "c01-l03",
+      "questionIds": [
+        "q-ba4d50d3-a661-4334-9554-56f3e2273e64",
+        "q-9cc337aa-5ebb-4084-9f80-9906245fbb5a",
+        "q-8893043a-64be-4d29-9a9f-84345d84d378",
+        "q-a6debd62-51ae-453d-b9d8-4b2dab0fd837",
+        "q-447a2170-f591-4eec-a413-d291eb80f27a",
+        "q-b8ca2bd5-935e-4235-af10-2d442d43153f",
+        "q-8877ae84-181c-41d9-a4da-66a1d74170a9",
+        "q-26911c26-a2e1-42cb-88af-7e596272c947"
+      ]
+    },
+    {
+      "lessonId": "l-nato-premiers",
+      "questionIds": [
+        "q-1bbf9544-e1d8-4786-bc8a-2ce70df6cd47",
+        "q-ae3f9d1c-2407-47de-a2c1-95ae47eb475b",
+        "q-5cc77ca1-ecec-4f5e-891e-78654b09a23c",
+        "q-2881d57a-cea2-40d3-8d6f-071022808961",
+        "q-490d2fdc-27c6-4c56-90db-7e3899867fa3",
+        "q-de7cd2de-a131-4f8a-8c1a-2aff646f7949"
+      ]
+    },
+    {
+      "lessonId": "l-circuit-ferme",
+      "questionIds": [
+        "q-96e1083f-13db-4a50-abe1-149dcdef9c81",
+        "q-508457ba-0501-4b5c-996d-d03f0ef7240b",
+        "q-e12ce661-53f8-4bdf-b775-bd4bd214bad3",
+        "q-43d06f30-07d2-4225-a463-44b2c32e5f3c"
+      ]
+    },
+    {
+      "lessonId": "l-tension-deux-points",
+      "questionIds": [
+        "q-9c670af9-e0ec-45de-b497-0d4e528c0659",
+        "q-61868e5f-7b97-4005-b753-07b703ff2678",
+        "q-306a576c-1e9b-499e-9e32-5666b61afc32",
+        "q-1cbe41ee-0498-4cbb-9a46-7f691fe9e6bb"
+      ]
+    },
+    {
+      "lessonId": "c03-l02",
+      "questionIds": [
+        "q-cb1c6df3-3d48-4a3e-a50f-0df5a0ece4ca",
+        "q-9b83bc39-2cd1-4e70-a1d3-29735dce86b8",
+        "q-7ad3e813-01af-487a-bf70-5884c32641fd",
+        "q-04d688fd-fba6-4da0-815c-0bb5070d6450",
+        "q-8c8d59d5-63c6-4a96-abf3-17e5a0bfd728",
+        "q-f69731fd-05ff-4829-8b0b-4060fae7ceba",
+        "q-e0ea9bc7-d251-41dc-b0a3-b43e6a9cd85a",
+        "q-139bc13c-562b-4a8d-802e-1f8007b6449a"
+      ]
+    },
+    {
+      "lessonId": "c03-l03",
+      "questionIds": [
+        "q-eec28acd-60f6-410b-8521-43a39bef2fc1",
+        "q-9f6b9c7b-00e1-49ba-b042-2c04f613a207",
+        "q-f97db811-4ceb-4fa8-9faf-3b8974f9e3a0",
+        "q-876c660d-56bf-488e-907f-6efb8d9f26bf",
+        "q-09977bcf-0496-4ad8-bf1e-3023aa81b5b6",
+        "q-02c7d0bf-1c76-4006-adcd-84beaa8b175f",
+        "q-aa9b1551-3c86-470f-be60-a2c508ccfac2",
+        "q-d2248a96-85ce-463c-bcfd-d9953d45f3a3"
+      ]
+    },
+    {
+      "lessonId": "c03-l04",
+      "questionIds": [
+        "q-24b789dc-72b5-4b42-85ea-c69a74467640",
+        "q-93d9ddfc-c631-4629-9b22-0fe632bb6dec",
+        "q-900eccea-b6a6-464f-b2db-bcc4be1c8b3d",
+        "q-800cc3d6-ec0d-4133-8e87-27c7e4ddf94f",
+        "q-b9bffd6d-3e3a-439f-8b81-5bfddf36e349",
+        "q-aba437ae-585e-417a-802e-dcac6cda42a4",
+        "q-38a30fbf-9474-4cb0-a902-d85933b05e22",
+        "q-323da3a1-667f-40a9-9d77-de7219460b26",
+        "q-8e329789-9197-4bb5-a593-71f57973fda7"
+      ]
+    },
+    {
+      "lessonId": "l-energie-duree",
+      "questionIds": [
+        "q-92ab0d00-a478-42cd-a82b-93525fea09c8",
+        "q-e10f229e-761a-4470-a2c5-7ac6a70d04ef",
+        "q-1ebb8f79-c562-4235-ad70-376376fcdbd2",
+        "q-310c62b2-b822-4c9d-a447-1ec5f7b8f222"
+      ]
+    },
+    {
+      "lessonId": "c16-l02",
+      "questionIds": [
+        "q-58361b42-79f4-4acc-961d-8e8ac098b02a",
+        "q-1f1751b8-599a-43bb-93cc-cea11f9f8905",
+        "q-4fe61001-4cec-47e2-894e-3d0c253e31f5",
+        "q-bf45f9d0-a852-438d-8f68-c483fa747ea3",
+        "q-87c660a9-8ff2-469e-939d-c85562a161b7"
+      ]
+    },
+    {
+      "lessonId": "c15-l01",
+      "questionIds": [
+        "q-454d43cd-d24a-41d0-834a-0699b5649b60",
+        "q-6ec27012-bd95-427e-9ccd-63cde83c983b",
+        "q-c1ccd500-5fd2-4a51-9aed-fd5e50c816c5",
+        "q-b54ae8b5-9e6e-43cf-b42c-541f83411e80",
+        "q-43b0baff-61b2-4f43-a7a1-39b253c8e0c2",
+        "q-bc789bbe-46c9-4362-b31f-5acc4f7ccd7a",
+        "q-e6657827-2bea-4ab0-885a-67b9207ba564",
+        "q-d6f441b4-e69a-4571-bd5f-b38dc1b7934e",
+        "q-47dc0332-5229-4bab-ad95-dfa79a822426",
+        "q-896b55b1-f792-4786-b5a1-8d6b96984d27",
+        "q-59f22614-49ac-4d99-9ec1-608b72819ed8",
+        "q-d6dffc5a-b43b-408e-88fa-f06402a571c4",
+        "q-fe2841ec-cd31-4e2f-b7d8-d44532e309fd",
+        "q-6e26656f-8b66-4ec9-8279-ec1bea63f684"
+      ]
+    },
+    {
+      "lessonId": "c15-l09",
+      "questionIds": [
+        "q-50df7ae5-8525-4889-8d30-23f3d2f80714",
+        "q-182901b5-e44a-49bc-b5c6-023d59caaadc",
+        "q-25b06ebc-96a3-490a-bb5d-516fb3cf67a5",
+        "q-029f5e3e-94c8-4bab-9af0-cf5fad85a3f9",
+        "q-b54e2d07-b209-476a-be88-43d2cb5f75cd",
+        "q-6ee9b67c-df3c-4963-85e7-d442dc28b43b",
+        "q-22048b67-9c41-4c5b-8891-6e83b3bd2eb7",
+        "q-59823988-c242-42a6-a234-f5f76ef4feb9"
+      ]
+    },
+    {
+      "lessonId": "l-morse-mots-etim",
+      "questionIds": [
+        "q-6949e873-2538-4714-a114-94c6a73d2519",
+        "q-71b9502a-6fa9-41d5-9ca2-a3315aef8de1",
+        "q-f7fac9ba-a2f7-4320-9aea-e570756850ec",
+        "q-8e79f48e-7f65-42e8-a28c-22acc508fa8b",
+        "q-0101184a-65ee-43b9-a741-230d6a467314"
+      ]
+    },
+    {
+      "lessonId": "c04-l01",
+      "questionIds": [
+        "q-37348bcd-da13-4a51-a4d3-3ad0c88b6baa",
+        "q-ec283f3d-a062-4dee-b762-2706679b942b",
+        "q-3b0e64c6-4282-435b-acf7-1f46316e9d5b",
+        "q-6c80876a-f5e3-43f1-933e-a4ec8a5a7aaa",
+        "q-33ac577f-57a7-4af6-9764-0d7ea1135626",
+        "q-fe9f206e-c5e1-4bb8-a5d0-ff347530d701",
+        "q-d6bf0dc5-b708-4040-b0c0-5c4169ba0f98",
+        "q-026071cb-f565-4b5a-be7d-d41d9d4f49d0"
+      ]
+    },
+    {
+      "lessonId": "c04-l02",
+      "questionIds": [
+        "q-7d0a1df0-9748-413b-b288-54f6083fda3f",
+        "q-4657ac1e-b0bc-4e8e-903c-2fcb82e4eb7b",
+        "q-417fcba3-307d-4355-80a6-0383896bd537",
+        "q-d516b941-85a9-4464-be8a-e8d1d8060c95",
+        "q-f10d3ce1-10fd-4e73-b030-e6a5c1c85e6d",
+        "q-d56ac961-c5e4-423a-9439-360249da8ef8",
+        "q-3b25446e-ba81-4532-82c6-da01359eda2a",
+        "q-c72f6790-ec00-428e-82fe-fdc4f3282b82"
+      ]
+    },
+    {
+      "lessonId": "c04-l03",
+      "questionIds": [
+        "q-1464111a-efa1-40f4-aee1-c75d072d5c13",
+        "q-afa27523-2b26-44a9-b005-8faccde1e546",
+        "q-c07204fd-2bb5-404c-8458-5cdf2338f3ef",
+        "q-9313d5a5-5379-4143-a76c-6189f9770a2f",
+        "q-f7f9e294-ecbd-45ed-aa13-3e0c4036d205",
+        "q-80e253d7-982d-4a66-8b20-9ffe0dc0a757",
+        "q-7983a12c-a3a4-42aa-9254-ed4b60eabfe6",
+        "q-958af8ad-2159-485b-aaa5-534afb0bc542"
+      ]
+    },
+    {
+      "lessonId": "c04-l04",
+      "questionIds": [
+        "q-a654e051-9452-4460-b3ed-0e8819513908",
+        "q-efb043ef-b9de-4ef4-8a89-aa4a60b4508b",
+        "q-a2888c8f-9ce9-4254-933f-091d1599e977",
+        "q-2b0c181f-d87f-4a6a-a8ce-e4bb8adeea01",
+        "q-e63e6d2b-db2e-44dd-9e49-67528441a6ef",
+        "q-60e130ba-9c71-4ef5-88a3-bdfa24c16803",
+        "q-789efbe9-d675-4199-9645-c21c34b5d022",
+        "q-342db4f5-1f4c-40c1-ace5-1ed0cda17b06"
+      ]
+    },
+    {
+      "lessonId": "c05-l01",
+      "questionIds": [
+        "q-280453ab-a6e2-4267-84e2-a2ff7925af4f",
+        "q-3530e07a-a961-4926-8326-2de2792a9171",
+        "q-d54b658f-c963-46a9-8dae-e89b593bfc11",
+        "q-bd4a5b04-1698-4e27-ba6f-232ad9ee7fd4",
+        "q-9aa26067-8ff1-4363-9a9e-667de78c0619",
+        "q-717a6d8a-3c3c-4ca3-b61c-b97a141d612d",
+        "q-1786d5c4-cf72-46a7-b5b1-812ba9328b54",
+        "q-9be5262c-feb5-4d7a-a5d6-7f4c3fa4ba40"
+      ]
+    },
+    {
+      "lessonId": "l-fils-materiaux",
+      "questionIds": [
+        "q-f6ad3579-c4cb-4948-8bef-f9548881b741",
+        "q-179bd2b9-7be6-4f95-abf6-66e2873b0426",
+        "q-82d53c45-b4a1-4800-9af7-5abd49f44980",
+        "q-8344be80-177f-49ae-9040-6603ccf86d69"
+      ]
+    },
+    {
+      "lessonId": "l-voltemetre-amperemetre",
+      "questionIds": [
+        "q-4c4b1812-9935-409f-ad02-7c402fc398b7",
+        "q-ee4acfaa-38a6-49e4-aa16-ed92243a5f87",
+        "q-b1dc58f0-c688-40fa-be47-2813cea83e3a",
+        "q-a23e5019-35e2-4951-875c-5dd85f8488de"
+      ]
+    },
+    {
+      "lessonId": "c06-l01",
+      "questionIds": [
+        "q-fae65c97-1744-4efe-809f-34e78f51ed74",
+        "q-3fc96b13-1983-4da2-8fa3-2418665c1e79",
+        "q-a5854bd2-e35a-492f-9a79-be2f70861de9",
+        "q-92322a6e-18d0-414b-9df7-4a6ce6f18e71",
+        "q-6562317b-bf5a-4d39-b88e-bb6571002025",
+        "q-0e0e351c-783c-41a6-b622-834f2f82c753",
+        "q-db6744e9-7c37-4a1b-bca0-7062f172b846",
+        "q-fef77f11-733c-4c14-b763-912c24be3082"
+      ]
+    },
+    {
+      "lessonId": "c06-l02",
+      "questionIds": [
+        "q-4ba1c5c6-37c3-4489-9d21-c26648c5affa",
+        "q-c8d82c62-87b6-45c1-b077-e5fb7b49cda8",
+        "q-306e759e-bf16-4f5e-8994-7015c617cd33",
+        "q-7f0eccbb-ec92-47fc-8b1f-2a5ee2b44218",
+        "q-4cbdfeb7-de1b-4547-a7d7-b5e874399b1e",
+        "q-2e85404d-edf8-4f9e-90e6-74774f6bee02",
+        "q-e6bb53e9-00ea-4d2c-bc2c-c680476e5228",
+        "q-2a01aff1-b502-4774-924f-48e8d8d5a26b",
+        "q-4b849548-bf6f-4489-89c8-98abaa59c0ca"
+      ]
+    },
+    {
+      "lessonId": "l-rms-sans-confusion",
+      "questionIds": [
+        "q-76c6a5a2-77b9-4f32-bcfd-7996d86a4b35",
+        "q-6dc77abd-a970-43db-bccc-df774b96d2a6",
+        "q-dd1c4d01-6787-4062-8d19-b78f52de5218",
+        "q-120f5824-f9df-46d7-a023-f04eec8276f4",
+        "q-afdaf1f1-a08a-4570-a836-d568f0e27316"
+      ]
+    },
+    {
+      "lessonId": "c06-l03",
+      "questionIds": [
+        "q-097e9715-d10d-4d73-90ca-91582493bd7b",
+        "q-95614f37-bf58-49fc-9ad4-4f3ed30437ac",
+        "q-3cdf05df-7953-4d3e-b884-eb620d2326b5",
+        "q-92c5f281-7353-4876-9aeb-1b384ec0d08e",
+        "q-6df12405-129a-4faf-8fff-d51757f17047",
+        "q-d23eb280-1a8f-4df1-98a5-689f56af3e93",
+        "q-7247f1fe-5ef2-4ef4-961e-2ad058f47b14",
+        "q-9e0c57b5-31df-4731-b311-b591ae3cd188"
+      ]
+    },
+    {
+      "lessonId": "c16-l04",
+      "questionIds": [
+        "q-8dde1164-0917-43a7-958c-578578dd09e7",
+        "q-2d23fa4a-4777-49f8-8a55-4693bbff94da",
+        "q-fd14fb8f-a307-4b38-9de1-2d26213f9882",
+        "q-3950b7d8-4ce2-4b87-948c-01cc173a3c13",
+        "q-c6b6e812-2272-41c6-aa7f-1727891cdca0",
+        "q-45977e89-4e44-4cb7-bebc-4b359179ff75",
+        "q-93b950ac-81b1-4a88-b398-0df64f7b58a5",
+        "q-2273d5b6-9a84-4e3d-9b95-bf8ba1b86498"
+      ]
+    },
+    {
+      "lessonId": "l-nato-milieu",
+      "questionIds": [
+        "q-4b4f9cb5-71e6-4d43-ae02-e59b94e67841",
+        "q-feb97012-074a-4b17-bf81-09b35587e94a",
+        "q-a43a1855-8940-4740-b497-0834554fd776",
+        "q-ea366895-fea7-4ab3-913d-88512e71642e",
+        "q-ec9ab7e0-9329-489e-b4bb-19a92220db60",
+        "q-11bc6fcc-1759-4516-abb9-c03e281bdeb9",
+        "q-725f0285-6228-440e-98ca-ab94dd3cc8e6",
+        "q-8d74d16b-7446-4a1e-ba8e-7bbb582a89ec",
+        "q-c92e8018-dd6c-42e2-b844-36cceb145224",
+        "q-42446a72-9ec3-41e1-bda0-71b1a2595f8c"
+      ]
+    },
+    {
+      "lessonId": "c05-l02",
+      "questionIds": [
+        "q-e8920d4a-8dcf-46da-8233-a92d691ba851",
+        "q-73f19ed6-03c2-4e23-8f6d-9b3557a7185c",
+        "q-39a129dd-067f-4075-922d-be4e8093980a",
+        "q-bceeba59-a33a-448c-ab3b-c928a0990676",
+        "q-22e271f9-5c54-4199-86a2-586ba8d45aff",
+        "q-eb83e743-f4b7-469b-8f55-c28bef6569da",
+        "q-d86a8a7e-cc2e-4fa6-9189-5f1c7e40655b",
+        "q-bad0c921-f194-40e0-add0-2dcbbf16a5b3"
+      ]
+    },
+    {
+      "lessonId": "l-condensateur-polarite",
+      "questionIds": [
+        "q-81b31f3c-5e5d-4cd9-b51f-b718da313d40",
+        "q-94cdb212-c509-4850-93c4-13e775c7eba6",
+        "q-282908e8-85a2-4a20-b32f-db86b9a16f1f",
+        "q-53016a64-5bf3-4a3c-8555-0e2395422b2b",
+        "q-082699e8-1a27-47d0-a926-3facbd6894c9"
+      ]
+    },
+    {
+      "lessonId": "c05-l03",
+      "questionIds": [
+        "q-a87f61fc-1d2f-4e7a-98a1-2740b94a2a4a",
+        "q-55729c53-d0b7-45a3-a9e7-ace3826b937c",
+        "q-7a08d658-d442-4fd3-8ce7-d2b624053eb5",
+        "q-2ea6326a-3f0f-4e28-836c-d470646fc83c",
+        "q-ded87835-f027-4aa4-aa1a-505368521693",
+        "q-fde67a54-fba1-495d-84f3-b0c88b5cd658",
+        "q-142a72dc-39cd-4cc1-bcb5-c1c02392fed7",
+        "q-244d43c6-e256-4704-8439-96d4518a5eb2"
+      ]
+    },
+    {
+      "lessonId": "l-bobine-coupure",
+      "questionIds": [
+        "q-72ba0b0d-eea8-47dc-a555-408d94ca77dd",
+        "q-3acaee34-b684-456d-9331-4fb8c396533e",
+        "q-7a2a1e65-cade-4f21-a78d-ff6f53285935",
+        "q-12a2ea3b-9de1-4716-8046-9732584313b0"
+      ]
+    },
+    {
+      "lessonId": "c05-l04",
+      "questionIds": [
+        "q-4196b177-06ef-4c1b-9b71-51fa60ecf436",
+        "q-ca85a8e2-29a1-47a4-8b9e-08c94300539d",
+        "q-1a931834-3379-430a-9ff0-0fd40dd46f66",
+        "q-3a427468-9aa6-42be-b352-f84704dc4846",
+        "q-80b06261-d0b9-46da-ae05-c12306806696",
+        "q-afc47760-0f22-4338-8db9-69e6cce4cc69",
+        "q-0802c10d-5f34-4312-b8d8-237c4c05f2bd",
+        "q-3324b319-9d74-4742-acb0-f3919524e2ad"
+      ]
+    },
+    {
+      "lessonId": "c17-l01",
+      "questionIds": [
+        "q-06ac40bc-93b5-43f0-9c04-a570f2ad7a19",
+        "q-8f19224b-ece0-44f8-a376-1a80bd0c3421",
+        "q-f2d2169b-d6f4-427e-ac44-f836bfc34f17",
+        "q-e60d99da-91fb-4e83-be0a-164948f4b76a",
+        "q-18805e5e-b59a-4b34-b174-0fcfb33d7ea1",
+        "q-016cc604-203a-4494-896d-84278b05ac0d",
+        "q-e70fc09f-6010-4090-804d-fc1c0203743a",
+        "q-22b661f1-f5f5-4141-90a7-1b220fc0acdb"
+      ]
+    },
+    {
+      "lessonId": "c06-l04",
+      "questionIds": [
+        "q-5d028a94-cedd-4eaa-8b74-152262b75206",
+        "q-1a6a395c-2dd4-4652-be0f-d939a66d4f34",
+        "q-bc9f3f03-f80e-4cab-80d9-2c68b315671b",
+        "q-a25c8b2a-8fc8-4e7a-bb39-dd6de3563ff6",
+        "q-ba232c97-c109-4f3e-bbd9-a4a86224e055",
+        "q-e3a9c33a-5a1c-4851-b504-48293122d980",
+        "q-f1e8118f-b20b-46ae-b181-e796849d279f",
+        "q-7741f510-bcad-46be-ae77-819fce47a29d"
+      ]
+    },
+    {
+      "lessonId": "c17-l02",
+      "questionIds": [
+        "q-bd57061b-e808-49bb-ad4c-cb1812ee3bcd",
+        "q-5ee7e999-2598-4b42-a1c3-8c00c3c511cb",
+        "q-d875655c-ef0a-4ca2-965a-baa317f8c4a0",
+        "q-d1610153-ca10-464c-828c-2576cb36e927",
+        "q-1f7ba27e-3b0d-4b85-827f-9a8709b9bdc2",
+        "q-0849ea32-8626-4f08-964e-bc543c1e3db8",
+        "q-3a21be5a-67e4-4597-a42f-f8ae52128023",
+        "q-cc5dd66d-f88d-427b-aacb-11971428db1d"
+      ]
+    },
+    {
+      "lessonId": "c17-l03",
+      "questionIds": [
+        "q-1e53c703-d2ac-4313-89e8-7896cb53b829",
+        "q-39671c97-d97a-4c34-a314-a29d00cca386",
+        "q-bb04ce3d-35bc-40d6-b25c-248eb9357975",
+        "q-b1cc5ea5-ce42-48a3-98a1-7035243f2888",
+        "q-b87fe5c2-ae7b-4bfa-b61e-5b1be0a41be0",
+        "q-94857cd4-b1d1-46c3-ad5d-cdebdf2347d5",
+        "q-9204385b-989d-4ca5-a46e-b8dd41c37dbd",
+        "q-b84728e6-0f8c-4f06-a1a2-edc7187c0f0e",
+        "q-71e6ef72-3eca-4793-b526-f69b796b6d11"
+      ]
+    },
+    {
+      "lessonId": "c07-l01",
+      "questionIds": [
+        "q-0b502af3-ab9a-41b4-af8f-9beba7591440",
+        "q-bd5271f6-ecbb-4c48-b826-6ef5f17bed54",
+        "q-c87c42c8-7523-4386-95d1-76796ba8e426",
+        "q-77602277-2089-4fa8-b94b-df554348cf35",
+        "q-c8d6d7a2-2695-40d7-8bbd-8190fcf465a9",
+        "q-0b21c862-adcb-4a44-a2e6-59d76646688d",
+        "q-6881230c-6a1a-4e96-9eb6-a2175090f8fa",
+        "q-e9018eab-112f-467f-9429-f202ab2b77f1",
+        "q-f88fb19d-f946-4f5c-8317-c4c838adb7d1"
+      ]
+    },
+    {
+      "lessonId": "l-filtre-coupure",
+      "questionIds": [
+        "q-1cd22c46-53a8-4522-be93-722bdc4a9c58",
+        "q-08259a69-ef69-4cb6-89d6-4769e207d411",
+        "q-e11d10f1-89a5-44fa-976a-889ecdccdac2",
+        "q-4de938b1-0430-423c-8931-73e0135a097b"
+      ]
+    },
+    {
+      "lessonId": "c07-l02",
+      "questionIds": [
+        "q-d353d203-edcc-4945-8c80-e8ad04b151e3",
+        "q-89595e5f-d827-415f-bb1c-a7756d3aa484",
+        "q-539cb1f6-3bb6-49d6-be64-a6e081622e1e",
+        "q-541c1c16-bb1d-44ad-ae25-1a60618d676d",
+        "q-fb0fa77f-8232-4257-b9dd-5e34c0c7262c",
+        "q-8b4d78c1-cd70-4f1d-9a0f-b41c3d0d36c8",
+        "q-21821e7d-f719-4752-bcd4-1af3c7919197",
+        "q-ea080ed9-5aa5-45b3-8183-8c2257302e23"
+      ]
+    },
+    {
+      "lessonId": "c17-l04",
+      "questionIds": [
+        "q-424cd52b-f7bb-4f12-afe5-990d47fd8e49",
+        "q-bb4a3ac0-49cf-43a1-b685-bdfc0c0e9942",
+        "q-8eddc44e-af63-4f13-a6b4-e643dc90037a",
+        "q-1cdfc2af-1c4b-4723-9343-42a93216674c",
+        "q-9907b456-a14f-4e5d-aa42-af0c761a081a",
+        "q-05d6e9eb-18c8-4e77-8b2e-ff01d356e4b7",
+        "q-9e1113a3-6391-4a40-b2f8-0ea115501f66",
+        "q-825dc480-00e5-4cf1-afab-cd3b9c856712"
+      ]
+    },
+    {
+      "lessonId": "c07-l03",
+      "questionIds": [
+        "q-d23d2a36-56bb-446f-911b-2b392d181d00",
+        "q-72082cc7-e10b-40ca-9d81-508bc985e659",
+        "q-9ea80f91-6127-4e8f-af95-c4b697f848d7",
+        "q-32e69d10-1fe7-45d2-920b-d6c3f10bdf56",
+        "q-cdc64210-e451-4edd-91c3-5d85feeb9cba",
+        "q-d8782bf3-4432-46d7-9ce1-829df812ab4e",
+        "q-7ff30729-8a15-4914-9489-e942e7488fd5",
+        "q-d3d160ee-a9eb-4fb1-a8d7-a65100beeb91"
+      ]
+    },
+    {
+      "lessonId": "l-pile-resistance-interne",
+      "questionIds": [
+        "q-1d5d7be3-53d8-4fe3-b22d-d979fcb1580a",
+        "q-f57be268-0586-49fc-a645-ca9e9b565efe",
+        "q-bffc90f8-670c-4408-89ee-881f2dc893ee",
+        "q-27bf50f5-1e12-49f9-adcc-eb5eb405fd06"
+      ]
+    },
+    {
+      "lessonId": "l-decibels-reperes",
+      "questionIds": [
+        "q-c8fc8c9f-2c5a-41c6-9a54-c6eeecb44047",
+        "q-75a25d9a-653f-4360-b340-3af1f1037df4",
+        "q-8dd1e6bf-0434-4a80-a433-6fe4a3f88e39",
+        "q-0682f6eb-f00c-44b0-8f3e-76093ea3a07e"
+      ]
+    },
+    {
+      "lessonId": "c07-l04",
+      "questionIds": [
+        "q-d79b116a-25c7-4d60-b96b-38665d0a24d2",
+        "q-f1fe2441-fdae-4500-9ca3-4e7fcf297571",
+        "q-8b5e9280-ef9b-4ecd-8ccb-4645a39e27db",
+        "q-9fc247d7-cbbb-45c2-a0b2-1d5968970ec0",
+        "q-8fe75172-3c70-452b-b3be-4c94e60da87c",
+        "q-f6c0f133-70cf-4d3b-8265-8d5cc6533c7a",
+        "q-1b4a1d27-e8ea-4459-83e4-d067c10b7918",
+        "q-bf3a9b85-fd9d-4cb9-a10a-adcfe5571246"
+      ]
+    },
+    {
+      "lessonId": "l-signal-dbm",
+      "questionIds": [
+        "q-f74c8d1d-2782-4dd2-bf87-57885d5c6433",
+        "q-9cada797-58b6-4d9e-9ef0-f9d06a8bd482",
+        "q-80441963-894d-4d32-ab25-0bb0abdd47d2",
+        "q-6e5feca7-f420-49f9-9043-84a858ae35f0"
+      ]
+    },
+    {
+      "lessonId": "c02-l03",
+      "questionIds": [
+        "q-d3f1d31f-b5a1-4f8f-82aa-34e6805c90e1",
+        "q-12e1aea0-3865-45db-927b-592594465eac",
+        "q-3f78e98c-9a06-4677-831a-447f8294c4ce",
+        "q-0cf15a01-2d3d-4e12-bb0e-1cfb09a122a2",
+        "q-cd53f444-8540-42bd-af8f-9d525592bf36",
+        "q-594a7076-5dab-422b-a25e-aae8b5936041",
+        "q-2c56a46b-3345-46b8-9dad-4e43dd8f9f87",
+        "q-d369ebe6-da3c-43fb-974b-d7973004d4ad"
+      ]
+    },
+    {
+      "lessonId": "c15-l02",
+      "questionIds": [
+        "q-3def60a1-cbf9-44c0-af78-2b158f45a5b6",
+        "q-60050807-2a11-48b6-9aba-fdd29cad3e57",
+        "q-4dc1342a-1ede-443e-8fe7-63b51052b229",
+        "q-d4473b89-eaf2-4c7c-862a-910ec4edb587",
+        "q-b9c5a4e9-1190-4394-bbb2-f58475fa9a5d",
+        "q-2545c84e-a035-49e1-a0a5-7ba69c4140b6",
+        "q-ce259576-d7e6-4b30-88bc-6f4ca15738e5",
+        "q-79b16a55-08e2-408a-bca1-92994648fc3c",
+        "q-09113e6d-2847-4bc0-b155-7138ee799419",
+        "q-b072b9f0-ae72-4f40-a3ed-5fffcdf020be",
+        "q-627c1359-fc17-41b3-8e0f-ea401d3c868c",
+        "q-d610b1b3-b145-4001-9a75-c25060cb8910",
+        "q-9d38c87d-5aae-491b-aae2-fc42b84cf014"
+      ]
+    },
+    {
+      "lessonId": "l-morse-mots-anso",
+      "questionIds": [
+        "q-4802b9aa-fb20-4113-bc31-6d206559838e",
+        "q-fcdb367f-9c73-4ccb-9f0c-49fae4304b3b",
+        "q-ca9e104f-327a-426c-9f38-f46a05b31ff4",
+        "q-97143a77-7edf-41ce-95eb-ea3dbfa00867",
+        "q-faee3465-d7d3-4580-a1e1-afbca82c586e"
+      ]
+    },
+    {
+      "lessonId": "l-nato-fin",
+      "questionIds": [
+        "q-2b9eb13a-108b-4bd8-8f00-a84807eca0ab",
+        "q-7f8b2444-f248-4513-9984-964da9023188",
+        "q-c0bfa21e-5fbb-4fba-98bf-d6c6d6d9855a",
+        "q-c91caffb-bc9f-4f79-ad44-05f25814a05f",
+        "q-56ebf527-9557-47d8-8cc2-76672f56be65",
+        "q-b2f4cbc4-4e7e-438c-aec8-759b62c17332",
+        "q-db699018-f318-4c64-a777-5024003b7057",
+        "q-5580d988-ec1a-4b75-8b04-571a19ea5778",
+        "q-725b2e24-aa1a-493e-a277-1aa60496c7c2",
+        "q-c73ad8ce-3ec0-4641-a18b-38e8f9428528"
+      ]
+    },
+    {
+      "lessonId": "c02-l01",
+      "questionIds": [
+        "q-0bb01065-6948-4d2c-bbb3-b4c39a1a2414",
+        "q-c1b219f5-afef-4c5e-994f-f977949d257d",
+        "q-d88d940f-c6ae-4dc2-b71c-8fe633e760f7",
+        "q-db71578f-ef7b-4f6d-93b2-7d2ca6ac0d55"
+      ]
+    },
+    {
+      "lessonId": "l-nato-groupes",
+      "questionIds": [
+        "q-7e6907ba-8ddd-43b5-87e8-a93bf58a78d9",
+        "q-934b3b19-6861-486a-9840-635b421122ae",
+        "q-e8090326-99e6-460c-92ba-cb51c7ec7e22",
+        "q-9a2a7b8c-031e-4f21-aca5-b028b49c6974"
+      ]
+    },
+    {
+      "lessonId": "l-diode-sens",
+      "questionIds": [
+        "q-9443160c-ad12-4899-9d0d-134e8c79a7d9",
+        "q-020ccb87-eae2-4bde-8fc9-5be3b6ac03ba",
+        "q-2f4778a3-896c-4cbb-83f5-b167feee96b4",
+        "q-ca54ef71-d840-4dc5-b8a4-bef22391b841"
+      ]
+    },
+    {
+      "lessonId": "c08-l01",
+      "questionIds": [
+        "q-6b1687a1-8a56-4e34-ace2-724dcd6096e1",
+        "q-2f9b884a-c298-4eff-bc0c-583f7dde1bf9",
+        "q-45529e02-18d5-473d-8f90-fb35ad3c8163",
+        "q-2222e7de-8f4e-4f82-b414-3c64d22ae4d0",
+        "q-5e3a0ee1-8277-4c63-a75b-0fa4045b8503",
+        "q-701185ae-7269-4a66-9338-9ae3ded2d6c3",
+        "q-5c894b6b-d2ce-4c76-9e6a-852972221a8a",
+        "q-f194561c-3f5e-486f-bdba-4901d0564259"
+      ]
+    },
+    {
+      "lessonId": "l-alimentation-etages",
+      "questionIds": [
+        "q-56ebfb90-9a92-4d63-8941-fc67112f89bc",
+        "q-2efa3421-1507-4c2e-bec6-66ae16a8172b",
+        "q-329e1f20-260b-4c0e-8d56-fc1c11d454b4",
+        "q-a98f06b9-4a01-4fa9-afcc-e8bd3ea5eff1"
+      ]
+    },
+    {
+      "lessonId": "c08-l02",
+      "questionIds": [
+        "q-e8ec6d09-8ad9-49f7-b32a-ffd75a49b365",
+        "q-927f8f78-e4ff-4e27-988f-c0d6bfc7651c",
+        "q-2f3de973-2229-4f51-a9fd-c1f21abe1e0c",
+        "q-0d48c64c-7827-49de-8bef-2c3853ce046e",
+        "q-167294bd-2e47-4a19-a0ba-7b6f363b5716",
+        "q-6a2afa4f-5d96-43e1-84a9-1f8a8f7b196e",
+        "q-20eaa46f-95d1-4203-9bf8-0bdd90acbb2b",
+        "q-b5f5a526-bbb3-480b-976e-af0b80889e66"
+      ]
+    },
+    {
+      "lessonId": "c08-l03",
+      "questionIds": [
+        "q-59514898-48a2-4e7f-9658-315ef2f3160e",
+        "q-101b2463-d724-4cd9-baba-c3c2f32f36dd",
+        "q-777a61a3-455a-44bc-8f7f-35d4ca0f1513",
+        "q-03bf3eec-c6cb-442a-8c43-68765a09ace9",
+        "q-d6034c1e-4e6c-431f-918f-ff98c0e26b17",
+        "q-1c5abaa9-373d-481c-a0b2-5fc3d3efdae7",
+        "q-10320fe8-ee8a-4593-b134-d06cce69c825",
+        "q-aa83cf45-8c2a-4a0d-8e31-134eeaff3878",
+        "q-5c959840-e48a-41be-90d7-23d0181b5ae1",
+        "q-23fa0b14-91ce-4617-8d55-31859cf018ba"
+      ]
+    },
+    {
+      "lessonId": "l-classes-amplification",
+      "questionIds": [
+        "q-3062f0d6-45f0-47ee-96ba-995ca588cdbc",
+        "q-8d69173b-7e76-4581-944d-013807f6d044",
+        "q-6a5f53c7-af23-412b-8df4-44c1b6fe62df",
+        "q-af35f6b8-f9a4-4db4-9295-f9e9bffa0b9a"
+      ]
+    },
+    {
+      "lessonId": "l-aop-entrees",
+      "questionIds": [
+        "q-d129576d-f422-43e1-a9f5-b95807754e04",
+        "q-2f5b2a55-397d-43e7-b3f2-f6637b20c74d",
+        "q-2f2441f8-c75f-4847-88d7-c2d72bbb5f58",
+        "q-818bfed3-fffd-4efd-b1d0-84cf80c88022"
+      ]
+    },
+    {
+      "lessonId": "l-aop-montages",
+      "questionIds": [
+        "q-890bca8a-24d7-4c27-aa0e-27292eb615c8",
+        "q-2530b7cf-c5f8-4d91-8d7b-3d04a6f4c527",
+        "q-6b7fb867-a0b6-49a7-ad4c-56639aa7f712",
+        "q-310924d3-6fd5-40f3-97bf-721d065266b3"
+      ]
+    },
+    {
+      "lessonId": "c08-l04",
+      "questionIds": [
+        "q-ae6d0adb-503c-4c3e-974c-41937e646253",
+        "q-471fba70-e3b6-40c8-9452-ecbacf4c8052",
+        "q-d4195976-e326-42a4-bdff-ed2fdd8ee128",
+        "q-ee584a83-708e-4daa-9027-139a9842d271",
+        "q-d0471255-9ed8-4e5b-8229-ee8cc892d4a0",
+        "q-d2bb25be-440a-4a71-b6ea-46b7d4864af8",
+        "q-fdd548ab-e15e-48b0-9b0c-d694e793160b",
+        "q-7855380a-08ba-40e4-ad30-6fd797d2a7cd"
+      ]
+    },
+    {
+      "lessonId": "l-quartz-pll",
+      "questionIds": [
+        "q-4fc02b23-a079-418a-9ac6-54432347e3dc",
+        "q-b1455075-e5b8-47fc-817b-acdd6a071ad7",
+        "q-b8f122a2-e62e-4b95-93fe-03de97d52e16",
+        "q-70cda2c2-fd6e-4ac1-af56-1d7946a66081"
+      ]
+    },
+    {
+      "lessonId": "l-tubes-reperes",
+      "questionIds": [
+        "q-6843eeee-adbf-451a-8123-d7391e542f28",
+        "q-fc534199-fd26-4a8a-bbbd-37d17ae4af45",
+        "q-083376d1-42fb-42c9-a7f5-3268237c341c",
+        "q-da6e17b9-d7a3-467a-a147-eb3910b5d13c"
+      ]
+    },
+    {
+      "lessonId": "c09-l01",
+      "questionIds": [
+        "q-a6119e22-15ef-4803-b89e-2440c32778be",
+        "q-7cb0cfee-82bd-408e-9901-f7e19a404979",
+        "q-ed8f65ef-e73a-4d30-b079-3a0b5fd62410",
+        "q-0f25ccdf-636b-45fb-97a1-80f222682820",
+        "q-39737935-4b1f-4d27-8dc3-42bb7686257e",
+        "q-e4c4ec43-5cba-4cf8-9d14-cdb1fddceede",
+        "q-b3993a55-fd14-43bc-a693-dc76fe8d8c5a",
+        "q-616f39de-f52b-4d2f-8750-afceeaed9f5f"
+      ]
+    },
+    {
+      "lessonId": "c09-l02",
+      "questionIds": [
+        "q-9ddbd1c5-b211-48a0-886a-13132bcbef63",
+        "q-477e149b-3ccc-4761-bfdf-97b66e6d714e",
+        "q-095a54e3-7535-499a-bcc3-523e00b63876",
+        "q-4774368b-d782-40d3-bbe3-4383989d796e",
+        "q-de2c1e66-1a59-44d9-ab9a-7cff23f0ffd9",
+        "q-b291be3a-e1ce-4c53-a694-c4d210c3f9ac",
+        "q-5ea69575-3920-4fbb-8f1f-35fdda2f0b5a",
+        "q-0bfe9996-21ea-413f-8f4c-9fddba599a41"
+      ]
+    },
+    {
+      "lessonId": "c09-l03",
+      "questionIds": [
+        "q-82f93f23-41b2-4c56-b340-8d07c1cbc2b4",
+        "q-a6ea29a9-b2ce-4807-abfa-66af712a6d68",
+        "q-2f447c9f-4836-40bf-be2d-04fe39755c9a",
+        "q-5185f8fb-c370-4e4a-91a0-cb9938d7c1a8",
+        "q-ea57d74a-335c-45bb-a7c7-f17646a00c6b",
+        "q-47c373bf-4f09-44e4-9aff-60a845f171e3",
+        "q-7fe41db3-c5bc-4a3a-be04-62acd50bfa90",
+        "q-9424c3b8-b666-4df4-a1ed-34ae47a5e652"
+      ]
+    },
+    {
+      "lessonId": "l-recepteur-etapes",
+      "questionIds": [
+        "q-bcacaa46-7409-45e8-8ed0-8be41d3fc4b9",
+        "q-0a73e4e6-8854-49c5-bec1-7ff74e33d5d9",
+        "q-d132e772-fcca-4b46-a8ac-098e7f7a1bcc",
+        "q-701c4de4-6623-4456-aae7-e38fb4b82bcd"
+      ]
+    },
+    {
+      "lessonId": "c10-l01",
+      "questionIds": [
+        "q-35232c2e-8f1f-453c-91c7-cb893708bdd9",
+        "q-15a4b494-f430-44b1-859b-50b3de2e1d6c",
+        "q-5a60410b-66f6-4d64-a722-5519e36eead3",
+        "q-f9e7834d-d204-415b-bddc-78ebfc2b22f8",
+        "q-a89ecbab-f072-4c9d-b43f-926cce98a4da",
+        "q-6602ffe3-6123-4cf1-99cc-563ce64fc287",
+        "q-c3cb6250-5a64-47f2-adf7-c36ed39e1fe4",
+        "q-5317f6e7-703e-4508-97a3-c5ac00ac33dd"
+      ]
+    },
+    {
+      "lessonId": "c10-l02",
+      "questionIds": [
+        "q-54f876a6-41ff-4fd6-97cf-0d2a1e29ae8b",
+        "q-91095593-1d41-462e-9c42-1d352c87efce",
+        "q-9cbb65a9-cb29-4db1-b5f7-16bf212ea709",
+        "q-ce5d14d4-446e-401c-b785-ef5bb23d73a3",
+        "q-b1384fc7-67a6-4d82-b1d5-0539c86a71e2",
+        "q-eaac352c-2557-4605-a032-8269af9442cd",
+        "q-554b0c80-e289-414b-b2cb-f4a5c8e6ee33",
+        "q-5afc81cb-35a6-4305-96cb-cc0ea55ba25d"
+      ]
+    },
+    {
+      "lessonId": "l-image-reception",
+      "questionIds": [
+        "q-a29adeb5-c71e-49cc-a163-53f25525eba6",
+        "q-8c3bf124-e77e-4a41-ba5c-6918ecd87390",
+        "q-0bdc077b-a0f9-4e8a-9026-ec71ad0894ac",
+        "q-46aec9c6-e95a-4604-afdc-55df3b1f5687"
+      ]
+    },
+    {
+      "lessonId": "c18-l01",
+      "questionIds": [
+        "q-3de053ad-63d6-44c8-909a-ba29640b76ba",
+        "q-e1b38b13-fd89-492b-ab1d-639ef7f2b859",
+        "q-5d1af9f1-0eac-4b73-9bdd-b5488248233c",
+        "q-6da9a531-0d9e-4e2b-8859-4ae532b8b7a8",
+        "q-101e3160-ded1-4c9b-a13a-4b288f1e4455",
+        "q-f2243fee-279d-40e5-bccf-05231481c906",
+        "q-da13b913-d974-465b-9f9f-d54c95169b28",
+        "q-67da01bc-f623-45ba-86f0-8bf5e9725e51"
+      ]
+    },
+    {
+      "lessonId": "c18-l02",
+      "questionIds": [
+        "q-46b84b2b-e81e-4d41-9f83-803dcdbbf6dd",
+        "q-28fcf803-4237-401b-af1c-7b1dd4d818eb",
+        "q-614f50af-2cbd-4a8a-883b-11ead478b457",
+        "q-c398a3d1-2686-4f91-a02b-d3b343e9ad0f",
+        "q-caaec494-abc2-4172-ae4b-3429f893a437",
+        "q-fd0c2cac-836a-4b78-9c63-488037b0c551",
+        "q-2c4cab01-baa1-4384-be2d-75a5f88c4584",
+        "q-f9714d8f-f513-452c-8137-63c83979f95b"
+      ]
+    },
+    {
+      "lessonId": "c18-l03",
+      "questionIds": [
+        "q-410e3ab2-b3f9-4e51-8059-a03afdecf9b1",
+        "q-95afa68c-0574-4008-a0a1-f2e0d56bdb62",
+        "q-6062d7a4-2e94-4a42-ba17-002a5e87f724",
+        "q-efc75377-2b2d-45cc-b670-f3521ef860ee",
+        "q-3ba38ea4-3d30-4380-a8ba-cf58c371fcd0",
+        "q-c5ba8b16-1df0-4ee8-84ec-0d3f33d29dd4",
+        "q-1c02755c-8a1d-43c1-8bf8-21e54bd412b2",
+        "q-91c74446-03c1-4751-92bc-c7034890500d"
+      ]
+    },
+    {
+      "lessonId": "c10-l03",
+      "questionIds": [
+        "q-4deeb265-8a09-43a0-b83e-960564517fec",
+        "q-9cd2048f-1bdf-43b1-85cd-f52999deb08a",
+        "q-feb20954-efb0-4b05-a3de-7bac30eb9cbd",
+        "q-03e6ae81-6a81-44c7-b65c-30f2098b6bd6",
+        "q-62555fc5-5f75-4f4e-b3f3-e0a05eb53c03",
+        "q-8c3a822c-2a7f-4640-a592-f9b391c5c50c",
+        "q-c15f4ea1-5172-45be-86aa-304d8f9ad48e",
+        "q-615d2072-36db-49e6-ad85-50a40a8c797d"
+      ]
+    },
+    {
+      "lessonId": "l-bruit-largeur",
+      "questionIds": [
+        "q-e9d4d421-4f10-449d-847c-1d0a45b8cb9b",
+        "q-8fff320f-8081-41e1-bcf7-60046808874f",
+        "q-8d38b2fb-426a-42be-a188-d57d746c03b8",
+        "q-eb2b239a-dec9-4e9b-9156-857932811a95"
+      ]
+    },
+    {
+      "lessonId": "c18-l04",
+      "questionIds": [
+        "q-03e2461f-ffe7-42bb-94ad-7204c0577529",
+        "q-539daa55-b15e-4d19-878c-a7362f1dc39f",
+        "q-fb54dbaf-0cc3-447d-b707-fb4066d10402",
+        "q-9d761257-8024-4721-a956-d20acab9ed5d",
+        "q-5e80ebf5-55a2-40ac-b3b0-d9bab3905efb",
+        "q-60122829-3ce0-4332-b03b-8dfe2b2a0656",
+        "q-a0f7e94a-4f68-4db0-9cda-64c6317d1943",
+        "q-4cf433a7-ab7f-49b7-87ed-91d8dcc340e3"
+      ]
+    },
+    {
+      "lessonId": "c20-l01",
+      "questionIds": [
+        "q-6380a2db-8a31-4f79-8950-c37a3218764e",
+        "q-f7eda2d7-8e37-4f6c-9fc3-fe335ca2f199",
+        "q-0b51417b-626e-4f73-93d7-6d4b9686c52d",
+        "q-09dfcfcb-2ab4-4134-befb-99cc9b439e59",
+        "q-37f5505a-5d9b-4254-9d4d-59e5f9106275",
+        "q-5086f909-f23c-47a6-95a3-4614cf156adb",
+        "q-f32b888f-b2a3-44fa-8e27-a4a33937fa4d",
+        "q-82b74597-eb1f-463e-beda-70b91c6268e9"
+      ]
+    },
+    {
+      "lessonId": "c22-l02",
+      "questionIds": [
+        "q-e1e21327-ae7a-401b-a1bf-558ebd47612e",
+        "q-cd9f74e9-6f2b-4850-be0a-ac08b8c2615c",
+        "q-a543b924-ad22-4ce7-a465-59d22c9b9494",
+        "q-6289432d-81aa-4bbf-968f-9f8d4aa12557",
+        "q-e59ae025-bf81-4830-9e36-baa46f5d0525",
+        "q-26c0e593-4546-4e0c-9354-bafa6f8ca13b",
+        "q-8a637b78-dcd1-40a1-a0ad-9c8267c2cdd9",
+        "q-f8b82b50-61dd-469c-95fb-42a64335f5a4"
+      ]
+    },
+    {
+      "lessonId": "c22-l03",
+      "questionIds": [
+        "q-d0ccbff2-f21c-47be-beb1-4000b3079e5d",
+        "q-e3abfa4f-2578-4ce0-8be0-b8721ded8997",
+        "q-370f8f7b-aa99-47a1-8719-1dbb79b3ac42",
+        "q-fa7e5116-cce2-41e1-8602-278c28f8ea7e",
+        "q-4bff2f8f-20e5-47d1-9722-897b6108a238",
+        "q-86f355f4-ed4a-449e-8315-73083c0c3329",
+        "q-8316c47f-2d9e-42d9-bd0d-05679c5c3558",
+        "q-c6ebf32a-e980-4434-a741-22d4382fadf6"
+      ]
+    },
+    {
+      "lessonId": "c22-l04",
+      "questionIds": [
+        "q-dad59f03-8430-40e9-94d8-4d053476f285",
+        "q-6c6c074e-96cc-472f-8de5-cfd595b5ec70",
+        "q-e81656e7-8f49-469a-846e-3bd35a425761",
+        "q-0f359ad7-1345-4954-99d5-e254afd29789",
+        "q-9ed3ab86-87aa-4f71-aca8-491e84f40c19",
+        "q-47edd5b8-8530-4326-9adc-c4e8dd2817c5",
+        "q-535e52b3-df6c-4aef-a45b-d6e77e508b2f",
+        "q-6cea2e44-65e3-4081-837a-7a9784692a9b"
+      ]
+    },
+    {
+      "lessonId": "c09-l04",
+      "questionIds": [
+        "q-b39d580c-e55d-4e4f-a7e5-6530f84c6571",
+        "q-6e406591-53ab-4dde-b633-3eafebd3fb06",
+        "q-428d1509-9331-49fa-8c08-fa11d275b7bf",
+        "q-803dc4ea-b7e5-4ac6-990c-71629576878c",
+        "q-17d88fbb-8f81-4d9c-8dca-6cac5c6d2fb0",
+        "q-000d8c56-3ee8-43ce-a49f-90f608df298a",
+        "q-cd11274d-42ad-4d83-b5db-185b14d825c6",
+        "q-9650d990-ad50-4de4-a42b-3612a07a0190"
+      ]
+    },
+    {
+      "lessonId": "c20-l02",
+      "questionIds": [
+        "q-97374df6-dacf-4e5a-b881-d3c973e3e287",
+        "q-f01c3e90-a5de-49f0-91db-ce939e2a5356",
+        "q-310695b2-3221-41ff-baa7-57ff875fa740",
+        "q-504c8f8b-5767-4640-b953-c0ad0eb57f85",
+        "q-e7a80946-3a9c-4388-bc14-2ca277c63cbe",
+        "q-311ca328-f6d1-4fff-b26e-4b2c8f5d0fc8",
+        "q-29be6ca6-fdff-4a34-a0af-58419fa0bb80",
+        "q-2ad7d5c2-6b09-476a-99fc-4acb7a8b522f"
+      ]
+    },
+    {
+      "lessonId": "c20-l03",
+      "questionIds": [
+        "q-d585a9b5-aa97-4b82-8654-1866c19b1e13",
+        "q-dbf29c71-7a10-4350-91f6-a386d7389d50",
+        "q-2c1c3015-054e-4f9b-94b6-009cacade01e",
+        "q-a2613cef-03a4-4471-898f-8a752fee4157",
+        "q-a9be860d-6765-4d97-ae27-3f7893e352be",
+        "q-9f4ef5f4-bf72-4c00-9e76-3331b6662ef6",
+        "q-0d12ad43-f2ce-4cdf-bbc4-4e7c589e5eef",
+        "q-c0747150-bbd8-46ef-8a0e-f9ac0ed2785c"
+      ]
+    },
+    {
+      "lessonId": "c20-l04",
+      "questionIds": [
+        "q-98533dba-f07b-4d86-a05e-9481a16ebeef",
+        "q-01b1a777-cab1-45ef-aa13-62f19007ec0d",
+        "q-d8986210-1756-432f-b45e-e11737448de1",
+        "q-dd625cb1-6d9f-48df-b036-d5faeaddf122",
+        "q-c69b125b-b42d-40be-8100-994b99345875",
+        "q-8de686bf-f4ed-4be4-b979-055bf431aa82",
+        "q-d6beed6a-b791-4a78-888d-5bfb64476c46",
+        "q-c075f668-0367-44ee-9bc2-1945822de9ee"
+      ]
+    },
+    {
+      "lessonId": "c01-l04",
+      "questionIds": [
+        "q-597c056b-8e5a-4a5c-bdde-da8d679138b2",
+        "q-c508d5c4-3954-4c6e-94e8-f84aec085cd1",
+        "q-a5d36619-8faa-4416-b8f5-59da2cd32076",
+        "q-f9aa465c-663d-4d7a-9f39-b63334819124",
+        "q-cd2f740d-4300-47f7-83f1-be57f929d89b",
+        "q-f519ab3c-efc3-417b-9047-b00a76be3a6f",
+        "q-3655dbd5-b4bc-459d-a0a2-a2e79f69acc4",
+        "q-872a33ea-bfa7-4fb0-a8cd-833abc123b0b"
+      ]
+    },
+    {
+      "lessonId": "l-band-plans",
+      "questionIds": [
+        "q-a7a000b0-e3a4-4b28-87b4-f0cff2910a32",
+        "q-868602c5-f423-4c40-bff6-671814a565f7",
+        "q-ccf5d3ff-a860-4624-813f-0e419be97842",
+        "q-49845664-1b99-4a46-ab5d-59240278e244"
+      ]
+    },
+    {
+      "lessonId": "c02-l02",
+      "questionIds": [
+        "q-21db47b6-9c77-447f-9716-2fc1a137da5a",
+        "q-1c580788-83de-4360-adb2-5463ceff8bce",
+        "q-613ebac6-55ec-4f76-aebd-b56adc28ecbd",
+        "q-8cca3d67-edbf-42b9-bb8b-853a2c60d5cf",
+        "q-9de745c9-2568-4d7f-a237-eb57ffd7f982",
+        "q-0a5b81f5-1ef1-4917-9ae4-abdaba603de6",
+        "q-c254ffdd-6760-44c2-8cbb-5d30a1b6c560",
+        "q-73a01f78-f6c2-4a0a-ad50-14ce7155cb00"
+      ]
+    },
+    {
+      "lessonId": "c11-l01",
+      "questionIds": [
+        "q-316ebb9d-661f-4f88-8722-91ffff908cf6",
+        "q-b798136f-37d0-437d-bdb6-e4426fc996b7",
+        "q-d4b4a94f-4d3c-4348-8222-08e8bf253b7b",
+        "q-9b884152-fcda-4081-b943-c7beaec4cd8b",
+        "q-d5fc0f9e-c902-4e5f-b9ae-65437579a1f8",
+        "q-83ba1cea-e32d-40d6-b4be-88b24adbf861",
+        "q-73fda97b-7543-41be-9813-40493728bf3f",
+        "q-25687994-e559-4c31-a0d3-cd82532dc994"
+      ]
+    },
+    {
+      "lessonId": "c11-l02",
+      "questionIds": [
+        "q-a9722c7c-48af-4db1-8275-25e1ad96ef7b",
+        "q-cf9d1268-0ee7-46df-b55d-307a887a0457",
+        "q-83c41935-804b-4423-ab9d-face92582a9c",
+        "q-84e0fd90-3e6d-4671-ab05-b57e7f02b2a8",
+        "q-78132d60-b0be-43e2-9d86-6e7971659207",
+        "q-b5559ef3-018f-4a90-8c22-61eb0f341064",
+        "q-539fd22c-ac0b-4669-891d-2cf1e3bfd889",
+        "q-17bfa538-1e8e-4e03-9b6b-242f84e87570"
+      ]
+    },
+    {
+      "lessonId": "c11-l03",
+      "questionIds": [
+        "q-cfab6af4-6680-41f7-845e-945c2d44d57e",
+        "q-3aaeecf8-4428-48ad-aaca-2e5df733fb86",
+        "q-2ea24e29-a57e-4b4a-8c1a-3e126cc4db28",
+        "q-5f8b60bd-4398-4245-84a5-3614d263e33f",
+        "q-e0bb78eb-00c9-4c5d-989a-0a252e9b75b9",
+        "q-cafdb851-baa9-45a5-83d7-f59ed1154c47",
+        "q-5c1972c2-9e5a-4e64-ae2b-94be25dd2fce",
+        "q-948b174d-11cb-400a-9cce-cd2eb2a6b319"
+      ]
+    },
+    {
+      "lessonId": "c11-l04",
+      "questionIds": [
+        "q-cf54e20d-59f9-4af0-bc66-8923228ec62b",
+        "q-d1fc05f5-92c7-4838-919b-cade9ca77b53",
+        "q-885b324f-7f0f-46aa-836c-5c80525a8353",
+        "q-b0926bec-8ea8-4600-b6b7-c9dfa247463f",
+        "q-e83b4c53-430b-42e5-aab3-c557544d7705",
+        "q-541f651c-c926-45ef-acd7-8febff45d277",
+        "q-c6a66247-454e-4e9d-8ba9-914fb302b802",
+        "q-a1e73bb6-dad4-4ff0-8ba6-2f1d5eb0b81d"
+      ]
+    },
+    {
+      "lessonId": "c19-l01",
+      "questionIds": [
+        "q-10f936e7-74d3-4581-9171-84429ea9efd0",
+        "q-be4dd68f-5ecf-472c-b295-aa23f971d3bc",
+        "q-48da61cb-9d0b-4718-9b11-46307892afb0",
+        "q-ab26f4e4-3d43-49eb-9b1c-fa53e17b23e0",
+        "q-a046fbbe-da53-46e4-bdcf-f653f097ab96",
+        "q-17e24140-c737-44f7-87bb-072c004b7c40",
+        "q-27b6b72a-5755-4253-8607-ed2b1d4ddb0c",
+        "q-4de255f7-48a3-4769-b693-472a171884a7"
+      ]
+    },
+    {
+      "lessonId": "c19-l02",
+      "questionIds": [
+        "q-488b48ce-aac0-4102-8806-cd3c564f8ef0",
+        "q-06d7a27f-f911-4f99-a0d5-749e4e1de9d4",
+        "q-0fc1c430-7d2d-474b-8a58-266b663aad27",
+        "q-9cfde878-b886-4636-9892-b45fa94efa24",
+        "q-cd99686a-1b33-4337-885e-df63de945d04",
+        "q-458d4bc7-0782-4325-9afc-d40f04790686",
+        "q-67c4f83d-cd31-4d74-822c-f53e3a162473",
+        "q-3773d2fe-560a-4f1c-9045-76c0f51376e2"
+      ]
+    },
+    {
+      "lessonId": "c19-l03",
+      "questionIds": [
+        "q-5c6a7b8a-79c5-4a9f-9933-0b5623dc2f7b",
+        "q-97d36d0b-31b9-40f4-b1a8-5dad75c3ee59",
+        "q-23a7e1a1-a5f4-456a-9987-75f2f6a144c9",
+        "q-61f6fd7a-d359-4ae7-8bed-137df4e28e8c",
+        "q-7d5fd6a8-fe55-40c7-8231-a20b718a31e4",
+        "q-3bde9431-602b-46ee-845f-d307b01d7f1d",
+        "q-8ee9df99-8428-4266-ad1d-849258f689e7",
+        "q-2890100a-55fa-42a0-a8d3-c54ff5ba60a3"
+      ]
+    },
+    {
+      "lessonId": "c12-l01",
+      "questionIds": [
+        "q-cf4f7d49-7ba2-415a-91fd-20d2d71bda74",
+        "q-9ccd824e-1918-42c3-9dcb-e3409687b3bf",
+        "q-c4057d52-3002-4488-9226-89a448c413a4",
+        "q-998f9a5f-b74f-41b8-9120-4b07b20ffb90",
+        "q-e5cc396c-031f-4ab1-9345-f8cf39fef66b",
+        "q-8a1d91c9-cb1b-4c30-b275-fc8872ac5bfc",
+        "q-6bbf38c8-ca46-4b13-976a-2b13a39c8e50",
+        "q-42b6467b-9033-41b7-9d2f-cff9be00a27f"
+      ]
+    },
+    {
+      "lessonId": "c12-l02",
+      "questionIds": [
+        "q-88890d3b-c759-4ca4-89dd-c07749bebcfb",
+        "q-c05f254b-728d-41b6-8de4-1898ca7b2618",
+        "q-5a7667e1-6fdb-472e-902d-2a8202b6aeb3",
+        "q-b91c6776-1cde-418b-b0d8-bcd63b0ccc61",
+        "q-2cc87176-1a91-4932-8573-7d36397a2545",
+        "q-ed1449fc-8e33-411f-9a29-0dbd9610c0cb",
+        "q-a2420176-90a6-4e01-81d7-19ec75420a30",
+        "q-33ecdcc5-631c-4708-98a9-e248c31fb137"
+      ]
+    },
+    {
+      "lessonId": "c12-l03",
+      "questionIds": [
+        "q-b25bf915-575c-492f-9454-afbe812961f3",
+        "q-a4718f50-ddc5-43b9-a19a-47a7e59c4609",
+        "q-1b2f1d77-e2d6-45f9-a4e0-8c439882ade0",
+        "q-3b636d46-ce91-4a3f-b07a-90187029663a",
+        "q-cbef970d-ebac-408d-9204-bbe2cf6a1b15",
+        "q-c81abd70-bca9-4e12-adf1-5f1ba8b9f64e",
+        "q-185065e7-7af8-47e1-9c99-b9d71271c7b5",
+        "q-8ed6ff9e-c705-4ac8-b8cd-94c116a65f50"
+      ]
+    },
+    {
+      "lessonId": "c12-l04",
+      "questionIds": [
+        "q-2843181c-e6c1-49e7-aa2c-8735d551ca41",
+        "q-6645b2df-7588-4a5f-bfc4-ddc4ba442f4f",
+        "q-740c358d-453a-4617-9145-7f23fcc06515",
+        "q-0cd2a1c9-cd60-4d9f-85e9-cb38670ebd3d",
+        "q-e9b0409a-0f47-48b8-aabc-bca1b8e35808",
+        "q-0c96f1c1-0535-4a9e-a0ff-89b2c63dafc1",
+        "q-9b99446c-d1b4-4238-aa86-c820064b0d5a",
+        "q-d9b398f0-ad17-478c-b95e-8bdd25c016c1"
+      ]
+    },
+    {
+      "lessonId": "c15-l03",
+      "questionIds": [
+        "q-edfa46bf-bfe3-4cd2-8a8b-9bb5e7029535",
+        "q-b94dbe57-f101-458a-9ff8-861b01bb77c2",
+        "q-b528a075-4274-400f-8a06-ce857b93b30f",
+        "q-92e319c0-1cf5-4fbd-b9d0-fbb7661a008b",
+        "q-ee2979ca-8bb4-4301-94ad-1a272f24a4af",
+        "q-a4ca4383-6b13-4f31-8892-a9b38df6c374",
+        "q-dab18659-c460-409d-ba39-d648a31adf10",
+        "q-615e90c1-545c-485c-8836-24c4a9ba1a43",
+        "q-72966372-63ca-45fb-958c-8fc437279196",
+        "q-55450a33-9481-4fbf-be2c-37227edbd413",
+        "q-9356a63c-880f-4c62-ac2c-7d5eed1ba09b",
+        "q-18f66e9d-6a9c-44fd-8f39-d4d5c817bcd9",
+        "q-cde65bee-188e-4b46-b650-e6a3b0847f99"
+      ]
+    },
+    {
+      "lessonId": "l-morse-mots-durk",
+      "questionIds": [
+        "q-dded8049-a80f-4c91-9a6e-d547ba93ce29",
+        "q-7f42aa8f-723c-4758-a550-0d171dc9e6d9",
+        "q-66bf4b1a-73ea-4a52-84c7-d92ea76d7035",
+        "q-14651ebc-5a9f-4c11-8c79-f082bf2cc802",
+        "q-3c6a857e-d277-4bae-b085-0c16150ea286"
+      ]
+    },
+    {
+      "lessonId": "c13-l01",
+      "questionIds": [
+        "q-264d94f0-70b1-40cd-97a1-830d830d0061",
+        "q-d038a39f-02a4-45c6-ac9c-71466d22ef15",
+        "q-93148d8c-c862-466a-ac79-d0c19d736028",
+        "q-9937a46e-7455-4fa1-a081-97fe3ef7bb3f",
+        "q-0d40e607-e239-4d96-a3a9-db70b002191e",
+        "q-e7283771-d8fb-4d03-8127-6d666ccb37be",
+        "q-2b5fc32d-d4d3-4025-8ff9-b0b862627ecc",
+        "q-05a28dfd-cce8-4910-982d-a5570d261ebb"
+      ]
+    },
+    {
+      "lessonId": "c13-l02",
+      "questionIds": [
+        "q-dce2ce7d-d742-4b7d-b6e6-c8c84be3979a",
+        "q-830d55f1-e8e9-4cb0-86c1-5f3c6986bbda",
+        "q-aafa99c4-79a2-45b2-a19e-e83ad40ca087",
+        "q-43c5955d-1cb9-44bc-8e74-adc91ef0a246",
+        "q-3795b7ac-6eeb-41c7-ae95-f7a5d39b20a4",
+        "q-07dd0158-157f-4f39-9e2b-05cba304a71e",
+        "q-8a4e76f3-c8f4-48b8-b2c0-b46c4a291bbe",
+        "q-7a87b012-8c18-481d-ade8-06e0946fe971"
+      ]
+    },
+    {
+      "lessonId": "c13-l03",
+      "questionIds": [
+        "q-95f1e4f6-1f96-4e1b-8044-69ba079919ce",
+        "q-21d975c3-1f66-40dd-96e4-0abcba645d51",
+        "q-13afbe52-c9db-40e2-8eab-e901d0e36351",
+        "q-8aaa8ac9-6ca0-4550-acfa-918d6c8f48d8",
+        "q-f8f3a3b3-0f10-40a0-946a-a1239fce4d68",
+        "q-6c071bbf-9497-4a3d-ad32-15897db35025",
+        "q-a015e9f6-ec7c-4cd0-87fa-29842a20b440",
+        "q-52e1825e-7fa0-4698-bf46-8667d2f4cc1a"
+      ]
+    },
+    {
+      "lessonId": "l-emission-puissances",
+      "questionIds": [
+        "q-4f95bb8d-c813-48d1-955c-a956be994e5d",
+        "q-7bff9635-94c3-4d79-b440-543714ce6ae6",
+        "q-ac01727d-d773-4a13-bdf2-8660b362548e",
+        "q-e1926cd3-b56c-4348-a8ea-0e0429ea3583"
+      ]
+    },
+    {
+      "lessonId": "l-identification-carnet",
+      "questionIds": [
+        "q-3da78061-c7a0-418c-95ad-8244cd3076cc",
+        "q-ecf566c6-d8ca-4ecd-9e51-c56185f0efef",
+        "q-822791ab-e656-48d9-bd71-aa0c6894c9b3",
+        "q-a4f55b68-b9db-4d12-933b-430786c8a4f3"
+      ]
+    },
+    {
+      "lessonId": "c13-l04",
+      "questionIds": [
+        "q-1129adb7-dbd1-4025-a14c-f2ea0aaaccdc",
+        "q-836bb05e-3387-42e5-91cf-997116c95b80",
+        "q-771fa9cb-bb86-42cd-89a9-7a72b01dbc71",
+        "q-719ac140-e349-444c-aaa3-36a795b67aab",
+        "q-1f761194-1823-40c2-9aed-3eef2dd6c232",
+        "q-ec39c7b9-2f60-4ef3-8577-4c562e16d6f2",
+        "q-0393ff08-093f-4d34-bddc-b7aa948d0bff",
+        "q-e1900e2b-9928-4d9f-9941-dffe259f202c"
+      ]
+    },
+    {
+      "lessonId": "l-cept-voyage",
+      "questionIds": [
+        "q-e25ed32d-a533-46d7-a185-31b1190649a1",
+        "q-521d30e2-bb19-4f92-beb0-125b6798ece6",
+        "q-62996cbe-2ecb-43f4-ba88-1313fd1f2a2b",
+        "q-9e7d598b-c324-44be-8bc0-2b06d83e4681"
+      ]
+    },
+    {
+      "lessonId": "l-installation-droits",
+      "questionIds": [
+        "q-c98a2865-e047-4100-a901-2da6b37200dd",
+        "q-c5cc0606-2808-42d1-bfcc-4078130408cf",
+        "q-595c59f5-6efa-4cb8-a144-356cd7d95747",
+        "q-f5a210f2-1c6b-498f-a2a2-895fd23d82f2"
+      ]
+    },
+    {
+      "lessonId": "l-emissions-designation",
+      "questionIds": [
+        "q-fefc24ba-5355-425c-b432-f0a1e5793e50",
+        "q-c174398d-9bad-46f5-8edf-1cda749f0e00",
+        "q-57c111df-9396-405a-bb59-4eeb11f7cc5d",
+        "q-1f5f32c2-932f-4622-93e7-ae4cf16c8abd"
+      ]
+    },
+    {
+      "lessonId": "l-messages-amateur",
+      "questionIds": [
+        "q-2084c4bb-7dd6-42bb-b8a3-739b94ca5fcf",
+        "q-75b0ba02-2ba6-4e63-b7e1-cae3eb2ec33b",
+        "q-7c7c43c7-cf71-41b0-8da0-dd4170e85528",
+        "q-a18b76b7-95e7-4dc5-b575-5d4a85a551ae"
+      ]
+    },
+    {
+      "lessonId": "l-controle-responsabilite",
+      "questionIds": [
+        "q-cc860fdc-641d-48cf-bf51-d8ebefd5ba49",
+        "q-4127518c-b0d0-4207-9f0c-6058e77ab499",
+        "q-71e5a3c7-cc23-436a-9505-846c4b59593f",
+        "q-36752416-9f12-44f7-921b-3977b1b8c2dd"
+      ]
+    },
+    {
+      "lessonId": "c21-l01",
+      "questionIds": [
+        "q-2308eff0-b21c-4533-b0d5-4fdc1f94f1a3",
+        "q-a293049b-25e2-4c17-a85c-d54cf0d0bb63",
+        "q-c9cfdbb4-22bc-479a-a6d0-d2998cd81eae",
+        "q-7fa1b6ee-b129-4df4-b0ca-a544ab7c0ff3",
+        "q-8a7e2c27-ec08-48e0-b521-e57c370eeeb0",
+        "q-7bc19560-e17f-4695-8fcb-5639ac6d0419",
+        "q-620bfe60-add8-49bc-a608-2064af2ae941",
+        "q-a97bd23b-54bb-4585-a794-d3e1dc109cdb"
+      ]
+    },
+    {
+      "lessonId": "c21-l03",
+      "questionIds": [
+        "q-5c5427d3-fc68-4b00-bbf7-a7d6d2b73e2f",
+        "q-7c996462-b80b-4812-b70f-bdd85f03bc4b",
+        "q-8b6b996d-38e8-4a86-8b47-80a87ec8dc1c",
+        "q-b53b0193-9360-4d29-8f5a-fadeca39f8c2",
+        "q-ce3cb789-6262-479a-804e-907661de6b54",
+        "q-e2765c2e-34c4-460c-a5c1-1787ebe61677",
+        "q-e8b1bc4a-9134-4bb5-b33a-c5b909966747",
+        "q-004f350f-5c5c-4c73-b2e8-13379249fbf5"
+      ]
+    },
+    {
+      "lessonId": "l-synthese-calculs",
+      "questionIds": [
+        "q-28f8daec-7b73-4b53-a438-5191555af9e0",
+        "q-e89ca694-48d7-4bbc-b50f-21284877972a",
+        "q-35ca411a-b1eb-4a58-8fed-10b33e49adff",
+        "q-45e98275-46c5-41f9-8001-86bf2ca67119"
+      ]
+    },
+    {
+      "lessonId": "c14-l01",
+      "questionIds": [
+        "q-cacf7487-7bbb-4179-a7a2-1bcbe83a0f14",
+        "q-d20cd391-da81-4528-8454-2e0689c5ecee",
+        "q-59c2967f-8d1e-46b7-b41f-6953658438df",
+        "q-966d17a5-29f9-46de-b8b1-c1a61a77a877",
+        "q-92d55bd6-6c20-4893-893d-2dd002a75471",
+        "q-3c28d4f3-cbc0-4103-a07d-985613c6332d",
+        "q-c2da067a-9ab3-4fbd-9df5-bc06dfabca66",
+        "q-4d05d761-4966-4300-9b2d-53c1562546a6"
+      ]
+    },
+    {
+      "lessonId": "c14-l02",
+      "questionIds": [
+        "q-f5a68c7a-3ba9-4c00-beed-45e5994d18c3",
+        "q-cacf115d-cb74-400a-9606-9c320828133e",
+        "q-07449d52-ae48-41bd-9167-2e13abbdfab8",
+        "q-921e8478-0ad0-4c65-9c7d-cad240093be4",
+        "q-578db80a-0926-4f24-92b5-cf9c526c5b03",
+        "q-6a929525-33f6-4698-abc3-f5332e36f3f3",
+        "q-819d93f8-53fa-4b04-9426-cf21a7eb4a66",
+        "q-23f2161e-7619-4689-9340-1ba0948dcaa6"
+      ]
+    },
+    {
+      "lessonId": "l-examen-materiel",
+      "questionIds": [
+        "q-5f0616e5-f671-4ec0-9f2a-52843abe1c94",
+        "q-a06004bc-5547-450d-a0a6-f529c2611bf3",
+        "q-ca077e7b-0cfd-4497-8a83-82afe8b725e8",
+        "q-8d247b25-b1a5-4b85-9f34-ba9ab83bacc5",
+        "q-be41f6ac-a84a-4531-b008-f0707486abef"
+      ]
+    },
+    {
+      "lessonId": "c14-l03",
+      "questionIds": [
+        "q-93e14d44-6af3-493f-af0f-ee16d21ba41d",
+        "q-57d72ab2-60d4-4ffb-8dd2-ce3befb6e525",
+        "q-cbda851c-5849-444a-8804-f5da7799ae18",
+        "q-8b6b6426-639d-4c9a-a151-06edf3932570",
+        "q-e825d4c0-0bc4-4aa8-825c-b63236870e2a",
+        "q-0a6c1526-0fe5-4647-a419-ee4daa36147f",
+        "q-3a6bc99f-7dd3-4a55-894e-a89d59b2d00c",
+        "q-4d8258e6-8bf8-475c-9678-a1a4a9585095"
+      ]
+    },
+    {
+      "lessonId": "c14-l04",
+      "questionIds": [
+        "q-3fcfcbec-89f7-4d66-a676-4f95a4fa2615",
+        "q-34d23d2f-6ea6-4f98-aa57-325290e36eea",
+        "q-cea9c1d3-354c-4a46-995c-9b14e50099c6",
+        "q-6814adfc-6d93-44a7-a21e-69cf5ff1b799",
+        "q-178fe597-298d-460e-ab2b-c8bdb4d9b9a9",
+        "q-f90e9d14-07f4-4e28-8be1-e647ae452e95",
+        "q-02b7ceb5-31c4-47f8-a803-845da351288b",
+        "q-6005295e-f651-47be-836e-bcff20eb4d31"
+      ]
+    },
+    {
+      "lessonId": "c02-l04",
+      "questionIds": [
+        "q-2997913a-f78f-42f9-aa87-5d0a22e9ab4f",
+        "q-94738c08-2b41-4a07-aeeb-ccd30e298368",
+        "q-3bcb0751-659f-4b14-9ef0-b60ca8c59b88",
+        "q-cd9894d7-ae20-47c0-b589-a0cb58d6e849",
+        "q-fc06a941-31e8-4c48-83b5-4cc327e9b51f",
+        "q-510786b6-b362-4011-88b2-b70023c5a777",
+        "q-93a6b9f6-47df-4198-8440-48374b203375",
+        "q-11688cfb-7510-4035-a3d4-da215ba260e2"
+      ]
+    },
+    {
+      "lessonId": "c10-l04",
+      "questionIds": [
+        "q-b98a319d-7038-44d6-b082-49f3add12036",
+        "q-fe39f773-12c8-4594-ab86-ffe1f7fbde1c",
+        "q-8d0c0983-6391-4aab-9525-b3e6776cc6b4",
+        "q-663e6c05-3fdf-4352-a106-3e217ba90adb",
+        "q-f7856090-b951-4ca3-a3dd-ea20f6269963",
+        "q-b604977a-f1b7-4c98-b471-20d09e34e4a0",
+        "q-f15bc85f-240b-47fb-8d7c-55da0b079c4e",
+        "q-bcbc9851-1356-413b-adb1-2c8fba954ffd"
+      ]
+    },
+    {
+      "lessonId": "c19-l04",
+      "questionIds": [
+        "q-ea88366e-4da8-4c33-8837-475015dc6a88",
+        "q-831cd2b8-c02d-4d4f-bebf-85183eeac994",
+        "q-0938096b-14ab-416f-bada-c84a16e2d0d8",
+        "q-cee1f493-9b7e-4272-b10f-324f78642c37",
+        "q-6fed8f39-1392-4e35-9e08-f30f10f95f19",
+        "q-92c841b9-15a0-42e6-be3d-b696653d5e65",
+        "q-d1e48d78-d649-480e-aee0-ba322dbeded8",
+        "q-c42ff5c3-099d-4e40-842a-683157fe5e1a"
+      ]
+    },
+    {
+      "lessonId": "c21-l02",
+      "questionIds": [
+        "q-b073f3db-af43-4ea3-a1ba-dbcf52bbaac1",
+        "q-66626f29-57d2-4435-baad-e7da6e4a5980",
+        "q-9ac37cd2-455d-4d5c-9b63-1bfc11068be1",
+        "q-74f88418-a5c8-4878-bfcd-0c4b73fe31be",
+        "q-8d316b0d-3b72-4544-9f51-cc0e339c3c27",
+        "q-3a0322a4-026d-4aba-b615-61a860ff1a46",
+        "q-7ec0e80e-1028-4f1a-8e50-e83233261dbf",
+        "q-95cc0318-9f4b-4818-98da-4738896e2876"
+      ]
+    },
+    {
+      "lessonId": "c21-l04",
+      "questionIds": [
+        "q-f08df675-e6fd-4caf-b5e2-8e4006583c5d",
+        "q-9b8a6335-6f5f-44f8-b140-d0f9fff3e77e",
+        "q-8e0a3ef9-4c97-401c-bd36-ba0cfe9dafb2",
+        "q-2182aea4-8fbe-4580-b9a6-6526838e55db",
+        "q-a38009d4-397d-4d77-917e-6c688ca78d02",
+        "q-784d38b7-d8a4-4ea0-9759-671cd2547c88",
+        "q-491e50bf-5d1b-4ce6-9e2a-213f3805eecc",
+        "q-53c672c5-c2c7-4d4a-9636-6f9169e9c2bd"
+      ]
+    },
+    {
+      "lessonId": "c15-l04",
+      "questionIds": [
+        "q-343008ef-0dd8-4f4a-819d-bfc68039d512",
+        "q-21e63171-ecef-49b8-8216-d2bd0a781e95",
+        "q-921156e0-2a3f-47bf-80fe-187e1c3bde8b",
+        "q-49743539-0bad-4fb7-b796-e2c1bd2d96e2",
+        "q-c835fdfc-b7a8-402c-81e3-cc7287248bff",
+        "q-4aa63f19-a0f3-4ebc-8d0b-a5943f8525d9",
+        "q-1319cb59-cab5-45b1-a7e3-14c00ab57d6a",
+        "q-3413028c-5d16-4579-a64d-e53de53f013e",
+        "q-6d7b5f1d-4799-454d-8946-ad9839d7dd19",
+        "q-caab3367-e91f-47da-ac52-afdd5d349402",
+        "q-4e7bc890-fe9b-4730-b244-95210cad152a",
+        "q-4981e4bc-9920-40fd-a52b-73b1585b7379",
+        "q-88d64c2a-f0fd-4eef-87fc-79dfedc7574f"
+      ]
+    },
+    {
+      "lessonId": "c15-l05",
+      "questionIds": [
+        "q-e342b22a-4f9d-432c-bc87-5aeab582d665",
+        "q-0a62fe25-25ef-4691-a47b-2ada2391e3aa",
+        "q-7c3786f8-86e8-4bf2-a374-812064c6a86f",
+        "q-6810c0d0-869a-468a-b14c-4066d22ae336",
+        "q-f1a54446-6977-4a36-aa29-d1cf25fbfb06",
+        "q-0a1934d5-a605-44a3-9636-453c488baa5b",
+        "q-7951f40e-3bda-413f-8ca6-681e35cb6a51",
+        "q-1d4d05af-b051-49be-8d0a-e9600c324927",
+        "q-ca59fc2a-a2e9-407d-87ea-481a8aef1e5d",
+        "q-8f2de69f-3ff5-4f12-b667-84d5f8ed0dbe",
+        "q-b4379a3b-010a-4448-8dd7-e02a3e4eabea",
+        "q-6e5edbf9-10f6-4d92-a7e0-3c7884ce89a1",
+        "q-8f809267-e823-48ff-a87d-51a02c5d1bfd"
+      ]
+    },
+    {
+      "lessonId": "l-morse-mots-longs",
+      "questionIds": [
+        "q-2fb0abed-c95e-49ca-b72b-e3229f67d4a3",
+        "q-87b8fd3b-842c-46ec-b0a9-55d7cdcbd4f8",
+        "q-b79635a2-2dff-46a7-9729-f55038adcf3f",
+        "q-30bbd337-a204-4c05-977b-5759478aa7f7",
+        "q-9b7ace43-ff94-494b-93e3-3d0808965d5e"
+      ]
+    },
+    {
+      "lessonId": "l-dipole-projet",
+      "questionIds": [
+        "q-a5d0dc9e-2eb0-44b5-b97a-1eb2f31bd751",
+        "q-d1d38c61-8722-4cb6-a23b-4b551140def6",
+        "q-79d78185-d4df-46a8-8137-da9285016414",
+        "q-cb4959f6-3cf9-4af0-8c7b-3909a7a135e6"
+      ]
+    },
+    {
+      "lessonId": "l-antenne-mesures",
+      "questionIds": [
+        "q-e355c29c-acc9-4c31-9e60-41923b0ef548",
+        "q-f5a81ccc-36cb-44de-a2a5-142477ef2396",
+        "q-152264ec-4e74-4904-9354-5e788d0e1303",
+        "q-55cd3a5f-4b8f-4a65-bdde-f3e68c03df0e"
+      ]
+    },
+    {
+      "lessonId": "l-portable-energie",
+      "questionIds": [
+        "q-e8ee0857-4f95-43db-a118-c42b58aace29",
+        "q-a309af9e-acdc-479e-b46d-04bd8e792a8e",
+        "q-d456aacb-429d-4e76-b922-0d3d6b1b4f1e",
+        "q-8abf1f1c-39fe-4e8a-8764-5d8de4eaadc1"
+      ]
+    },
+    {
+      "lessonId": "l-pota-decouverte",
+      "questionIds": [
+        "q-585b2bff-2fa2-480c-96f3-80d86ef3b3fe",
+        "q-b05524d6-54ad-452c-bf33-4c637f2d9c1b",
+        "q-32297d63-8352-4695-b79f-b42b901823d4",
+        "q-5c8e62b1-2ee2-4ea8-8011-2caedce49e8c"
+      ]
+    },
+    {
+      "lessonId": "l-pota-contacts",
+      "questionIds": [
+        "q-f99525cb-ae84-4da8-b701-f4faed186ef3",
+        "q-ab23f6c8-2f2e-4672-829c-a06cfc01de6f",
+        "q-237b307e-ec0e-4ca4-b876-68ad09e1fcb7",
+        "q-2910ed96-3984-4905-ad30-7a285ece844f"
+      ]
+    },
+    {
+      "lessonId": "l-sota-sommets",
+      "questionIds": [
+        "q-c1b6be42-beca-4fee-b147-b81e9775b773",
+        "q-0a9ec7a4-a393-4b55-aaa8-1d0cab9582c4",
+        "q-98909497-ede6-418b-9e39-6d0b861c6c3c",
+        "q-9e5b81d0-dc5b-4e83-aca5-ee29642765c7"
+      ]
+    },
+    {
+      "lessonId": "l-iss-passage",
+      "questionIds": [
+        "q-8681c0e1-2c75-4434-bf8a-bd42e7c1f7f4",
+        "q-53c22677-ae5a-4ae3-bf47-3ecceaa32df3",
+        "q-41ea3df4-4446-4361-a82d-607310bf9b1c",
+        "q-96389ff0-109a-4f9c-82b6-3d503e85ad40"
+      ]
+    },
+    {
+      "lessonId": "l-satellite-monte-descente",
+      "questionIds": [
+        "q-7f556d53-8bc6-4aa9-9fcb-4cc53d81772c",
+        "q-4c5192b9-07c2-4334-9c6c-02b63154fa36",
+        "q-1db300de-81b4-4671-aa40-137010aa19b0",
+        "q-21636368-45a2-44ad-a95e-05d428d2f94f"
+      ]
+    },
+    {
+      "lessonId": "c15-l06",
+      "questionIds": [
+        "q-fec2a9c5-582c-46d8-9e2a-2cb1d49f5e88",
+        "q-e9e3d16a-13cf-46a0-8326-7ff04d58fb82",
+        "q-391cc6fd-6f21-48bd-8973-986cc86bf4a0",
+        "q-fa3bb457-38dd-4363-b9e1-2d9f6b4f0001",
+        "q-51411eb6-9946-4194-8713-fba5fe7c1070",
+        "q-301496d3-a5c4-48f2-b616-2e3df4793da4",
+        "q-6ef2873d-201f-4b86-b78f-f59d56b8a00d",
+        "q-c4445589-b01e-4403-b9bd-aa25e33675d1",
+        "q-d8714007-a472-4565-b866-6f149d1f0154",
+        "q-0b67c956-e6dc-4af3-b77f-13a472506033",
+        "q-8e8e6713-cf95-4eb9-ad93-289416796bb2",
+        "q-3014d48b-2483-429e-a619-4b9aaa0053a0",
+        "q-977dc7bf-d36a-4779-96f4-4991bcac4448",
+        "q-d4acddb5-1a28-4beb-82ae-c629e071044b",
+        "q-47947578-e728-4864-af86-d078a13a411e",
+        "q-a3c8c6c0-f043-4ed3-be41-4fae7e8ee2b6",
+        "q-e80e87b4-635c-492f-96fe-b3920f17b0a4",
+        "q-b2636a05-8514-4984-bb5c-29d8181b263e",
+        "q-734533b7-e331-49e6-a4d6-f751fd9ffe8e"
+      ]
+    },
+    {
+      "lessonId": "c15-l13",
+      "questionIds": [
+        "q-cafc4752-5da0-486d-95c6-a556db0750a6",
+        "q-6927fc05-3d9c-4550-9e06-ee1940659d40",
+        "q-176fe402-112c-4d05-8239-1bb95e30ec09",
+        "q-aba8f8da-fc62-4b04-9b76-695a6f9b2423",
+        "q-a62539b0-423c-430d-85ec-4d520f51148e",
+        "q-c3337734-63c4-4b9b-b9c5-38e33a384293",
+        "q-bc1ff288-c2ec-4423-b766-46952cbb9cba",
+        "q-28ba2099-d16c-4e24-9bc1-c85511f82cdc"
+      ]
+    },
+    {
+      "lessonId": "l-sdr-premiers",
+      "questionIds": [
+        "q-fe9397a7-01ef-4807-a1e6-aafecdd972e9",
+        "q-3ddaa76b-3b9b-40a3-9e4e-84dd1b425565",
+        "q-802ce17e-3132-4fba-a70d-975791802c66",
+        "q-0d253810-332c-4b63-bdc1-7a8329f1869a"
+      ]
+    },
+    {
+      "lessonId": "l-cascade-spectre",
+      "questionIds": [
+        "q-48e30162-0c9f-4364-b274-24f3a029031a",
+        "q-6c37652d-9d71-4c6f-8641-f49965c95ce5",
+        "q-bc86fe49-588b-480d-b2b8-84c4c484380e",
+        "q-16c08636-2834-4c46-8901-3b1ac62b3163"
+      ]
+    },
+    {
+      "lessonId": "l-sstv-image-son",
+      "questionIds": [
+        "q-113fc42c-ad54-4389-a6f1-3ff8dc7ac28e",
+        "q-6dab11a6-a6c5-47a1-85d0-b170564c075e",
+        "q-63e15667-6c0e-48d8-a9b7-0b44d93df317",
+        "q-b2c420f0-aeed-421e-8761-6e72425bdecb"
+      ]
+    },
+    {
+      "lessonId": "l-sstv-reception",
+      "questionIds": [
+        "q-cdaf653f-9295-4691-9ce0-2ed0970cb266",
+        "q-16878a85-2640-4014-af3a-95b52c66ac35",
+        "q-f4851e05-8acf-4600-ab9e-7e28a490d9f3",
+        "q-4a17efc7-fd96-4998-897b-d9659223c78e",
+        "q-8f23b3cf-3e89-4e3d-9568-0604ba3fc5ee",
+        "q-e6edcf9a-4e15-47bf-87be-98a82e45ac9d"
+      ]
+    },
+    {
+      "lessonId": "l-aprs-paquets",
+      "questionIds": [
+        "q-22d736d2-7286-481b-a8e8-c40c05cdd6cf",
+        "q-02b38f68-210f-4a3e-b8ff-7f9a33122e01",
+        "q-2cf4c139-e266-40b0-a0ce-a90572127441",
+        "q-6deff677-50b5-4e97-82fe-640e1311ef34"
+      ]
+    },
+    {
+      "lessonId": "l-numerique-faibles-signaux",
+      "questionIds": [
+        "q-266f1003-992b-48cb-afee-542774fc1493",
+        "q-8f910529-df23-4bc2-b232-e8e921596b06",
+        "q-4d4e7ce6-04fc-45ee-b405-1c6cf6287d3b",
+        "q-470ec353-f82d-40ed-ba06-2645f7400821"
+      ]
+    },
+    {
+      "lessonId": "c15-l07",
+      "questionIds": [
+        "q-90079335-ba5c-492b-8a52-8330aee7b693",
+        "q-56a3e0c1-2251-43c6-97e2-09feedfd1e87",
+        "q-eb2a0392-9f41-472b-851c-c04bb852036d",
+        "q-6ce6b37b-ccb1-4299-98ca-5e5039750189",
+        "q-f1dd9b21-65a3-4017-85fd-08a7a8fbcf2c",
+        "q-bc51c1e2-86a7-4a02-9984-87648c56ba61",
+        "q-da5ded28-6b76-4bba-9bbf-662503996253",
+        "q-46e4d016-d378-451c-8d06-0f2f7cdefee0",
+        "q-b9b9666a-d2e0-48d5-b739-a75bb484b6ca",
+        "q-406682b1-c895-4ff9-8747-edb7bdb7069f",
+        "q-dfadc8d6-cb30-4c2b-9466-214cd3ea0c25",
+        "q-3862a485-a194-454a-abd8-7eb2083e99ce",
+        "q-489a4af3-5fe5-4cf6-aa22-5cf853ddb986",
+        "q-e0cb6d65-82c6-44cd-82ac-059b66992865",
+        "q-53e1b369-e8a4-44b8-80a2-89c7b012f52a",
+        "q-3c231d51-3d5b-4b3a-a920-523ee4d12c4a"
+      ]
+    },
+    {
+      "lessonId": "c15-l08",
+      "questionIds": [
+        "q-59e26dee-873d-44a1-b56b-7cbcb92176d5",
+        "q-77e5422f-9bda-4f89-9887-8f139862ea0f",
+        "q-b0c6d77e-6e06-42a6-b13b-9e9b52ab3517",
+        "q-56d3f210-624c-48f9-b962-f0dd22385579",
+        "q-e95b125c-e39f-4634-af4b-792730680a90",
+        "q-65643638-d8a1-4d8a-8a9c-696c8923ba4e",
+        "q-495814b9-1361-489f-9238-00896dc32460",
+        "q-e9e2fb23-93df-42c8-950f-f369b199b009",
+        "q-7cf55eb2-95cf-4f86-9305-b94e22bdfbf6",
+        "q-be6afaa9-2e2d-4f5e-98af-16e8e373d844",
+        "q-55f9d93f-ad36-49d4-9d08-a7b2a6eb4c00",
+        "q-d22d1860-48df-4dfa-85ab-163f45fc2d88",
+        "q-7bc6fdab-3475-4d94-b78e-487336b10d7d",
+        "q-0f49efd7-ab98-4285-9204-458cb05a5d90",
+        "q-1b6a1198-3a47-4f3c-82fc-fbc0127d28fb",
+        "q-1beedff3-4cdd-47fc-ae16-63cb5dcadb52"
+      ]
+    },
+    {
+      "lessonId": "l-morse-chiffres-groupes",
+      "questionIds": [
+        "q-090a3b4a-c39d-4626-85b0-cf769ea1f3b5",
+        "q-890c4e1c-c77a-4ea2-8283-238887e78be5",
+        "q-7f49e921-85c3-4e29-8a6e-b9492b0c28ad",
+        "q-14290dac-c754-46e1-882b-33525a681077"
+      ]
+    },
+    {
+      "lessonId": "c15-l10",
+      "questionIds": [
+        "q-b13aa0ba-a1fb-4510-90aa-83624f816ae9",
+        "q-d322174b-6955-41ec-a872-3ecfb488a7ff",
+        "q-66168249-5b4f-4971-917a-f7953612a6d1",
+        "q-db92d563-f77e-4b69-8539-f77538d7545d",
+        "q-a8409c68-e097-49b0-8c88-4fad34d38043",
+        "q-eca45bf9-357c-431a-b3ba-069700a52a16",
+        "q-f565eecc-df37-4e76-871c-2a74c66c1764",
+        "q-66cf7242-3ac2-4fb3-a2cb-9b7e15b3b218",
+        "q-9d255dc9-8d79-4606-a022-581856a11b70",
+        "q-a2a80a5e-66de-4a53-aa2f-4caaa61c7888",
+        "q-33b4e074-e5af-44b6-8390-b8082ff134e8",
+        "q-bfe63aa5-9592-4162-9454-9505d990c21c",
+        "q-ac7a3ebe-cff8-43d0-b341-f7b9c0db7d0c",
+        "q-c5d34287-bd1f-490a-b94d-0d788758f832",
+        "q-b0f492b6-f61b-4f22-8de9-5d7a9d6c826a",
+        "q-65177cf4-58e6-437e-9a78-9b7a9b3f36b6",
+        "q-80d5966e-c0c5-4121-a691-4664f2609de1",
+        "q-703780af-d635-41ea-8381-8585e2ca9694",
+        "q-1ad2c3af-cd67-4b7f-ab6a-f9dc773ad3e7"
+      ]
+    },
+    {
+      "lessonId": "c15-l11",
+      "questionIds": [
+        "q-9f685a0b-92c7-4b84-b7ae-194c4c4f9897",
+        "q-384ef759-888b-44c7-8448-be0d7ae29c89",
+        "q-b7011ec1-b7cb-44d4-8982-512ae020574f",
+        "q-68bc0665-9f59-4b69-b7cf-8ef6fe66d3c8",
+        "q-096f17cf-6cad-4fb2-86ea-bb19d185b11b",
+        "q-b9db4c1f-b923-497e-a98f-34e10b7f778d",
+        "q-827f9d86-68db-40b0-ab2b-f1be844ef36b",
+        "q-038934ef-42b1-4bd1-8e37-8f63768b6fd6"
+      ]
+    },
+    {
+      "lessonId": "c15-l12",
+      "questionIds": [
+        "q-3f2695bd-4603-43ad-9019-1f731ef49566",
+        "q-2d7f5231-ae97-4cfc-963f-6db93a27abc6",
+        "q-ae1faf85-d762-45d3-aba5-73ad8bf5cda0",
+        "q-aaa3911e-21cb-4a6a-a109-11715d0ea52d",
+        "q-38087411-c2e3-4ec0-8247-f06e46a06f5d",
+        "q-0b0c80f0-6cb1-4143-98d8-c64ef22b59a8",
+        "q-1628712c-4685-4354-a5f4-17262ccd94f6",
+        "q-3d3e3804-6327-4a1a-be18-0611fd234260"
+      ]
+    },
+    {
+      "lessonId": "l-morse-vers-epellation",
+      "questionIds": [
+        "q-a32a540a-8bde-4981-9b5d-6c51dfea73df",
+        "q-7da84a7a-ac26-4605-ae2d-b53ca7524ca9",
+        "q-70d4212c-6989-4a44-a3d2-c6cbf336ca17",
+        "q-a04d0816-54b3-4562-8f3e-a288d767ba6f"
+      ]
+    },
+    {
+      "lessonId": "c15-l14",
+      "questionIds": [
+        "q-f0996b76-7407-49a5-90f4-9033fae0b3c0",
+        "q-0aebbec8-86b2-4c71-a4d0-29366c7db628",
+        "q-a00213b6-c4fc-4849-8936-02ea1b36434f",
+        "q-992fe897-8c66-4b18-bf86-e15281faf5b9",
+        "q-083fe996-c7e4-4451-9ced-ffe568096afd",
+        "q-d01d68e9-7ea9-4658-9478-cfce6077ad84",
+        "q-444b7090-5fb9-4817-965e-cd766c4feec3",
+        "q-29297365-3927-433d-8988-df4a9c282033",
+        "q-0a40eab9-8f28-4257-b481-65a49f2c03fe",
+        "q-c0134d03-9081-423c-8b3d-49c78edd51ab"
+      ]
+    },
+    {
+      "lessonId": "l-morse-qso-appel",
+      "questionIds": [
+        "q-bf767995-9e4b-4fe0-8c6b-abc5a666fdbb",
+        "q-407d6f57-9a40-48e5-bff8-db4d4d499d61",
+        "q-158f2d7b-3311-418e-9cfc-2b94b56b86fe",
+        "q-4f0cff46-4507-4627-b9f5-1fbeeabb02c1",
+        "q-54930403-3d60-4638-8a8c-eef77a134590"
+      ]
+    },
+    {
+      "lessonId": "l-morse-qso-comprendre",
+      "questionIds": [
+        "q-e92c387e-d629-48ef-ba37-51290ada9555",
+        "q-788b5ff9-9c1a-4058-a604-98007447a861",
+        "q-8187dc85-6303-4c92-8ede-8f3d4c1acff7",
+        "q-abe0f3b8-d539-4de3-8101-b4d50c71c9c4",
+        "q-8001fe61-7a6d-4eae-a9d1-5bba6935091e",
+        "q-3f0d35a2-b2e5-45c8-80c5-335e84627999"
+      ]
+    },
+    {
+      "lessonId": "l-automatisme-controle",
+      "questionIds": [
+        "q-4cb70fa3-631f-4ee6-9c3e-7ab53426cd61",
+        "q-575df378-e79b-4d6f-8521-9ff6181e9411",
+        "q-5d2779a8-b9b1-47b5-b6a2-f072048ccacc",
+        "q-be16a7c7-c772-449d-bc2b-18c4206d06e7"
+      ]
+    },
+    {
+      "lessonId": "l-projet-experience",
+      "questionIds": [
+        "q-6a33f344-ee3e-4db7-9a7d-61b6d178a5b9",
+        "q-a511855c-cca8-415e-bf5f-e5004f6c00e0",
+        "q-a42b6474-742d-4192-86f9-92c3451aebd0",
+        "q-9f0f04bd-0a12-4164-96b2-dac511ec4f39"
+      ]
+    }
+  ],
+  "stats": {
+    "before": {
+      "lessons": 163,
+      "questions": 1130
+    },
+    "after": {
+      "lessons": 173,
+      "questions": 1229,
+      "chapters": 64
+    },
+    "addedQuestions": 99
+  },
+  "additions": [
+    {
+      "lessonId": "l-math-decimaux",
+      "rationale": "Trois raisonnements absents des quatre reconnaissances initiales : comparer fraction et décimal, traverser zéro, respecter les parenthèses.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T0001a"
+      ],
+      "questionIds": [
+        "q-a2dd98f1-7e2e-48bf-80b8-c9de5b2a8922",
+        "q-8c762cd3-3973-42e2-8a9e-5c9ea01d10fc",
+        "q-06a6f451-4ade-40c8-af4a-756fb789c1b6"
+      ]
+    },
+    {
+      "lessonId": "l-math-rapports",
+      "rationale": "Distinguer facteur inférieur à un, échelle et situation non proportionnelle, sans série de substitutions.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T0001a"
+      ],
+      "questionIds": [
+        "q-c5467c8e-6a7b-41c0-946e-1406ec2634ff",
+        "q-388fa19a-6062-4f51-aa2b-7742bac17d3c",
+        "q-0a8bc326-5d36-48b2-a295-3862c3952a76"
+      ]
+    },
+    {
+      "lessonId": "l-math-formules",
+      "rationale": "Choisir les données utiles puis conserver un regroupement lors de la substitution : deux objectifs absents.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T0001a"
+      ],
+      "questionIds": [
+        "q-ba690f50-f387-4e5e-8353-b778a844d3f2",
+        "q-9d3057b7-d33e-458c-aba5-6d2259811355"
+      ]
+    },
+    {
+      "lessonId": "c16-l03",
+      "rationale": "La variation sous racine est annoncée dans le cours mais les cinq exercices ne l’évaluent pas.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T0001a"
+      ],
+      "questionIds": [
+        "q-b6088ecf-e25b-47fb-9319-d6287bc25c28"
+      ]
+    },
+    {
+      "lessonId": "l-energie-duree",
+      "rationale": "Recentrer le cours après transfert de trois situations historiques d’énergie depuis c03-l04. Deux ajouts seulement : bilan à plusieurs états et autonomie inverse. La définition de puissance remonte dans la première partie.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T013b"
+      ],
+      "questionIds": [
+        "q-f87ad02b-7450-4823-b482-0b2e93977d09",
+        "q-309f1e5f-447f-4024-a14d-77f0f911d78d"
+      ]
+    },
+    {
+      "lessonId": "l-fils-materiaux",
+      "rationale": "Les exercices actuels changent une seule dimension. Ajouter variation simultanée et choix de matériau à géométrie fixée.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T014a"
+      ],
+      "questionIds": [
+        "q-1bfff0b9-3ae0-4de7-8049-99da0ff31aea",
+        "q-c4b0d9f5-b503-4426-b2b0-8330fdaa1b85"
+      ]
+    },
+    {
+      "lessonId": "l-voltemetre-amperemetre",
+      "rationale": "Trois situations pratiques au-delà du dessin de branchement : déplacer le cordon, choisir une plage et préparer un ohmmètre.",
+      "sourceUrls": [
+        "https://www.fluke.com/en-us/learn/blog/digital-multimeters/how-to-measure-dc-voltage-with-a-digital-multimeter",
+        "http://f6kgl.free.fr/COURS.html#T034",
+        "https://www.fluke.com/en-ca/learn/blog/clamps/how-to-measure-signals-using-test-probes"
+      ],
+      "questionIds": [
+        "q-078083d5-28e4-4d5e-a11a-09a520e46e8c",
+        "q-4db9272a-b1c4-4206-8626-95ff2d6a3f88",
+        "q-b952813a-ea63-4d7a-8204-964ad0d6854b"
+      ]
+    },
+    {
+      "lessonId": "l-rms-sans-confusion",
+      "rationale": "Rapprocher deux instruments affichant des grandeurs différentes et appliquer l’équivalence thermique.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T021b",
+        "http://f6kgl.free.fr/COURS.html#T013b"
+      ],
+      "questionIds": [
+        "q-45897c4c-e763-4846-8496-0c2c64bf380b",
+        "q-81d944fd-e78d-4683-a7be-7ba014f0c74e"
+      ]
+    },
+    {
+      "lessonId": "l-bobine-coupure",
+      "rationale": "Passer du nom de la surtension au chemin physique du courant et au bilan d’énergie.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T037b",
+        "https://www.ti.com/video/6018730150001"
+      ],
+      "questionIds": [
+        "q-65ae473b-b045-4bb8-a6ff-84a864a84a71",
+        "q-6aaff3cb-2481-40a2-a442-367f40998614"
+      ]
+    },
+    {
+      "lessonId": "l-filtre-coupure",
+      "rationale": "La formule RC et les limites asymptotiques sont annoncées mais pas exercées : calcul, choix de réglage et critique d’une extrapolation.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T042a",
+        "https://www.analog.com/en/resources/technical-articles/a-beginners-guide-to-filter-topologies.html"
+      ],
+      "questionIds": [
+        "q-2d41dc4a-25aa-464f-8e29-f3aa0fae5653",
+        "q-0fa5156b-fb19-4989-b255-290a40dd3f98"
+      ]
+    },
+    {
+      "lessonId": "l-pile-resistance-interne",
+      "rationale": "Inférer depuis une mesure, intégrer une charge avec Ohm, puis comparer charge et énergie à tensions différentes.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T033d",
+        "http://f6kgl.free.fr/COURS.html#T013b"
+      ],
+      "questionIds": [
+        "q-40670f79-f1ba-4e5b-add4-761d1806a1b8",
+        "q-fd465f3c-e88b-4b19-9f9d-1fc9ee458ff3",
+        "q-e63a0380-fc0a-4b71-90b2-5c806b4e0c6e"
+      ]
+    },
+    {
+      "lessonId": "l-decibels-reperes",
+      "rationale": "Cibler deux erreurs absentes : 0 dB pris pour zéro puissance et dB soustraits comme des watts.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T041a"
+      ],
+      "questionIds": [
+        "q-b0f5211d-34a3-42cf-a11c-c11c8dbb0569",
+        "q-bfb37df1-29ec-4502-8697-245352d4db68"
+      ]
+    },
+    {
+      "lessonId": "l-signal-dbm",
+      "rationale": "Niveau négatif quantifié, chaîne avec gain/perte et addition de puissances distinctes : trois objectifs différents.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T044c",
+        "http://f6kgl.free.fr/COURS.html#T041a"
+      ],
+      "questionIds": [
+        "q-6d306f3d-0e55-4dac-b397-17d88834307e",
+        "q-ffe48608-0985-4387-8aef-dc87e02757d7"
+      ]
+    },
+    {
+      "lessonId": "c18-l04",
+      "rationale": "Remplacer le simple calcul de conversion dBm/mW déplacé plus tôt par un vrai transfert : comparer avant/après un préamplificateur qui augmente le niveau, mais dégrade le rapport signal sur bruit.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-225c5b7b-ace9-4157-bf9e-e836d7ae4a61"
+      ]
+    },
+    {
+      "lessonId": "l-diode-sens",
+      "rationale": "Passer du vocabulaire à une polarisation réellement donnée ; réutiliser Ohm et la puissance pour dimensionner une résistance plutôt que répéter une valeur de courant.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T051"
+      ],
+      "questionIds": [
+        "q-885ef131-0c00-40dc-99ea-ed6c87da227b",
+        "q-c311e2d8-e942-4ed2-a4e7-58b9d3c137d6"
+      ]
+    },
+    {
+      "lessonId": "l-alimentation-etages",
+      "rationale": "Appliquer l'ordre fonctionnel, contrôler une condition de régulation et relier la chute de tension à la chaleur : trois décisions différentes après les simples rôles des étages.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T054a"
+      ],
+      "questionIds": [
+        "q-43b85271-b337-4c6a-b3a8-8b08d51d48c4",
+        "q-dc546a52-9264-44ea-a204-66b78ac723fc",
+        "q-852382cd-6e7c-489d-aea0-16bc6accfdb7"
+      ]
+    },
+    {
+      "lessonId": "l-classes-amplification",
+      "rationale": "Appliquer les limites de conduction à un cas mesuré, sans ajouter un autre calcul identique de rendement.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T071a"
+      ],
+      "questionIds": [
+        "q-1b4596b0-be37-4e0a-ae4c-cef405a08a20"
+      ]
+    },
+    {
+      "lessonId": "l-aop-entrees",
+      "rationale": "Distinguer comportement en boucle ouverte et hypothèse conditionnelle d'égalité des entrées ; prévenir l'application automatique d'un modèle linéaire.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T081a"
+      ],
+      "questionIds": [
+        "q-c6a18a6e-1f0a-4827-8127-35866f296708",
+        "q-08097c56-5380-474a-ad95-cfcc92dd9932"
+      ]
+    },
+    {
+      "lessonId": "l-aop-montages",
+      "rationale": "Compléter les deux calculs directs de gain par un dimensionnement inverse, une sortie signée et la détection d'une saturation.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T082a"
+      ],
+      "questionIds": [
+        "q-0e6d62cc-3d4b-42fe-b2a2-ac168820e231",
+        "q-9a5917b0-bfea-42d2-8c04-0cd0015eac95",
+        "q-dfdf4434-8765-427d-a697-5314747d20bf"
+      ]
+    },
+    {
+      "lessonId": "c08-l04",
+      "rationale": "Après extraction des six questions contenant de la logique, donner à cette leçon un objet cohérent : rôle de l’alimentation, réaction entretenue et distinction avec un simple résonateur.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T075a"
+      ],
+      "questionIds": [
+        "q-e4f65301-fe2b-42a9-96eb-e7840b6c96e3",
+        "q-cfa99522-04ff-488e-8bb6-31d7e829a060"
+      ]
+    },
+    {
+      "lessonId": "l-quartz-pll",
+      "rationale": "Dépasser le rappel de sigles : lire une boucle de correction et appliquer une relation de division explicitement donnée.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T075a"
+      ],
+      "questionIds": [
+        "q-22a6abf7-25da-4db8-a3b1-45210ca52598",
+        "q-5c7d7566-c696-4a42-a13e-3e7faf5945f1"
+      ]
+    },
+    {
+      "lessonId": "l-recepteur-etapes",
+      "rationale": "Vérifier une conséquence concrète du rôle des blocs, au-delà de l'ordre du synoptique.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T112a"
+      ],
+      "questionIds": []
+    },
+    {
+      "lessonId": "l-image-reception",
+      "rationale": "Appliquer la symétrie dans l'autre sens de conversion et expliquer l'échec d'un filtrage situé après la collision en FI.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T113a"
+      ],
+      "questionIds": [
+        "q-b72d01aa-acef-4aa5-83ca-cde8ffd4f820"
+      ]
+    },
+    {
+      "lessonId": "l-bruit-largeur",
+      "rationale": "Associer largeur, bruit et signal utile dans trois situations : rapport quantitatif, filtre trop étroit, comparaison de deux réceptions.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T116"
+      ],
+      "questionIds": [
+        "q-fecbbd01-d683-4955-927c-a4452f8fa701",
+        "q-0d25d942-98db-48a6-992c-5e7939a30385",
+        "q-114ccbdf-b3e3-4ef5-9bf6-5beb4a732db3"
+      ]
+    },
+    {
+      "lessonId": "l-band-plans",
+      "rationale": "Faire appliquer la règle de largeur au spectre d'une AM déjà étudiée et la priorité d'un service primaire à une situation réelle, sans introduire de nouvelle valeur réglementaire de bande.",
+      "sourceUrls": [
+        "https://www.arcep.fr/uploads/tx_gsavis/12-1241.pdf"
+      ],
+      "questionIds": [
+        "q-d3e4c9d6-eae0-4ab7-b59b-bb3de638d682",
+        "q-04191cc0-7c86-495f-94fa-467ed88c3299"
+      ]
+    },
+    {
+      "lessonId": "l-emission-puissances",
+      "rationale": "Faire calculer une PIRE avec la chaîne réelle et distinguer réduction de puissance et suppression de produits indésirables. Les valeurs sont d'exercice, pas des limites nationales.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-087d78ed-45d7-446e-8fc0-9d4f45d95650",
+        "q-54562f06-6ba2-4680-a008-1f261c9c5e80"
+      ]
+    },
+    {
+      "lessonId": "l-identification-carnet",
+      "rationale": "Remplacer le seul rappel de délais par une chronologie et l'identification d'une ligne de journal incomplète.",
+      "sourceUrls": [
+        "https://www.arcep.fr/uploads/tx_gsavis/12-1241.pdf"
+      ],
+      "questionIds": [
+        "q-eff73afd-2e2c-4f1d-8eae-c5fbdc20867b",
+        "q-8d417249-ddb2-4438-9e9c-69ee24422e85"
+      ]
+    },
+    {
+      "lessonId": "l-emissions-designation",
+      "rationale": "Passer de trois codes reconnus globalement à la fonction de chaque position et au code AM manquant.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-74f1b2f5-b8c2-4673-ac4a-3d6ab500bdf5",
+        "q-35c9bd11-242b-4862-88da-3ef76a6c0c2c"
+      ]
+    },
+    {
+      "lessonId": "l-messages-amateur",
+      "rationale": "Appliquer la distinction entre code documenté et dissimulation à un échange technique, plutôt que demander encore un oui/non sur le numérique.",
+      "sourceUrls": [
+        "https://www.arcep.fr/uploads/tx_gsavis/12-1241.pdf"
+      ],
+      "questionIds": [
+        "q-39986079-24ba-4c1f-bee6-f4065579d661"
+      ]
+    },
+    {
+      "lessonId": "l-synthese-calculs",
+      "rationale": "Transformer le contrôle général de résultat en trois décisions de méthode : bonne grandeur, durée à partir d'une énergie et sens d'une perte passive.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T0001a"
+      ],
+      "questionIds": [
+        "q-9534526d-71ee-40ca-bcea-910ecb3bce73",
+        "q-c6d59b21-ded4-476c-ad84-ec585c9f9c4a",
+        "q-68cae9a8-c2fa-41fc-98a8-7aead9a79edf"
+      ]
+    },
+    {
+      "lessonId": "c21-l03",
+      "rationale": "Reprendre à distance le choix d'une classe après l'étude des modulations : ne pas confondre appellation de classe et marge de fonctionnement.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T071a"
+      ],
+      "questionIds": [
+        "q-2968704e-b2d2-45a7-9a78-ebe663ae2311"
+      ]
+    },
+    {
+      "lessonId": "c14-l02",
+      "rationale": "Faire revenir les circuits actifs après les antennes, la propagation et la réglementation : adapter une source fragile et vérifier qu'un calcul de gain en courant respecte les limites physiques.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-82c6e63f-d1cd-45c0-a2ec-039f50893270",
+        "q-574b9c70-a042-47fd-959e-49818f141e9a"
+      ]
+    },
+    {
+      "lessonId": "l-dipole-projet",
+      "rationale": "Distinguer la longueur totale et celle de chaque brin, puis transférer la proportion inverse à une autre fréquence. Deux applications ciblées suffisent ; aucun doublon sur le ROS déjà évalué.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-7ee657b4-740f-4df3-a44e-d227e37da5e5",
+        "q-7180159d-0b11-4608-813d-d754da97d31d"
+      ]
+    },
+    {
+      "lessonId": "l-antenne-mesures",
+      "rationale": "Interpréter une comparaison confondue, puis choisir une ligne à partir d’un objectif chiffré de puissance à l’antenne. Ce second cas combine deux pertes et une décision, sans répéter le calcul élémentaire 20 W/−3 dB des fondations.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-caf72166-6b76-4821-9ee5-df0fe7f88c36",
+        "q-d55d897e-11ad-4e33-b24a-73d7d7723109"
+      ]
+    },
+    {
+      "lessonId": "l-portable-energie",
+      "rationale": "Quatre applications distinctes justifient huit questions : bilan réception/émission, comparaison de batteries à tensions différentes, réserve explicite et chute de tension du câble. Hypothèses idéales données ; aucune autonomie réelle promise.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-83742c84-c29a-444b-8b74-31c6a01ffe68",
+        "q-248bebc5-7db3-4f9f-8ef8-e8fa77893ea8",
+        "q-018235ac-08e3-414c-bb7f-ed49cdf4c269",
+        "q-a118dc25-b678-43f0-bacc-731696f75119"
+      ]
+    },
+    {
+      "lessonId": "l-pota-decouverte",
+      "rationale": "Appliquer deux règles : limites de toute la station et changement de journée UTC. Pas de procédure administrative accessoire.",
+      "sourceUrls": [
+        "https://docs.pota.app/docs/rules.html"
+      ],
+      "questionIds": [
+        "q-a2513696-3b04-4999-be78-e82ccbfc332e",
+        "q-2e89e8bd-c414-46ad-bc5c-be57c898d5f6"
+      ]
+    },
+    {
+      "lessonId": "l-pota-contacts",
+      "rationale": "Un cas suffit pour appliquer la réception des indicatifs : aide extérieure et contact admissible ne se confondent pas.",
+      "sourceUrls": [
+        "https://docs.pota.app/docs/rules.html"
+      ],
+      "questionIds": [
+        "q-26182b81-f334-4f00-8a8b-7f5250faf522"
+      ]
+    },
+    {
+      "lessonId": "l-sota-sommets",
+      "rationale": "Découverte courte, avec application de l’altitude et de la continuité de la zone en un seul cas.",
+      "sourceUrls": [
+        "https://www.sota.org.uk/Blog/2017/07/08/In-The-Zone",
+        "https://storage.sota.org.uk/arms/KH8%20ARM.pdf"
+      ],
+      "questionIds": [
+        "q-7eeee055-7140-472d-a568-0af2f8f93401"
+      ]
+    },
+    {
+      "lessonId": "l-iss-passage",
+      "rationale": "Deux décisions de préparation : confronter la prédiction à l’horizon réel puis distinguer géométrie et activité radio. Aucune fréquence ou activité courante figée.",
+      "sourceUrls": [
+        "https://www.ariss.org/current-status-of-iss-stations.html",
+        "https://www.ariss.org/tips-and-techniques.html"
+      ],
+      "questionIds": [
+        "q-6f11b048-d5dd-4f15-b9ca-a10985de2b53",
+        "q-ce629f01-43e9-43d1-83b8-472a9daac5af"
+      ]
+    },
+    {
+      "lessonId": "l-satellite-monte-descente",
+      "rationale": "Passer du vocabulaire à un décalage chiffré et à un diagnostic de réception. Les nombres sont un exercice, pas une fréquence d’exploitation.",
+      "sourceUrls": [
+        "https://www.ariss.org/tips-and-techniques.html",
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-157704cd-8405-4f89-a808-093033044ca9",
+        "q-ebfd41c7-fd24-48a2-bb74-0d187fa19c15"
+      ]
+    },
+    {
+      "lessonId": "l-sdr-premiers",
+      "rationale": "Une application de modulation suffit pour ce premier workflow. L’échantillonnage avancé reste dans ses cours ; le spectre dans le cours suivant.",
+      "sourceUrls": [
+        "https://pysdr.org/content/intro",
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-1bc66e7d-be57-4de9-8199-b40168cf62ff"
+      ]
+    },
+    {
+      "lessonId": "l-cascade-spectre",
+      "rationale": "Trois lectures distinctes : déplacement fréquentiel, effet commun d’un gain et comparaison de deux SNR. Les couleurs ne sont pas une mesure de qualité à elles seules.",
+      "sourceUrls": [
+        "https://pysdr.org/content/frequency_domain",
+        "http://f6kgl.free.fr/COURS.html"
+      ],
+      "questionIds": [
+        "q-1901e12a-3fc7-4dd2-9292-74a60cd370b8",
+        "q-399f4777-0332-471f-abae-5f394ac8867d",
+        "q-cfe9f815-3877-46f7-9f08-7a8eb2e8d792"
+      ]
+    },
+    {
+      "lessonId": "l-sstv-reception",
+      "rationale": "Les mires évaluent déjà deux défauts. Ajouter deux diagnostics de chaîne : audio absent à l’entrée et mode incompatible sur un enregistrement complet.",
+      "sourceUrls": [
+        "https://www.qsl.net/o/on4qz/qsstv/manual/_r_x_s_s_t_v.html",
+        "https://www.ariss.org/tips-and-techniques.html"
+      ],
+      "questionIds": [
+        "q-dbd31156-a5d8-41e8-a2bb-d38368863097",
+        "q-2fbcac65-b81e-4500-9bd7-80473d0afb41"
+      ]
+    },
+    {
+      "lessonId": "l-aprs-paquets",
+      "rationale": "Deux applications distinctes : quantifier l’occupation accrue et interpréter la fraîcheur d’une position.",
+      "sourceUrls": [
+        "https://www.aprs.org/",
+        "https://www.aprs.org/football.html"
+      ],
+      "questionIds": [
+        "q-da0f26af-f96a-4015-af16-3cff987d2b49",
+        "q-c4bc1a60-bba0-48af-8de4-af858615baae"
+      ]
+    },
+    {
+      "lessonId": "l-numerique-faibles-signaux",
+      "rationale": "Comparer des reports référencés, puis choisir une vérification avant d’accuser la puissance. Pas de seuil ni version logicielle figé.",
+      "sourceUrls": [
+        "https://wsjtx.github.io/wsjtx/guide-full.html"
+      ],
+      "questionIds": [
+        "q-f625a7ce-d4c1-4aea-bf08-3bacc89688cf",
+        "q-546c0705-2b3f-47a0-bdb1-8ff05df9e2f5"
+      ]
+    },
+    {
+      "lessonId": "l-automatisme-controle",
+      "rationale": "Appliquer le contrôle à une panne réelle et transférer la distinction droit national/règlement sportif. Aucune obligation technique de panne précise inventée.",
+      "sourceUrls": [
+        "https://www.arcep.fr/uploads/tx_gsavis/12-1241.pdf",
+        "https://docs.pota.app/docs/rules.html"
+      ],
+      "questionIds": [
+        "q-74c1d268-ea58-44ec-8249-4abab813dbe2",
+        "q-75c4299c-5b0c-41e7-856e-d90ba6cd0517"
+      ]
+    },
+    {
+      "lessonId": "l-projet-experience",
+      "rationale": "Trois mini-cas réutilisent la méthode dans des contextes différents : référence qui dérive, défaut électrique sous charge et comparaison de décodages. Petite synthèse appliquée, sans nouveau prérequis.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html",
+        "https://www.qsl.net/o/on4qz/qsstv/manual/_r_x_s_s_t_v.html"
+      ],
+      "questionIds": [
+        "q-4d83b7e5-f893-4ac9-a0d2-058eba648145",
+        "q-d25e9d92-2447-4e59-913c-b291c8c46efd",
+        "q-64bfe157-d813-4190-aac6-249c00cf3df4"
+      ]
+    },
+    {
+      "lessonId": "l-nato-groupes",
+      "rationale": "Décoder en réception une répétition de lettre, au lieu d’épeler uniquement un groupe affiché.",
+      "sourceUrls": [
+        "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals"
+      ],
+      "questionIds": [
+        "q-d5e71737-dfeb-4938-b53d-38a40f9b1704"
+      ]
+    },
+    {
+      "lessonId": "l-nato-groupes",
+      "rationale": "Choisir une répétition ciblée plutôt que compléter un groupe douteux par supposition.",
+      "sourceUrls": [
+        "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals"
+      ],
+      "questionIds": [
+        "q-c3ed9d77-e5cf-44ba-bc94-de217cfa2c15"
+      ]
+    },
+    {
+      "lessonId": "l-sdr-premiers",
+      "rationale": "Reprendre largeur/bruit dans un réglage logiciel concret, avec conservation explicite du message CW.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T117d"
+      ],
+      "questionIds": [
+        "q-d87a3efe-a23f-45fd-8cbd-6c4ec7a0310d"
+      ]
+    },
+    {
+      "lessonId": "l-logique-commandes",
+      "rationale": "Transférer la table ET à une commande dont les états d’autorisation et de bouton sont explicités, après un intervalle de cours hors logique.",
+      "sourceUrls": [
+        "http://f6kgl.free.fr/COURS.html#T084a"
+      ],
+      "questionIds": [
+        "q-c2f6cf3c-1d44-4826-ac06-cb0b043b05de"
+      ]
+    }
+  ],
+  "moves": [
+    {
+      "questionId": "q-93d9ddfc-c631-4629-9b22-0fe632bb6dec",
+      "from": "c03-l04",
+      "to": "l-energie-duree",
+      "reason": "Produit P×t en Wh : premier exemple énergétique, relève du cours sur la durée. Conserver UUID et réponse."
+    },
+    {
+      "questionId": "q-b9bffd6d-3e3a-439f-8b81-5bfddf36e349",
+      "from": "c03-l04",
+      "to": "l-energie-duree",
+      "reason": "Énergie avec conversion minutes/heures : application graduée du même objectif durée et unités. Conserver UUID."
+    },
+    {
+      "questionId": "q-38a30fbf-9474-4cb0-a902-d85933b05e22",
+      "from": "c03-l04",
+      "to": "l-energie-duree",
+      "reason": "Énergie en joules avec secondes : mettre en regard J et Wh dans le cours énergétique, sans changer UUID."
+    },
+    {
+      "questionId": "q-1ebb8f79-c562-4235-ad70-376376fcdbd2",
+      "from": "l-energie-duree",
+      "to": "c03-l04",
+      "reason": "Cette question nouvelle définit la puissance comme transfert par unité de temps ; elle appartient à la première partie. Corriger son skillIds actuel de energy-duration vers electric-power, tout en conservant son UUID et sa correction."
+    },
+    {
+      "questionId": "q-5c959840-e48a-41be-90d7-23d0181b5ae1",
+      "from": "c08-l03",
+      "to": "l-synthese-calculs",
+      "reason": "Ce troisième calcul direct de rendement à l'intérieur du même cours n'apporte pas une nouvelle situation. Le reprendre en synthèse, plusieurs chapitres plus tard, allège le cours initial sans perdre son UUID ni son suivi ; conserver sa compétence amplifier-efficiency."
+    },
+    {
+      "questionId": "q-471fba70-e3b6-40c8-9452-ecbacf4c8052",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-d4195976-e326-42a4-bdff-ed2fdd8ee128",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-ee584a83-708e-4daa-9027-139a9842d271",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-d0471255-9ed8-4e5b-8229-ee8cc892d4a0",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-d2bb25be-440a-4a71-b6ea-46b7d4864af8",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-fdd548ab-e15e-48b0-9b0c-d694e793160b",
+      "from": "c08-l04",
+      "to": "l-logique-commandes",
+      "reason": "Séparer six questions de logique d'un cours d'oscillateurs, après enseignement des portes. Les cinq tables de vérité et l'association mixte gardent leurs UUID ; une situation de commande ajoute un transfert concret. Ne pas valider cette séance automatiquement au moyen d'une nouvelle réussite du seul parent."
+    },
+    {
+      "questionId": "q-539daa55-b15e-4d19-878c-a7362f1dc39f",
+      "from": "c18-l04",
+      "to": "l-signal-dbm",
+      "reason": "Déplacer le calcul élémentaire dBm au premier apprentissage, garder la comparaison avant/après au retour."
+    },
+    {
+      "questionId": "q-fd0c2cac-836a-4b78-9c63-488037b0c551",
+      "from": "c18-l02",
+      "to": "l-image-reception",
+      "reason": "Rassembler la collision FI et son explication au premier apprentissage, sans créer un doublon."
+    }
+  ],
+  "morseSplits": [
+    {
+      "type": "split",
+      "originalLessonId": "c15-l01",
+      "newLessonId": "l-morse-rappel-etim",
+      "before": 14,
+      "recognition": 8,
+      "production": 6,
+      "preservedQuestionIds": [
+        "q-c1ccd500-5fd2-4a51-9aed-fd5e50c816c5",
+        "q-bc789bbe-46c9-4362-b31f-5acc4f7ccd7a",
+        "q-47dc0332-5229-4bab-ad95-dfa79a822426",
+        "q-d6dffc5a-b43b-408e-88fa-f06402a571c4",
+        "q-fe2841ec-cd31-4e2f-b7d8-d44532e309fd",
+        "q-6e26656f-8b66-4ec9-8279-ec1bea63f684"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l02",
+      "newLessonId": "l-morse-rappel-anso",
+      "before": 13,
+      "recognition": 8,
+      "production": 5,
+      "preservedQuestionIds": [
+        "q-4dc1342a-1ede-443e-8fe7-63b51052b229",
+        "q-2545c84e-a035-49e1-a0a5-7ba69c4140b6",
+        "q-09113e6d-2847-4bc0-b155-7138ee799419",
+        "q-d610b1b3-b145-4001-9a75-c25060cb8910",
+        "q-9d38c87d-5aae-491b-aae2-fc42b84cf014"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l03",
+      "newLessonId": "l-morse-rappel-durk",
+      "before": 13,
+      "recognition": 8,
+      "production": 5,
+      "preservedQuestionIds": [
+        "q-b528a075-4274-400f-8a06-ce857b93b30f",
+        "q-a4ca4383-6b13-4f31-8892-a9b38df6c374",
+        "q-72966372-63ca-45fb-958c-8fc437279196",
+        "q-18f66e9d-6a9c-44fd-8f39-d4d5c817bcd9",
+        "q-cde65bee-188e-4b46-b650-e6a3b0847f99"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l04",
+      "newLessonId": "l-morse-rappel-gwbv",
+      "before": 13,
+      "recognition": 8,
+      "production": 5,
+      "preservedQuestionIds": [
+        "q-921156e0-2a3f-47bf-80fe-187e1c3bde8b",
+        "q-4aa63f19-a0f3-4ebc-8d0b-a5943f8525d9",
+        "q-6d7b5f1d-4799-454d-8946-ad9839d7dd19",
+        "q-4981e4bc-9920-40fd-a52b-73b1585b7379",
+        "q-88d64c2a-f0fd-4eef-87fc-79dfedc7574f"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l05",
+      "newLessonId": "l-morse-rappel-flpj",
+      "before": 13,
+      "recognition": 8,
+      "production": 5,
+      "preservedQuestionIds": [
+        "q-7c3786f8-86e8-4bf2-a374-812064c6a86f",
+        "q-0a1934d5-a605-44a3-9636-453c488baa5b",
+        "q-ca59fc2a-a2e9-407d-87ea-481a8aef1e5d",
+        "q-6e5edbf9-10f6-4d92-a7e0-3c7884ce89a1",
+        "q-8f809267-e823-48ff-a87d-51a02c5d1bfd"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l06",
+      "newLessonId": "l-morse-rappel-cqxyzh",
+      "before": 19,
+      "recognition": 12,
+      "production": 7,
+      "preservedQuestionIds": [
+        "q-391cc6fd-6f21-48bd-8973-986cc86bf4a0",
+        "q-301496d3-a5c4-48f2-b616-2e3df4793da4",
+        "q-d8714007-a472-4565-b866-6f149d1f0154",
+        "q-3014d48b-2483-429e-a619-4b9aaa0053a0",
+        "q-47947578-e728-4864-af86-d078a13a411e",
+        "q-b2636a05-8514-4984-bb5c-29d8181b263e",
+        "q-734533b7-e331-49e6-a4d6-f751fd9ffe8e"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l07",
+      "newLessonId": "l-morse-rappel-12345",
+      "before": 16,
+      "recognition": 10,
+      "production": 6,
+      "preservedQuestionIds": [
+        "q-eb2a0392-9f41-472b-851c-c04bb852036d",
+        "q-bc51c1e2-86a7-4a02-9984-87648c56ba61",
+        "q-b9b9666a-d2e0-48d5-b739-a75bb484b6ca",
+        "q-3862a485-a194-454a-abd8-7eb2083e99ce",
+        "q-53e1b369-e8a4-44b8-80a2-89c7b012f52a",
+        "q-3c231d51-3d5b-4b3a-a920-523ee4d12c4a"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l08",
+      "newLessonId": "l-morse-rappel-67890",
+      "before": 16,
+      "recognition": 10,
+      "production": 6,
+      "preservedQuestionIds": [
+        "q-b0c6d77e-6e06-42a6-b13b-9e9b52ab3517",
+        "q-65643638-d8a1-4d8a-8a9c-696c8923ba4e",
+        "q-7cf55eb2-95cf-4f86-9305-b94e22bdfbf6",
+        "q-d22d1860-48df-4dfa-85ab-163f45fc2d88",
+        "q-1b6a1198-3a47-4f3c-82fc-fbc0127d28fb",
+        "q-1beedff3-4cdd-47fc-ae16-63cb5dcadb52"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    },
+    {
+      "type": "split",
+      "originalLessonId": "c15-l10",
+      "newLessonId": "l-morse-rappel-ponctuation",
+      "before": 19,
+      "recognition": 12,
+      "production": 7,
+      "preservedQuestionIds": [
+        "q-66168249-5b4f-4971-917a-f7953612a6d1",
+        "q-eca45bf9-357c-431a-b3ba-069700a52a16",
+        "q-9d255dc9-8d79-4606-a022-581856a11b70",
+        "q-bfe63aa5-9592-4162-9454-9505d990c21c",
+        "q-b0f492b6-f61b-4f22-8de9-5d7a9d6c826a",
+        "q-703780af-d635-41ea-8381-8585e2ca9694",
+        "q-1ad2c3af-cd67-4b7f-ab6a-f9dc773ad3e7"
+      ],
+      "reason": "Séparer reconnaissance et rappel productif, puis intercaler des cours d’un autre domaine ; aucune question ni identité ne disparaît."
+    }
+  ],
+  "corrections": [
+    {
+      "questionId": "q-b0f5211d-34a3-42cf-a11c-c11c8dbb0569",
+      "reason": "Retirer une seconde réponse mathématiquement équivalente (soustraire 0 W)."
+    },
+    {
+      "questionId": "q-fd465f3c-e88b-4b19-9f9d-1fc9ee458ff3",
+      "reason": "Ne pas attribuer une résistance interne à la source idéale elle-même."
+    },
+    {
+      "questionId": "q-c4b0d9f5-b503-4426-b2b0-8330fdaa1b85",
+      "reason": "Remplacer le distracteur couleur par la confusion entre propriété du fil et courant."
+    },
+    {
+      "questionId": "q-b952813a-ea63-4d7a-8204-964ad0d6854b",
+      "reason": "Retirer le condensateur non encore enseigné, conserver la décision de mesure sur branches déjà connues."
+    },
+    {
+      "questionId": "q-0a8bc326-5d36-48b2-a295-3862c3952a76",
+      "reason": "Faire porter les mauvaises conclusions sur la proportion et le calcul, plutôt qu’une phrase artificielle."
+    },
+    {
+      "questionId": "q-e4f65301-fe2b-42a9-96eb-e7840b6c96e3",
+      "reason": "Distinguer LC idéal initialement chargé et oscillateur réel entretenu ; ne pas livrer la réponse par l’absence explicite d’énergie."
+    },
+    {
+      "questionId": "q-cfa99522-04ff-488e-8bb6-31d7e829a060",
+      "reason": "Rendre visible la reprise causale du stockage d’énergie."
+    },
+    {
+      "questionId": "q-22a6abf7-25da-4db8-a3b1-45210ca52598",
+      "reason": "Demander une grandeur et confronter les éléments réels de la PLL, dans son modèle fixé."
+    },
+    {
+      "questionId": "q-fecbbd01-d683-4955-927c-a4452f8fa701",
+      "reason": "Corriger le signet primaire kTB, distinct de la CEM."
+    },
+    {
+      "questionId": "q-0d25d942-98db-48a6-992c-5e7939a30385",
+      "reason": "Corriger le signet primaire kTB, distinct de la CEM."
+    },
+    {
+      "questionId": "q-114ccbdf-b3e3-4ef5-9bf6-5beb4a732db3",
+      "reason": "Corriger le signet primaire kTB, distinct de la CEM."
+    },
+    {
+      "questionId": "q-83742c84-c29a-444b-8b74-31c6a01ffe68",
+      "reason": "Distinguer consommation électrique et puissance RF, sans supposer un rendement."
+    },
+    {
+      "questionId": "q-ebfd41c7-fd24-48a2-bb74-0d187fa19c15",
+      "reason": "Isoler la polarisation du diagramme et du pointage, préciser l’antenne linéaire."
+    },
+    {
+      "questionId": "q-c4bc1a60-bba0-48af-8de4-af858615baae",
+      "reason": "Le compte rendu et sa date ne certifient pas la présence réelle lors de la réception."
+    },
+    {
+      "questionId": "q-546c0705-2b3f-47a0-bdb1-8ff05df9e2f5",
+      "reason": "Diagnostiquer sur l’observation des créneaux, plutôt que nommer l’horloge fautive dans l’énoncé."
+    },
+    {
+      "questionId": "q-2fbcac65-b81e-4500-9bd7-80473d0afb41",
+      "reason": "Distracteur remplacé par une confusion pertinente relevée en revue indépendante."
+    },
+    {
+      "questionId": "q-d25e9d92-2447-4e59-913c-b291c8c46efd",
+      "reason": "Distracteur remplacé par une confusion pertinente relevée en revue indépendante."
+    },
+    {
+      "questionId": "q-ce629f01-43e9-43d1-83b8-472a9daac5af",
+      "reason": "Distracteur remplacé par une confusion pertinente relevée en revue indépendante."
+    },
+    {
+      "questionId": "q-4d83b7e5-f893-4ac9-a0d2-058eba648145",
+      "reason": "Distracteur remplacé par une confusion pertinente relevée en revue indépendante."
+    }
+  ],
+  "rejected": [
+    {
+      "questionId": "q-cf74cc85-8899-4067-838b-4f24c7866470",
+      "reason": "Doublon exact du calcul historique −10 dBm ; déplacer son UUID existant."
+    },
+    {
+      "questionId": "q-75cfab32-b374-460d-98e0-9d69ed417359",
+      "reason": "La réserve « environ/loin de la coupure » livre la réponse oui/non ; les deux applications RC retenues suffisent."
+    },
+    {
+      "questionId": "q-cc6e7878-8c7e-4ff7-9d3c-6f3deb7cc5ef",
+      "reason": "La fonction manquante est nommée dans l’énoncé ; rappel déjà exercé."
+    },
+    {
+      "questionId": "q-d915cdc3-f748-41cd-8f6b-2c56cefd6d7f",
+      "reason": "Même collision FI que l’historique déplacé, sans situation supplémentaire."
+    },
+    {
+      "questionId": "q-55751d24-67af-4f59-ad5b-bf14520b0922",
+      "reason": "Réaction et énergie déjà réunies dans l’exercice historique ; privilégier LC idéal/réel."
+    }
+  ],
+  "retainedShort": [
+    {
+      "lessonId": "l-radio-ondes",
+      "reason": "4 questions : unité, conversion, intervalle et message. Période, forme et modulation sont repris aux sections 4 et 7 ; ne pas les anticiper ici."
+    },
+    {
+      "lessonId": "l-circuit-ferme",
+      "reason": "4 situations couvrent ouverture, court-circuit, tension sans courant et maquette adaptée. Ohm et branches viennent ensuite."
+    },
+    {
+      "lessonId": "l-tension-deux-points",
+      "reason": "4 objectifs couverts : unité, référence, branchement et signe. Les décisions instrumentales reviennent plus loin avec trois contextes pratiques."
+    },
+    {
+      "lessonId": "l-condensateur-polarite",
+      "reason": "5 questions dont Q=CU dans les deux sens, remplacement et énergie résiduelle. RC et énergie offrent les retours suivants ; pas de substitution supplémentaire."
+    },
+    {
+      "lessonId": "c16-l02",
+      "reason": "5 questions : deux relations, contrôle d’unité et somme incohérente. La résistance interne remobilise ensuite l’isolation dans un modèle différent."
+    },
+    {
+      "lessonId": "l-tubes-reperes",
+      "reason": "Quatre exercices couvrent le repérage cathode/grille/diode et le danger résiduel. Une hausse artificielle inviterait à détailler des montages haute tension hors de l'objectif de reconnaissance."
+    },
+    {
+      "lessonId": "l-cept-voyage",
+      "reason": "Quatre repères de préparation suffisent ici ; ajouter des exemples de pays sans avoir les conditions actuelles multiplierait surtout les listes à mémoriser et les risques de règles périmées."
+    },
+    {
+      "lessonId": "l-installation-droits",
+      "reason": "Quatre cas distinguent déclaration radio, urbanisme et accès au site. La suite pertinente est la vérification locale pour un vrai projet, pas davantage de oui/non quasi identiques."
+    },
+    {
+      "lessonId": "l-controle-responsabilite",
+      "reason": "Quatre objectifs restreints et distincts. Pas de nouveaux montants de sanction ni de procédures non contrôlées à introduire pour remplir une séance."
+    },
+    {
+      "lessonId": "l-examen-materiel",
+      "reason": "Cinq situations couvrent documents, modèle de calculatrice, brouillon, méthode et démonstration de l'interface. Les conditions locales sont déjà distinguées ; éviter des variantes qui répètent 'demander au centre'."
+    },
+    {
+      "lessonId": "l-sstv-image-son",
+      "reason": "Garder 4 questions : image fixe, mode compatible, démarrage tardif et événements ponctuels. L’application est dans l-sstv-reception : 8 questions avec ses deux mires existantes et deux diagnostics de chaîne ajoutés."
+    },
+    {
+      "lessonId": "l-pota-contacts",
+      "reason": "Rester à 5. Le seuil UTC et l’emplacement sont appliqués dans la première leçon, pas besoin de réciter tout le règlement."
+    },
+    {
+      "lessonId": "l-sota-sommets",
+      "reason": "Rester à 5 avec un cas d’altitude/continuité. La découverte ne prétend pas couvrir toutes les règles de points et d’alimentation SOTA."
+    },
+    {
+      "lessonId": "c14-l04",
+      "reason": "8 questions historiques sur préparation, charge, puissance et carnet : ne pas gonfler ; les applications chiffrées sont dans autonomie et antennes."
+    },
+    {
+      "lessonId": "c02-l04",
+      "reason": "8 questions historiques sur procédure et reports. Le nouveau cas POTA réutilise qso-procedure dans un autre contexte."
+    },
+    {
+      "lessonId": "c21-l04",
+      "reason": "8 questions sur routine/rappel : faire les retours dans les autres leçons plutôt que multiplier celles qui vantent la répétition espacée."
+    }
+  ],
+  "spacedReturns": [
+    {
+      "skillId": "proportional-reasoning",
+      "currentLessons": [
+        "l-math-rapports",
+        "l-fils-materiaux",
+        "l-filtre-coupure",
+        "c17-l04",
+        "c19-l02"
+      ],
+      "recommendation": "Des reprises existent mais ne déclarent souvent que la compétence finale. Une simple question voisine ne prouve pas un espacement.",
+      "proposedAction": "Les nouveaux transferts L/S et fc portent proportional-reasoning. Après revue, associer aussi la compétence aux questions existantes q-9907b456-a14f-4e5d-aa42-af0c761a081a (C×9, f0/3) et q-06d7a27f-f911-4f99-a0d5-749e4e1de9d4 (quart d’onde dans la ligne), sans changer leurs UUID."
+    },
+    {
+      "skillId": "powers-roots",
+      "currentLessons": [
+        "c16-l03",
+        "c03-l04",
+        "l-rms-sans-confusion",
+        "c17-l01",
+        "c17-l03",
+        "c17-l04"
+      ],
+      "recommendation": "Puissance, efficace, énergie et impédance apportent de vrais contextes. Le nouveau RMS combine deux lectures et la racine.",
+      "proposedAction": "Nouvelle comparaison oscilloscope/multimètre taguée powers-roots. Conserver les contextes spécialisés ; vérifier les tags des retours énergie et impédance avant de créer un autre cours arithmétique."
+    },
+    {
+      "skillId": "ohm-law",
+      "currentLessons": [
+        "c03-l03",
+        "c04-l01",
+        "c04-l02",
+        "c04-l03",
+        "c04-l04",
+        "l-pile-resistance-interne"
+      ],
+      "recommendation": "Source réelle plus charge est une reprise intégrative après plusieurs chapitres, absente du cours nouveau sur la pile.",
+      "proposedAction": "Les nouveaux calculs de r et de courant déclarent ohm-law ; ne pas présenter E/r comme un courant normal de fonctionnement."
+    },
+    {
+      "skillId": "energy-duration",
+      "currentLessons": [
+        "l-energie-duree",
+        "l-pile-resistance-interne"
+      ],
+      "recommendation": "Wh/Ah revient après mesures et composants dans une comparaison différente de P×t.",
+      "proposedAction": "Nouvelle comparaison 5 Ah à 6 et 12 V taguée energy-duration. Pour le retour encore plus éloigné, vérifier avec l’agent pratique un bilan d’autonomie avec plusieurs états et pertes préalablement enseignées."
+    },
+    {
+      "skillId": "equation-rearrange",
+      "currentLessons": [
+        "l-math-formules",
+        "c16-l02",
+        "l-pile-resistance-interne",
+        "c17-l04"
+      ],
+      "recommendation": "Inférer r d’une chute mesurée réemploie la méthode après plusieurs chapitres au lieu de répéter I=P/U immédiatement.",
+      "proposedAction": "Nouvelle question r=(E−U)/I taguée equation-rearrange. Garder c16-l02 courte."
+    },
+    {
+      "skillId": "metric-prefixes",
+      "currentLessons": [
+        "c16-l01",
+        "c03-l01",
+        "l-filtre-coupure",
+        "c17-l02",
+        "c17-l04"
+      ],
+      "recommendation": "Le calcul de coupure demande de convertir deux unités dans un produit ; réactances et Q poursuivent le retour.",
+      "proposedAction": "Le nouveau fc avec kΩ et nF porte metric-prefixes. Vérifier le même lien dans les calculs ultérieurs de réactance et de f0/B."
+    },
+    {
+      "skillId": "decibel-landmarks",
+      "currentLessons": [
+        "l-decibels-reperes",
+        "c07-l04",
+        "l-signal-dbm",
+        "c18-l04",
+        "c19-l03"
+      ],
+      "recommendation": "Les trois premiers cours sont voisins : ne pas les appeler une reprise éloignée. Bruit et pertes de ligne sont les véritables retours suivants.",
+      "proposedAction": "Nouveaux niveau de sortie et addition de consommations tagués decibel-landmarks. Confirmer avec l’autre agent un bilan bruit et un bilan ligne plus loin, sans copier encore 10−3 dB."
+    },
+    {
+      "skillId": "amplifier-efficiency",
+      "currentLessons": [
+        "c08-l03",
+        "l-classes-amplification"
+      ],
+      "recommendation": "Retarder un des calculs directs actuellement regroupés pour qu'il redevienne un rappel, au lieu de présenter trois rendements proches dans la même séance.",
+      "proposedAction": "Déplacement proposé de q-5c959840-e48a-41be-90d7-23d0181b5ae1 vers l-synthese-calculs. Le nombre de questions diminue de un dans c08-l03 ; l'identité et la compétence de l'exercice sont conservées."
+    },
+    {
+      "skillId": "amplifier-classes",
+      "currentLessons": [
+        "c08-l03",
+        "l-classes-amplification"
+      ],
+      "recommendation": "Faire revenir la classe AB après l'étude de la modulation et des émissions indésirables, comme outil de décision plutôt que liste d'angles.",
+      "proposedAction": "Nouvelle question de c21-l03 sur un final AB réellement écrêté ; la compétence de cette question inclut clean-transmission et amplifier-classes."
+    },
+    {
+      "skillId": "op-amp-feedback",
+      "currentLessons": [
+        "l-aop-entrees",
+        "l-aop-montages"
+      ],
+      "recommendation": "Les deux cours consécutifs enseignent et appliquent, mais ne forment pas encore une reprise à distance. Reprendre le choix d'un suiveur lors de la synthèse, après la radioélectricité.",
+      "proposedAction": "Nouvelle situation source fragile/charge dans c14-l02, avec technical-synthesis et op-amp-feedback."
+    },
+    {
+      "skillId": "transistor-bias",
+      "currentLessons": [
+        "c08-l02"
+      ],
+      "recommendation": "Reprendre la limite du modèle β après les limites d'AOP et de récepteur : un calcul ne rend pas physiquement possible un courant interdit par l'alimentation et la charge.",
+      "proposedAction": "Nouvelle situation de limite donnée à 50 mA dans c14-l02, avec technical-synthesis et transistor-bias."
+    },
+    {
+      "skillId": "oscillator-feedback",
+      "currentLessons": [
+        "c08-l04",
+        "l-quartz-pll"
+      ],
+      "recommendation": "Relier l'entretien de l'oscillation au stockage d'énergie LC introduit plus tôt ; préserver ensuite la différence entre réaction entretenue et boucle correctrice PLL.",
+      "proposedAction": "Trois nouvelles situations dans c08-l04, retrait de l'anticipation logique, puis deux applications PLL. Le retour LC n'ajoute aucune nouvelle formule de résonance."
+    },
+    {
+      "skillId": "noise-bandwidth",
+      "currentLessons": [
+        "l-bruit-largeur",
+        "c18-l04"
+      ],
+      "recommendation": "Ces deux cours donnent une progression qualitative puis en dB ; il faut un autre retour après plusieurs chapitres, idéalement dans le SDR où l'utilisateur choisit un filtre réel.",
+      "proposedAction": "Coordonner avec l'agent des découvertes un cas de lecture SDR/filtre à largeur donnée dans l-sdr-cascade ou l-sdr-reglages si ces leçons existent. Ne pas compter les seuls distracteurs randomisés comme reprise à distance. Proposition non implémentée dans ce JSON pour respecter les responsabilités."
+    },
+    {
+      "skillId": "logic-basic",
+      "currentLessons": [
+        "c22-l03",
+        "c22-l04"
+      ],
+      "recommendation": "La séance déplacée complète le découpage progressif, mais son placement dans le même chapitre ne constitue pas une reprise à distance.",
+      "proposedAction": "Nouvelle séance l-logique-commandes après c22-l04. Pour la vraie reprise plus loin, coordonner une application de conditions à un diagnostic de station ou à l'automatisation encadrée ; ne pas prétendre que ces six déplacements produisent à eux seuls l'espacement."
+    },
+    {
+      "skillId": "energy-duration",
+      "currentLessons": [
+        "l-energie-duree"
+      ],
+      "recommendation": "Le retour section 11 doit exiger un bilan de plusieurs états et une réserve, au-delà de E=P×t constant.",
+      "proposedAction": "Trois questions ajoutées à l-portable-energie portent energy-duration : temps RX/TX, comparaison V×Ah et réserve. Introduction de la méthode composée."
+    },
+    {
+      "skillId": "ohm-law",
+      "currentLessons": [
+        "c03-l03"
+      ],
+      "recommendation": "Réutiliser Ohm hors réseau abstrait après un long intervalle.",
+      "proposedAction": "Câble 0,20 Ω / 3 A puis tension au poste dans l-portable-energie, avec ohm-law et dc-voltage. Reprise de la mesure sous charge au projet final sans répéter le calcul."
+    },
+    {
+      "skillId": "wavelength",
+      "currentLessons": [
+        "c11-l01"
+      ],
+      "recommendation": "Passer de λ au plan d’un dipôle et au changement de fréquence.",
+      "proposedAction": "Longueur d’un brin depuis le total, puis dimension à fréquence divisée par deux ; skills antenna-length/wavelength/proportional-reasoning sur les questions concernées."
+    },
+    {
+      "skillId": "decibel-landmarks",
+      "currentLessons": [
+        "l-decibels-reperes"
+      ],
+      "recommendation": "Réemployer le repère −3 dB sur un élément réel de la station.",
+      "proposedAction": "Choisir entre deux lignes de pertes 3 et 6 dB pour atteindre une puissance minimale à l’antenne, dans l-antenne-mesures. Bonne adaptation et faible perte restent distinctes."
+    },
+    {
+      "skillId": "signal-noise",
+      "currentLessons": [
+        "c18-l04"
+      ],
+      "recommendation": "Revenir section 12 en séparant puissance absolue, gain et SNR.",
+      "proposedAction": "Deux cas de cascade puis comparaison des reports faibles signaux utilisent la différence de niveaux, avec signal-noise explicite ; pas une mention dans les seuls prérequis."
+    },
+    {
+      "skillId": "metric-prefixes",
+      "currentLessons": [
+        "c16-l01"
+      ],
+      "recommendation": "Usages de lecture kHz/MHz sans autre séance entière de conversion.",
+      "proposedAction": "Ajout d’un décalage de descendante satellite et déplacement observé sur cascade, dans deux cours distincts."
+    },
+    {
+      "skillId": "antenna-gain",
+      "currentLessons": [
+        "c11-l03"
+      ],
+      "recommendation": "Faire réutiliser la polarisation en réception sans augmenter aveuglément la puissance.",
+      "proposedAction": "Essai d’orientation sur une descendante : observation du signal avec antenna-gain, après les fondations de section 8."
+    },
+    {
+      "skillId": "diagnostic-method",
+      "currentLessons": [
+        "c21-l02"
+      ],
+      "recommendation": "La méthode ne doit pas rester une liste récitée près des antennes.",
+      "proposedAction": "Situations audio SSTV, horloge FT8, arrêt RF automatique et A/B/A final. Chacune donne une observation puis demande le contrôle justifié."
+    },
+    {
+      "skillId": "measurement-circuits",
+      "currentLessons": [
+        "l-voltemetre-amperemetre",
+        "c10-l04"
+      ],
+      "recommendation": "Au projet final, choisir les mesures sous la charge réelle au-delà du seul branchement série/parallèle.",
+      "proposedAction": "Comparer les tensions des deux extrémités d’un câble pendant le même courant. Pas de nouvelle manipulation dangereuse ni de nouveau prérequis."
+    },
+    {
+      "skillId": "pota-operation",
+      "currentLessons": [
+        "l-pota-decouverte",
+        "l-pota-contacts"
+      ],
+      "recommendation": "Ces deux leçons sont proches : rappel ultérieur dans un autre problème.",
+      "proposedAction": "Dans l-automatisme-controle, conformité radio supposée et admissibilité d’un QSO entièrement automatique. Reprise après ISS/SDR/SSTV/APRS, avec deux skills."
+    },
+    {
+      "skillId": "sstv-reception",
+      "currentLessons": [
+        "l-sstv-reception"
+      ],
+      "recommendation": "Réemployer la capture enregistrée dans une démarche finale plus large.",
+      "proposedAction": "Le projet final demande un protocole même audio avant/après réglage : SSTV devient un cas de méthode expérimentale."
+    },
+    {
+      "skillId": "fm-modulation",
+      "currentLessons": [
+        "c09-l02"
+      ],
+      "recommendation": "La modulation revient comme réglage concret de réception.",
+      "proposedAction": "Station FM connue mais démodulateur AM : choisir le bon mode avant de monter le gain."
+    }
+  ],
+  "introChanges": [
+    {
+      "lessonId": "l-math-decimaux",
+      "reason": "Enseigner comparaison, variation signée et regroupement avant les nouveaux exercices."
+    },
+    {
+      "lessonId": "l-math-rapports",
+      "reason": "Faire reconnaître une proportion au lieu d’appliquer mécaniquement une règle."
+    },
+    {
+      "lessonId": "l-math-formules",
+      "reason": "Préparer sélection des données et structure de la relation."
+    },
+    {
+      "lessonId": "l-energie-duree",
+      "reason": "Leçon de huit questions après trois arrivées historiques, un départ vers puissance et deux ajouts distincts ; préparer bilan par phases et durée inverse."
+    },
+    {
+      "lessonId": "l-voltemetre-amperemetre",
+      "reason": "Préparer les décisions instrumentales sans prétendre former aux installations dangereuses."
+    },
+    {
+      "lessonId": "l-bobine-coupure",
+      "reason": "Enseigner le chemin de décharge et l’énergie avant les applications."
+    },
+    {
+      "lessonId": "l-pile-resistance-interne",
+      "reason": "Préparer inférence, modèle complet et reprise différée énergie/charge."
+    },
+    {
+      "lessonId": "l-decibels-reperes",
+      "reason": "Enseigner les erreurs ciblées sans imposer déjà les logarithmes."
+    },
+    {
+      "lessonId": "l-signal-dbm",
+      "reason": "Distinguer rapports successifs et addition de puissances indépendantes."
+    },
+    {
+      "lessonId": "c03-l04",
+      "reason": "Découpage réel de la leçon historique en puissance/dissipation puis énergie/durée, sans changer son ID. Les produits P×t ont rejoint l-energie-duree."
+    },
+    {
+      "lessonId": "c18-l04",
+      "reason": "Introduire le transfert avant/après et distinguer gain de niveau et amélioration de S/B avant la nouvelle application."
+    },
+    {
+      "lessonId": "l-alimentation-etages",
+      "reason": "Enseigner les conditions et la dissipation utilisées par les nouveaux cas, avec seuil donné dans l’énoncé plutôt qu’une valeur universelle."
+    },
+    {
+      "lessonId": "l-aop-entrees",
+      "reason": "Expliciter le sens de la comparaison avant de l'évaluer."
+    },
+    {
+      "lessonId": "c08-l04",
+      "reason": "Retirer l’anticipation ET/OU/NON lorsque les six questions contenant de la logique rejoignent une séance du chapitre logique. Garder le contenu de résonance, énergie et réaction avant son évaluation."
+    },
+    {
+      "lessonId": "l-quartz-pll",
+      "reason": "Introduire le chemin de correction et la relation utilisée par la situation graduée."
+    },
+    {
+      "lessonId": "l-bruit-largeur",
+      "reason": "Enseigner la proportion et les conditions de comparaison avant le calcul et le transfert au choix de filtre."
+    },
+    {
+      "lessonId": "l-emission-puissances",
+      "reason": "Préparer le transfert des décibels et de l’antenne au calcul de PIRE ; aucun nouveau plafond de puissance."
+    },
+    {
+      "lessonId": "l-synthese-calculs",
+      "reason": "Faire expliciter les méthodes mobilisées dans les nouveaux exercices ; ce sont des retours des chapitres précédents, pas de nouvelles formules d'examen."
+    },
+    {
+      "lessonId": "c14-l02",
+      "reason": "Rappeler les conditions connues avant leur transfert dans la synthèse technique."
+    },
+    {
+      "lessonId": "l-dipole-projet",
+      "reason": "Distinguer total/brin et enseigner le transfert de proportion avant les applications."
+    },
+    {
+      "lessonId": "l-antenne-mesures",
+      "reason": "Retour appliqué sur pertes et décibels, sans confondre ROS et rendement."
+    },
+    {
+      "lessonId": "l-portable-energie",
+      "reason": "Enseigner énergie composée, réserve et chute de tension avant de les évaluer."
+    },
+    {
+      "lessonId": "l-satellite-monte-descente",
+      "reason": "Préparer la conversion MHz/kHz et le diagnostic de polarisation ; les paramètres réels restent ceux du satellite actif."
+    },
+    {
+      "lessonId": "l-cascade-spectre",
+      "reason": "Réactiver fréquences, préfixes, dBm et SNR avant trois lectures distinctes."
+    },
+    {
+      "lessonId": "l-aprs-paquets",
+      "reason": "Préparer fraîcheur et calcul de cadence sans intervalle universel."
+    },
+    {
+      "lessonId": "l-numerique-faibles-signaux",
+      "reason": "Réemployer les niveaux négatifs dans un autre contexte sans confondre report, puissance et liaison."
+    },
+    {
+      "lessonId": "l-projet-experience",
+      "reason": "Trois transferts effectifs de la méthode expérimentale, au-delà de la recommandation de pratiquer."
+    }
+  ],
+  "parentReviewQuestionIds": [
+    "q-d5e71737-dfeb-4938-b53d-38a40f9b1704",
+    "q-c3ed9d77-e5cf-44ba-bc94-de217cfa2c15",
+    "q-d87a3efe-a23f-45fd-8cbd-6c4ec7a0310d"
+  ],
+  "notes": [
+    "Les reprises d’une opération déjà étudiée sont comptées comme rappels espacés, pas comme situations nouvelles.",
+    "La reprise logique suit les lignes, après un intervalle de cours hors logique.",
+    "La provenance des validations antérieures à 0.55 est capturée séparément pour ne pas valider de nouvelles parties à partir d’un succès partiel récent.",
+    "Le chapitre de projets précède le rappel de ponctuation et les deux échanges CW : les signes sont réemployés après un détour par la méthode expérimentale et le contrôle des automatismes."
+  ]
+}

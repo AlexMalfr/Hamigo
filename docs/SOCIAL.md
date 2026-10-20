@@ -185,8 +185,17 @@ La progression complète conserve `streakHistory`, version 1 : journées histori
 
 Retirer uniquement cette conversion temporaire en **0.57**, après cinq versions 0.52–0.56. Garder `StudyDay`, le lecteur/validateur et la fusion de `StreakHistory`, les données persistées, et initialiser un historique vide pour une nouvelle progression. Le schéma global reste 2. Rappels et widgets utilisent le compteur de Moi ; les widgets prévoient un rafraîchissement à la limite de 03:00. L’écran ouvert se rafraîchit aussi à cette limite, sans réinitialisation à minuit.
 
-L’espacement Morse automatique reste un choix local de saisie, comme le son en direct : aucune clé supplémentaire dans les préférences que les anciennes versions des sauvegardes valident strictement. Le mode un/deux boutons et son seuil continuent d’être sauvegardés.
+Le mode un/deux boutons et son seuil continuent d’être sauvegardés dans les préférences historiques. Le son en direct, l’espacement automatique, le mode vocal, Sons/Vibrations et autoSync sont maintenant transportés dans le champ facultatif appSettings séparé ; la liste historique des préférences reste compatible.
 
 Le résumé social publie `dayStartHour: 3` et son fuseau. Le lecteur conserve la convention calendaire pour un ancien résumé sans ce champ ; il ne transforme pas arbitrairement les agrégats d’un ami. La vue horaire d’une nouvelle journée suit 03 h → 23 h → 00 h → 02 h. Une comparaison horaire exige la même date, le même fuseau et la même heure de limite.
 
 Les nouvelles récompenses de questions utilisent l’espace `answer3:<ID stable>:<jour d’activité>`. Les anciens `answer:` restent immuables et lisibles. Cela évite qu’une ancienne réponse à 01:00 et une nouvelle réponse après 03:00 partagent accidentellement la même clé calendaire. Les IDs de questions ne changent pas.
+
+
+## Réglages et cours ignorés (candidate 0.55)
+
+Le champ facultatif `appSettings` porte des registres indépendants `{value, modifiedAt}` pour `interactionSound`, `interactionHaptics`, `morseLiveSound`, `morseAutoSpaces`, `speechInputMode` et `autoSync`. La fusion prend la dernière modification par clé, avec départage canonique déterministe à égalité. Une sauvegarde ancienne sans ce champ conserve les réglages locaux. Un import explicite établit un choix plus récent que ses registres entrants, même si leur horloge est dans le futur ; une fusion ordinaire ne les redatera pas. Les tâches de synchro sont replanifiées si autoSync change. L’historique d’autorisation micro reste local au système/appareil.
+
+`progress.ignoredLessons` contient des choix réversibles par ID stable de cours, `{ignored, modifiedAt}`. Une désélection conserve sa valeur false horodatée ; à égalité elle prévaut sur true, afin qu’une vieille sauvegarde ne réactive pas un cours ignoré. Les ignorés comptent dans la progression du parcours et le résumé social. La preuve de réussite `completed`, les réponses et le SRS restent séparés.
+
+Ignorer ne donne aucun XP, aucune réponse ni preuve `completed`. Après réintégration, les réponses et la première réussite réelle donnent leurs récompenses habituelles, dont le bonus de fin de 6 XP. Les anciens bonus synthétiques de la candidate 0.55 sont identifiés par leur événement sans réponse ni complétion, avec 6 XP et la clé `lesson:<id>` : le journal reste conservé mais sa projection exclut ces faux gains. Une vraie fin à 0 XP due à l’ancien partage de clé récupère son bonus au jour réel, sauf si cette complétion est déjà représentée dans le baseline historique. Une somme compactée sans preuve événementielle n’est jamais diminuée par supposition.

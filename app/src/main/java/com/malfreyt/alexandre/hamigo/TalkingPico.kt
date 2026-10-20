@@ -16,7 +16,7 @@ internal val PicoBodyCenter=HorizontalAlignmentLine {a,b->minOf(a,b)}
 /** The same speech motion in questions and course introductions. Idle drawings retain their face. */
 @Composable internal fun TalkingPico(modifier:Modifier,talking:Boolean,mood:MascotMood=MascotMood.HAPPY,
     pose:MascotPose=MascotPose.POINT,mirrored:Boolean=false,pointLeft:Boolean=false,eyesClosed:Boolean=false,
-    idleMotion:Boolean=false,reaction:Int=0,mouthActivity:Float=1f,speechActive:Boolean=talking) {
+    idleMotion:Boolean=false,reaction:Int=0,mouthActivity:Float=1f,speechActive:Boolean=talking,listening:Boolean=false) {
     val activity by animateFloatAsState(if(talking)mouthActivity.coerceIn(0f,1f) else 0f,
         // Preserve velocity on retarget: small voice variations must not jerk the oval.
         spring(dampingRatio=1f,stiffness=1000f,visibilityThreshold=.001f),label="audible speech")
@@ -26,7 +26,7 @@ internal val PicoBodyCenter=HorizontalAlignmentLine {a,b->minOf(a,b)}
         val mouth by transition.animateFloat(0f,1f,infiniteRepeatable(tween(720,easing=LinearEasing),RepeatMode.Restart),label="mouth")
         phase to mouth
     }else 0f to 0f
-    val idlePhase=if(idleMotion) {
+    val idlePhase=if(idleMotion||listening) {
         val transition=rememberInfiniteTransition(label="Pico breathes")
         val phase by transition.animateFloat(0f,1f,infiniteRepeatable(tween(4800,easing=LinearEasing),RepeatMode.Restart),label="breath")
         phase
@@ -53,10 +53,10 @@ internal val PicoBodyCenter=HorizontalAlignmentLine {a,b->minOf(a,b)}
         val mouth=if(speechActive||talking)activity*(.25f+.75f*(sin(mouthPhase*2*Math.PI).toFloat()+1f)/2f) else null
         val save=canvas.save()
         canvas.translate(size.width/2f,size.height/2f-sway*lift)
-        canvas.rotate(sway*.9f)
+        canvas.rotate(if(listening)-5f+sway*.7f else sway*.9f)
         canvas.scale((if(mirrored)-1f else 1f)*(1f+body*.014f+sway*.006f+bounce.value),1f-body*.014f-sway*.005f+bounce.value)
         canvas.translate(-size.width/2f,-size.height/2f)
-        PicoRenderer.draw(canvas,bounds,mood,pose,if(idleMotion&&!talking)idlePhase else .25f,
+        PicoRenderer.draw(canvas,bounds,mood,pose,if((idleMotion||listening)&&!talking)idlePhase else .25f,
             mouthOpen=mouth,eyesClosed=eyesClosed||(!talking&&idleMotion&&idlePhase>.97f),pointLeft=pointLeft,drawGroundShadow=false)
         canvas.restoreToCount(save)
     }

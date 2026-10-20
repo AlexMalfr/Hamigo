@@ -3,6 +3,9 @@ package com.malfreyt.alexandre.hamigo
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.*
 import kotlin.math.sin
 import kotlin.random.Random
@@ -11,9 +14,13 @@ internal data class MorsePcm(val samples:ShortArray,val rate:Int,val signalRange
 internal object MorseSignalAudio {
     const val LEAD_MS=800
     const val DOT_MS=90
-    fun render(code:String):MorsePcm {
-        val words=normalizeMorse(code).take(240).split('/').map {it.trim().split(Regex("\\s+")).filter(String::isNotBlank)}.filter(List<String>::isNotEmpty)
-        val rate=16000;val dot=rate*DOT_MS/1000
+    const val MAX_DURATION_MS=180_000
+    private const val RATE=16000
+    private fun timing(code:String):Pair<Int,List<IntRange>> {
+        val normalized=normalizeMorse(code)
+        require(normalized.length<=12_000){"Le signal Morse dépasse la longueur prise en charge."}
+        val words=normalized.split('/').map {it.trim().split(Regex("\\s+")).filter(String::isNotBlank)}.filter(List<String>::isNotEmpty)
+        val rate=RATE;val dot=rate*DOT_MS/1000
         val lead=rate*LEAD_MS/1000;val tail=rate*LEAD_MS/1000
         val ranges=mutableListOf<IntRange>();var cursor=lead
         words.forEachIndexed {wi,letters->letters.forEachIndexed {li,symbols->symbols.forEachIndexed {si,c->
@@ -23,8 +30,15 @@ internal object MorseSignalAudio {
                 cursor+=dot*when {si<symbols.lastIndex->1;li<letters.lastIndex->3;wi<words.lastIndex->7;else->1}
             }
         }}}
-        if(ranges.isEmpty())return MorsePcm(ShortArray(0),rate,emptyList())
-        val samples=ShortArray(cursor+tail);val random=Random(70044)
+        if(ranges.isEmpty())return 0 to emptyList()
+        require(cursor+tail<=rate*(MAX_DURATION_MS/1000)){"Le signal Morse dépasse trois minutes."}
+        return cursor+tail to ranges
+    }
+    fun durationMs(code:String):Long=timing(code).first*1000L/RATE
+    fun render(code:String):MorsePcm {
+        val (length,ranges)=timing(code);val rate=RATE
+        if(length==0)return MorsePcm(ShortArray(0),rate,emptyList())
+        val samples=ShortArray(length);val random=Random(70044)
         var noise=0.0
         samples.indices.forEach {i->
             // Very low receiver hiss opens the audio path before the first dot/dash.
@@ -43,10 +57,12 @@ internal object MorseSignalAudio {
 
 private val morseAudioScope=CoroutineScope(SupervisorJob()+Dispatchers.Default)
 private var morseAudioJob:Job?=null
-internal fun stopMorsePlayback(){morseAudioJob?.cancel();morseAudioJob=null}
+internal object MorsePlayback {var code by mutableStateOf<String?>(null);internal set}
+internal fun stopMorsePlayback(){val old=morseAudioJob;morseAudioJob=null;MorsePlayback.code=null;old?.cancel()}
 fun stopMorse(){stopMorsePlayback();MorseSidetone.stopOthers()}
 fun playMorse(code:String) {
     stopMorse()
+    MorsePlayback.code=normalizeMorse(code)
     val owner=Any();FeedbackAudioGate.reserve(owner)
     val job=morseAudioScope.launch {
         var track:AudioTrack?=null
@@ -66,6 +82,6 @@ fun playMorse(code:String) {
         catch(_:Exception) { /* A missing audio device must not terminate a lesson. */ }
         finally {track?.let {runCatching {it.stop()};it.release()}}
     }
-    job.invokeOnCompletion {FeedbackAudioGate.release(owner)}
     morseAudioJob=job
+    job.invokeOnCompletion {if(morseAudioJob===job){morseAudioJob=null;MorsePlayback.code=null};FeedbackAudioGate.release(owner)}
 }

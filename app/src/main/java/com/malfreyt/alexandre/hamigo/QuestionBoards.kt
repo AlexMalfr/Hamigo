@@ -37,7 +37,7 @@ private val wrongWireColors=listOf(Color(0xFFB65049),Color(0xFFC56557),Color(0xF
 /** Tapping or dragging works from either end. Dots and wires share one foreground canvas. */
 @Composable fun MatchBoard(q:Question,key:String,matches:Map<Int,Int>,enabled:Boolean,feedback:Boolean?=null,
     onChange:(Map<Int,Int>)->Unit) {
-    val shuffled=remember(key) {q.pairs.indices.shuffled(Random(q.id.hashCode()))}
+    val shuffled=remember(key) {rightQuestionOrder(q)}
     val rects=remember(key) {mutableStateMapOf<Pair<Boolean,Int>,Rect>()}
     var board by remember(key) {mutableStateOf(Rect.Zero)}
     var selected by remember(key) {mutableStateOf<Pair<Boolean,Int>?>(null)}

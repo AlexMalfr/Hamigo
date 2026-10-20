@@ -1,0 +1,2551 @@
+{
+  "l-hamigo-bienvenue": {
+    "bodyHash": "3046c5037c80e92408386b6d012737611bcdc53dc4c83d39c728746a05581a9f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Parcours te guide des premières bases aux activités radio."
+        ],
+        "tip": "Astuce : touche Pico pour écouter cette fiche ; touche-le à nouveau pour arrêter la lecture."
+      },
+      "1": {
+        "heading": "Un parcours, deux repères",
+        "breakBefore": [
+          "Tous les cours restent accessibles"
+        ]
+      },
+      "2": {
+        "emphasis": [
+          "Mémo permet de retrouver une formule, un schéma ou un outil."
+        ]
+      },
+      "3": {
+        "emphasis": [
+          "Défis rassemble les révisions, les entraînements et les examens blancs."
+        ]
+      },
+      "4": {
+        "emphasis": [
+          "Équipe permet de suivre tes amis.",
+          "Moi rassemble ton activité et tes réglages."
+        ],
+        "breakBefore": [
+          "Moi rassemble"
+        ]
+      },
+      "5": {
+        "heading": "Une erreur ou une idée ?"
+      }
+    }
+  },
+  "c01-l01": {
+    "bodyHash": "a06e7812782f823035eafc6ab9eed5631177c868827f9f4454be9dd8ef9ab87f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "à titre personnel, sans intérêt pécuniaire"
+        ]
+      },
+      "1": {
+        "heading": "Certificat et indicatif"
+      }
+    }
+  },
+  "c01-l02": {
+    "bodyHash": "eb685f004dc0ae3a1f707452334f0ac806423495ac494850866eb482065357d4",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "20 QCM"
+        ]
+      },
+      "1": {
+        "heading": "Les points et les seuils"
+      }
+    }
+  },
+  "l-examen-inscription": {
+    "bodyHash": "5b523736714c7ff0b87e793a69c96596236c5e3656aaeab2160b06e9b9aef985",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "téléphone au centre choisi"
+        ]
+      },
+      "1": {
+        "heading": "Préparer son dossier"
+      },
+      "3": {
+        "heading": "Demander un aménagement"
+      }
+    }
+  },
+  "l-math-decimaux": {
+    "bodyHash": "95d8428b8c5d383e8c9830e933b70272fad3fe215b3b791610fb9fa89f1f044c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fractions d’unité"
+        ]
+      },
+      "2": {
+        "heading": "Fractions et parenthèses"
+      }
+    }
+  },
+  "l-math-rapports": {
+    "bodyHash": "fa1ae039acf16aad0d4ccb46572050fd9e8ca55e76a47f34210ffd6d088ee510",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Un rapport compare deux valeurs"
+        ]
+      },
+      "2": {
+        "heading": "Quand le rapport s’inverse"
+      }
+    }
+  },
+  "l-math-formules": {
+    "bodyHash": "74a2337d9eeeeeb56f465515344f23742ebad1216c22480f6f257e30a3ad8f07",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Une formule décrit une relation entre grandeurs"
+        ]
+      },
+      "2": {
+        "heading": "Retrouver l’inconnue"
+      }
+    }
+  },
+  "c16-l03": {
+    "bodyHash": "f86c713e4382c22c443dcb1b2542268b63545293922bc4acd0c6b53f6010927a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "La racine carrée"
+        ]
+      },
+      "2": {
+        "heading": "Angles droits et pourcentages"
+      }
+    }
+  },
+  "c16-l01": {
+    "bodyHash": "8f65f7a5fbcf53c50ed1c576f857d3cf2ff2fe78c73849393f99a37d591d547b",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "La grandeur ne change pas"
+        ]
+      },
+      "2": {
+        "heading": "Convertir sans changer la grandeur"
+      }
+    }
+  },
+  "c03-l01": {
+    "bodyHash": "1b50d0bdc52bec0974c0c3d126f64267f317def78b8edfd4b7bddc2f0283c7c3",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Une unité donne un sens au nombre"
+        ]
+      },
+      "1": {
+        "heading": "Convertir avant de calculer"
+      }
+    }
+  },
+  "l-radio-ondes": {
+    "bodyHash": "deb40cc9ab902de47a745ac8eea92baae69a2cd6e705f56cec2a6896e4c63c02",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "le signal physique et le message porté"
+        ]
+      },
+      "1": {
+        "heading": "Fréquence et bande"
+      }
+    }
+  },
+  "c01-l03": {
+    "bodyHash": "79154cb08f37407b0e7e6ffe6c8a5bc6d0347f60a4e13788d31f5e9f537cd5da",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un préfixe"
+        ]
+      },
+      "1": {
+        "heading": "S’identifier pendant l’émission"
+      },
+      "3": {
+        "heading": "Portable ou mobile ?"
+      }
+    }
+  },
+  "l-nato-premiers": {
+    "bodyHash": "8b11c6608ff68509c357612acd07bd37674c8a754467cf27a3acd6d504b86242",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un mot conventionnel"
+        ],
+        "references": [
+          {
+            "text": "L’alphabet international",
+            "lessonId": "c02-l01"
+          }
+        ]
+      },
+      "1": {
+        "heading": "Les six premiers mots"
+      }
+    }
+  },
+  "l-circuit-ferme": {
+    "bodyHash": "ea2552c22d97c0e5ca1089e32895175026d793abaaef62a3c6d4efbcaddb7d7e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une source d’énergie"
+        ]
+      },
+      "1": {
+        "heading": "Fermer le trajet"
+      }
+    }
+  },
+  "l-tension-deux-points": {
+    "bodyHash": "487354540eb9a482b9df85ace5632f46e68e3c9c3a24999317c895fc9fb00af4",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "entre deux points"
+        ]
+      },
+      "2": {
+        "heading": "Brancher le voltmètre"
+      }
+    }
+  },
+  "c03-l02": {
+    "bodyHash": "b71408e2ab9936958d058b09f45c8153e37239f6df5546868304ea126a308ce0",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un débit de charges électriques"
+        ]
+      },
+      "2": {
+        "heading": "Le sens du courant"
+      },
+      "4": {
+        "heading": "Courant et quantité de charge"
+      }
+    }
+  },
+  "c03-l03": {
+    "bodyHash": "422e40269e404e714068be0f714c3d4ffb9d848a891afe4c9466c668f126b5ec",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "conducteur ohmique"
+        ]
+      },
+      "2": {
+        "heading": "Choisir la bonne forme"
+      }
+    }
+  },
+  "c03-l04": {
+    "bodyHash": "2f72938ae6b88f69762b8bc9451f9d5106f4eb61750f0503fa9cb93f0eb5f358",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un joule par seconde"
+        ],
+        "references": [
+          {
+            "text": "la loi d’Ohm",
+            "lessonId": "c03-l03"
+          }
+        ]
+      },
+      "1": {
+        "heading": "Choisir une relation"
+      },
+      "2": {
+        "heading": "Respecter les limites du composant"
+      }
+    }
+  },
+  "l-energie-duree": {
+    "bodyHash": "c10d3eccf44e2ed03b707f4a1ce202dd001208b64562af19ce3ba8c2da45b92b",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "rythme d’un transfert d’énergie"
+        ]
+      },
+      "1": {
+        "heading": "Calculer l’énergie"
+      },
+      "3": {
+        "heading": "Découper le fonctionnement"
+      }
+    }
+  },
+  "c16-l02": {
+    "bodyHash": "cc255722c97d494a4221b3fb0e598977d81f57596079d7161d5d5afe9c7bbe43",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "la même opération des deux côtés"
+        ]
+      },
+      "1": {
+        "heading": "Contrôler avec les unités"
+      }
+    }
+  },
+  "c15-l01": {
+    "bodyHash": "fbc7462741dac27ec9baf4b6a87c7534236c51d2dbb358347a4f326d3809516d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "le son complet"
+        ]
+      },
+      "2": {
+        "heading": "Quatre rythmes à écouter"
+      }
+    }
+  },
+  "c15-l09": {
+    "bodyHash": "78120ce5e03249c86764cf52a754c5022f6f42942490452c1411638a2c7341c5",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Les pauses servent de séparateurs"
+        ]
+      },
+      "1": {
+        "heading": "Les durées de référence"
+      }
+    }
+  },
+  "c04-l01": {
+    "bodyHash": "b622c9509efa177c266096e330118c43a8f24d14186603528e49a325006b26e8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "le même courant"
+        ]
+      },
+      "1": {
+        "heading": "Comment la tension se répartit"
+      }
+    }
+  },
+  "c04-l02": {
+    "bodyHash": "2f2f15a9cb7661ebb63a642b2288a22ded75d4ec8458adb51590b6012c1cdf0a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "la même tension"
+        ]
+      },
+      "1": {
+        "heading": "Calculer la résistance équivalente"
+      }
+    }
+  },
+  "c04-l03": {
+    "bodyHash": "6c0758db38ac5256d8a8e918d1d7fdcae8067b6d5eed591c05d34e33244093e8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux résistances en série"
+        ]
+      },
+      "1": {
+        "heading": "Comparer deux diviseurs"
+      },
+      "2": {
+        "heading": "Quand la sortie est chargée"
+      }
+    }
+  },
+  "c04-l04": {
+    "bodyHash": "ca374c17d8fd2f7f9c11cca24ec35f764c523205d6ed0cdb76dc5535a263f1ad",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "courants entrants"
+        ]
+      },
+      "1": {
+        "heading": "Dans une boucle",
+        "references": [
+          {
+            "text": "la loi d’Ohm",
+            "lessonId": "c03-l03"
+          }
+        ]
+      },
+      "2": {
+        "heading": "Choisir ses flèches"
+      }
+    }
+  },
+  "c05-l01": {
+    "bodyHash": "4c5ced9e6cf8301377e1d5ebbbd5c646a99c8d141a0eb2ce3a593c90df4d7c6f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "quatre anneaux"
+        ]
+      },
+      "1": {
+        "heading": "Chiffres et multiplicateur"
+      },
+      "3": {
+        "heading": "Lire la tolérance"
+      }
+    }
+  },
+  "l-fils-materiaux": {
+    "bodyHash": "327dc9b71a48a0e992d237f7867a3ce0508a39b7f84976054673a529549bd11c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "augmente avec sa longueur"
+        ]
+      },
+      "1": {
+        "heading": "Longueur, section et résistivité"
+      }
+    }
+  },
+  "l-voltemetre-amperemetre": {
+    "bodyHash": "a60f8b04d787a756e0c33a4e325148c6fdec79db4a05ded970c3ff2cb7eb78c6",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "en série"
+        ]
+      },
+      "1": {
+        "heading": "Éviter le court-circuit"
+      },
+      "3": {
+        "heading": "Calibre et circuit mesuré"
+      }
+    }
+  },
+  "l-morse-rappel-etim": {
+    "bodyHash": "d7db87a1994425f6972bebe573b0c12f3fbd311baedc96c7ade40e43d4509c73",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-mots-etim": {
+    "bodyHash": "f6191f35030139e9e7e57317f0cd5b38a8cee3f3075b56368b7a8d8b207e337a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "E, T, I et M"
+        ]
+      },
+      "1": {
+        "heading": "Garder les séparations"
+      }
+    }
+  },
+  "c06-l01": {
+    "bodyHash": "e1f1f8c0d3e84083320099dd2174b9d995ff12aae038b26db90a5045e822a626",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "change de sens"
+        ]
+      },
+      "1": {
+        "heading": "Une moyenne nulle, mais de l’énergie"
+      }
+    }
+  },
+  "c06-l02": {
+    "bodyHash": "984b5f06317856660f81d29f76ca6539ef387080a5b372e0bf13582304dd6ed4",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "la durée d’un cycle"
+        ]
+      },
+      "1": {
+        "heading": "Passer de l’une à l’autre"
+      }
+    }
+  },
+  "l-rms-sans-confusion": {
+    "bodyHash": "a327422267ad91d2928716b7497c5ee90f71ea5c561ef1cffd070d4b076ceee8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "valeur crête à crête"
+        ]
+      },
+      "1": {
+        "heading": "La valeur efficace"
+      },
+      "2": {
+        "heading": "Lire ce que l’appareil mesure"
+      }
+    }
+  },
+  "c06-l03": {
+    "bodyHash": "6b2371299dc84f893747c3526e57d6df5cbfadc79d32075e0202ec2b59872240",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "puissance moyenne"
+        ]
+      },
+      "1": {
+        "heading": "Un décalage dans le temps"
+      }
+    }
+  },
+  "c16-l04": {
+    "bodyHash": "cf880ce3aaece1e7cd41954bdfea818eab5b998d2f049456ed3dc418c992bf16",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "360°"
+        ]
+      },
+      "1": {
+        "heading": "Lire les échelles"
+      }
+    }
+  },
+  "l-nato-milieu": {
+    "bodyHash": "8cf38b152b3ec3603acb1e904af40a0e26bef33acb3950afe0ed3e3434d7d7a6",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un mot conventionnel"
+        ],
+        "references": [
+          {
+            "text": "L’alphabet international",
+            "lessonId": "c02-l01"
+          }
+        ]
+      },
+      "1": {
+        "heading": "De Golf à Papa"
+      }
+    }
+  },
+  "c05-l02": {
+    "bodyHash": "2dce358a94be9378960cea9e6498e723db23d471b3c056a6eda200aedf1a908d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "champ électrique"
+        ]
+      },
+      "1": {
+        "heading": "Continu, alternatif et associations"
+      }
+    }
+  },
+  "l-condensateur-polarite": {
+    "bodyHash": "5c88ed1ac276371c299c4d8e4395eae30cc54133c46acc4552950f17c2cc61d4",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "la charge stockée par volt"
+        ]
+      },
+      "1": {
+        "heading": "Tension limite et polarité"
+      }
+    }
+  },
+  "c05-l03": {
+    "bodyHash": "70ec235a2c7065205d2678dd6e81a9b07e6f36110aefae3a2e8485d752de2c4e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "variations du courant"
+        ]
+      },
+      "1": {
+        "heading": "Continu et alternatif"
+      }
+    }
+  },
+  "l-bobine-coupure": {
+    "bodyHash": "8fc28828898d91ec326827522982766af95c16075ec86a24af6a2ab9bd602471",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "champ magnétique"
+        ]
+      },
+      "1": {
+        "heading": "Ce qui se passe à la coupure"
+      },
+      "3": {
+        "heading": "Le chemin de roue libre"
+      }
+    }
+  },
+  "c05-l04": {
+    "bodyHash": "25fa1e3e15e4d9aaa88b9c0c9d181ded9e9a04f325c7647d892ac0e1b64ae4c7",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "constante de temps"
+        ]
+      },
+      "1": {
+        "heading": "Charger et décharger"
+      }
+    }
+  },
+  "c17-l01": {
+    "bodyHash": "5dc7ba6d81e854e4e66db0d6b4b4a5c4d1721d9a4f7552e847488ee9df58097d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "champ électrique"
+        ]
+      },
+      "1": {
+        "heading": "Une énergie à prendre au sérieux"
+      }
+    }
+  },
+  "c06-l04": {
+    "bodyHash": "4c4e1f2ac70eee01af6791693b421717f8bb8254b4f16d9a1681629b6e219443",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "L’impédance"
+        ]
+      },
+      "1": {
+        "heading": "Courant en avance ou en retard ?"
+      }
+    }
+  },
+  "c17-l02": {
+    "bodyHash": "b2cba279052ce76ce18798a416b191a23c49d335de65afddb5b3b74a51439512",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "en hertz"
+        ]
+      },
+      "1": {
+        "heading": "Comment les valeurs évoluent"
+      }
+    }
+  },
+  "c17-l03": {
+    "bodyHash": "6da7970edfa399c8107d504adf0796edd0980af754d0d5e670347a921220cdf9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "X = XL − XC"
+        ]
+      },
+      "1": {
+        "heading": "Lire la phase"
+      }
+    }
+  },
+  "l-decibels-reperes": {
+    "bodyHash": "f7458eb4133e8d9fb33c9b0816ff222f6a2b91b08c927880ab14a4451b6488a9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un rapport"
+        ]
+      },
+      "1": {
+        "heading": "Enchaîner gains et pertes"
+      }
+    }
+  },
+  "c07-l04": {
+    "bodyHash": "c77aa03772d765ce375e3312f01297239867fa2875fb8545e50e15acfd982a7c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "rapports successifs"
+        ]
+      },
+      "1": {
+        "heading": "Puissances, tensions et chaîne de gains"
+      }
+    }
+  },
+  "l-signal-dbm": {
+    "bodyHash": "b51cf92dbc746e0b1e79be3e1a31226067e19960c0bfef9be4a2107128af3801",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "par rapport à 1 mW"
+        ]
+      },
+      "1": {
+        "heading": "Des valeurs positives ou négatives"
+      },
+      "3": {
+        "heading": "Le niveau dans une chaîne"
+      }
+    }
+  },
+  "c07-l01": {
+    "bodyHash": "361617bff8e9311c485b072aac3bfbaca7a32d71c87ac9044245c136f9ee355a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "le même module"
+        ]
+      },
+      "1": {
+        "heading": "Série ou parallèle ?"
+      },
+      "3": {
+        "heading": "Sélectivité et facteur Q"
+      }
+    }
+  },
+  "l-filtre-coupure": {
+    "bodyHash": "4f620cf666d541f93798e78679e66ae888ba7e76edacaabfa3e5ccdc29ee20a0",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Un filtre"
+        ]
+      },
+      "1": {
+        "heading": "Le repère de coupure"
+      },
+      "2": {
+        "heading": "Octaves et décades"
+      }
+    }
+  },
+  "c07-l02": {
+    "bodyHash": "6d7332df8d78436995bed9e0f6ce6d4530e0e865ec15974e249a3449b6ccf87f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Un filtre passe-bas"
+        ]
+      },
+      "1": {
+        "heading": "Une transition progressive"
+      }
+    }
+  },
+  "c17-l04": {
+    "bodyHash": "4291a909fdf355e4ea216e4062466a7b7c0c7f749e34e11c922816e08e084da2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "bande plus étroite"
+        ]
+      },
+      "1": {
+        "heading": "Le facteur Q et le chargement"
+      }
+    }
+  },
+  "c07-l03": {
+    "bodyHash": "1d5a5e085ad2d7900ee00ef95b1d720df62963a1e51ca7efc218084caed94f7a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "champ magnétique variable"
+        ]
+      },
+      "1": {
+        "heading": "Puissance et rapport de transformation"
+      }
+    }
+  },
+  "l-pile-resistance-interne": {
+    "bodyHash": "6d16be80f441f4c26b81ca6a8830f6d74e9676c715a195f40b0481e7b7443ff5",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "tension à vide"
+        ]
+      },
+      "1": {
+        "heading": "La chute interne"
+      },
+      "3": {
+        "heading": "Estimer et comparer"
+      }
+    }
+  },
+  "c02-l03": {
+    "bodyHash": "d340043ec41e9d853e574be313e523f8b93aa5ca74be9e4bcca362dcdfb06993",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une unité"
+        ]
+      },
+      "1": {
+        "heading": "Un rythme à reconnaître"
+      },
+      "3": {
+        "heading": "Comparer les premiers caractères"
+      }
+    }
+  },
+  "c15-l02": {
+    "bodyHash": "42ad34c8b8007cb6bd15d919f3e62652616794456c21614208c18c66bda9c05e",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "l-nato-fin": {
+    "bodyHash": "95c1a413296f2e4610b1883336b943c216e4e14c62d185963f882db500377989",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un mot conventionnel"
+        ],
+        "references": [
+          {
+            "text": "L’alphabet international",
+            "lessonId": "c02-l01"
+          }
+        ]
+      },
+      "1": {
+        "heading": "De Quebec à Zulu"
+      }
+    }
+  },
+  "c02-l01": {
+    "bodyHash": "3afac7d43701bf1bc2c7b0504885ad2d36deefb033759fabc44982f13b646983",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un mot fixé"
+        ]
+      },
+      "1": {
+        "heading": "Épeler sans traduire"
+      },
+      "3": {
+        "heading": "Les mots de A à Z"
+      }
+    }
+  },
+  "l-nato-groupes": {
+    "bodyHash": "26798cc75d18f88c927ca2efe05bdda4a4aaa9f3e9b28f14f94a0967a4d2bb93",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "dans l’ordre"
+        ]
+      },
+      "1": {
+        "heading": "Un exemple d’épellation"
+      },
+      "3": {
+        "heading": "Retrouver les caractères reçus"
+      }
+    }
+  },
+  "l-diode-sens": {
+    "bodyHash": "c61924e8f17a050c7232ae58f90d529cd36fde8628e21dbe44ddeb1492d3edcf",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une anode et une cathode"
+        ]
+      },
+      "1": {
+        "heading": "La diode réelle"
+      },
+      "2": {
+        "heading": "Limiter le courant d’une DEL"
+      }
+    }
+  },
+  "c08-l01": {
+    "bodyHash": "f50e7a19d4e17dd04c4370df23ab22cb955a89795b910c63991f570c03efd3ff",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "sens direct"
+        ]
+      },
+      "1": {
+        "heading": "Redresser puis lisser"
+      },
+      "3": {
+        "heading": "Le cas de la LED"
+      }
+    }
+  },
+  "l-alimentation-etages": {
+    "bodyHash": "3b0ff5d6a6e3783f107be7e4fcc76b0672ad004e1f82a32701a2e61007bd4852",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "transformateur, redresseur"
+        ]
+      },
+      "1": {
+        "heading": "Du courant redressé à la tension lissée"
+      },
+      "2": {
+        "heading": "Les limites de la régulation"
+      }
+    }
+  },
+  "l-morse-rappel-anso": {
+    "bodyHash": "e20bfa8e6943b7b856861113526b903441aa9ca90fc3ffd3da2ab9cb02c426a8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-mots-anso": {
+    "bodyHash": "1edd65a6e68eaf79b2c7d8950dde3f58c7da0ae6922e3c9257453248537d6c8c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "A, N, S et O"
+        ]
+      },
+      "1": {
+        "heading": "Composer un mot entier"
+      }
+    }
+  },
+  "c08-l02": {
+    "bodyHash": "df6405ff0e77fc44908eb8963794b6209f8d4064e27584b595258365dfefcac2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "commande un courant"
+        ]
+      },
+      "1": {
+        "heading": "Le bipolaire"
+      },
+      "2": {
+        "heading": "Le transistor à effet de champ"
+      },
+      "3": {
+        "heading": "Polarisation et gain"
+      }
+    }
+  },
+  "c08-l03": {
+    "bodyHash": "ff706f62607de264d2a56dbdc2f0c32452b47e2b23437c74e6a6a5e5deb2d0dd",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "son alimentation"
+        ]
+      },
+      "1": {
+        "heading": "Classe et linéarité"
+      },
+      "2": {
+        "heading": "Calculer le rendement"
+      }
+    }
+  },
+  "l-classes-amplification": {
+    "bodyHash": "327c2b63464d3961d031f46c955a9abf1a52221244808063515f645346fa7dc0",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fraction de période"
+        ]
+      },
+      "1": {
+        "heading": "Garder la forme du signal"
+      }
+    }
+  },
+  "l-aop-entrees": {
+    "bodyHash": "cb6c5b52dc5ea28a36e24a74ee8c5fc73d5dbcc05751f0c62fd3e732adb159d1",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux entrées"
+        ]
+      },
+      "1": {
+        "heading": "Avec une contre-réaction"
+      },
+      "3": {
+        "heading": "Le signe de la différence"
+      }
+    }
+  },
+  "l-aop-montages": {
+    "bodyHash": "ee44aa38032111438f21b09cf2d8a17ef80e9a267fdb6da893b96b7ba0c5f42c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "montage inverseur"
+        ]
+      },
+      "1": {
+        "heading": "Le non-inverseur"
+      },
+      "2": {
+        "heading": "Le suiveur"
+      },
+      "3": {
+        "heading": "Les conditions à vérifier"
+      }
+    }
+  },
+  "c08-l04": {
+    "bodyHash": "400f188ce8363be61fe435cfe18100c19f6a15f47d704e0d9a1684cfe723e2d5",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une alimentation"
+        ]
+      },
+      "1": {
+        "heading": "Compenser les pertes"
+      },
+      "3": {
+        "heading": "Le rôle du quartz"
+      }
+    }
+  },
+  "l-quartz-pll": {
+    "bodyHash": "4f89e2fd83fa0d13b1d543e3e78cf89444a51af40a7e941ebc95addf8960d329",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "compense les pertes"
+        ]
+      },
+      "1": {
+        "heading": "La référence à quartz"
+      },
+      "2": {
+        "heading": "La boucle PLL"
+      }
+    }
+  },
+  "l-tubes-reperes": {
+    "bodyHash": "1cd52a1b646df341227324737e768e93311b1ee973b98375a6286ecd7a47d70e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une cathode chauffée"
+        ]
+      },
+      "1": {
+        "heading": "La grille de commande"
+      },
+      "2": {
+        "heading": "Attention aux hautes tensions"
+      }
+    }
+  },
+  "c09-l01": {
+    "bodyHash": "ed9fd1d3a0e27a9fbac0087963f3e373e8a1aaf3a9c467c79d3a7d75d619bfa8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "l’amplitude de la porteuse"
+        ]
+      },
+      "1": {
+        "heading": "Largeur et bandes latérales"
+      }
+    }
+  },
+  "c09-l02": {
+    "bodyHash": "a95fa114a3df5efe351c3e8279c4b08551ee3dda5759e4d82e980f5f149e91b5",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fréquence instantanée"
+        ]
+      },
+      "1": {
+        "heading": "Estimer la largeur occupée"
+      }
+    }
+  },
+  "c09-l03": {
+    "bodyHash": "786e83ec40e7d4fd2e4e09fc702c639e214ade051a57f3fbf8e23f3e823512d6",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une seule bande latérale"
+        ]
+      },
+      "1": {
+        "heading": "La CW et son écoute"
+      },
+      "3": {
+        "heading": "Les classes d’émission"
+      }
+    }
+  },
+  "l-recepteur-etapes": {
+    "bodyHash": "4b1a55e2521dae8e5a1c261eb7aaac70c181e296785a23d3dd135e3a49b8f1b8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Un filtre"
+        ]
+      },
+      "1": {
+        "heading": "Retrouver le message"
+      }
+    }
+  },
+  "c10-l01": {
+    "bodyHash": "977a780a9bbeff885bcfa658f3f6676d8a448cc2363d69c894873803704cf6ce",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "signal électrique audio"
+        ]
+      },
+      "1": {
+        "heading": "Transposer et filtrer"
+      }
+    }
+  },
+  "c10-l02": {
+    "bodyHash": "30309c5d6ee10bb97af9fc6b4b164e561c5fb12c17e3ab3669911b605ae4bc4f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fréquence intermédiaire"
+        ]
+      },
+      "1": {
+        "heading": "Démodulation et fréquence image"
+      }
+    }
+  },
+  "l-image-reception": {
+    "bodyHash": "b86c29d0cef599a1226977922b0d37165b3c7258b59da84d9fc60fe2ad330e2f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "somme et la différence"
+        ]
+      },
+      "1": {
+        "heading": "Deux fréquences, une même différence"
+      },
+      "2": {
+        "heading": "Filtrer avant le mélangeur"
+      }
+    }
+  },
+  "c18-l01": {
+    "bodyHash": "d92b16c30afa7f2ca683011943b9bc70f36bdea2c49fc61bcdab5e9e8f0d6ca3",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fondamentale"
+        ]
+      },
+      "1": {
+        "heading": "Quand la forme se dégrade"
+      }
+    }
+  },
+  "c18-l02": {
+    "bodyHash": "347b6c5682b9a0f80bfdae0fba12f01391d004da3fa062c5f82c65138cb806e8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "somme et leur différence"
+        ]
+      },
+      "1": {
+        "heading": "Le cas d’un oscillateur local au-dessus"
+      }
+    }
+  },
+  "c18-l03": {
+    "bodyHash": "57b5e6224f7d8f388f0c748ceba405d6fb103dddc8e3b0ef5cb4dfba1faa5f2d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "compression"
+        ]
+      },
+      "1": {
+        "heading": "Des produits proches du signal utile"
+      }
+    }
+  },
+  "c10-l03": {
+    "bodyHash": "f1fa270cd62eba7f7d00f5b1fbee6eb9db13b6e0e53df22c8b4bee71469b9fc6",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "La sélectivité"
+        ]
+      },
+      "1": {
+        "heading": "Dynamique et signaux voisins"
+      }
+    }
+  },
+  "l-bruit-largeur": {
+    "bodyHash": "0114c6e2e05cd4ba23e1dbf8df14a0d07302079a8f8c91f52b45e0df34f54d3d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "bruit thermique"
+        ]
+      },
+      "1": {
+        "heading": "Garder le signal utile"
+      },
+      "3": {
+        "heading": "Le rôle de la largeur de bande"
+      }
+    }
+  },
+  "c18-l04": {
+    "bodyHash": "b7c720ac7dedbd0314abb1df7c97f577ece8a796503378b521b21e7233afc5ae",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "référence de 1 mW"
+        ]
+      },
+      "1": {
+        "heading": "Comparer signal et bruit"
+      },
+      "3": {
+        "heading": "Évaluer un préamplificateur"
+      }
+    }
+  },
+  "c20-l01": {
+    "bodyHash": "411d5f3018a24e3c1fb2ba46c3f3931fda072878aad39c9a3b63ac63d2401cb3",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux états"
+        ]
+      },
+      "1": {
+        "heading": "Combinaisons et valeurs"
+      }
+    }
+  },
+  "c22-l02": {
+    "bodyHash": "6c9f4b85726eace764dc144a59e8c0a7d313f927ef9af8d640f15ec4ecc64746",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "les poids"
+        ]
+      },
+      "1": {
+        "heading": "Un octet, huit bits"
+      },
+      "2": {
+        "heading": "Écrire en hexadécimal"
+      }
+    }
+  },
+  "c22-l03": {
+    "bodyHash": "1f45e644c2c7222b2714dada8cbe3cd7b899f79fdb422ab97515cbffd289711a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "niveaux logiques"
+        ]
+      },
+      "1": {
+        "heading": "Reconnaître les symboles"
+      },
+      "2": {
+        "heading": "ET"
+      },
+      "3": {
+        "heading": "OU"
+      },
+      "4": {
+        "heading": "NON"
+      }
+    }
+  },
+  "c22-l04": {
+    "bodyHash": "69e1fab80bc891a23dd4cb619e87db0e8affbe0f5d909b986fd5ae15c3451c48",
+    "paragraphs": {
+      "0": {
+        "heading": "NAND et NOR",
+        "emphasis": [
+          "une inversion"
+        ]
+      },
+      "2": {
+        "heading": "Le OU exclusif"
+      },
+      "3": {
+        "heading": "Suivre un circuit combiné"
+      }
+    }
+  },
+  "c09-l04": {
+    "bodyHash": "ada65c9a6a8fa9a67b9380ccccc690906e954d15056ef7e03811470efffd68d3",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "des bits"
+        ]
+      },
+      "1": {
+        "heading": "Symboles et débit binaire"
+      }
+    }
+  },
+  "c20-l02": {
+    "bodyHash": "2906dbfb07ca9dcbb38c52f39c47c5cf3b741d6a542b7b91edf5324fa907ad4e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux bits par symbole"
+        ]
+      },
+      "1": {
+        "heading": "Calculer le débit utile"
+      },
+      "3": {
+        "heading": "Reconnaître ASK, FSK et PSK"
+      }
+    }
+  },
+  "c20-l03": {
+    "bodyHash": "499c7f47c90adb3cd3ed1c9727bce3ee3ab00a8b7051f9950b58639e53cd8e72",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "cadence d’échantillonnage"
+        ]
+      },
+      "1": {
+        "heading": "Éviter le repliement"
+      }
+    }
+  },
+  "c20-l04": {
+    "bodyHash": "f8d7d9333a4b1a8a28baa00bfc3230ce47f2cfa60bc96df2d057360df1ca9cb7",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "détecter"
+        ]
+      },
+      "1": {
+        "heading": "Ajouter une redondance utile"
+      }
+    }
+  },
+  "c01-l04": {
+    "bodyHash": "4c5f7f85ae1f7f090fdc20767617dc8c2ce2ba7d7da43c0577e45f23b9c59f17",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "conditions de puissance"
+        ]
+      },
+      "1": {
+        "heading": "Écouter et partager"
+      },
+      "3": {
+        "heading": "Un premier repère : les 2 mètres"
+      }
+    }
+  },
+  "l-band-plans": {
+    "bodyHash": "988e4ff6e5a780008847460bda587f9ece32272945f9e7da045a7369ff55e6d9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "organisation"
+        ]
+      },
+      "1": {
+        "heading": "Garder toute l’émission dans la bande"
+      }
+    }
+  },
+  "c02-l02": {
+    "bodyHash": "917ca0a78f0db36e9f542efbe3e023d784e05e022aa07533ff0f7931d2d93e18",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "point d’interrogation"
+        ]
+      },
+      "1": {
+        "heading": "Lire le contexte"
+      },
+      "3": {
+        "heading": "Changer de fréquence ou de cadence"
+      }
+    }
+  },
+  "c11-l01": {
+    "bodyHash": "436955aba75fe15466eb37cd324695b1ad70f334db81adab7d87449b4a10e3bb",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "longueur d’onde"
+        ]
+      },
+      "1": {
+        "heading": "Quand la fréquence augmente"
+      }
+    }
+  },
+  "c11-l02": {
+    "bodyHash": "49ee31e6e80c83477301c0d7c579ec4889c3c90646ae1105ffbcaafa908261bf",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux bras"
+        ]
+      },
+      "1": {
+        "heading": "Retour du courant et dimensions réelles"
+      }
+    }
+  },
+  "c11-l03": {
+    "bodyHash": "96d3e373718aab595b81e837a258637a8320ab84a6f200d10dedfff26433c309",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une antenne de référence"
+        ]
+      },
+      "1": {
+        "heading": "La polarisation"
+      }
+    }
+  },
+  "c11-l04": {
+    "bodyHash": "0132731986bc3dbb7a7de0c8956a6d4240e31077ccd2c3d93b3881a3bf6e0edc",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "impédance caractéristique"
+        ]
+      },
+      "1": {
+        "heading": "Ce que dit le ROS"
+      },
+      "3": {
+        "heading": "Une charge purement résistive"
+      }
+    }
+  },
+  "c19-l01": {
+    "bodyHash": "8d0eb57a43d9010411f094c5c999b8d83a99c8416938ed35c48a02884c8cd408",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une partie de l’onde"
+        ]
+      },
+      "1": {
+        "heading": "Calculer le ROS"
+      }
+    }
+  },
+  "c19-l02": {
+    "bodyHash": "f51ddda1b232e837801b71fc31bd2a9aae40acc006a6339bb97f3bb677497b21",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "facteur de vélocité"
+        ]
+      },
+      "1": {
+        "heading": "Ce que transforme la ligne"
+      }
+    }
+  },
+  "c19-l03": {
+    "bodyHash": "74648419c20eef6402f85c43c1192c742b5524410bb12d4060fe034b3f4e09cb",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "rapport de puissance"
+        ]
+      },
+      "1": {
+        "heading": "Pourquoi les pertes augmentent"
+      }
+    }
+  },
+  "l-logique-commandes": {
+    "bodyHash": "d2c1726a527b2106db89bf72a949e883036124f1f065fdef4327208b670af903",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "au moins une entrée"
+        ]
+      },
+      "1": {
+        "heading": "Choisir une porte pour une commande"
+      },
+      "3": {
+        "heading": "Lire la convention des états"
+      }
+    }
+  },
+  "c12-l01": {
+    "bodyHash": "41b07c937f95449b88dc9e69a9b544b3fd14f59249676a3d2a7c4ed0d4d6ca5d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "l’ionosphère"
+        ]
+      },
+      "1": {
+        "heading": "Des conditions qui changent"
+      },
+      "3": {
+        "heading": "Fréquence et trajet utilisables"
+      }
+    }
+  },
+  "c12-l02": {
+    "bodyHash": "735a9835d75a0ccdce506739aadf3fda28ad389c1ab16133be5318b15787f042",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "visibilité radio"
+        ]
+      },
+      "1": {
+        "heading": "Le Doppler d’un satellite"
+      }
+    }
+  },
+  "c12-l03": {
+    "bodyHash": "8595ef9dee06c375245076a3b61db1d8d9ca0b11398d1c340e4763eab27ca6d4",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "gains"
+        ]
+      },
+      "1": {
+        "heading": "Ce que le bilan permet d’estimer"
+      }
+    }
+  },
+  "c12-l04": {
+    "bodyHash": "053275be36bb592415c0d6ea68c61f2b7b6601139ea6cc91761fc7cfc67c1df8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "bandes HF"
+        ]
+      },
+      "1": {
+        "heading": "Choisir une zone adaptée"
+      },
+      "3": {
+        "heading": "Retrouver les bandes courantes"
+      }
+    }
+  },
+  "c15-l03": {
+    "bodyHash": "59c1bb2feb664eb3761be5544b37ca20420b26ea7e8e2a03b5c7c559ed8aa71a",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "c13-l01": {
+    "bodyHash": "a477a083dbd400ded7e8bd2998ab67b200caa15c54baf3b37259016b14295c66",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "énergie stockée"
+        ]
+      },
+      "1": {
+        "heading": "Avant toute intervention"
+      }
+    }
+  },
+  "c13-l02": {
+    "bodyHash": "077a1bfc970c165c255f1c65ca2dffb200f2def9ddda4570e2c62d0300cfdd2b",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "limites d’exposition"
+        ]
+      },
+      "1": {
+        "heading": "Mât, distances et météo"
+      },
+      "3": {
+        "heading": "À quoi servent les haubans ?"
+      }
+    }
+  },
+  "c13-l03": {
+    "bodyHash": "65a396eaa9bb4304fa9194f7090ab71cafda8531cd1c4188b22f24d9cf0d5353",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "mode commun"
+        ]
+      },
+      "1": {
+        "heading": "Faire cesser puis chercher la cause"
+      }
+    }
+  },
+  "l-emission-puissances": {
+    "bodyHash": "5e4b42dc67c7a7272adc51c76fbb31fee76bb26278ec042e39ca013a9c82df58",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "pertes de ligne"
+        ]
+      },
+      "1": {
+        "heading": "Lire la bonne limite"
+      },
+      "3": {
+        "heading": "De la sortie du poste à l’antenne"
+      }
+    }
+  },
+  "l-morse-rappel-durk": {
+    "bodyHash": "32f88ee3bfed01d30de08ce53dc29c2c07bb499bbbb2b594282ceb2cb4dc2bd6",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-mots-durk": {
+    "bodyHash": "730024e54023c319d84faa1f80f8046ca4466aae029baddc679d2db1862790b2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "D, U, R et K"
+        ]
+      },
+      "1": {
+        "heading": "Garder le rythme du mot"
+      }
+    }
+  },
+  "l-identification-carnet": {
+    "bodyHash": "ecf5136fa30ecf3e7fbd09eb45628f64ef07d395c3d56fbc75cf4d3049ae2229",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "au début et à la fin"
+        ]
+      },
+      "1": {
+        "heading": "Les informations du journal"
+      }
+    }
+  },
+  "c13-l04": {
+    "bodyHash": "c00139092b3ecf08ebe2be641447c5dcd6fa72eda5491f59bed8f2949142629f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "chaque communication"
+        ]
+      },
+      "1": {
+        "heading": "Déclarer et se déplacer"
+      }
+    }
+  },
+  "l-cept-voyage": {
+    "bodyHash": "968e16099bc76a92a053521e328ed5c9d03b3a25dd9634f01ce3d4c714a7d2dc",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "pas les mêmes droits partout"
+        ]
+      },
+      "1": {
+        "heading": "Avant de partir"
+      }
+    }
+  },
+  "l-installation-droits": {
+    "bodyHash": "b2fec6a72e6c557261c3b5e2de47e05683153038d0689252b72211f5f4c1f4fa",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "plusieurs règles"
+        ]
+      },
+      "1": {
+        "heading": "Des démarches distinctes"
+      }
+    }
+  },
+  "l-emissions-designation": {
+    "bodyHash": "5692d69e925aaa487d733ae1ac2a7d40490592ca76aa2cc8dac8088f822a26e0",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "trois caractères"
+        ]
+      },
+      "1": {
+        "heading": "Lire les symboles"
+      },
+      "2": {
+        "heading": "Quatre exemples à reconnaître"
+      }
+    }
+  },
+  "l-messages-amateur": {
+    "bodyHash": "07adb2210d04a4fe0204030f857b299aefb31742b2f2e6f0e151b85622ac73e7",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "sans intérêt pécuniaire"
+        ]
+      },
+      "1": {
+        "heading": "Codage et contenu"
+      },
+      "2": {
+        "heading": "Le cas des tiers non amateurs"
+      }
+    }
+  },
+  "l-controle-responsabilite": {
+    "bodyHash": "3592a786db9834bf3490e7c6bb177879475bf462f5ac2347196a3cf5f7f18789",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "responsabilité de l’exploitant"
+        ]
+      },
+      "1": {
+        "heading": "Conditions, contrôle et sanctions"
+      }
+    }
+  },
+  "c21-l01": {
+    "bodyHash": "0966658161656ca27c623dcf04a1097e690659b96dfef5a8933204bb0be02051",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "ce que tu reçois"
+        ]
+      },
+      "1": {
+        "heading": "Force et lisibilité sont distinctes"
+      }
+    }
+  },
+  "c21-l03": {
+    "bodyHash": "c1f64d1b4af3bb59e04026bec6885ca310ace70b408d54f0d06a9fc42c970b92",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "écrêtage"
+        ]
+      },
+      "1": {
+        "heading": "Commencer sur une charge adaptée"
+      }
+    }
+  },
+  "l-synthese-calculs": {
+    "bodyHash": "b1512ba35deb130be904c0b98f0a9a4700ea7dc7bab549489a52221c8c5dd2bf",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "ce que tu cherches"
+        ]
+      },
+      "1": {
+        "heading": "Calculer avec les bonnes unités"
+      },
+      "2": {
+        "heading": "Contrôler l’ordre de grandeur"
+      }
+    }
+  },
+  "c14-l01": {
+    "bodyHash": "637c42031ad6629652cfa6f4112e59f068414f09a6744c4089a9285cac70a91c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux exigences différentes"
+        ]
+      },
+      "1": {
+        "heading": "Le cadre des échanges"
+      }
+    }
+  },
+  "c14-l02": {
+    "bodyHash": "de5af1c06aeda8d3bbcdcd54b14fc29a74d8bd5aa0667f84f400c95768978fd8",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "unités différentes"
+        ]
+      },
+      "1": {
+        "heading": "Repérer les résultats impossibles"
+      },
+      "3": {
+        "heading": "Vérifier les hypothèses du modèle"
+      }
+    }
+  },
+  "l-examen-materiel": {
+    "bodyHash": "2bc3d1cc612cd288a41811fc575909b48ec7c4a21f0c0f5eb3bd2ebb53d65dca",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "convocation et pièce d’identité"
+        ]
+      },
+      "1": {
+        "heading": "Sur place"
+      },
+      "2": {
+        "heading": "Calculatrice et brouillon"
+      },
+      "4": {
+        "heading": "S’entraîner avec sa méthode"
+      }
+    }
+  },
+  "c14-l03": {
+    "bodyHash": "e652a30d9828a72dcf70a075e548b4a9ad10e6e2eb032e04f840d25010f7fedd",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "questions de notions et examens complets"
+        ]
+      },
+      "1": {
+        "heading": "Gérer le temps"
+      }
+    }
+  },
+  "c14-l04": {
+    "bodyHash": "237c4a789a6ddccaae54d8c758de184a088acee1d4f7b25271ac4d69faf56f9f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un objectif réaliste"
+        ]
+      },
+      "1": {
+        "heading": "Tester avant d’émettre"
+      }
+    }
+  },
+  "c02-l04": {
+    "bodyHash": "b13f46f87650d989a6dff8f9622f51b68426dd1cbadb3bd7651a01bfd593487c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "Un QSO est un contact"
+        ]
+      },
+      "1": {
+        "heading": "Les informations d’un contact"
+      },
+      "3": {
+        "heading": "Une heure commune : UTC"
+      }
+    }
+  },
+  "c15-l04": {
+    "bodyHash": "462ef21e2da45b990ffd600dffeefdcebd393159b13e9c9a7b7bfd05b0f17a6e",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "c10-l04": {
+    "bodyHash": "5400df8183344f0d551ef3087dfe51663b34d5393062402386997f9723b3fb39",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "en parallèle"
+        ]
+      },
+      "1": {
+        "heading": "Choisir ce qu’on observe"
+      }
+    }
+  },
+  "c19-l04": {
+    "bodyHash": "479ca5c553d32d9e4ca9a28030c1200513bfb0d26889ab387331e5a37f89d69a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "configuration connue"
+        ]
+      },
+      "1": {
+        "heading": "Adapter sans masquer les pertes"
+      }
+    }
+  },
+  "c21-l02": {
+    "bodyHash": "62cc66fc1b103ce17c0c26cf612b8b4d6a5703e572e87dbfb5c4a7389b5bf964",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "décrire le symptôme"
+        ]
+      },
+      "1": {
+        "heading": "Changer une variable à la fois"
+      }
+    }
+  },
+  "c21-l04": {
+    "bodyHash": "f17cce833fea9670992d605353ad1d25f2e58d8b7f3c1707919be94e5f7bdbef",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "quelques rappels anciens"
+        ]
+      },
+      "1": {
+        "heading": "Varier le rappel"
+      }
+    }
+  },
+  "l-morse-rappel-gwbv": {
+    "bodyHash": "57bf828590ea20d7c3336ecb22c94e1cb03484c6c960312f8fb86947c26b9b63",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "c15-l05": {
+    "bodyHash": "e6ed7597c20cd46f6ac71410608a8cd798b5476a80b53113a7dc90a958547f41",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "l-dipole-projet": {
+    "bodyHash": "e485e0c03b360409d316c10274dec194361f0ed0e9d770621db08e9f13a97f29",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux brins"
+        ]
+      },
+      "1": {
+        "heading": "Une longueur de départ"
+      },
+      "2": {
+        "heading": "Installer puis mesurer"
+      }
+    }
+  },
+  "l-antenne-mesures": {
+    "bodyHash": "5e4cba1363a4dcb65b48cd7bb4f37363200cf60392a7f524dd594af9b2095ccb",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "conditions sont connues"
+        ]
+      },
+      "1": {
+        "heading": "Ne changer qu’une chose"
+      },
+      "3": {
+        "heading": "Inclure la ligne dans la mesure"
+      }
+    }
+  },
+  "l-morse-rappel-flpj": {
+    "bodyHash": "acec20a0f5f88674a89f94919fe62069b6103bfd6ca653bfe964115369e9b2c2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-mots-longs": {
+    "bodyHash": "f9b1f9a2a1f878938bb8ba07c7cc5a7d65755a81ed27d8c053ade74ce75c19c5",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "caractères déjà rencontrés"
+        ]
+      },
+      "1": {
+        "heading": "Un caractère, puis le suivant"
+      }
+    }
+  },
+  "l-portable-energie": {
+    "bodyHash": "43b989498408f37bd38b6d91a6fa4868bf34714acb4ff43046cc42c8bce041b9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "bilan d’énergie"
+        ]
+      },
+      "1": {
+        "heading": "De la capacité à l’autonomie"
+      },
+      "3": {
+        "heading": "Alterner réception et émission"
+      }
+    }
+  },
+  "l-pota-decouverte": {
+    "bodyHash": "5492e33af32f8a0934c32d59a61bb100fcbc887887a2f8a84c65c284e5cbdff2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "parcs référencés"
+        ]
+      },
+      "1": {
+        "heading": "Installer toute la station dans le parc"
+      }
+    }
+  },
+  "l-pota-contacts": {
+    "bodyHash": "006c8d86cbf89d332097ad2c7096922c90d510ce794f5d6f58c0dde2bb0ef0c9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "noter leurs indicatifs"
+        ]
+      },
+      "1": {
+        "heading": "Les contacts admissibles"
+      }
+    }
+  },
+  "l-sota-sommets": {
+    "bodyHash": "07daffea4d6f5baf1f416d0eb5a95270d073ee1104003b936121772b2c9e85fc",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "sommets référencés"
+        ]
+      },
+      "1": {
+        "heading": "La zone d’activation"
+      },
+      "2": {
+        "heading": "Préparer l’accès et le retour"
+      }
+    }
+  },
+  "l-iss-passage": {
+    "bodyHash": "faeb5888d8cb707971abfaeb5064dbbaffeefb9ff876f14d8da4709e405008ee",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "fenêtre limitée"
+        ]
+      },
+      "1": {
+        "heading": "Vérifier l’activité, pas seulement le passage"
+      }
+    }
+  },
+  "l-satellite-monte-descente": {
+    "bodyHash": "e73ab1fc2af3e7a4770faa7b4dff505b266426bbf76f49967ff7f93eb3adbe80",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "montante"
+        ]
+      },
+      "1": {
+        "heading": "Partager le relais"
+      },
+      "3": {
+        "heading": "Suivre le décalage de fréquence"
+      }
+    }
+  },
+  "c15-l06": {
+    "bodyHash": "c8d6a7b7e46610c6073a95190b7465da66aaff74a7d5107c2f101adfc9999e4f",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "c15-l13": {
+    "bodyHash": "73218b745f28876a85f1d00bf86000344cbf6b3d17d5fc2a55f4ca24798a1cb2",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "pas exactement le même rappel"
+        ]
+      },
+      "1": {
+        "heading": "Espacer sans déformer le caractère"
+      }
+    }
+  },
+  "l-sdr-premiers": {
+    "bodyHash": "53f9e7d9b2b5f88bcda778d3ab677d96b232a6c16a13f11698d24b3fe8e56a3c",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "par logiciel"
+        ]
+      },
+      "1": {
+        "heading": "Commencer en réception"
+      },
+      "2": {
+        "heading": "Choisir et régler un signal"
+      }
+    }
+  },
+  "l-cascade-spectre": {
+    "bodyHash": "2d23ed6a440d9b397ada5ff484bbe293a787c997d8da686f503d9a4ec6204917",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "le temps"
+        ]
+      },
+      "1": {
+        "heading": "Interpréter une trace"
+      },
+      "3": {
+        "heading": "Comparer fréquence et niveau"
+      }
+    }
+  },
+  "l-morse-rappel-cqxyzh": {
+    "bodyHash": "0bb839b69c4f86bdc0e2fbbb4c2d9a1ab29431ee246f89abb4af94e440ea1913",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "c15-l07": {
+    "bodyHash": "db5c70191e211736cb1d9fd5cf9d13cc29b03fb2b9ee6a466ae9f25a761e6900",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "l-sstv-image-son": {
+    "bodyHash": "6719c2ec16f88a61e9819473486a73e6cc7dacacf40e30f2b75ff89f4fb2bb9b",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "image fixe"
+        ]
+      },
+      "1": {
+        "heading": "Le mode et la durée de l’image"
+      }
+    }
+  },
+  "l-sstv-reception": {
+    "bodyHash": "340be55c2d219030098b619d7ad2f2ee00d9a1b05d40d64b18a2c5c38dbf196d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "un décodeur SSTV"
+        ]
+      },
+      "1": {
+        "heading": "Régler sans écrêter"
+      },
+      "3": {
+        "heading": "Inclinaison ou signal manquant ?"
+      }
+    }
+  },
+  "l-morse-rappel-12345": {
+    "bodyHash": "dd5610668c9518c223a2331692d87f4f92ab43fc9ab22e99f8e535c446579123",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "c15-l08": {
+    "bodyHash": "c124f8a03db8b5c5199520dffc83f6cad8dbb12b4646a3eecb0bd2ddfb51e2fd",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "l-aprs-paquets": {
+    "bodyHash": "b4b79b2487f94f0a3906184206e01dcd1a526614736a7e325dede58315f0332d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "positions, états, messages et objets"
+        ]
+      },
+      "1": {
+        "heading": "Radio, relais et Internet"
+      },
+      "3": {
+        "heading": "Lire aussi l’heure de la donnée"
+      }
+    }
+  },
+  "l-numerique-faibles-signaux": {
+    "bodyHash": "b356fe8abc7282703b21a12ef7f7fef7184b89c901750b86e86e03aae6f6530f",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "courts messages"
+        ]
+      },
+      "1": {
+        "heading": "Garder la maîtrise des réglages"
+      },
+      "3": {
+        "heading": "Lire les reports et synchroniser l’horloge"
+      }
+    }
+  },
+  "l-morse-rappel-67890": {
+    "bodyHash": "b40634600787e84cb3d3ab657a2b5e3c6592970235432a2ff724bc22873c984a",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-chiffres-groupes": {
+    "bodyHash": "6492be161768987f18164be0ea98802dead5f385b95360d44b18a7c7c9816c0e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "cinq éléments"
+        ]
+      },
+      "1": {
+        "heading": "Reconnaître un groupe"
+      },
+      "2": {
+        "heading": "Des nombres qui ont un sens"
+      }
+    }
+  },
+  "c15-l10": {
+    "bodyHash": "a41b587b6385620eee35d996eaa9ef9f1d9cc61a8d529417a1f8ab903d9b5224",
+    "paragraphs": {
+      "1": {
+        "heading": "Les caractères à écouter"
+      },
+      "2": {
+        "emphasis": [
+          "après d’autres notions"
+        ]
+      }
+    }
+  },
+  "c15-l11": {
+    "bodyHash": "368674a5443d6b9cb797a5587cffe968b7f9b65d0d3445390a38361128bd5435",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "groupes courts"
+        ]
+      },
+      "1": {
+        "heading": "Comprendre les groupes usuels"
+      }
+    }
+  },
+  "c15-l12": {
+    "bodyHash": "2fad2e64b9206b1f916d1520971fa9332087d647ef22c9d373453f3d750d52a9",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "lettres et chiffres"
+        ]
+      },
+      "1": {
+        "heading": "Lettres, chiffres et barre"
+      },
+      "2": {
+        "heading": "Garder les caractères reconnus"
+      }
+    }
+  },
+  "l-morse-vers-epellation": {
+    "bodyHash": "ffbf4035eada84fbe49684017515c28071e06e7d726b166a915351869222f947",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "deux rappels"
+        ],
+        "references": [
+          {
+            "text": "l’alphabet international",
+            "lessonId": "c02-l01"
+          }
+        ]
+      },
+      "1": {
+        "heading": "Un exemple de double rappel"
+      }
+    }
+  },
+  "c15-l14": {
+    "bodyHash": "d4f0b8281b644a19d917d58c7c8be89276d8351de7b2c4327da998e4b38d2595",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "rappel du rythme complet"
+        ]
+      },
+      "1": {
+        "heading": "Lire la consigne"
+      },
+      "2": {
+        "heading": "Reprendre un peu, souvent"
+      }
+    }
+  },
+  "l-automatisme-controle": {
+    "bodyHash": "1a00238a88a0f374c22ebcc60ae34e776a773d682fd212e05f72df1ccf3afc09",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "faire cesser immédiatement"
+        ]
+      },
+      "1": {
+        "heading": "L’arrêt ne suffit pas à tout autoriser"
+      }
+    }
+  },
+  "l-projet-experience": {
+    "bodyHash": "f6d0dfc05fd37957bc7d57cca32e0f7187182a38f96a0f04d090c99ff237825d",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "une question précise"
+        ]
+      },
+      "1": {
+        "heading": "Comparer avec une référence"
+      },
+      "3": {
+        "heading": "Revenir à la référence"
+      }
+    }
+  },
+  "l-morse-rappel-ponctuation": {
+    "bodyHash": "70163022eb48b8e4240d8f49dc013584494ba10db2497fd11c29f218a28b2d2e",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "de mémoire"
+        ]
+      },
+      "1": {
+        "heading": "Les rythmes à retrouver"
+      },
+      "2": {
+        "heading": "Composer sans fusionner les lettres"
+      }
+    }
+  },
+  "l-morse-qso-appel": {
+    "bodyHash": "496fe01082fbdf3af037f21ffaa1efd3e72808a122c1669aef47af63e3263bd7",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "CQ est un appel général"
+        ]
+      },
+      "1": {
+        "heading": "Des conventions, pas une traduction littérale"
+      }
+    }
+  },
+  "l-morse-qso-comprendre": {
+    "bodyHash": "85d291e8e6170a0d283c6db13e205f21ab48f1af60664396b31861165b5ba608",
+    "paragraphs": {
+      "0": {
+        "emphasis": [
+          "comprendre qui parle"
+        ]
+      },
+      "1": {
+        "heading": "Lire qui parle à qui"
+      },
+      "3": {
+        "heading": "Les abréviations de l’extrait"
+      }
+    }
+  }
+}

@@ -14,17 +14,33 @@ import com.malfreyt.alexandre.hamigo.platform.DailyReminder
 import com.malfreyt.alexandre.hamigo.platform.ProgressSyncScheduler
 
 data class PairItem(val left: String, val right: String)
+/** An independently answered row. Choices are optional; empty choices mean written recall. */
+data class AnswerRow(val id:String,val prompt:String,val choices:List<String> = emptyList(),
+    val answer:Int = 0,val acceptedAnswers:List<String> = emptyList())
+data class LessonLink(val label:String,val url:String)
 data class Question(
     val id: String, val prompt: String, val choices: List<String>, val answer: Int,
     val explanation: String, val topic: String = "", val section: String = "technique",
     val kind: String = "choice", val image: String? = null, val value: Double? = null,
     val unit: String = "", val tolerance: Double = .01, val pairs: List<PairItem> = emptyList(),
-    val source: String = "Hamigo", val bands: List<String> = emptyList(), val visual: String = ""
+    val source: String = "Hamigo", val bands: List<String> = emptyList(), val visual: String = "",
+    val skillIds: List<String> = emptyList(), val acceptedAnswers: List<String> = emptyList(),
+    val template: String = "", val distractors: List<String> = emptyList(), val rawJson: String = "",
+    val presentationSeed: Int = 0, val morseComprehension: Boolean = false, val studyToolsHint:Boolean = false,
+    val rows:List<AnswerRow> = emptyList()
 )
 /** Optional visuals align with body paragraphs; empty entries leave the paragraph as text. */
 data class Lesson(val id: String, val title: String, val summary: String, val body: List<String>,
-    val formula: String, val topic: String, val questions: List<Question>, val visuals: List<String> = emptyList(), val narration:List<String> = emptyList())
-data class Chapter(val id: String, val title: String, val subtitle: String, val lessons: List<Lesson>)
+    val formula: String, val topic: String, val questions: List<Question>, val visuals: List<String> = emptyList(), val narration:List<String> = emptyList(),
+    val skillIds: List<String> = emptyList(), val certificateWeight: Int = 1, val explorationWeight: Int = 0,
+    val referenceIds: List<String> = emptyList(), val knownCharacters: String = "",
+    val legacyLessonIds: List<String> = emptyList(), val prerequisiteSkillIds: List<String> = emptyList(),val studyToolsHint:Boolean=false,
+    val links:List<LessonLink> = emptyList(),val presentation:Map<Int,LessonParagraphPresentation> = emptyMap())
+data class Chapter(val id: String, val title: String, val subtitle: String, val lessons: List<Lesson>, val sectionId: String = "")
+
+data class CourseSection(val id: String, val number: Int, val title: String, val subtitle: String = "")
+data class CourseSkill(val id: String, val title: String)
+data class PathCompletion(val certificate: Float, val exploration: Float)
 data class RefRow(val term: String, val description: String, val extra: String,
     val group: String = "", val kind: String = "fact", val visual: String = "",
     val source: String = "", val region: String = "", val cardId: String = "")
@@ -67,17 +83,35 @@ class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=E
     private val resourceLinks:JSONObject=base?.resourceLinks ?: JSONObject(json("lesson-resources.json"))
     val courseSources: Map<String,String> = resourceLinks.getJSONObject("courseSources").let { sources -> sources.keys().asSequence().associateWith(sources::getString) }
     private val lessonReferenceIds=resourceLinks.getJSONObject("lessonReferences")
-    fun referencesFor(lesson:Lesson):List<RefCategory> = lessonReferenceIds.optJSONArray(lesson.id)?.strings().orEmpty().mapNotNull { id->references.firstOrNull { it.id==id } }
+    fun referencesFor(lesson:Lesson):List<RefCategory> = lesson.referenceIds.ifEmpty {
+        lessonReferenceIds.optJSONArray(lesson.id)?.strings().orEmpty()
+    }.mapNotNull { id->references.firstOrNull { it.id==id } }
     private fun json(path: String) = context.assets.open(path).bufferedReader().use { it.readText() }
-    val courseQuestions:List<Question> = base?.courseQuestions ?: JSONObject(json("course-questions.json")).getJSONArray("questions").objects().map {parseQuestion(it)}
+    private val lessonPresentations:JSONObject=base?.lessonPresentations ?: JSONObject(json("lesson-presentation.json"))
+    private val curriculum:JSONObject=base?.curriculum ?: JSONObject(json("curriculum.json"))
+    val sections:List<CourseSection> = base?.sections ?: curriculum.optJSONArray("sections")?.objects().orEmpty().map {
+        CourseSection(it.getString("id"),it.getInt("number"),it.getString("title"),it.optString("subtitle"))
+    }
+    val skills:List<CourseSkill> = base?.skills ?: runCatching { JSONObject(json("skills.json")) }.getOrDefault(JSONObject())
+        .optJSONArray("skills")?.objects().orEmpty().map { CourseSkill(it.getString("id"),it.getString("title")) }
+    private val courseQuestionData:JSONObject=base?.courseQuestionData ?: JSONObject(json("course-questions.json"))
+    val courseQuestions:List<Question> = base?.courseQuestions ?: courseQuestionData.getJSONArray("questions").objects().map {parseQuestion(it)}
+    val archivedQuestions:List<Question> = base?.archivedQuestions ?: courseQuestionData
+        .optJSONArray("archivedQuestions")?.objects().orEmpty().map {parseQuestion(it)}
     private val courseBank=courseQuestions.associateBy {it.id}
-    val chapters: List<Chapter> = base?.chapters ?: JSONObject(json("curriculum.json")).getJSONArray("chapters").objects().map { c ->
+    val chapters: List<Chapter> = base?.chapters ?: curriculum.getJSONArray("chapters").objects().map { c ->
         Chapter(c.getString("id"), c.getString("title"), c.optString("subtitle"), c.getJSONArray("lessons").objects().map { l ->
             val topic = l.optString("topic")
             Lesson(l.getString("id"), l.getString("title"), l.optString("summary"), l.getJSONArray("body").strings(),
                 l.optString("formula"), topic, l.getJSONArray("questionIds").strings().map {courseBank.getValue(it)},
-                l.optJSONArray("visuals")?.strings() ?: emptyList(),l.optJSONArray("narration")?.strings() ?: emptyList())
-        })
+                l.optJSONArray("visuals")?.strings() ?: emptyList(),l.optJSONArray("narration")?.strings() ?: emptyList(),
+                l.optJSONArray("skillIds")?.strings().orEmpty(),l.optInt("certificateWeight",1).coerceAtLeast(0),
+                l.optInt("explorationWeight",0).coerceAtLeast(0),l.optJSONArray("referenceIds")?.strings().orEmpty(),
+                l.optString("knownCharacters"),l.optJSONArray("legacyLessonIds")?.strings().orEmpty(),
+                l.optJSONArray("prerequisiteSkillIds")?.strings().orEmpty(),l.optBoolean("studyToolsHint"),
+                l.optJSONArray("links")?.objects().orEmpty().map {LessonLink(it.getString("label"),it.getString("url"))},
+                presentation=parseLessonPresentation(lessonPresentations.getJSONObject(l.getString("id")).getJSONObject("paragraphs")))
+        },c.optString("sectionId"))
     }
     val lessons = chapters.flatMap { it.lessons }
     val references:List<RefCategory> = base?.references ?: JSONObject(json("reference.json")).getJSONArray("categories").objects().map { c ->
@@ -98,10 +132,29 @@ class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=E
     } }
     val procedural:List<Question> = base?.procedural ?: ((0..250).flatMap { PracticeGenerator.create(it) } + ExtendedPracticeGenerator.catalog()).distinctBy { it.id }
     val mixIndex = PracticeMixIndex(activeExam, procedural)
-    val allQuestions = (lessons.flatMap { it.questions } + exam + flashcards + procedural).associateBy { it.id }
+    val allQuestions = (courseQuestions + archivedQuestions + exam + flashcards + procedural).associateBy { it.id }
+    private val activeCourseIds=lessons.flatMap {it.questions}.map {it.id}.toSet()
+    private val archivedCourseIds=(courseQuestions+archivedQuestions).map {it.id}.toSet()-activeCourseIds
+    private val questionSkillIds=lessons.flatMap {lesson->lesson.questions.map {it.id to lesson.skillIds}}.toMap()
+    private val topicSkillIds=lessons.groupBy {it.topic}.mapValues {(_,items)->items.flatMap {it.skillIds}.distinct()}
+    val requiredLegacy:Map<String,Set<String>> = lessons.filter {it.legacyLessonIds.isNotEmpty()}.associate {it.id to it.legacyLessonIds.toSet()}
     val topics = activeExam.groupBy { it.topic }.toSortedMap()
     fun withExam(snapshot:ExamBankSnapshot?)=Content(context,snapshot,this)
     fun nextLesson(completed: Set<String>) = lessons.firstOrNull { it.id !in completed }
+    fun pathCompletion(completed:Set<String>):PathCompletion = SkillLearning.pathCompletion(lessons,completed)
+    fun currentSection(completed:Set<String>):CourseSection? {
+        val next=nextLesson(completed) ?: lessons.lastOrNull() ?: return sections.firstOrNull()
+        val sectionId=chapters.firstOrNull {chapter->chapter.lessons.any {it.id==next.id}}?.sectionId
+        return sections.firstOrNull {it.id==sectionId}
+    }
+    fun isReviewEligible(question:Question)=question.id !in archivedCourseIds&&skillsFor(question).all(SkillLearning::isSrsSkill)
+    fun skillsFor(question:Question):List<String> = question.skillIds.ifEmpty {
+        questionSkillIds[question.id].orEmpty().ifEmpty {
+            SkillLearning.proceduralSkillIds(question).filter {candidate->skills.any {it.id==candidate}}.ifEmpty {
+                topicSkillIds[question.topic].orEmpty().takeIf {it.size==1}.orEmpty()
+            }
+        }
+    }.distinct()
     private fun parseQuestion(q: JSONObject, fallbackTopic: String = ""): Question {
         val pairs = q.optJSONArray("pairs")?.objects()?.map { PairItem(it.getString("left"), it.getString("right")) } ?: emptyList()
         return Question(q.getString("id"), q.getString("prompt"), q.optJSONArray("choices")?.strings() ?: emptyList(),
@@ -109,7 +162,12 @@ class Content(private val context: Context, val examSnapshot:ExamBankSnapshot?=E
             q.optString("section", "technique"), q.optString("kind", "choice"), q.optString("image").takeIf { it.isNotBlank() && it != "null" },
             if (q.has("value") && !q.isNull("value")) q.getDouble("value") else null, q.optString("unit"),
             q.optDouble("tolerance", .01), pairs, q.optString("source", "Hamigo"),
-            q.optJSONArray("bands")?.strings() ?: q.optJSONObject("resistor")?.optJSONArray("bands")?.strings() ?: emptyList(), q.optString("visual"))
+            q.optJSONArray("bands")?.strings() ?: q.optJSONObject("resistor")?.optJSONArray("bands")?.strings() ?: emptyList(), q.optString("visual"),
+            q.optJSONArray("skillIds")?.strings().orEmpty(),q.optJSONArray("acceptedAnswers")?.strings().orEmpty(),
+            if(q.has("template")&&!q.isNull("template"))q.get("template").toString() else "",
+            q.optJSONArray("distractors")?.strings().orEmpty(),q.toString(),morseComprehension=q.optBoolean("morseComprehension"),studyToolsHint=q.optBoolean("studyToolsHint"),
+            rows=q.optJSONArray("rows")?.objects().orEmpty().map {row->AnswerRow(row.getString("id"),row.getString("prompt"),
+                row.optJSONArray("choices")?.strings().orEmpty(),row.optInt("answer"),row.optJSONArray("acceptedAnswers")?.strings().orEmpty())})
     }
 }
 fun JSONArray.objects() = (0 until length()).map { getJSONObject(it) }
@@ -120,14 +178,19 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     companion object { val CLOUD_LOCK = Any() }
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = loadState()
+    private var preparedContent:Content?=null
     // Persist the temporary streak bridge before another reader can load the old state.
     @android.annotation.SuppressLint("ApplySharedPref")
     private fun loadState():JSONObject = synchronized(CLOUD_LOCK) {
         val state=runCatching {JSONObject(prefs.getString("progress","{}")!!)}.getOrElse {JSONObject()}
         if(state.has("questionIdsVersion"))require(state.getInt("questionIdsVersion")==1)
+        if(state.has("skillReviewsVersion"))require(state.getInt("skillReviewsVersion") in 1..SkillLearning.FORMAT_VERSION)
+        val skipBonusChanged=IgnoredLessons.repairLegacyBonuses(state)
+        val skillChanged=SkillLearning.normalize(state)
         val streakChanged=StreakMigration52.apply(state,activityClock.instant(),activityClock.zone)
         val dayChanged=StudyDayMigration52.apply(state)
-        val changed=streakChanged||dayChanged||!state.has("questionIdsVersion")
+        val lessonHistoryChanged=LessonCompletionMigration55.capture(state)
+        val changed=skipBonusChanged||streakChanged||dayChanged||skillChanged||lessonHistoryChanged||!state.has("questionIdsVersion")
         state.put("questionIdsVersion",1)
         if(changed)check(prefs.edit().putString("progress",state.toString()).commit())
         state
@@ -138,11 +201,72 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
             synchronized(CLOUD_LOCK) { prefs.edit().putString("name", value.take(40).ifBlank { "Pilote des ondes" }).putLong("profileUpdatedAt",System.currentTimeMillis()).apply() }
             if(sideEffects)ProgressSyncScheduler.enqueue(context)
         }
+    val ignored: Set<String> get()=IgnoredLessons.selected(root.optJSONObject(IgnoredLessons.FIELD))
+    val pathCompleted:Set<String> get()=completed+ignored
+    fun setIgnored(ids:Set<String>,ignored:Boolean)=synchronized(CLOUD_LOCK) {
+        reload()
+        root.put(IgnoredLessons.FIELD,IgnoredLessons.update(root.optJSONObject(IgnoredLessons.FIELD),ids,ignored,activityClock.millis()))
+        save()
+    }
     val completed: Set<String> get() = (root.optJSONArray("completed") ?: JSONArray()).strings().toSet()
     val reviews: Map<String, Review> get() {
         val obj = root.optJSONObject("reviews") ?: JSONObject()
         return obj.keys().asSequence().associateWith { id -> val r = obj.getJSONObject(id)
             Review(r.optLong("due"), r.optDouble("interval"), r.optDouble("ease", 2.5), r.optInt("repetitions"), r.optInt("lapses")) }
+    }
+    val skillReviews:Map<String,SkillReview> get()=SkillLearning.read(root.optJSONObject("skillReviews"))
+    val examHistory:List<ExamAttempt> get()=ExamHistory.read(root.optJSONObject("examHistory"))
+    /** Finalized exams are independent from XP awards and ordinary question reviews. */
+    fun recordExam(attempt:ExamAttempt):Boolean = synchronized(CLOUD_LOCK) {
+        reload()
+        val old=root.optJSONObject("examHistory") ?: JSONObject()
+        val incoming=JSONObject().put(attempt.id,ExamHistory.write(attempt))
+        ExamHistory.validate(incoming)
+        val merged=ExamHistory.mergeJson(old,incoming)
+        if(CloudProgress.canonical(old)==CloudProgress.canonical(merged))return@synchronized false
+        root.put("examHistory",merged)
+        save()
+        true
+    }
+    /** A layout move never awards XP or edits historical UUID reviews/events. */
+    fun prepareLearning(content:Content):Boolean = synchronized(CLOUD_LOCK) {
+        reload()
+        val changed=prepareLearningState(content)
+        if(changed)save()
+        changed
+    }
+    /** Migrate the state already held under CLOUD_LOCK, before adding a new answer. */
+    private fun prepareLearningState(content:Content):Boolean {
+        preparedContent=content
+        val lessonsChanged=LessonCompletionMigration55.apply(root,content.requiredLegacy)
+        val skillsChanged=SkillLearning.migrate(root,content)
+        return lessonsChanged||skillsChanged
+    }
+    /** Record the first response only; a session owns deduplication of later corrections. */
+    fun recordSkillAnswer(question:Question,content:Content,correct:Boolean,
+                          quality:Int=if(correct)4 else 1,attemptId:String?=null):Boolean = synchronized(CLOUD_LOCK) {
+        require(quality in 0..5)
+        reload()
+        preparedContent=content
+        val changed=recordSkillAnswerState(question,content,correct,quality,attemptId,activityClock.millis())
+        if(changed)save()
+        changed
+    }
+    private fun recordSkillAnswerState(question:Question,content:Content,correct:Boolean,quality:Int,
+                                       attemptId:String?,now:Long):Boolean {
+        val skills=content.skillsFor(question)
+        if(skills.isEmpty())return false
+        val records=root.optJSONObject("skillReviews") ?: JSONObject().also {root.put("skillReviews",it)}
+        val previous=skills.associateWith {id->records.optJSONObject(id)?.let(SkillLearning::readReview)}
+        val attempt=attemptId ?: java.util.UUID.randomUUID().toString()
+        var changed=false
+        skills.forEach {id->
+            val next=SkillLearning.record(previous[id],question.id,correct,quality,now,attempt)
+            if(next!=previous[id]) {records.put(id,SkillLearning.write(next));changed=true}
+        }
+        SkillLearning.trimHistory(records)
+        root.put("skillReviewsVersion",SkillLearning.FORMAT_VERSION)
+        return changed
     }
     val activeDays: Set<String> get() = (root.optJSONObject("dailyXp") ?: JSONObject()).keys().asSequence().toSet()
     val xp get() = root.optInt("xp")
@@ -155,12 +279,38 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     val dailyGoalChoice get() = DailyGoals.keys.indexOf(prefs.getInt("dailyGoal",30))
     fun setDailyGoalChoice(index:Int) { require(index in DailyGoals.keys.indices);setDailyGoal(DailyGoals.keys[index]) }
     fun dayXp(day: LocalDate) = root.optJSONObject("dailyXp")?.optInt(day.toString()) ?: 0
-    fun due(content: Content) = reviews.filter { (id, r) -> r.due <= System.currentTimeMillis() && id in content.allQuestions }
-        .toList().sortedBy { it.second.due }.mapNotNull { content.allQuestions[it.first] }
+    fun due(content:Content):List<Question> {
+        val uuidReviews=reviews
+        val now=activityClock.millis()
+        val legacyDue=uuidReviews.filter { (id,r)->r.due<=now&&content.allQuestions[id]?.let(content::isReviewEligible)==true }
+            .toList().sortedBy {it.second.due}.mapNotNull {content.allQuestions[it.first]}
+        val skills=skillReviews
+        if(skills.isEmpty())return legacyDue
+        val pool=CourseRevisionBuilder.eligible(content,completed,uuidReviews,skills,legacyDue)
+        return CourseRevisionBuilder.due(pool,uuidReviews,skills,content::skillsFor,now)
+    }
     fun answer(id: String, correct: Boolean, quality: Int = if (correct) 4 else 1): Int = synchronized(CLOUD_LOCK) {
         reload()
+        val gain=recordQuestionAnswer(id,correct,quality,activityClock.millis())
+        save()
+        gain
+    }
+    /** Publish the UUID review, XP event and concept evidence together, including to preference listeners. */
+    fun answer(question:Question,content:Content,correct:Boolean,quality:Int=if(correct)4 else 1,
+               attemptId:String?=null,recordSkill:Boolean=true):Int = synchronized(CLOUD_LOCK) {
+        require(quality in 0..5)
+        reload()
+        // Only reviews which predate this answer may establish legacy exposure.
+        prepareLearningState(content)
+        val now=activityClock.millis()
+        val gain=recordQuestionAnswer(question.id,correct,quality,now)
+        if(recordSkill)recordSkillAnswerState(question,content,correct,quality,attemptId,now)
+        save()
+        gain
+    }
+    private fun recordQuestionAnswer(id:String,correct:Boolean,quality:Int,now:Long):Int {
+        require(quality in 0..5)
         CloudProgress.ensureLedger(root)
-        val now = activityClock.millis()
         val previous = reviews[id] ?: Review()
         // Early successful rereading isn't a spaced recall. Failed items may be corrected immediately.
         val review = if(correct && previous.repetitions>0 && previous.due>now) previous else SpacedRepetition.next(previous, quality, now)
@@ -175,17 +325,18 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         root.put("answers", totalAnswers + 1).put("correct", totalCorrect + if (correct) 1 else 0)
         addXp(gain,day)
         CloudProgress.recordEvent(root,day,gain,answers=1,correct=if(correct)1 else 0,awardKey=if(gain>0)"answer3:$id:$day" else null,at=now)
-        save(); gain
+        return gain
     }
     fun complete(id: String): Int = synchronized(CLOUD_LOCK) {
         reload()
         CloudProgress.ensureLedger(root)
-        if (id !in completed) {
+        if (id !in completed && id !in ignored) {
             val now=activityClock.millis()
             val day=StudyDay.date(java.time.Instant.ofEpochMilli(now),activityClock.zone).toString()
-            root.put("completed", JSONArray((completed + id).toList())); addXp(6,day)
-            CloudProgress.recordEvent(root,day,6,completed=id,at=now)
-            save(); 6
+            val gain=6
+            root.put("completed", JSONArray((completed + id).toList())); addXp(gain,day)
+            CloudProgress.recordEvent(root,day,gain,completed=id,at=now)
+            save(); gain
         } else {
             0
         }
@@ -222,6 +373,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
                 .put("reminderHour",prefs.getInt("reminderHour",20)).put("reminderMinute",prefs.getInt("reminderMinute",0))
                 .put(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey)
                 .put(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
+            .put(SyncedAppSettings.FIELD,SyncedAppSettings.snapshot(prefs))
             .put("progress",root).put("friends",cloudFriendRecords()).put("socialInbox",socialInboxState()).toString()
     }
     /** Verified avatar metadata stays local; an imported cache is not GitHub verification. */
@@ -271,6 +423,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     }
     fun mergeCloud(json:String):Boolean = synchronized(CLOUD_LOCK) {
         val previousReminder=reminderSettings()
+        val previousAutoSync=prefs.getBoolean("autoSync",true)
         val before=cloudExport()
         val merged=CloudProgress.merge(before,json)
         val candidate=JSONObject(merged)
@@ -286,6 +439,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
                 .putBoolean(GameplayPreferences.SINGLE_KEY,settings.optBoolean(GameplayPreferences.SINGLE_KEY,GameplayPreferences.read(prefs).singleKey))
                 .putInt(GameplayPreferences.THRESHOLD,settings.optInt(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
         }
+        candidate.optJSONObject(SyncedAppSettings.FIELD)?.let {SyncedAppSettings.restore(editor,prefs,it)}
         candidate.optJSONObject("friends")?.let { records ->
             editor.putString("friends",CloudProgress.activeFriends(retainLocalFriendIdentities(records)).toString())
                 .putString("friendTombstones",CloudProgress.friendTombstones(records).toString())
@@ -293,6 +447,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         candidate.optJSONObject("socialInbox")?.let { editor.putString("socialInbox",it.toString()) }
         save(editor)
         if(previousReminder!=reminderSettings()) if(sideEffects)DailyReminder.schedule(context)
+        if(previousAutoSync!=prefs.getBoolean("autoSync",true)&&sideEffects)ProgressSyncScheduler.schedule(context)
         before != cloudExport()
     }
     fun export() = cloudExport()
@@ -309,6 +464,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         }
         synchronized(CLOUD_LOCK) {
             val previousReminder=reminderSettings()
+        val previousAutoSync=prefs.getBoolean("autoSync",true)
             root = state
             // Publish one preference transaction. A UI listener can reload immediately on apply().
             val editor=prefs.edit().putString("name",candidate.optString("name",name).take(40).ifBlank {"Pilote des ondes"})
@@ -328,19 +484,25 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
                     .putInt(GameplayPreferences.THRESHOLD,settings.optInt(GameplayPreferences.THRESHOLD,GameplayPreferences.read(prefs).thresholdMs))
                     .putLong("preferencesUpdatedAt",System.currentTimeMillis())
             }
+            candidate.optJSONObject(SyncedAppSettings.FIELD)?.let {SyncedAppSettings.restore(editor,prefs,it,explicit=true)}
             save(editor)
             if(previousReminder!=reminderSettings()) if(sideEffects)DailyReminder.schedule(context)
+        if(previousAutoSync!=prefs.getBoolean("autoSync",true)&&sideEffects)ProgressSyncScheduler.schedule(context)
         }
         if(sideEffects)ProgressSyncScheduler.enqueue(context)
     }
     private fun reminderSettings() = Triple(prefs.getBoolean("reminderEnabled",false),prefs.getInt("reminderHour",20),prefs.getInt("reminderMinute",0))
-    fun snapshot() = synchronized(CLOUD_LOCK) {
+    fun snapshot(content:Content?=preparedContent) = synchronized(CLOUD_LOCK) {
         val today=StudyDay.date(activityClock.instant(),activityClock.zone);val hours=com.malfreyt.alexandre.hamigo.platform.SocialActivity.hours(root,today,activityClock.zone)
-        com.malfreyt.alexandre.hamigo.platform.ShareProgress(name,xp,streak,completed.size,weeklyXp,
+        val section=content?.currentSection(pathCompleted)
+        val activeCompleted=content?.let {catalog->pathCompleted.intersect(catalog.lessons.map {it.id}.toSet()).size}
+        com.malfreyt.alexandre.hamigo.platform.ShareProgress(name,xp,streak,activeCompleted ?: pathCompleted.size,weeklyXp,
             dailyXp=(0L..13L).reversed().map {today.minusDays(it).let {day->DailyPoint(day.toString(),dayXp(day))}},
             dailyGoal=dailyGoal,hourlyDay=today.toString(),hourlyXp=hours.points,hourlyComplete=hours.complete,zoneId=activityClock.zone.id,
             activityHistory=com.malfreyt.alexandre.hamigo.platform.PublicActivityHistory.fromDailyXp(root.optJSONObject("dailyXp"),today),
-            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE,dayStartHour=3)
+            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE,dayStartHour=3,
+            pathSectionNumber=section?.number,pathSectionTitle=section?.title,
+            pathCompletedLessons=activeCompleted,pathTotalLessons=content?.lessons?.size)
     }
 }
 

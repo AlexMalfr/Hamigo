@@ -1,21 +1,53 @@
 package com.malfreyt.alexandre.hamigo
 
+import android.content.Context
+import android.os.Build
 import androidx.compose.ui.test.*
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.lifecycle.ViewModelProvider
+import androidx.test.platform.app.InstrumentationRegistry
+import com.malfreyt.alexandre.hamigo.platform.ProgressSyncScheduler
 import org.junit.Before
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExternalResource
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
-/** Exercises real user paths while retaining any progress already stored on the test emulator. */
+/** Exercises real user paths with reversible fixtures, restricted to the test emulator. */
 @RunWith(AndroidJUnit4::class)
 class ApplicationSmokeTest {
-    @get:Rule
-    val ui = createAndroidComposeRule<MainActivity>()
+    private val context get()=InstrumentationRegistry.getInstrumentation().targetContext
+    private val saved=mutableMapOf<String,Map<String,Any?>>()
+    private val fixture=object:ExternalResource() {
+        override fun before() {
+            check(Build.HARDWARE in listOf("ranchu","goldfish")||Build.FINGERPRINT.contains("generic")) {"Emulator fixtures only"}
+            for(file in listOf("hamigo","hamigo_social","hamigo_secure")) {
+                val prefs=context.getSharedPreferences(file,Context.MODE_PRIVATE)
+                saved[file]=prefs.all.mapValues {(_,v)->if(v is Set<*>)v.toSet() else v}
+                check(prefs.edit().clear().commit())
+            }
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",true)
+                .putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putInt("hamigoTourStep",-1).commit())
+            ProgressSyncScheduler.cancel(context)
+        }
+        override fun after() {
+            saved.forEach {(file,values)->
+                val edit=context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear()
+                values.forEach {(key,value)->when(value) {
+                    is String->edit.putString(key,value);is Boolean->edit.putBoolean(key,value);is Int->edit.putInt(key,value)
+                    is Long->edit.putLong(key,value);is Float->edit.putFloat(key,value)
+                    is Set<*>->edit.putStringSet(key,value.filterIsInstance<String>().toSet())
+                }}
+                check(edit.commit())
+            }
+            stopMorse();ProgressSyncScheduler.schedule(context)
+        }
+    }
+    private val ui=createAndroidComposeRule<MainActivity>()
+    @get:org.junit.Rule val rules:RuleChain=RuleChain.outerRule(fixture).around(ui)
 
     @Before
     fun awaitContentAndDismissWelcomeWhenNeeded() {
@@ -37,7 +69,7 @@ class ApplicationSmokeTest {
         ui.onNodeWithText("Réviser avec les flashcards").performScrollTo().performClick()
 
         awaitText("Retourner la carte")
-        ui.onNodeWithText("FLASHCARD · RAPPEL ACTIF").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Retourner la carte").assertIsDisplayed()
         // The selected card may vary with saved review dates; the recall interaction must not.
         ui.onNodeWithText("Retourner la carte").performClick()
         awaitText("Comment était le rappel ?")
@@ -55,40 +87,33 @@ class ApplicationSmokeTest {
 
     @Test
     fun firstLessonShowsCorrectionAndChecksTheMatchingWidget() {
-        // Explore an explicit lesson, rather than depending on the user's recommended next lesson.
-        ui.onNodeWithText("Parcours").performClick()
-        ui.onNode(hasScrollAction()).performScrollToNode(hasText("Bienvenue sur les ondes"))
-        if (!exists("Le service amateur")) {
-            ui.onNodeWithText("Bienvenue sur les ondes").performClick()
-        }
-        ui.onNodeWithText("Le service amateur").performScrollTo().performClick()
+        val model=ViewModelProvider(ui.activity)[AppModel::class.java]
+        val lesson=model.content!!.lessons.first {it.id=="c01-l01"}
+        val recall=lesson.questions.first {it.id=="q-f39b165e-c14d-43f1-be43-a5084daf9db4"}
+        val matching=lesson.questions.first {it.id=="q-eb65542e-1ed8-4e54-9bdc-6bf695b1fd29"}
+        ui.runOnIdle {model.startLesson(lesson)}
         ui.onNodeWithText("D'abord le déclic.\nEnsuite, à toi de jouer.").assertExists()
-        // Keep this correction/matching smoke path stable while normal lesson sessions randomize.
-        val model = ViewModelProvider(ui.activity)[AppModel::class.java]
         ui.runOnIdle {
-            val lesson = model.lesson!!
-            model.startQuestions(lesson.title, lesson.questions.take(2), lesson.id)
+            model.startQuestions(lesson.title,listOf(recall,matching),lesson.id)
         }
 
-        awaitText("Quel est l’objectif du service amateur ?")
-        ui.onNodeWithText("Diffuser des publicités").performScrollTo().performClick()
+        awaitText(recall.prompt)
+        val wrong=recall.choices[recall.choices.indices.first {it!=recall.answer}]
+        ui.onNodeWithText(wrong).performScrollTo().performClick()
         ui.onNodeWithText("Vérifier").assertIsEnabled().performClick()
         ui.onNodeWithText("Une occasion de retenir").performScrollTo().assertIsDisplayed()
-        ui.onNodeWithText("Réponse : L’instruction et l’expérimentation personnelles")
+        ui.onNodeWithText("Réponse : ${recall.choices[recall.answer]}")
             .performScrollTo().assertIsDisplayed()
-        ui.onNodeWithText("Le service amateur est une activité personnelle sans intérêt pécuniaire.")
+        ui.onNodeWithText(recall.explanation)
             .performScrollTo().assertIsDisplayed()
         ui.onNodeWithText("Continuer").performClick()
 
-        awaitText("Associe chaque élément à son rôle.")
-        ui.onNodeWithText("LES BONNES CONNEXIONS").performScrollTo().assertIsDisplayed()
+        awaitText(matching.prompt)
         ui.onNodeWithText("Vérifier").assertIsNotEnabled()
-        pair("Certificat", "Compétences de l’opérateur")
-        pair("Indicatif", "Identification de la station")
-        pair("ANFR", "Organisation de l’examen")
+        matching.pairs.forEach {pair(it.left,it.right)}
         ui.onNodeWithText("Vérifier").assertIsEnabled().performClick()
         ui.onNodeWithText("Signal reçu !").performScrollTo().assertIsDisplayed()
-        ui.onNodeWithText("Certificat et indicatif remplissent deux fonctions distinctes.")
+        ui.onNodeWithText(matching.explanation)
             .performScrollTo().assertIsDisplayed()
 
         quitQuiz()
@@ -115,12 +140,17 @@ class ApplicationSmokeTest {
         ui.onNodeWithText("Autre réponse").performScrollTo().performClick()
         ui.onNodeWithText("Enregistrer et continuer").performClick()
         ui.onNodeWithText("Relire").performClick()
-        ui.runOnIdle {assertEquals(1,model.session!!.responses[0]!!.choiceIndex)}
+        ui.runOnIdle {
+            val response=model.session!!.responses[0]!!
+            assertEquals("Autre réponse",response.display)
+            assertEquals("Autre réponse",model.session!!.questions[0].choices[response.choiceIndex])
+            org.junit.Assert.assertFalse(response.correct)
+        }
         ui.onNodeWithText("Finaliser la réglementation").performScrollTo().performClick()
         ui.onNodeWithText("Finaliser").performClick()
         ui.onNodeWithText("Commencer la technique").assertIsDisplayed().performClick()
         ui.runOnIdle {
-            repeat(20) {model.answer(true,display="La bonne réponse",choiceIndex=0)}
+            repeat(20) {model.answer(true,display="La bonne réponse",choiceIndex=model.session!!.current!!.answer)}
             model.finishExamPart()
         }
         ui.onNodeWithText("19 / 20").assertIsDisplayed()

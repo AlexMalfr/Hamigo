@@ -202,7 +202,7 @@ fun normalizeMorse(code:String):String=code.replace('·','.').replace('•','.')
 }
 
 @Composable fun WaveformPreview(kind:String,modifier:Modifier=Modifier,color:Color=Teal) {
-    Canvas(modifier.fillMaxWidth().height(68.dp).semantics {contentDescription=when(kind){"am"->"Oscillation dont l'amplitude varie";"fm"->"Oscillation dont la fréquence varie";"square"->"Signal carré";"dc"->"Signal constant";"noise"->"Signal irrégulier";else->"Oscillation sinusoïdale"}}) {
+    Canvas(modifier.fillMaxWidth().height(68.dp).semantics {contentDescription=when(kind){"am"->"Oscillations dont la hauteur augmente puis diminue, avec un espacement régulier";"fm"->"Oscillations de même hauteur, tantôt rapprochées, tantôt espacées";"square"->"Plateaux horizontaux alternant entre deux niveaux avec des transitions abruptes";"dc"->"Ligne horizontale à un niveau constant";"noise"->"Courbe irrégulière sans répétition visible";else->"Courbe périodique lisse, arrondie, de hauteur et d’espacement constants"}}) {
         drawLine(Muted.copy(alpha=.18f),Offset(0f,size.height/2f),Offset(size.width,size.height/2f),1.dp.toPx())
         val p=Path()
         repeat(240){i ->

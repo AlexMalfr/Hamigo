@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,8 +65,8 @@ fun QuestionCountSelector(
     availableCount: Int?=null,
     minimumInlineWidth: Int=0,
 ) {
-    var customOpen by remember { mutableStateOf(false) }
-    var custom by remember { mutableStateOf(count.toString()) }
+    var customOpen by rememberSaveable { mutableStateOf(false) }
+    var custom by rememberSaveable { mutableStateOf(count.toString()) }
     val options=questionCountOptions(availableCount)
     val customMaximum=minOf(1000,availableCount?:1000)
     Layout(modifier=Modifier.fillMaxWidth().testTag(testTag),content={

@@ -1,0 +1,561 @@
+{
+  "schema": 1,
+  "skills": [
+    {
+      "id": "amateur-service",
+      "title": "Le service amateur"
+    },
+    {
+      "id": "exam-format",
+      "title": "Comprendre les deux épreuves"
+    },
+    {
+      "id": "station-identification",
+      "title": "Identifier sa station"
+    },
+    {
+      "id": "band-allocation",
+      "title": "Bandes et statuts des services"
+    },
+    {
+      "id": "nato-recall",
+      "title": "Retrouver les mots de l’alphabet international"
+    },
+    {
+      "id": "q-codes",
+      "title": "Comprendre les codes Q"
+    },
+    {
+      "id": "morse-spacing",
+      "title": "Morse : Le silence fait partie du message"
+    },
+    {
+      "id": "qso-procedure",
+      "title": "Conduire un contact"
+    },
+    {
+      "id": "metric-prefixes",
+      "title": "Convertir les préfixes"
+    },
+    {
+      "id": "equation-rearrange",
+      "title": "Isoler une inconnue"
+    },
+    {
+      "id": "powers-roots",
+      "title": "Carrés, racines et rapports"
+    },
+    {
+      "id": "signal-measurement",
+      "title": "Lire les axes d’un oscilloscope"
+    },
+    {
+      "id": "measurement-units",
+      "title": "Grandeurs et unités"
+    },
+    {
+      "id": "dc-current",
+      "title": "Courant et charge"
+    },
+    {
+      "id": "ohm-law",
+      "title": "Appliquer la loi d’Ohm"
+    },
+    {
+      "id": "electric-power",
+      "title": "Puissance et énergie"
+    },
+    {
+      "id": "series-resistors",
+      "title": "Résistances en série"
+    },
+    {
+      "id": "parallel-resistors",
+      "title": "Résistances en parallèle"
+    },
+    {
+      "id": "voltage-divider",
+      "title": "Diviseur et pont"
+    },
+    {
+      "id": "kirchhoff-laws",
+      "title": "Nœuds et mailles"
+    },
+    {
+      "id": "resistor-colours",
+      "title": "Lire les résistances"
+    },
+    {
+      "id": "capacitors",
+      "title": "Comprendre les condensateurs"
+    },
+    {
+      "id": "inductors",
+      "title": "Comprendre les bobines"
+    },
+    {
+      "id": "rc-transient",
+      "title": "Charge et décharge RC"
+    },
+    {
+      "id": "signal-shapes",
+      "title": "Identifier les formes de signal"
+    },
+    {
+      "id": "period-frequency",
+      "title": "Période et fréquence"
+    },
+    {
+      "id": "rms-phase",
+      "title": "Valeur efficace et phase"
+    },
+    {
+      "id": "reactance-impedance",
+      "title": "Réactance et impédance"
+    },
+    {
+      "id": "lc-resonance",
+      "title": "Résonance LC"
+    },
+    {
+      "id": "filter-families",
+      "title": "Familles de filtres"
+    },
+    {
+      "id": "transformer-ratios",
+      "title": "Rapports du transformateur"
+    },
+    {
+      "id": "decibel-ratios",
+      "title": "Calculer les décibels"
+    },
+    {
+      "id": "stored-energy",
+      "title": "Énergie dans C et L"
+    },
+    {
+      "id": "reactance-calculation",
+      "title": "Calculer une réactance"
+    },
+    {
+      "id": "impedance-phase",
+      "title": "Module et phase de Z"
+    },
+    {
+      "id": "filter-quality",
+      "title": "Sélectivité et facteur Q"
+    },
+    {
+      "id": "diode-rectification",
+      "title": "Diodes et redressement"
+    },
+    {
+      "id": "transistor-bias",
+      "title": "Bipolaires et FET"
+    },
+    {
+      "id": "amplifier-efficiency",
+      "title": "Amplification et rendement"
+    },
+    {
+      "id": "oscillator-feedback",
+      "title": "Oscillateurs et réaction"
+    },
+    {
+      "id": "am-modulation",
+      "title": "Modulation AM"
+    },
+    {
+      "id": "fm-modulation",
+      "title": "Modulation FM et PM"
+    },
+    {
+      "id": "ssb-cw",
+      "title": "BLU et CW"
+    },
+    {
+      "id": "digital-modulation",
+      "title": "Modulations numériques"
+    },
+    {
+      "id": "binary-representation",
+      "title": "Représentation binaire"
+    },
+    {
+      "id": "hexadecimal",
+      "title": "Binaire et hexadécimal"
+    },
+    {
+      "id": "logic-basic",
+      "title": "Portes ET, OU et NON"
+    },
+    {
+      "id": "logic-combined",
+      "title": "NAND, NOR et XOR"
+    },
+    {
+      "id": "symbol-rate",
+      "title": "Symboles et débit"
+    },
+    {
+      "id": "sampling",
+      "title": "Échantillonner sans repliement"
+    },
+    {
+      "id": "error-control",
+      "title": "Détection et correction d’erreurs"
+    },
+    {
+      "id": "transmitter-chain",
+      "title": "Chaîne d’émission"
+    },
+    {
+      "id": "superheterodyne",
+      "title": "Récepteur superhétérodyne"
+    },
+    {
+      "id": "receiver-quality",
+      "title": "Sensibilité et sélectivité"
+    },
+    {
+      "id": "measurement-circuits",
+      "title": "Brancher les appareils de mesure"
+    },
+    {
+      "id": "harmonic-spectrum",
+      "title": "Fondamentale et harmoniques"
+    },
+    {
+      "id": "mixer-products",
+      "title": "Produits de mélange"
+    },
+    {
+      "id": "intermodulation",
+      "title": "Compression et intermodulation"
+    },
+    {
+      "id": "signal-noise",
+      "title": "Puissance et bruit"
+    },
+    {
+      "id": "wavelength",
+      "title": "Fréquence et longueur d’onde"
+    },
+    {
+      "id": "antenna-length",
+      "title": "Dipôle et quart d’onde"
+    },
+    {
+      "id": "antenna-gain",
+      "title": "Gain et polarisation"
+    },
+    {
+      "id": "transmission-line",
+      "title": "Coaxial et adaptation"
+    },
+    {
+      "id": "standing-wave-ratio",
+      "title": "Réflexion et ROS"
+    },
+    {
+      "id": "electrical-length",
+      "title": "Longueur électrique"
+    },
+    {
+      "id": "line-loss",
+      "title": "Pertes dans la ligne"
+    },
+    {
+      "id": "antenna-measurement",
+      "title": "Mesurer avant de régler"
+    },
+    {
+      "id": "hf-propagation",
+      "title": "Propagation HF"
+    },
+    {
+      "id": "satellite-doppler",
+      "title": "VHF, satellites et Doppler"
+    },
+    {
+      "id": "link-budget",
+      "title": "Bilan de liaison"
+    },
+    {
+      "id": "band-mode-choice",
+      "title": "Choisir bande et mode"
+    },
+    {
+      "id": "electrical-safety",
+      "title": "Sécurité électrique"
+    },
+    {
+      "id": "rf-mechanical-safety",
+      "title": "Sécurité des antennes"
+    },
+    {
+      "id": "emc",
+      "title": "Compatibilité électromagnétique"
+    },
+    {
+      "id": "operating-records",
+      "title": "Journal et déplacements"
+    },
+    {
+      "id": "signal-report",
+      "title": "Décrire la réception"
+    },
+    {
+      "id": "diagnostic-method",
+      "title": "Diagnostiquer une station"
+    },
+    {
+      "id": "clean-transmission",
+      "title": "Régler une émission propre"
+    },
+    {
+      "id": "learning-routine",
+      "title": "Organiser ses rappels"
+    },
+    {
+      "id": "regulation-synthesis",
+      "title": "Résoudre une situation réglementaire"
+    },
+    {
+      "id": "technical-synthesis",
+      "title": "Choisir la bonne relation technique"
+    },
+    {
+      "id": "exam-method",
+      "title": "Préparer une épreuve chronométrée"
+    },
+    {
+      "id": "station-plan",
+      "title": "Préparer sa première station"
+    },
+    {
+      "id": "morse-characters",
+      "title": "Reconnaître les caractères Morse"
+    },
+    {
+      "id": "morse-punctuation",
+      "title": "Morse : Ponctuer sans confusion"
+    },
+    {
+      "id": "morse-words",
+      "title": "Reconnaître des groupes Morse"
+    },
+    {
+      "id": "morse-callsigns",
+      "title": "Morse : Décoder un indicatif"
+    },
+    {
+      "id": "morse-listening",
+      "title": "Reconnaître le Morse à l’oreille"
+    },
+    {
+      "id": "morse-qso",
+      "title": "Comprendre un échange CW"
+    },
+    {
+      "id": "hamigo-tools",
+      "title": "Choisir le bon outil Hamigo"
+    },
+    {
+      "id": "spaced-recall",
+      "title": "Pratiquer le rappel espacé"
+    },
+    {
+      "id": "number-basics",
+      "title": "Lire décimaux et fractions"
+    },
+    {
+      "id": "proportional-reasoning",
+      "title": "Raisonner sur un rapport"
+    },
+    {
+      "id": "formula-reading",
+      "title": "Lire une formule"
+    },
+    {
+      "id": "dc-voltage",
+      "title": "Comprendre une tension"
+    },
+    {
+      "id": "closed-circuit",
+      "title": "Reconnaître un circuit fermé"
+    },
+    {
+      "id": "resistivity",
+      "title": "Résistivité et conductivité"
+    },
+    {
+      "id": "battery-capacity",
+      "title": "Piles et accumulateurs"
+    },
+    {
+      "id": "diode-polarity",
+      "title": "Polarité d’une diode"
+    },
+    {
+      "id": "regulated-supply",
+      "title": "Redresser, filtrer et réguler"
+    },
+    {
+      "id": "op-amp-feedback",
+      "title": "Amplificateur opérationnel et contre-réaction"
+    },
+    {
+      "id": "thermionic-tubes",
+      "title": "Repères sur les tubes"
+    },
+    {
+      "id": "receiver-blocks",
+      "title": "Reconnaître les blocs du récepteur"
+    },
+    {
+      "id": "emission-limits",
+      "title": "Puissance et rayonnements non essentiels"
+    },
+    {
+      "id": "cept-travel",
+      "title": "Voyager avec le certificat"
+    },
+    {
+      "id": "installation-rights",
+      "title": "Démarches d’installation"
+    },
+    {
+      "id": "automatic-station",
+      "title": "Encadrer une station automatique"
+    },
+    {
+      "id": "sstv-principles",
+      "title": "Comprendre la SSTV"
+    },
+    {
+      "id": "sstv-reception",
+      "title": "Préparer une réception SSTV"
+    },
+    {
+      "id": "pota-operation",
+      "title": "Découvrir POTA"
+    },
+    {
+      "id": "sota-operation",
+      "title": "Découvrir SOTA"
+    },
+    {
+      "id": "sdr-workflow",
+      "title": "Utiliser un récepteur SDR"
+    },
+    {
+      "id": "waterfall-reading",
+      "title": "Lire un spectre et une cascade"
+    },
+    {
+      "id": "aprs-packet",
+      "title": "Comprendre les paquets APRS"
+    },
+    {
+      "id": "weak-signal-modes",
+      "title": "Comprendre un mode à signaux faibles"
+    },
+    {
+      "id": "portable-power",
+      "title": "Préparer l’énergie en portable"
+    },
+    {
+      "id": "experiment-design",
+      "title": "Concevoir une expérience radio"
+    },
+    {
+      "id": "morse-encoding",
+      "title": "Produire un message Morse"
+    },
+    {
+      "id": "energy-duration",
+      "title": "Relier énergie et durée"
+    },
+    {
+      "id": "rms-sine",
+      "title": "Valeur efficace d’une sinusoïde"
+    },
+    {
+      "id": "capacitor-ratings",
+      "title": "Respecter les limites d’un condensateur"
+    },
+    {
+      "id": "inductor-switching",
+      "title": "Anticiper une surtension inductive"
+    },
+    {
+      "id": "filter-cutoff",
+      "title": "Interpréter une coupure et une pente"
+    },
+    {
+      "id": "decibel-landmarks",
+      "title": "Reconnaître les rapports usuels en dB"
+    },
+    {
+      "id": "radio-wave-basics",
+      "title": "Relier onde, fréquence et bande"
+    },
+    {
+      "id": "identification-log",
+      "title": "Identifier et consigner un contact"
+    },
+    {
+      "id": "dbm-reference",
+      "title": "Puissances en dBm"
+    },
+    {
+      "id": "dipole-project",
+      "title": "Planifier et mesurer un dipôle"
+    },
+    {
+      "id": "antenna-experiment",
+      "title": "Interpréter un essai d’antenne"
+    },
+    {
+      "id": "iss-pass",
+      "title": "Préparer une écoute de l’ISS"
+    },
+    {
+      "id": "satellite-links",
+      "title": "Distinguer montée et descente satellite"
+    },
+    {
+      "id": "amplifier-classes",
+      "title": "Comparer les classes d’amplification"
+    },
+    {
+      "id": "frequency-stability",
+      "title": "Comprendre une référence stable"
+    },
+    {
+      "id": "image-frequency",
+      "title": "Écarter une fréquence image"
+    },
+    {
+      "id": "noise-bandwidth",
+      "title": "Relier bruit et largeur de bande"
+    },
+    {
+      "id": "calculation-method",
+      "title": "Choisir et vérifier un calcul"
+    },
+    {
+      "id": "amateur-messages",
+      "title": "Connaître les limites des messages amateur"
+    },
+    {
+      "id": "emission-designation",
+      "title": "Lire les désignations des émissions"
+    },
+    {
+      "id": "station-control",
+      "title": "Comprendre le contrôle de la station"
+    }
+  ]
+}

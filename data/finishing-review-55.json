@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-21",
+  "scope": "Finition contenu, rappel par lignes, préparation TTS et provenance ; pas une certification exhaustive",
+  "baseline": {
+    "lessons": 173,
+    "activeQuestions": 1229
+  },
+  "lessonChanges": [
+    {
+      "lessonId": "l-hamigo-bienvenue",
+      "field": "body",
+      "before": [
+        "Parcours est le fil de tes cours. Ouvre une leçon, lis son introduction et ses fiches Mémo liées, puis essaie les questions. Les cours restent accessibles dans l’ordre que tu choisis : l’ordre proposé aide surtout à rencontrer les bases avant leurs applications.",
+        "Les leçons portant le repère Certificat dans leur introduction enseignent des connaissances utiles à sa préparation. Pour les travailler en priorité, avance jusqu’à la section 9 « Cap sur le certificat » ; les découvertes courtes ponctuent déjà ce chemin. Les deux se croisent dans un seul parcours, et les cours restent accessibles dans l’ordre choisi. Les deux barres de Moi suivent les cours réalisés, sans promettre une réussite à l’examen.",
+        "Mémo garde les faits, schémas et outils à consulter. Les flashcards demandent de chercher la réponse avant de la révéler. Défis propose les révisions, les mélanges et les examens blancs : revenir sur une notion après un délai aide à la retenir.",
+        "Équipe permet d’ajouter tes amis et de comparer votre progression ; Moi rassemble ton activité et tes réglages. Une connexion reste facultative pour apprendre. Pour une question incorrecte, touche son drapeau ; les sources et le contact du projet sont aussi accessibles dans les réglages. Prends le temps de comprendre une correction avant de continuer."
+      ],
+      "after": [
+        "Bienvenue ! Parcours te guide des premières bases aux activités radio. Avant les questions, lis l’introduction et les fiches Mémo liées : elles enseignent ce que tu vas utiliser. Touche Pico pour écouter ou arrêter la lecture.",
+        "Les repères Certificat et Exploration précisent le rôle des leçons. Pour préparer l’examen en priorité, suis le chemin jusqu’à la section 9 « Cap sur le certificat ». Les découvertes y ont aussi leur place. Tous les cours restent accessibles dans l’ordre de ton choix ; l’ordre conseillé place les bases avant leurs applications.",
+        "Mémo permet de retrouver une formule, un schéma ou un outil. Pour apprendre avec les flashcards, cherche la réponse avant de la révéler, puis reviens dessus plus tard. Les fiches liées dans un cours t’aident à approfondir ce point précis.",
+        "Défis rassemble les révisions, les entraînements et les examens blancs. Alterne nouvelles notions et rappels après un délai ; prends le temps de comprendre les corrections. Répondre juste une fois ne suffit pas toujours pour retenir.",
+        "Équipe permet de suivre tes amis. Moi rassemble ton activité, tes réglages et les deux barres de parcours : elles suivent les cours réalisés pour le certificat et l’exploration. Ce sont des repères de progression. Tu peux apprendre sans te connecter.",
+        "Une erreur dans une question ? Utilise son drapeau de signalement. Pour une suggestion générale, les réglages donnent accès au contact du projet et aux sources. Pour les réponses à dicter, le micro reste facultatif : tu peux toujours écrire au clavier."
+      ],
+      "reason": "Première impression : paragraphes spécialisés, priorité certificat, lecture et Mémo avant questions, rappel espacé, liberté, onglets, sources/contact et réponses vocales facultatives."
+    }
+  ],
+  "questionChanges": [
+    {
+      "questionId": "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
+      "lessonId": "l-hamigo-bienvenue",
+      "before": {
+        "id": "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
+        "kind": "choice",
+        "prompt": "Après avoir lu une réponse de flashcard, quelle suite entraîne le rappel ?",
+        "choices": [
+          "La retrouver plus tard sans afficher la réponse",
+          "Relire immédiatement la réponse plusieurs fois",
+          "Regarder la réponse avant d’essayer de la retrouver",
+          "Revoir uniquement les cartes dont la réponse est déjà visible"
+        ],
+        "answer": 0,
+        "explanation": "Le rappel après un délai teste la mémoire.",
+        "skillIds": [
+          "hamigo-tools"
+        ],
+        "source": "https://github.com/AlexMalfr/Hamigo",
+        "section": "technique",
+        "topic": "Choisir le bon outil Hamigo"
+      },
+      "after": {
+        "id": "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
+        "kind": "choice",
+        "prompt": "Tu révises avec une flashcard. Quelle habitude fait travailler ta mémoire ?",
+        "choices": [
+          "Chercher la réponse avant de la révéler, puis réessayer plus tard",
+          "Relire plusieurs fois la réponse en la gardant affichée",
+          "Afficher d’abord la réponse, puis la recopier",
+          "Revoir seulement les cartes dont la réponse est visible"
+        ],
+        "answer": 0,
+        "explanation": "Essaie de retrouver la réponse avant de la lire. Un nouvel essai après un délai entraîne le rappel ; la correction aide ensuite à comprendre ce qui manque.",
+        "skillIds": [
+          "hamigo-tools"
+        ],
+        "source": "https://github.com/AlexMalfr/Hamigo",
+        "section": "technique",
+        "topic": "Choisir le bon outil Hamigo"
+      },
+      "reason": "Remplacer la formulation abstraite « quelle suite entraîne le rappel » par une action concrète sans changer la compétence ni la bonne réponse."
+    },
+    {
+      "questionId": "q-81b000df-b465-4abc-be6c-c46d60eff363",
+      "lessonId": "l-hamigo-bienvenue",
+      "before": {
+        "id": "q-81b000df-b465-4abc-be6c-c46d60eff363",
+        "kind": "choice",
+        "prompt": "Un cours te paraît trop facile. Que peux-tu faire ?",
+        "choices": [
+          "Consulter un autre cours du parcours",
+          "Terminer tous les précédents pour rendre les suivants accessibles",
+          "Attendre qu’un examen blanc débloque les cours suivants",
+          "Valider le chapitre entier pour pouvoir en consulter un autre"
+        ],
+        "answer": 0,
+        "explanation": "Les cours sont libres ; l’ordre conseillé n’est pas un verrou.",
+        "skillIds": [
+          "hamigo-tools"
+        ],
+        "source": "https://github.com/AlexMalfr/Hamigo",
+        "section": "technique",
+        "topic": "Choisir le bon outil Hamigo"
+      },
+      "after": {
+        "id": "q-81b000df-b465-4abc-be6c-c46d60eff363",
+        "kind": "choice",
+        "prompt": "Tu connais déjà les bases d’un cours. Comment poursuivre ton apprentissage ?",
+        "choices": [
+          "Ouvrir un autre cours du parcours qui t’intéresse",
+          "Attendre qu’un examen blanc rende les autres cours accessibles",
+          "Terminer tous les cours précédents avant de pouvoir en ouvrir un autre",
+          "Faire ajouter un déblocage par un ami dans Équipe"
+        ],
+        "answer": 0,
+        "explanation": "Tu peux ouvrir les cours dans l’ordre choisi. L’ordre conseillé sert à rencontrer les bases avant les applications ; il ne verrouille pas les leçons.",
+        "skillIds": [
+          "hamigo-tools"
+        ],
+        "source": "https://github.com/AlexMalfr/Hamigo",
+        "section": "technique",
+        "topic": "Choisir le bon outil Hamigo"
+      },
+      "reason": "Conserver la liberté de navigation ; rendre les distracteurs distincts au lieu de trois variantes de validation préalable."
+    }
+  ],
+  "additions": [
+    {
+      "lessonId": "l-nato-groupes",
+      "questionId": "q-bcc0c226-467c-4034-b440-0aaf8d1eb7df",
+      "reason": "Production indépendante de trois mots internationaux ; aucune banque de mots ne révèle les réponses. Complète l’enchaînement oral et la réception de groupes sans remplacer une question existante.",
+      "question": {
+        "kind": "rows",
+        "prompt": "Retrouve le mot international de chaque lettre, sans liste de réponses.",
+        "choices": [],
+        "answer": 0,
+        "rows": [
+          {
+            "id": "letter-b",
+            "prompt": "B",
+            "acceptedAnswers": [
+              "Bravo"
+            ]
+          },
+          {
+            "id": "letter-d",
+            "prompt": "D",
+            "acceptedAnswers": [
+              "Delta"
+            ]
+          },
+          {
+            "id": "letter-v",
+            "prompt": "V",
+            "acceptedAnswers": [
+              "Victor"
+            ]
+          }
+        ],
+        "explanation": "B se dit Bravo, D se dit Delta et V se dit Victor. Le rappel de chaque mot évite de simplement remettre une liste déjà visible dans l’ordre.",
+        "skillIds": [
+          "nato-recall"
+        ],
+        "source": "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals",
+        "section": "regulation",
+        "topic": "Retrouver les mots de l’alphabet international",
+        "id": "q-bcc0c226-467c-4034-b440-0aaf8d1eb7df"
+      }
+    },
+    {
+      "lessonId": "l-synthese-calculs",
+      "questionId": "q-8eed9418-9670-4e47-b441-3f991dbf45b2",
+      "reason": "Choix de méthode alterné entre courant, durée et puissance, avant calcul ; trois relations voisines sans banque commune. Tous les prérequis ont été enseignés dans les sections précédentes.",
+      "question": {
+        "kind": "rows",
+        "prompt": "Pour chaque situation, choisis la relation qui donne directement la grandeur demandée.",
+        "choices": [],
+        "answer": 0,
+        "rows": [
+          {
+            "id": "current",
+            "prompt": "Résistance pure : U = 12 V et R = 24 Ω. Courant I ?",
+            "choices": [
+              "I = U/R",
+              "I = U × R",
+              "I = R/U",
+              "I = U²/R"
+            ],
+            "answer": 0
+          },
+          {
+            "id": "duration",
+            "prompt": "Énergie utilisable E = 36 Wh, puissance constante P = 12 W. Durée t ?",
+            "choices": [
+              "t = P/E",
+              "t = E/P",
+              "t = E × P",
+              "t = E − P"
+            ],
+            "answer": 1
+          },
+          {
+            "id": "power",
+            "prompt": "Récepteur en continu : U = 12 V et I = 2 A. Puissance P ?",
+            "choices": [
+              "P = U × I",
+              "P = U/I",
+              "P = I/U",
+              "P = U − I"
+            ],
+            "answer": 0
+          }
+        ],
+        "explanation": "Le courant se calcule par I = U/R = 0,5 A. La durée idéale vaut t = E/P = 3 h. La puissance reçue vaut P = U × I = 24 W. Les unités et la grandeur recherchée permettent de distinguer les méthodes.",
+        "skillIds": [
+          "calculation-method",
+          "ohm-law",
+          "energy-duration",
+          "electric-power"
+        ],
+        "source": "http://f6kgl.free.fr/COURS.html#T0001a",
+        "section": "technique",
+        "topic": "Choisir une méthode de calcul",
+        "id": "q-8eed9418-9670-4e47-b441-3f991dbf45b2"
+      }
+    }
+  ],
+  "narrationChanges": [
+    {
+      "lessonId": "c04-l03",
+      "bodyIndex": 1,
+      "before": null,
+      "after": {
+        "index": 1,
+        "source": "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Avec R1 en haut à gauche, R2 en bas à gauche, R3 en haut à droite et R4 en bas à droite : R1/R2 = R3/R4.",
+        "speech": "Un pont de Wheatstone compare deux diviseurs. À l’équilibre, le courant dans la diagonale de mesure est nul. Appelons R un la résistance en haut à gauche, R deux celle du bas à gauche, R trois celle du haut à droite et R quatre celle du bas à droite. À l’équilibre, le rapport R un divisé par R deux est égal au rapport R trois divisé par R quatre."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c07-l01",
+      "bodyIndex": 0,
+      "before": {
+        "index": 0,
+        "source": "À la résonance, XL et XC ont le même module. La fréquence propre d’un circuit LC idéal vaut f0 = 1/(2π√LC). Augmenter L ou C abaisse cette fréquence; multiplier C par quatre divise f0 par deux.",
+        "speech": "À la résonance, les réactances inductive et capacitive ont le même module. La fréquence propre d’un circuit idéal à bobine et condensateur est l’inverse du produit de deux, pi, et la racine carrée du produit de l’inductance par la capacité. Augmenter l’inductance ou la capacité abaisse cette fréquence. Multiplier la capacité par quatre divise la fréquence propre par deux."
+      },
+      "after": {
+        "index": 0,
+        "source": "À la résonance, XL et XC ont le même module. La fréquence propre d’un circuit LC idéal vaut f0 = 1/(2π√LC). Augmenter L ou C abaisse cette fréquence; multiplier C par quatre divise f0 par deux.",
+        "speech": "À la résonance, les réactances inductive et capacitive ont le même module. La fréquence propre d’un circuit LC idéal est l’inverse de deux fois pi fois la racine carrée du produit de l’inductance par la capacité. Augmenter l’inductance ou la capacité abaisse cette fréquence. Multiplier la capacité par quatre divise la fréquence propre par deux."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c07-l01",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "La résonance est la fréquence où les échanges entre champs électrique et magnétique compensent les réactances. f0 = 1/(2π√LC). Un circuit série devient surtout résistif à f0; un circuit parallèle idéal possède au contraire une impédance très grande. Les pertes réelles limitent toujours ces cas idéaux.",
+        "speech": "La résonance est la fréquence où les échanges entre champs électrique et magnétique compensent les réactances. La fréquence propre est l’inverse de deux fois pi fois la racine carrée du produit de l’inductance par la capacité. Un circuit série devient surtout résistif à cette fréquence. Un circuit parallèle idéal possède au contraire une impédance très grande. Les pertes réelles limitent toujours ces cas idéaux."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c07-l01",
+      "bodyIndex": 3,
+      "before": null,
+      "after": {
+        "index": 3,
+        "source": "Pour un même type de résonateur à une fréquence f0 donnée, le facteur Q compare la fréquence centrale à la largeur de bande B : Q = f0/B, avec les deux fréquences dans la même unité. Un Q plus élevé correspond donc à une bande plus étroite. Le couplage et les pertes réels modifient ce facteur.",
+        "speech": "Pour un même type de résonateur à une fréquence centrale donnée, le facteur de qualité est la fréquence centrale divisée par la largeur de bande. Les deux fréquences doivent être exprimées dans la même unité. Un facteur de qualité plus élevé correspond donc à une bande plus étroite. Le couplage et les pertes réels modifient ce facteur."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c17-l04",
+      "bodyIndex": 1,
+      "before": null,
+      "after": {
+        "index": 1,
+        "source": "Pour le modèle de bande étudié, Q = f0/B. Les pertes dissipatives réduisent le Q. En série à résonance, le courant peut être élevé et les tensions individuelles sur L et C peuvent dépasser celle de la source.",
+        "speech": "Pour le modèle de bande étudié, le facteur de qualité est la fréquence centrale divisée par la largeur de bande. Les pertes dissipatives réduisent le facteur de qualité. En série à résonance, le courant peut être élevé et les tensions individuelles sur la bobine et le condensateur peuvent dépasser celle de la source."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c09-l01",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "Une AM sinusoïdale possède une porteuse à fc et des bandes latérales à fc − fm et fc + fm. Pour une bande audio de largeur Fmax, la largeur RF double bande vaut environ 2Fmax. Un taux de modulation supérieur à 100 % déforme l’enveloppe dans le modèle simple et crée un risque d’émission trop large.",
+        "speech": "Une modulation d’amplitude sinusoïdale possède une porteuse à la fréquence porteuse, et des bandes latérales situées à la fréquence porteuse moins la fréquence de modulation, et à la fréquence porteuse plus la fréquence de modulation. Pour une bande audio de largeur donnée, la largeur radio en double bande vaut environ deux fois cette largeur audio. Un taux de modulation supérieur à cent pour cent déforme l’enveloppe dans le modèle simple et crée un risque d’émission trop large."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "c11-l04",
+      "bodyIndex": 3,
+      "before": null,
+      "after": {
+        "index": 3,
+        "source": "Pour une ligne idéale d’impédance caractéristique Z0 et une charge purement résistive RL, on peut calculer le ROS sans passer par Γ : divise la plus grande des deux résistances par la plus petite. Si RL est supérieure à Z0, c’est RL/Z0 ; si RL est inférieure à Z0, c’est Z0/RL. Cette simplification ne s’applique pas telle quelle à une charge possédant une partie réactive.",
+        "speech": "Considérons une ligne idéale et une charge purement résistive. On peut calculer le rapport d’ondes stationnaires en divisant la plus grande valeur entre résistance de charge et impédance caractéristique par la plus petite. Cette simplification ne s’applique pas telle quelle à une charge possédant une partie réactive."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-quartz-pll",
+      "bodyIndex": 3,
+      "before": null,
+      "after": {
+        "index": 3,
+        "source": "Dans une PLL simple à diviseur entier, une partie de la sortie est divisée par un nombre N avant comparaison à la référence. Au verrouillage, fsortie/N = fréférence, donc fsortie = N × fréférence. L’oscillateur commandé, souvent nommé VCO, est l’élément que la boucle corrige. Cette relation décrit le modèle donné ; toutes les synthèses réelles n’ont pas la même architecture.",
+        "speech": "Dans une boucle à verrouillage de phase simple à diviseur entier, une partie de la sortie est divisée par un nombre N avant comparaison à la référence. Au verrouillage, la fréquence de sortie divisée par N est égale à la fréquence de référence. La fréquence de sortie est donc N fois la fréquence de référence. L’oscillateur commandé en tension, souvent nommé VCO, est l’élément que la boucle corrige. Cette relation décrit le modèle donné. Toutes les synthèses réelles n’ont pas la même architecture."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-projet-experience",
+      "bodyIndex": 3,
+      "before": null,
+      "after": {
+        "index": 3,
+        "source": "Un retour A/B/A aide à voir si la référence dérive pendant l’essai : si A a beaucoup changé, attribuer tout l’écart à B devient fragile. La même méthode vaut ailleurs : comparer les tensions d’un câble sous le même courant, ou décoder plusieurs fois le même audio SSTV en changeant un seul réglage. La référence doit conserver les conditions utiles à la question posée.",
+        "speech": "Comparer la configuration A, puis la configuration B, puis revenir à la configuration A aide à voir si la référence dérive pendant l’essai. Si la première configuration a beaucoup changé, attribuer tout l’écart à la deuxième devient fragile. La même méthode vaut ailleurs : comparer les tensions d’un câble sous le même courant, ou décoder plusieurs fois le même audio SSTV en changeant un seul réglage. La référence doit conserver les conditions utiles à la question posée."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-morse-mots-etim",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont ETE, MIMI, TETE. Les exercices n’utilisent que les caractères indiqués ici : ETIM. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont été, Mimi et tête. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-morse-mots-anso",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont SIMON, MAISON, SON. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSO. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Simon, maison et son. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-morse-mots-durk",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont MARTIN, RADIO, TROIS. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSODURK. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Martin, radio et trois. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O, D, U, R, K. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-morse-mots-longs",
+      "bodyIndex": 2,
+      "before": null,
+      "after": {
+        "index": 2,
+        "source": "Les mots d’exemple de ce cours sont LOUIS, PARIS, VIVE. Les exercices n’utilisent que les caractères indiqués ici : ETIMANSODURKGWBVFLPJ. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent ; sinon un exemple adapté est conservé.",
+        "speech": "Les mots d’exemple de ce cours sont Louis, Paris et vive. Les accents ne sont pas transmis dans ces groupes d’entraînement. Les lettres disponibles sont : E, T, I, M, A, N, S, O, D, U, R, K, G, W, B, V, F, L, P, J. Un prénom du profil ou d’un ami peut remplacer un exemple lorsque tous ses caractères conviennent. Sinon, un exemple adapté est conservé."
+      },
+      "reason": "Adaptation orale explicite contrôlée ; ne pas déléguer au moteur une formule ambiguë, un protocole A/B/A ou des mots en capitales."
+    },
+    {
+      "lessonId": "l-filtre-coupure",
+      "bodyIndex": 1,
+      "before": null,
+      "after": {
+        "index": 1,
+        "source": "Pour un simple RC du premier ordre, la fréquence de coupure vaut 1/(2πRC). Au point de coupure, la puissance est moitié de la référence, soit environ −3 dB, sous les hypothèses de charge du modèle.",
+        "speech": "Dans un filtre résistance condensateur du premier ordre, la fréquence de coupure est l’inverse de deux fois pi fois la résistance fois la capacité. Au point de coupure, la puissance est moitié de la référence, soit environ moins trois décibels, sous les hypothèses de charge du modèle."
+      },
+      "reason": "La préparation Android native laissait RC brut dans le produit 2 pi R C ; adaptation explicite du produit sans modifier la formule affichée."
+    }
+  ],
+  "result": {
+    "lessons": 173,
+    "activeQuestions": 1231,
+    "newQuestionIds": [
+      "q-bcc0c226-467c-4034-b440-0aaf8d1eb7df",
+      "q-8eed9418-9670-4e47-b441-3f991dbf45b2"
+    ],
+    "manualNarrationBodyChanges": 14
+  }
+}

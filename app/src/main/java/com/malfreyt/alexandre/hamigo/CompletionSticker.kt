@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -27,12 +28,12 @@ import kotlin.random.Random
 private data class StickerPlacement(val angle: Float,val x: Int,val y: Int)
 
 /** A small foil seal, with stable placement so recomposition never makes it jump. */
-@Composable internal fun ChapterCompletionSticker(chapterId:String,modifier:Modifier=Modifier) {
+@Composable internal fun ChapterCompletionSticker(chapterId:String,modifier:Modifier=Modifier,outlineOnly:Boolean=false) {
     val placement=remember(chapterId) {
         val random=Random(chapterId.hashCode()*-1640531527)
         StickerPlacement((if(random.nextBoolean())1f else -1f)*(7f+random.nextFloat()*9f),random.nextInt(-4,5),random.nextInt(-5,6))
     }
-    Canvas(modifier.size(62.dp).offset(x=placement.x.dp,y=placement.y.dp).semantics {contentDescription="Chapitre terminé"}) {
+    Canvas(modifier.size(62.dp).offset(x=placement.x.dp,y=placement.y.dp).semantics {contentDescription=if(outlineOnly)"Chapitre commencé" else "Chapitre terminé"}) {
         val radius=size.minDimension*.43f
         val center=Offset(size.width/2f,size.height/2f)
         rotate(placement.angle,center) {
@@ -52,6 +53,20 @@ private data class StickerPlacement(val angle: Float,val x: Int,val y: Int)
                 }
                 close()
             }
+            val check=Path().apply {
+                moveTo(center.x-radius*.36f,center.y)
+                lineTo(center.x-radius*.08f,center.y+radius*.25f)
+                lineTo(center.x+radius*.40f,center.y-radius*.29f)
+            }
+            if(outlineOnly) {
+                drawPath(seal,Color.White,style=Stroke(1.6.dp.toPx(),cap=StrokeCap.Round,join=StrokeJoin.Round,
+                    pathEffect=PathEffect.dashPathEffect(floatArrayOf(3.dp.toPx(),3.dp.toPx()))))
+                drawCircle(Color.White.copy(alpha=.85f),radius*.78f,center,style=Stroke(1.1.dp.toPx(),
+                    cap=StrokeCap.Round,pathEffect=PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(),2.8.dp.toPx()))))
+                drawPath(check,Color.White,style=Stroke(2.5.dp.toPx(),cap=StrokeCap.Round,join=StrokeJoin.Round,
+                    pathEffect=PathEffect.dashPathEffect(floatArrayOf(2.2.dp.toPx(),2.8.dp.toPx()))))
+                return@rotate
+            }
             // Soft cast shadow is restricted to the sticker's own reserved space.
             for(layer in 5 downTo 1) translate(0f,layer*.45.dp.toPx()) {
                 drawPath(seal,Color(0xFF35240B).copy(alpha=.065f))
@@ -68,11 +83,6 @@ private data class StickerPlacement(val angle: Float,val x: Int,val y: Int)
                 center-Offset(inset,inset),Size(inset*2,inset*2),style=Stroke(1.5.dp.toPx(),cap=StrokeCap.Round))
             drawArc(Color(0xFF9B6711).copy(alpha=.26f),28f,73f,false,
                 center-Offset(inset,inset),Size(inset*2,inset*2),style=Stroke(1.2.dp.toPx(),cap=StrokeCap.Round))
-            val check=Path().apply {
-                moveTo(center.x-radius*.36f,center.y)
-                lineTo(center.x-radius*.08f,center.y+radius*.25f)
-                lineTo(center.x+radius*.40f,center.y-radius*.29f)
-            }
             val checkStroke=Stroke(3.7.dp.toPx(),cap=StrokeCap.Round,join=StrokeJoin.Round)
             translate(0f,1.dp.toPx()) {drawPath(check,Color(0xFF956311).copy(alpha=.65f),style=checkStroke)}
             drawPath(check,Color(0xFFFFFEF1),style=checkStroke)

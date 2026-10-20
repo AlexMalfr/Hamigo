@@ -75,6 +75,7 @@ class QuestionViewportInstrumentedTest {
     @get:Rule val rules:RuleChain=RuleChain.outerRule(fixture).around(ui)
     private lateinit var model:AppModel
     @Before fun load() {
+        ui.prepareTestWindow()
         model=ViewModelProvider(ui.activity)[AppModel::class.java]
         ui.waitUntil(60_000){model.content!=null}
         ui.runOnIdle {model.showWelcome=false}
@@ -128,7 +129,11 @@ class QuestionViewportInstrumentedTest {
         ui.waitUntil(30_000){WindowInspector.getGlobalWindowViews().any {it.rootWindowInsets?.isVisible(WindowInsets.Type.ime())==true}}
         ui.waitUntil(10_000) {
             val field=ui.onNodeWithTag("question-number-input").fetchSemanticsNode().boundsInRoot
-            field.bottom<=minOf(toolBounds("Ouvrir le brouillon").top,toolBounds("Ouvrir la calculatrice").top)
+            val notes=toolBounds("Ouvrir le brouillon");val calculator=toolBounds("Ouvrir la calculatrice")
+            val stage=ui.onNodeWithTag("question-stage").fetchSemanticsNode().boundsInRoot
+            field.height>=with(ui.density){48.dp.toPx()}&&notes.height>=with(ui.density){48.dp.toPx()}&&
+                calculator.height>=with(ui.density){48.dp.toPx()}&&field.top>=stage.top&&field.bottom<=stage.bottom&&
+                (if(wasVertical)field.bottom<=minOf(notes.top,calculator.top) else !field.overlaps(notes)&&!field.overlaps(calculator))
         }
         val notes=toolBounds("Ouvrir le brouillon");val calculator=toolBounds("Ouvrir la calculatrice")
         assertEquals("The keyboard must not turn a column into a row",wasVertical,notes.bottom<calculator.top)

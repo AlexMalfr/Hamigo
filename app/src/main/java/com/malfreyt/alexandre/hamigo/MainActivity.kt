@@ -11,6 +11,8 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.BackEventCompat
 import androidx.activity.compose.setContent
+import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -56,6 +58,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -114,7 +117,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-        receive(intent)
+        // A widget/reminder destination is consumed once; recreating the same Activity keeps its current page.
+        if(savedInstanceState==null)receive(intent)
         setContent { HamigoTheme { HamigoApp(model) } }
     }
     override fun onNewIntent(intent: Intent) {super.onNewIntent(intent);receive(intent)}
@@ -168,6 +172,7 @@ private data class BackScreenSnapshot(
         resource != null -> if(lesson!=null) "path" else "resources"
         lesson != null -> "path"
         route == "settings" -> "profile"
+        route == "exam-history" -> "practice"
         else -> route
     }
     fun isCurrent(model: AppModel) = model.route == route && model.session === session &&
@@ -176,16 +181,20 @@ private data class BackScreenSnapshot(
         when {
             session != null -> model.leaveSession()
             resource != null -> model.resource = null
-            lesson != null -> model.lesson = null
+            lesson != null -> model.backFromLesson()
             route == "settings" -> model.route = "profile"
+            route == "exam-history" -> model.route = "practice"
             else -> model.route = "path"
         }
     }
 }
 
 @Composable fun HamigoApp(model: AppModel) {
+    val permissionOwner=LocalActivityResultRegistryOwner.current
+    val hostContext=LocalContext.current.applicationContext
+    val speechHost=remember(hostContext,permissionOwner){SpeechInputHost(hostContext,permissionOwner)}
     FeedbackHost(model.interactionFeedback) {
-        CompositionLocalProvider(LocalOpenDiagnostics provides {model.debugToolsOpen=true},LocalDiagnosticsCovered provides model.debugToolsOpen) {
+        CompositionLocalProvider(LocalSpeechInputHost provides speechHost,LocalOpenDiagnostics provides {model.debugToolsOpen=true},LocalDiagnosticsCovered provides model.debugToolsOpen) {
             val shown=model.diagnostics.sandbox ?: model
             FeedbackPreferenceScope(model.interactionFeedback,shown.progress.prefs) {key(shown){HamigoAppContent(shown,model)}}
             if(model.debugToolsOpen)DiagnosticsScreen(model)
@@ -207,6 +216,11 @@ private data class BackScreenSnapshot(
             }
         }
     }
+    val pageStates=rememberSaveableStateHolder()
+    val activeSession=model.session
+    DisposableEffect(activeSession) {onDispose {
+        if(activeSession!=null&&model.session!==activeSession)pageStates.removeState("session-${activeSession.attemptId}")
+    }}
     val content=model.content
     val tick=model.revision
     val context=LocalContext.current
@@ -230,6 +244,8 @@ private data class BackScreenSnapshot(
     var windowBounds by remember {mutableStateOf(Rect.Zero)}
     var contentBounds by remember {mutableStateOf(Rect.Zero)}
     val navigationBounds=remember {mutableMapOf<String,Rect>()}
+    val tourTargets=remember(model){HamigoTourTargets()}
+    val guideAccessible=rememberTouchExploration()&&model.tour.step==0
     val backAnchors=remember {BackMotionAnchors()}
     val backAnimationScope=rememberCoroutineScope()
     val density=LocalDensity.current
@@ -237,7 +253,8 @@ private data class BackScreenSnapshot(
     val navLeft=WindowInsets.navigationBars.getLeft(density,layoutDirection)
     val navRight=WindowInsets.navigationBars.getRight(density,layoutDirection)
     val navBottom=WindowInsets.navigationBars.getBottom(density)
-    val raisedBarVisible=model.session==null && model.lesson==null && model.resource==null && model.route!="settings"
+    val raisedBarVisible=model.session==null && model.lesson==null && model.resource==null && model.route !in setOf("settings","exam-history") &&
+        !(WindowInsets.ime.getBottom(density)>0&&questionToolsHorizontal())
     fun resetBackMotion() {
         backGeneration++
         backMotion?.cancel()
@@ -282,7 +299,9 @@ private data class BackScreenSnapshot(
         if(backSource?.isCurrent(model)==false) resetBackMotion()
     }
     BackHandler(enabled=model.session?.done==false) { quit=true }
-    PredictiveBackHandler(enabled=model.session?.done!=false && (model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
+    BackHandler(enabled=model.tour.step in 1..2) {model.tour.requestSkip(exitToPath=true)}
+    BackHandler(enabled=model.tour.navigationPhase) {model.allowTourNavigation()}
+    PredictiveBackHandler(enabled=!model.tour.navigationPhase&&model.tour.step !in 1..2&&model.session?.done!=false && (model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
         resetBackMotion()
         val generation=backGeneration
         val source=BackScreenSnapshot(model.route,model.session,model.lesson,model.resource)
@@ -361,12 +380,22 @@ private data class BackScreenSnapshot(
             }
         }
     }
-    Scaffold(modifier=Modifier.onGloballyPositioned {windowBounds=it.boundsInWindow()},containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
+    LaunchedEffect(model.tour.step,model.lesson,model.session) {
+        model.restoreTourLocation()
+        if(model.tour.step in 1..2&&model.lesson==null&&model.session==null) {
+            model.tour.move(1)
+            content.lessons.firstOrNull {it.id==HamigoWelcomeLesson}?.let {model.startLesson(it)}
+        }
+    }
+    CompositionLocalProvider(LocalHamigoTourTargets provides tourTargets,LocalTourNavigationGuard provides model::allowTourNavigation) {
+    Box(Modifier.fillMaxSize()) {
+    Scaffold(modifier=Modifier.onGloballyPositioned {windowBounds=it.boundsInWindow()}.then(if(guideAccessible)Modifier.clearAndSetSemantics {} else Modifier),containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
         if(raisedBarVisible) {
             HamigoBottomBar(model.route,onDestination={destination ->
                 resetBackMotion()
-                model.route=destination
-            },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds},friendRequestCount=model.friendRequests.size)
+                model.navigateTab(destination)
+            },onDestinationBounds={route,bounds ->navigationBounds[route]=bounds},friendRequestCount=model.friendRequests.size,
+                allowedDestinations=if(model.tour.navigationPhase)setOfNotNull(model.tour.currentRoute,model.tour.destination) else null)
         }
     }) { padding ->
         val regularPadding=hamigoContentPadding(padding,layoutDirection,raisedBarVisible)
@@ -436,13 +465,15 @@ private data class BackScreenSnapshot(
             Box(frameModifier.background(if(memoMorph)Color.White else Cream).testTag("back-foreground")) {
             Box(if(memoMorph)Modifier.wrapContentSize(Alignment.TopStart,unbounded=true)
                 .requiredSize(with(density){backWidth.toDp()},with(density){backHeight.toDp()}).graphicsLayer {alpha=(1f-dock/.65f).coerceIn(0f,1f)} else Modifier.fillMaxSize()) {
+            pageStates.SaveableStateProvider(model.visibleScreenKey()) {
             CompositionLocalProvider(LocalContext provides if(model.diagnosticModel)model.diagnosticContext else context) {when {
                 model.session!=null -> QuizScreen(model)
                 model.resource!=null -> ReferenceDetailScreen(model,model.resource!!)
                 model.lesson!=null -> LessonScreen(model,model.lesson!!)
-                model.route=="settings" -> if(model.diagnosticModel&&!diagnosticPreview)ReadOnlyDiagnosticPreview {SettingsScreen(model)} else SettingsScreen(model)
+                model.route=="settings" -> SettingsScreen(model)
                 else -> MainDestination(model,content)
             }}
+            }
             }
             if(memoMorph)MemoMorphRow(backSource!!.resource!!,Modifier.fillMaxWidth().graphicsLayer { alpha=((dock-.18f)/.5f).coerceIn(0f,1f) },titleSize=(21f-5f*dock).sp)
             }
@@ -450,8 +481,17 @@ private data class BackScreenSnapshot(
         }
         }
     }
+    if(!diagnosticPreview)HamigoTourOverlay(model,tourTargets)
+    }
+    }
     if(quit) AlertDialog(onDismissRequest={quit=false},title={Text("Une pause radio ?")},text={Text(if(model.session?.exam==true)"Les épreuves finalisées sont enregistrées. Les réponses de l’épreuve en cours seront perdues si tu quittes." else "Ton XP et tes révisions sont enregistrés. Pour valider une leçon, vise au moins 80 % dès le premier essai et corrige les erreurs restantes.")},
         confirmButton={TextButton(feedbackClick {quit=false;model.leaveSession()}){Text("Quitter la séance")}},dismissButton={TextButton(feedbackClick {quit=false}){Text("Continuer")}})
+    model.ignoredLessonRequest?.let { (lesson,_) ->
+        AlertDialog(onDismissRequest={model.ignoredLessonRequest=null},title={Text("Suivre ce cours ?")},
+            text={Text("« "+lesson.title+" » est ignoré. Pour le suivre, il sera d’abord marqué comme non ignoré. Ignorer ne donne aucun XP. Tu pourras gagner les récompenses habituelles en suivant le cours.",Modifier.verticalScroll(rememberScrollState()))},
+            confirmButton={TextButton(feedbackClick {model.confirmIgnoredLessonLaunch()}){Text("Désignorer et ouvrir")}},
+            dismissButton={TextButton(feedbackClick {model.ignoredLessonRequest=null}){Text("Annuler")}})
+    }
     model.incoming?.let { json ->
         AlertDialog(onDismissRequest={model.incoming=null},title={Text("Restaurer la sauvegarde ?")},
             text={Text("La sauvegarde remplacera ta progression locale actuelle. Ton compte GitHub reste connecté.")},
@@ -481,6 +521,7 @@ private data class BackScreenSnapshot(
     when(route) {
         "path"->PathScreen(model,content)
         "practice"->PracticeHubScreen(model,content)
+        "exam-history"->ExamHistoryScreen(model,content)
         "resources"->ResourceLibraryScreen(model,content)
         "friends"->FriendsScreen(model)
         else->ProfileScreen(model,content)
@@ -490,103 +531,4 @@ private data class BackScreenSnapshot(
 @Composable fun PageHeader(title: String,subtitle: String="",back: (() ->Unit)?=null) {
     if(back!=null) IconButton(back,Modifier.offset(x=(-12).dp)){Icon(Icons.Rounded.ArrowBack,"Retour")}
     BigTitle(title,subtitle)
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable fun PathScreen(model:AppModel, content:Content) {
-    val p=model.displayedProgress ?: model.progress
-    val completed=p.completed
-    var expanded by remember {mutableStateOf(content.chapters.indexOfFirst { c->c.lessons.any {it.id !in completed} }.coerceAtLeast(0))}
-    val next=content.nextLesson(completed)
-    val due=p.due(content)
-    val listState=androidx.compose.foundation.lazy.rememberLazyListState()
-    LazyColumn(Modifier.fillMaxSize().testTag("path-list"),state=listState,contentPadding=PaddingValues(start=16.dp,end=16.dp,top=16.dp,bottom=56.dp+LocalNavigationContentOverlap.current),verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        stickyHeader {
-            Row(Modifier.fillMaxWidth().stickyHeaderShadow(listState).background(Cream).padding(vertical=8.dp),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {Eyebrow("HAMIGO");Text("Salut ${p.name.split(' ').first()} !",fontSize=23.sp,fontWeight=FontWeight.ExtraBold,maxLines=1,overflow=TextOverflow.Ellipsis)}
-                Row(Modifier.clip(RoundedCornerShape(12.dp)).background(Mist.copy(alpha=.6f))
-                    .clickable(role=Role.Button,onClick=feedbackClick {model.route="profile"})
-                    .semantics(mergeDescendants=true) {contentDescription="Voir ma progression : ${dayCount(p.streak)} de série, ${p.xp} XP"}
-                    .padding(horizontal=10.dp,vertical=6.dp),verticalAlignment=Alignment.CenterVertically,
-                    horizontalArrangement=Arrangement.spacedBy(5.dp)) {
-                    Column(horizontalAlignment=Alignment.End) {StatMetric(dayCount(p.streak),Icons.Rounded.LocalFireDepartment,Color(0xFFB44D30));StatMetric("${p.xp} XP",Icons.Rounded.Bolt,fontSize=13.sp)}
-                    Icon(Icons.Rounded.ChevronRight,null,Modifier.size(17.dp),tint=Muted)
-                }
-            }
-        }
-        item {
-            Panel(color=Mist) {
-                Row(verticalAlignment=Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {Eyebrow("TA MISSION DU JOUR");Spacer(Modifier.height(5.dp));Text("Une petite onde,\nun grand déclic.",fontSize=23.sp,lineHeight=27.sp,fontWeight=FontWeight.ExtraBold);Spacer(Modifier.height(5.dp));Text("${p.todayXp} / ${p.dailyGoal} XP aujourd'hui",fontSize=13.sp,color=Muted)}
-                    Pico(Modifier.size(94.dp),mood=if(p.todayXp>=p.dailyGoal)MascotMood.CELEBRATE else if(p.streak>0)MascotMood.HAPPY else MascotMood.DETERMINED,pose=if(p.todayXp>=p.dailyGoal)MascotPose.DANCE else MascotPose.WAVE)
-                }
-                LinearProgressIndicator(progress={ (p.todayXp.toFloat()/p.dailyGoal).coerceIn(0f,1f) },modifier=Modifier.fillMaxWidth().height(8.dp),color=Teal,trackColor=Color.White)
-                Action(if(next==null)"Parcours terminé · refaire un défi" else "Continuer · ${next.title}") {
-                    if(next!=null)model.startLesson(next) else model.route="practice"
-                }
-            }
-        }
-        if(due.isNotEmpty()) item {
-            Surface(onClick=feedbackClick {if(due.isNotEmpty())model.startQuestions("Les ondes reviennent",due.take(12)) else model.route="resources"},shape=RoundedCornerShape(20.dp),color=Color(0xFFFFEDDC)) {
-                Row(Modifier.fillMaxWidth().padding(18.dp),verticalAlignment=Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.Refresh,"Réviser",tint=Color(0xFFB76D36));Spacer(Modifier.width(14.dp))
-                    Column(Modifier.weight(1f)) {Text(if(due.isEmpty())"Ta mémoire prend de l'avance" else "${due.size} notions à revoir",fontWeight=FontWeight.Bold);Text(if(due.isEmpty())"Découvre les fiches mémo" else "Une révision au bon moment, ça reste.",fontSize=12.sp,color=Muted)}
-                    Icon(Icons.Rounded.ChevronRight,null)
-                }
-            }
-        }
-        item {BigTitle("Ton voyage radio","${completed.size} / ${content.lessons.size} leçons · à ton rythme")}
-        items(content.chapters.size) { index ->
-            val c=content.chapters[index];val color=ChapterColors[index%ChapterColors.size]
-            val finished=c.lessons.count {it.id in completed}
-            Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
-                Surface(onClick=feedbackClick {expanded=if(expanded==index)-1 else index},modifier=Modifier.testTag("chapter-${c.id}")
-                    .semantics {stateDescription=if(expanded==index)"Déplié" else "Replié"},shape=RoundedCornerShape(22.dp),color=color) {
-                    Row(Modifier.fillMaxWidth().padding(14.dp),verticalAlignment=Alignment.CenterVertically) {
-                        Text("%02d".format(index+1),Modifier.background(Color.White.copy(alpha=.18f),RoundedCornerShape(14.dp)).padding(12.dp),fontSize=21.sp,fontWeight=FontWeight.ExtraBold,color=Color.White)
-                        val complete=c.lessons.isNotEmpty() && finished==c.lessons.size
-                        Spacer(Modifier.width(14.dp))
-                        Box(Modifier.weight(1f).testTag("chapter-content-${c.id}")) {
-                            Column(Modifier.fillMaxWidth().testTag("chapter-copy-${c.id}")) {
-                                Text(c.title,Modifier.fillMaxWidth(),color=Color.White,fontSize=18.sp,fontWeight=FontWeight.Bold)
-                                Spacer(Modifier.height(2.dp))
-                                Text("${finished}/${c.lessons.size} · ${c.subtitle}",
-                                    Modifier.fillMaxWidth().padding(end=if(complete)52.dp else 0.dp),
-                                    color=Color.White.copy(alpha=.85f),fontSize=12.sp,lineHeight=16.sp)
-                            }
-                            if(complete)Box(Modifier.matchParentSize()) {
-                                ChapterCompletionSticker(c.id,Modifier.align(Alignment.CenterEnd)
-                                    .wrapContentSize(Alignment.CenterEnd,unbounded=true).size(68.dp).offset(x=12.dp))
-                            }
-                        }
-                        Icon(if(expanded==index)Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,null,tint=Color.White)
-                    }
-                }
-                if(expanded==index) c.lessons.forEachIndexed { i,l ->
-                    val done=l.id in completed;val active=l.id==next?.id
-                    Row(Modifier.fillMaxWidth().padding(end=12.dp),verticalAlignment=Alignment.CenterVertically) {
-                        Row(Modifier.weight(1f).padding(start=if(i%2==0)12.dp else 34.dp,end=if(i%2==0)22.dp else 0.dp),verticalAlignment=Alignment.CenterVertically) {
-                        Surface(onClick=feedbackClick {model.startLesson(l)},modifier=Modifier.size(54.dp),shape=CircleShape,color=if(done)color else if(active)Gold else Color.White,shadowElevation=if(active)5.dp else 1.dp) {
-                            Box(contentAlignment=Alignment.Center) {Icon(if(done)Icons.Rounded.Replay else if(active)Icons.Rounded.PlayArrow else Icons.Rounded.RadioButtonUnchecked,l.title,tint=if(done)Color.White else color)}
-                        }
-                        Spacer(Modifier.width(15.dp))
-                        Column(Modifier.weight(1f).testTag("lesson-copy-${l.id}").clickable(interactionSource=remember(l.id){MutableInteractionSource()},indication=null,role=Role.Button,onClick=feedbackClick {model.startLesson(l)}).padding(vertical=13.dp)) {
-                            Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
-                                Text(l.title,Modifier.weight(1f,fill=false),fontWeight=if(active)FontWeight.ExtraBold else FontWeight.Bold,fontSize=15.sp)
-                                if(done)Icon(Icons.Rounded.CheckCircle,"Cours terminé",Modifier.size(17.dp),tint=Teal)
-                            }
-                            Text(l.summary,maxLines=2,overflow=TextOverflow.Ellipsis,fontSize=12.sp,lineHeight=16.sp,color=Muted)
-                        }
-                        }
-                        var menu by remember(l.id) {mutableStateOf(false)}
-                        Box {
-                            IconButton(feedbackClick {menu=true},Modifier.size(40.dp).testTag("lesson-menu-${l.id}")) {Icon(Icons.Rounded.MoreVert,"Options du cours ${l.title}",tint=Muted)}
-                            DropdownMenu(menu,{menu=false}) {DropdownMenuItem(text={Text("Lire le cours")},leadingIcon={Icon(Icons.Rounded.MenuBook,null)},onClick={menu=false;model.previewLesson(l)})}
-                        }
-                    }
-                }
-            }
-        }
-        item {Text("Parcours libre : tu peux explorer une leçon à tout moment. La prochaine étape conseillée reste la même pour tous.",fontSize=12.sp,color=Muted,modifier=Modifier.padding(vertical=8.dp))}
-    }
 }

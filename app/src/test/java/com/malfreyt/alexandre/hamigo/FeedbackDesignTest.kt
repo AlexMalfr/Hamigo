@@ -47,4 +47,15 @@ class FeedbackDesignTest {
         assertEquals(0,pcm.samples.first().toInt());assertEquals(0,pcm.samples.last().toInt())
         assertTrue(MorseSignalAudio.render("").samples.isEmpty())
     }
+    @Test fun aCompleteListeningExchangeIsRenderedThroughItsLastTurn() {
+        val code=List(100){".-"}.joinToString(" ")+" / -.. . / -.-"
+        assertTrue(code.length>240)
+        val pcm=MorseSignalAudio.render(code)
+        assertEquals(code.count {it=='.'||it=='-'},pcm.signalRanges.size)
+        val dot=pcm.rate*MorseSignalAudio.DOT_MS/1000
+        assertEquals(dot*3,pcm.signalRanges.last().count())
+    }
+    @Test(expected=IllegalArgumentException::class) fun excessiveAudioIsRejectedAsAWholeRatherThanSilentlyCut() {
+        MorseSignalAudio.render(List(500){"-----"}.joinToString(" "))
+    }
 }

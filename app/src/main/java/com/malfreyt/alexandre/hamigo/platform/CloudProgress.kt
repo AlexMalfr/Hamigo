@@ -9,10 +9,16 @@ import com.malfreyt.alexandre.hamigo.StreakHistory
 import com.malfreyt.alexandre.hamigo.StudyDayMigration52
 import com.malfreyt.alexandre.hamigo.StudyActivity
 import com.malfreyt.alexandre.hamigo.StudyDay
+import com.malfreyt.alexandre.hamigo.SkillLearning
+import com.malfreyt.alexandre.hamigo.IgnoredLessons
+import com.malfreyt.alexandre.hamigo.SyncedAppSettings
+import com.malfreyt.alexandre.hamigo.ExamHistory
+import com.malfreyt.alexandre.hamigo.LessonCompletionMigration55
 
 /** A mergeable backup: historical totals form a baseline, subsequent attempts are immutable events. */
 object CloudProgress {
     private const val MAX_BYTES = 8 * 1024 * 1024
+    const val MAX_BACKUP_BYTES=MAX_BYTES+SkillLearning.MAX_BYTES
     private const val MAX_EVENTS = 100_000
     private val eventId = Regex("[a-fA-F0-9-]{36}")
     const val MAX_FRIENDS = 30
@@ -185,15 +191,19 @@ object CloudProgress {
         var correct = base.optInt("correct").toLong()
         val awards = linkedMapOf<String, Pair<String, Int>>()
         val historicalAwards=base.optJSONObject("awarded") ?: JSONObject()
+        val legacySkipped=IgnoredLessons.legacyBonusLessons(events)
         events.keys().asSequence().sorted().forEach { id ->
             val event = events.getJSONObject(id)
             answers += event.getInt("answers")
             correct += event.getInt("correct")
             val lesson = event.optString("completed")
-            if (lesson.isNotBlank()) completed += lesson
-            val earned = event.getInt("xp")
-            if (earned > 0 && (lesson.isBlank() || lesson !in strings(base.optJSONArray("completed")))) {
-                val key = if (lesson.isNotBlank()) "lesson:$lesson" else event.optString("awardKey").ifBlank { "event:$id" }
+            if (lesson.isNotBlank()) {
+                completed += lesson
+            }
+            val earned = StudyActivity.rewardXp(event,legacySkipped)
+            val key = if (lesson.isNotBlank()) "lesson:$lesson" else event.optString("awardKey").ifBlank { "event:$id" }
+            val bonusLesson=if(key.startsWith("lesson:"))key.removePrefix("lesson:") else ""
+            if (earned > 0 && (bonusLesson.isBlank() || bonusLesson !in strings(base.optJSONArray("completed")))) {
                 // An award already represented in the current baseline must not be paid twice.
                 val questionId=StudyActivity.questionId(event)
                 if(questionId!=null && historicalAwards.optString(questionId)==event.getString("day")) return@forEach
@@ -213,6 +223,8 @@ object CloudProgress {
             val timeB = b.optLong("updatedAt")
             when { timeA > timeB -> a; timeB > timeA -> b; canonical(a) >= canonical(b) -> a; else -> b }
         }
+        val skillReviews=SkillLearning.mergeJson(left.optJSONObject("skillReviews"),right.optJSONObject("skillReviews"))
+        SkillLearning.validate(skillReviews)
         val awarded = JSONObject()
         listOf(left, right).forEach { side ->
             val entries = side.optJSONObject("awarded") ?: JSONObject()
@@ -226,6 +238,10 @@ object CloudProgress {
             .put("answers", capped(answers)).put("correct", capped(correct))
             .put("dailyXp", days).put("completed", JSONArray(completed.sorted()))
             .put("reviews", reviews).put("awarded", awarded).put("syncBase", base).put("syncEvents", events)
+            .put("skillReviews",skillReviews).put("skillReviewsVersion",SkillLearning.FORMAT_VERSION)
+            .put(LessonCompletionMigration55.FIELD,LessonCompletionMigration55.merged(left,right))
+            .put("examHistory",ExamHistory.mergeJson(left.optJSONObject("examHistory"),right.optJSONObject("examHistory")))
+        if(left.has(IgnoredLessons.FIELD)||right.has(IgnoredLessons.FIELD))state.put(IgnoredLessons.FIELD,IgnoredLessons.merge(left.optJSONObject(IgnoredLessons.FIELD),right.optJSONObject(IgnoredLessons.FIELD)))
         StudyActivity.rebuild(state)
         val profile = newer(local, remote, "profileUpdatedAt", "name")
         val preferences = newer(local, remote, "preferencesUpdatedAt", "preferences")
@@ -235,6 +251,7 @@ object CloudProgress {
             .put("preferences", mergedPreferences)
             .put("preferencesUpdatedAt", preferences.optLong("preferencesUpdatedAt"))
             .put("progress", state)
+        if(local.has(SyncedAppSettings.FIELD)||remote.has(SyncedAppSettings.FIELD))result.put(SyncedAppSettings.FIELD,SyncedAppSettings.merge(local.optJSONObject(SyncedAppSettings.FIELD),remote.optJSONObject(SyncedAppSettings.FIELD)))
         if (local.has("friends") || remote.has("friends")) result.put("friends", mergeFriends(
             local.optJSONObject("friends") ?: JSONObject(), remote.optJSONObject("friends") ?: JSONObject()))
         if (local.has("socialInbox") || remote.has("socialInbox")) result.put("socialInbox", FriendInboxState.merge(
@@ -245,7 +262,8 @@ object CloudProgress {
     fun validate(json: String): String = checked(json).toString()
 
     private fun checked(json: String): JSONObject {
-        require(json.toByteArray(Charsets.UTF_8).size <= MAX_BYTES) { "Sauvegarde GitHub trop volumineuse." }
+        val totalBytes=json.toByteArray(Charsets.UTF_8).size
+        require(totalBytes <= MAX_BACKUP_BYTES) { "Sauvegarde GitHub trop volumineuse." }
         val wrapper = JSONObject(json)
         require(wrapper.optString("app") == "hamigo" && wrapper.optInt("schema") == 2) { "Ce Gist n'est pas une sauvegarde Hamigo actuelle." }
         val name = wrapper.opt("name")
@@ -256,11 +274,17 @@ object CloudProgress {
         }
         if(wrapper.has("socialInbox")) FriendInboxState.validate(wrapper.getJSONObject("socialInbox"))
         val state = wrapper.getJSONObject("progress")
+        val skillBytes=state.optJSONObject("skillReviews")?.toString()?.toByteArray(Charsets.UTF_8)?.size ?: 0
+        // The pre-existing backup/XP budget remains 8 MiB; the new bounded skill section has its own budget.
+        require(totalBytes-skillBytes<=MAX_BYTES) {"Sauvegarde GitHub trop volumineuse hors compétences."}
         require(state.opt("syncBase") is JSONObject && state.opt("syncEvents") is JSONObject) { "Ancien format de progression non pris en charge." }
+        if(wrapper.has(SyncedAppSettings.FIELD))SyncedAppSettings.validate(wrapper.getJSONObject(SyncedAppSettings.FIELD))
+        if(state.has(IgnoredLessons.FIELD))IgnoredLessons.validate(state.getJSONObject(IgnoredLessons.FIELD))
         checkCollectionTypes(state)
         checkCounters(state)
         checkDays(state.optJSONObject("dailyXp") ?: JSONObject())
         checkCompleted(state.optJSONArray("completed"))
+        LessonCompletionMigration55.capture(state)
         val base = state.optJSONObject("syncBase")
         if (base != null) {
             checkCollectionTypes(base); checkCounters(base); checkDays(base.optJSONObject("dailyXp") ?: JSONObject())
@@ -287,6 +311,11 @@ object CloudProgress {
             require(review.getLong("due") >= 0 && review.optLong("updatedAt") >= 0)
             int(review, "repetitions"); int(review, "lapses")
         }
+        if(state.has("skillReviewsVersion"))require(int(state,"skillReviewsVersion") in 1..SkillLearning.FORMAT_VERSION) {"Version des compétences non reconnue."}
+        SkillLearning.validate(state.optJSONObject("skillReviews") ?: JSONObject())
+        SkillLearning.normalize(state)
+        if(state.has("skillReviews"))state.put("skillReviews",SkillLearning.mergeJson(state.getJSONObject("skillReviews"),null))
+        ExamHistory.validate(state.optJSONObject("examHistory") ?: JSONObject())
         checkAwarded(state.optJSONObject("awarded") ?: JSONObject())
         require(wrapper.optLong("profileUpdatedAt") >= 0 && wrapper.optLong("preferencesUpdatedAt") >= 0)
         require(!wrapper.has("preferences") || wrapper.opt("preferences") is JSONObject) { "Paramètres de sauvegarde invalides." }
@@ -301,6 +330,7 @@ object CloudProgress {
         if (preferences.has("morseSingleKey")) require(preferences.opt("morseSingleKey") is Boolean)
         if (preferences.has("morseThresholdMs")) require(int(preferences,"morseThresholdMs") in 150..600)
         if(state.has("questionIdsVersion"))require(int(state,"questionIdsVersion")==1) {"Version des identifiants de questions non reconnue."}
+        IgnoredLessons.repairLegacyBonuses(state)
         StreakMigration52.apply(state)
         StudyDayMigration52.apply(state)
         return wrapper
@@ -338,7 +368,7 @@ object CloudProgress {
     }
     private fun checkCounters(obj: JSONObject) { listOf("xp", "answers", "correct").forEach { int(obj, it) }; require(obj.optInt("correct") <= obj.optInt("answers")) }
     private fun checkCollectionTypes(state: JSONObject) {
-        listOf("dailyXp", "reviews", "awarded", "syncBase", "syncEvents").forEach { key ->
+        listOf("dailyXp", "reviews", "skillReviews", "examHistory", "awarded", "syncBase", "syncEvents").forEach { key ->
             require(!state.has(key) || state.opt(key) is JSONObject) { "État de sauvegarde $key invalide." }
         }
         require(!state.has("completed") || state.opt("completed") is JSONArray) { "Leçons de sauvegarde invalides." }

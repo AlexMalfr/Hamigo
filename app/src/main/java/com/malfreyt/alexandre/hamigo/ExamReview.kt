@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,23 +38,26 @@ fun examDuration(milliseconds:Long):String {
 
 @Composable fun ExamIntroduction(model:AppModel,s:Session) {
     val technique=s.examPart==1
-    Column(Modifier.fillMaxSize().padding(22.dp),horizontalAlignment=Alignment.CenterHorizontally,
-        verticalArrangement=Arrangement.Center) {
-        Eyebrow("ÉPREUVE ${s.examPart+1} / 2",if(technique)Teal else Purple)
-        Spacer(Modifier.height(18.dp))
-        Pico(Modifier.size(174.dp),mood=if(technique)MascotMood.DETERMINED else MascotMood.HAPPY,pose=if(technique)MascotPose.POINT else MascotPose.WAVE)
-        Spacer(Modifier.height(10.dp))
-        Surface(color=Color.White,shape=RoundedCornerShape(22.dp),border=BorderStroke(1.dp,Mist)) {
-            Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
-                Text(if(technique)"On branche la technique !" else "Prêt à ouvrir la fréquence ?",fontSize=22.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
-                Text(if(technique)"Une nouvelle épreuve, un nouveau départ. Respire, prends ton temps et vérifie tes calculs." else "Lis bien chaque question. Tu pourras revenir sur tes réponses avant de finaliser cette épreuve.",fontSize=15.sp,lineHeight=22.sp,color=Muted)
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+        val viewportHeight=maxHeight
+        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min=viewportHeight).padding(22.dp).testTag("exam-introduction-scroll"),horizontalAlignment=Alignment.CenterHorizontally,
+            verticalArrangement=Arrangement.Center) {
+            Eyebrow("ÉPREUVE ${s.examPart+1} / 2",if(technique)Teal else Purple)
+            Spacer(Modifier.height(18.dp))
+            Pico(Modifier.size(174.dp),mood=if(technique)MascotMood.DETERMINED else MascotMood.HAPPY,pose=if(technique)MascotPose.POINT else MascotPose.WAVE)
+            Spacer(Modifier.height(10.dp))
+            Surface(color=Color.White,shape=RoundedCornerShape(22.dp),border=BorderStroke(1.dp,Mist)) {
+                Column(Modifier.padding(18.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
+                    Text(if(technique)"On branche la technique !" else "Prêt à ouvrir la fréquence ?",fontSize=22.sp,fontWeight=FontWeight.ExtraBold,color=Ink)
+                    Text(if(technique)"Une nouvelle épreuve, un nouveau départ. Respire, prends ton temps et vérifie tes calculs." else "Lis bien chaque question. Tu pourras revenir sur tes réponses avant de finaliser cette épreuve.",fontSize=15.sp,lineHeight=22.sp,color=Muted)
+                }
             }
+            Spacer(Modifier.height(18.dp))
+            Text(s.examPartLabel,fontSize=26.sp,fontWeight=FontWeight.ExtraBold,color=if(technique)Teal else Purple)
+            Text("${s.examPartEnd-s.examPartStart} questions · ${s.examMinutes} minutes · objectif 10/20",fontSize=14.sp,color=Muted,modifier=Modifier.padding(top=5.dp,bottom=20.dp))
+            Action("Commencer ${if(technique)"la technique" else "la réglementation"}"){model.beginExamPart()}
+            TextButton(feedbackClick {model.leaveSession();model.route="practice"}) {Text("Revenir aux défis")}
         }
-        Spacer(Modifier.height(18.dp))
-        Text(s.examPartLabel,fontSize=26.sp,fontWeight=FontWeight.ExtraBold,color=if(technique)Teal else Purple)
-        Text("${s.examPartEnd-s.examPartStart} questions · ${s.examMinutes} minutes · objectif 10/20",fontSize=14.sp,color=Muted,modifier=Modifier.padding(top=5.dp,bottom=20.dp))
-        Action("Commencer ${if(technique)"la technique" else "la réglementation"}"){model.beginExamPart()}
-        TextButton(feedbackClick {model.leaveSession();model.route="practice"}) {Text("Revenir aux défis")}
     }
 }
 

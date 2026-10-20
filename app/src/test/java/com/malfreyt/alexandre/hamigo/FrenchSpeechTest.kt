@@ -4,6 +4,23 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class FrenchSpeechTest {
+    @Test fun emissionCodesCallsignsAndSuffixesDoNotStealUnitsOrMathematicalDivisions() {
+        val emissions=FrenchSpeech.prepare("A1A, A3E, J3E, F3E")
+        assertFalse(emissions.contains("ampère"))
+        assertTrue(emissions.contains("un"));assertTrue(emissions.contains("trois"))
+        val units=FrenchSpeech.prepare("1 A, 1 mA, 1 µA")
+        listOf("ampère","milliampère","microampère").forEach {assertTrue(units,units.contains(it))}
+        val calls=FrenchSpeech.prepare("D4C et F4ABC/P")
+        assertTrue(calls,calls.contains("barre oblique"));assertFalse(calls.contains("divisé"))
+        val suffixes=FrenchSpeech.prepare("/P, /M et /MM")
+        assertFalse(suffixes,suffixes.contains("divisé"))
+        assertEquals(3,Regex("barre oblique").findAll(suffixes).count())
+        for(formula in listOf("U/P","U /P","P/MM","P / MM")) {
+            val speech=FrenchSpeech.prepare(formula)
+            assertTrue("$formula : $speech",speech.contains("divisé"))
+            assertFalse(speech.contains("barre oblique"))
+        }
+    }
     @Test fun qUsesTheNativeFrenchLetterNameInsteadOfTheAmbiguousKuSpelling() {
         assertEquals("Q",FrenchSpeech.prepare(FrenchSpeech.option("Q")))
         assertEquals("La lettre Q.",FrenchSpeech.prepare("La lettre Q."))

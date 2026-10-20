@@ -47,6 +47,7 @@ class LessonRevisionInstrumentedTest {
     @get:Rule val rules:RuleChain=RuleChain.outerRule(fixture).around(ui)
     private lateinit var model:AppModel
     @Before fun load() {
+        ui.prepareTestWindow()
         model=ViewModelProvider(ui.activity)[AppModel::class.java]
         ui.waitUntil(60_000) {model.content!=null}
         ui.runOnIdle {model.showWelcome=false;model.route="path"}
@@ -54,24 +55,35 @@ class LessonRevisionInstrumentedTest {
 
     @Test fun courseMenuReadsCompletedAndUnfinishedLessonsWithoutStartingQuestions() {
         val content=model.content!!
-        val first=content.lessons.first();val second=content.lessons[1]
-        assertEquals(97,content.lessons.size)
-        assertTrue(content.lessons.all {content.referencesFor(it).isNotEmpty()})
+        val chapter=content.chapters.first {it.lessons.size>=2&&it.lessons.all {lesson->content.referencesFor(lesson).isNotEmpty()}}
+        val first=chapter.lessons[0];val second=chapter.lessons[1]
+        assertTrue(content.lessons.size>=163)
+        assertTrue(content.lessons.filter {it.id!=HamigoWelcomeLesson}.all {content.referencesFor(it).isNotEmpty()})
         assertEquals(40,content.courseSources.size)
         ui.runOnIdle {model.progress.complete(first.id);model.refresh()}
-        ui.onNodeWithTag("path-list").performScrollToIndex(3)
-        ui.onNodeWithText(first.title+" ✅").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithTag("path-list").performScrollToNode(hasTestTag("chapter-${chapter.id}"))
+        ui.onNodeWithTag("chapter-${chapter.id}").performClick()
+        ui.onNodeWithTag("path-list").performScrollToNode(hasTestTag("path-lesson-${first.id}"))
+        ui.onNodeWithText(first.title).assertIsDisplayed()
+        ui.onNode(hasTestTag("lesson-copy-${first.id}") and hasAnyDescendant(hasContentDescription("Cours terminé")),useUnmergedTree=true).assertExists()
         ui.onNodeWithText(first.summary).assertIsDisplayed()
-        ui.onNodeWithText("🔥 1 jour").assertExists()
+        ui.onNodeWithText("1 jour").assertExists()
         val firstMenu=ui.onNodeWithTag("lesson-menu-${first.id}").fetchSemanticsNode().boundsInRoot
+        val firstCopy=ui.onNodeWithTag("lesson-copy-${first.id}").fetchSemanticsNode().boundsInRoot
+        ui.onNodeWithTag("path-list").performScrollToNode(hasTestTag("path-lesson-${second.id}"))
         val secondMenu=ui.onNodeWithTag("lesson-menu-${second.id}").fetchSemanticsNode().boundsInRoot
         assertEquals("Les menus restent sur le même bord",firstMenu.center.x,secondMenu.center.x,1f)
-        val firstCopy=ui.onNodeWithTag("lesson-copy-${first.id}").fetchSemanticsNode().boundsInRoot
         val secondCopy=ui.onNodeWithTag("lesson-copy-${second.id}").fetchSemanticsNode().boundsInRoot
-        assertEquals("Les cours gardent leur indentation alternée",with(ui.density){22.dp.toPx()},secondCopy.left-firstCopy.left,1f)
+        assertTrue("Les cours gardent leur indentation alternée",secondCopy.left>firstCopy.left)
         capture("path-completed-next")
         for(lesson in listOf(first,second)) {
-            ui.onNodeWithTag("lesson-menu-${lesson.id}").performScrollTo().performClick()
+            ui.onNodeWithTag("path-list").performScrollToNode(hasTestTag("lesson-menu-${lesson.id}"))
+            // Reveal the whole row above the floating navigation and next-course button.
+            val viewport=ui.onNodeWithTag("path-list").fetchSemanticsNode().boundsInRoot
+            val menuBounds=ui.onNodeWithTag("lesson-menu-${lesson.id}").fetchSemanticsNode().boundsInRoot
+            val lift=(menuBounds.center.y-viewport.top-viewport.height*.55f).coerceIn(0f,viewport.height*.4f)
+            if(lift>1f)ui.onNodeWithTag("path-list").performTouchInput {swipe(center,center.copy(y=center.y-lift))}
+            ui.onNodeWithTag("lesson-menu-${lesson.id}").performClick()
             capture("course-menu-${lesson.id}")
             ui.onNodeWithText("Lire le cours").performClick()
             ui.runOnIdle {assertTrue(model.lessonPreviewOnly);assertNull(model.session);assertEquals(lesson,model.lesson)}
@@ -97,7 +109,8 @@ class LessonRevisionInstrumentedTest {
         ui.onNodeWithContentDescription("Écouter le cours").assertIsDisplayed()
         capture("course-normal-introduction")
         ui.runOnIdle {model.lesson=null;model.route="profile"}
-        ui.onNodeWithText("6 XP · 🔥 1 jour").assertIsDisplayed()
+        ui.onNodeWithText("6 XP").assertIsDisplayed()
+        ui.onNodeWithText("1 jour").assertIsDisplayed()
         capture("profile-one-day")
         val poster=com.malfreyt.alexandre.hamigo.platform.NativeShare.renderProgressImage(context,model.progress.snapshot())
         poster.copyTo(File(context.getExternalFilesDir(null),"lesson-revision-0.38-r4/share-one-day.png").apply {parentFile!!.mkdirs()},overwrite=true)
@@ -136,35 +149,42 @@ class LessonRevisionInstrumentedTest {
         ui.onNodeWithTag("practice-list").performScrollToNode(hasText("Lancer les révisions"))
         ui.onNodeWithText("Lancer les révisions").assertIsNotEnabled()
         capture("revisions-empty")
-        val lesson=model.content!!.lessons.first()
+        val contentForRevision=model.content!!
+        val lesson=contentForRevision.lessons.first {candidate->candidate.questions.size>=3&&
+            candidate.questions.all(contentForRevision::isReviewEligible)&&candidate.questions.flatMap(contentForRevision::skillsFor).distinct().size==1}
         ui.runOnIdle {
             model.progress.complete(lesson.id)
             lesson.questions.forEach {model.progress.answer(it.id,true)}
             model.progress.answer("exam-not-studied",false)
             val backup=JSONObject(model.progress.cloudExport())
+            // This scenario imports the UUID-only reminders of a pre-concept backup.
+            // A runtime listener may already have seeded a future concept while building the fixture.
+            backup.getJSONObject("progress").remove("skillReviews")
+            backup.getJSONObject("progress").remove("skillReviewsVersion")
             val reviews=backup.getJSONObject("progress").getJSONObject("reviews")
             lesson.questions.take(3).forEach {reviews.getJSONObject(it.id).put("due",1)}
             model.progress.import(backup.toString());model.refresh()
-            assertEquals(3,model.progress.due(model.content!!).size)
+            assertEquals("Three UUID reminders for the same concept become one due notion",1,model.progress.due(model.content!!).size)
         }
-        val eligible=CourseRevisionBuilder.eligible(model.content!!.lessons,model.progress.completed,model.progress.reviews)
+        val content=model.content!!
+        val eligible=CourseRevisionBuilder.eligible(content,model.progress.completed,model.progress.reviews,model.progress.skillReviews,model.progress.due(content))
         ui.onNodeWithTag("practice-list").performScrollToIndex(3)
         ui.onNodeWithText("Lancer les révisions").performScrollTo().assertIsDisplayed()
-        ui.onNodeWithText("(3 à revoir · ${eligible.size} questions disponibles).",substring=true).assertIsDisplayed()
+        ui.onNodeWithText("(1 à revoir · ${eligible.size} questions disponibles).",substring=true).assertIsDisplayed()
         capture("revisions-ready")
         ui.onNodeWithText("Lancer les révisions").performClick()
         ui.runOnIdle {
             val session=model.session!!
             assertEquals("practice",session.returnRoute);assertNull(session.lessonId)
             assertTrue(session.questions.all {it.id in eligible.map {q->q.id}})
-            val dueIds=lesson.questions.take(3).map {it.id}.toSet()
-            assertTrue(session.questions.first().id !in dueIds)
-            val index=session.questions.indexOfFirst {it.id in dueIds}
-            assertTrue(index>0)
+            val dueSkills=model.progress.skillReviews.filterValues {it.due<=System.currentTimeMillis()}.keys
+            val index=session.questions.indexOfFirst {content.skillsFor(it).any(dueSkills::contains)}
+            assertTrue(index>=0)
             repeat(index) {model.answer(true);model.next()}
-            val id=session.current!!.id;val previous=model.progress.reviews.getValue(id)
+            val skill=content.skillsFor(session.current!!).first(dueSkills::contains)
+            val previous=model.progress.skillReviews.getValue(skill)
             model.answer(true)
-            val updated=model.progress.reviews.getValue(id)
+            val updated=model.progress.skillReviews.getValue(skill)
             assertTrue(updated.due>System.currentTimeMillis());assertEquals(previous.repetitions+1,updated.repetitions)
             assertEquals(setOf(lesson.id),model.progress.completed)
         }

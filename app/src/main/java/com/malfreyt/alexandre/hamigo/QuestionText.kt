@@ -37,7 +37,8 @@ internal val LocalQuestionTextHeight=compositionLocalOf {Dp.Unspecified}
 
 @Composable internal fun QuestionText(text:String,towardsLeft:Boolean) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
-        val font=questionTextSize(AnnotatedString(text),constraints.maxWidth)
+        val prose=remember(text){formattedProse(text)}
+        val font=questionTextSize(prose.text,constraints.maxWidth,prose.placeholders)
         FormulaAwareQuestion(text,Modifier.fillMaxWidth(),fontSize=font,towardsLeft=towardsLeft)
     }
 }

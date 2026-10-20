@@ -1,110 +1,54 @@
 {
   "schema": 1,
   "lessonReferences": {
+    "l-hamigo-bienvenue": [],
     "c01-l01": [
       "radio-regulations"
     ],
     "c01-l02": [
       "exam-rules"
     ],
-    "c01-l03": [
-      "callsigns"
+    "l-examen-inscription": [
+      "exam-rules"
     ],
-    "c01-l04": [
-      "bands",
-      "itu-regions"
+    "l-math-decimaux": [
+      "math-basics"
     ],
-    "c02-l01": [
-      "nato"
+    "l-math-rapports": [
+      "math-basics"
     ],
-    "c02-l02": [
-      "qcodes"
-    ],
-    "c02-l03": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c02-l04": [
-      "operating-rules",
-      "reports",
-      "abbreviations"
-    ],
-    "c15-l01": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l02": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l03": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l04": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l05": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l06": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l07": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l08": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l09": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l10": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l11": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l12": [
-      "morse",
-      "morse-rhythm",
-      "callsigns"
-    ],
-    "c15-l13": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c15-l14": [
-      "morse",
-      "morse-rhythm"
-    ],
-    "c16-l01": [
-      "prefixes",
-      "units"
-    ],
-    "c16-l02": [
-      "math-basics",
-      "formulas"
+    "l-math-formules": [
+      "math-basics"
     ],
     "c16-l03": [
       "math-basics",
       "formulas"
     ],
-    "c16-l04": [
-      "ac-circuits",
-      "measurements"
+    "c16-l01": [
+      "prefixes",
+      "units"
     ],
     "c03-l01": [
       "units",
       "prefixes"
+    ],
+    "l-radio-ondes": [
+      "propagation",
+      "modulations"
+    ],
+    "c01-l03": [
+      "callsigns"
+    ],
+    "l-nato-premiers": [
+      "nato"
+    ],
+    "l-circuit-ferme": [
+      "dc-circuits",
+      "station-safety"
+    ],
+    "l-tension-deux-points": [
+      "dc-circuits",
+      "measurements"
     ],
     "c03-l02": [
       "dc-circuits"
@@ -116,6 +60,22 @@
     "c03-l04": [
       "dc-circuits",
       "formulas"
+    ],
+    "l-energie-duree": [
+      "dc-circuits",
+      "units"
+    ],
+    "c16-l02": [
+      "math-basics",
+      "formulas"
+    ],
+    "c15-l01": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l09": [
+      "morse",
+      "morse-rhythm"
     ],
     "c04-l01": [
       "dc-circuits",
@@ -135,15 +95,21 @@
     "c05-l01": [
       "resistors"
     ],
-    "c05-l02": [
-      "ac-circuits"
+    "l-fils-materiaux": [
+      "dc-circuits",
+      "materials",
+      "math-basics"
     ],
-    "c05-l03": [
-      "ac-circuits"
+    "l-voltemetre-amperemetre": [
+      "measurements"
     ],
-    "c05-l04": [
-      "ac-circuits",
-      "formulas"
+    "l-morse-rappel-etim": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-mots-etim": [
+      "morse",
+      "morse-rhythm"
     ],
     "c06-l01": [
       "ac-circuits",
@@ -153,27 +119,43 @@
       "ac-circuits",
       "formulas"
     ],
+    "l-rms-sans-confusion": [
+      "ac-circuits",
+      "measurements"
+    ],
     "c06-l03": [
       "ac-circuits"
     ],
-    "c06-l04": [
+    "c16-l04": [
+      "ac-circuits",
+      "measurements"
+    ],
+    "l-nato-milieu": [
+      "nato"
+    ],
+    "c05-l02": [
+      "ac-circuits"
+    ],
+    "l-condensateur-polarite": [
+      "ac-circuits",
+      "station-safety"
+    ],
+    "c05-l03": [
+      "ac-circuits"
+    ],
+    "l-bobine-coupure": [
+      "ac-circuits",
+      "measurements"
+    ],
+    "c05-l04": [
       "ac-circuits",
       "formulas"
     ],
-    "c07-l01": [
-      "filters",
-      "ac-circuits"
-    ],
-    "c07-l02": [
-      "filters"
-    ],
-    "c07-l03": [
-      "transformers-batteries"
-    ],
-    "c07-l04": [
-      "decibels"
-    ],
     "c17-l01": [
+      "ac-circuits",
+      "formulas"
+    ],
+    "c06-l04": [
       "ac-circuits",
       "formulas"
     ],
@@ -185,11 +167,72 @@
       "ac-circuits",
       "math-basics"
     ],
+    "l-decibels-reperes": [
+      "decibels"
+    ],
+    "c07-l04": [
+      "decibels"
+    ],
+    "l-signal-dbm": [
+      "decibels",
+      "radio-blocks"
+    ],
+    "c07-l01": [
+      "filters",
+      "ac-circuits"
+    ],
+    "l-filtre-coupure": [
+      "filters",
+      "decibels"
+    ],
+    "c07-l02": [
+      "filters"
+    ],
     "c17-l04": [
       "filters"
     ],
+    "c07-l03": [
+      "transformers-batteries"
+    ],
+    "l-pile-resistance-interne": [
+      "transformers-batteries"
+    ],
+    "c02-l03": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l02": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-nato-fin": [
+      "nato"
+    ],
+    "c02-l01": [
+      "nato"
+    ],
+    "l-nato-groupes": [
+      "nato",
+      "callsigns"
+    ],
+    "l-diode-sens": [
+      "diodes-power",
+      "dc-circuits"
+    ],
     "c08-l01": [
       "diodes-power"
+    ],
+    "l-alimentation-etages": [
+      "diodes-power",
+      "transformers-batteries"
+    ],
+    "l-morse-rappel-anso": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-mots-anso": [
+      "morse",
+      "morse-rhythm"
     ],
     "c08-l02": [
       "transistors-tubes"
@@ -197,9 +240,25 @@
     "c08-l03": [
       "amplifiers-oscillators"
     ],
-    "c08-l04": [
+    "l-classes-amplification": [
       "amplifiers-oscillators",
-      "binary-logic"
+      "modulations"
+    ],
+    "l-aop-entrees": [
+      "logic-digital"
+    ],
+    "l-aop-montages": [
+      "logic-digital"
+    ],
+    "c08-l04": [
+      "amplifiers-oscillators"
+    ],
+    "l-quartz-pll": [
+      "amplifiers-oscillators"
+    ],
+    "l-tubes-reperes": [
+      "transistors-tubes",
+      "station-safety"
     ],
     "c09-l01": [
       "modulations",
@@ -214,33 +273,8 @@
       "emissions",
       "morse"
     ],
-    "c09-l04": [
-      "digital-signals",
-      "modulations",
-      "emissions"
-    ],
-    "c20-l01": [
-      "binary-logic"
-    ],
-    "c22-l02": [
-      "binary-logic"
-    ],
-    "c22-l03": [
-      "binary-logic"
-    ],
-    "c22-l04": [
-      "binary-logic"
-    ],
-    "c20-l02": [
-      "digital-signals",
-      "modulations"
-    ],
-    "c20-l03": [
-      "digital-signals"
-    ],
-    "c20-l04": [
-      "digital-signals",
-      "binary-logic"
+    "l-recepteur-etapes": [
+      "radio-blocks"
     ],
     "c10-l01": [
       "radio-blocks",
@@ -250,12 +284,9 @@
       "radio-blocks",
       "amplifiers-oscillators"
     ],
-    "c10-l03": [
+    "l-image-reception": [
       "radio-blocks",
-      "emc-noise"
-    ],
-    "c10-l04": [
-      "measurements"
+      "filters"
     ],
     "c18-l01": [
       "amplifiers-oscillators",
@@ -269,10 +300,57 @@
       "amplifiers-oscillators",
       "emc-noise"
     ],
+    "c10-l03": [
+      "radio-blocks",
+      "emc-noise"
+    ],
+    "l-bruit-largeur": [
+      "emc-noise",
+      "radio-blocks"
+    ],
     "c18-l04": [
       "decibels",
       "radio-blocks",
       "emc-noise"
+    ],
+    "c20-l01": [
+      "binary-logic"
+    ],
+    "c22-l02": [
+      "binary-logic"
+    ],
+    "c22-l03": [
+      "binary-logic"
+    ],
+    "c22-l04": [
+      "binary-logic"
+    ],
+    "c09-l04": [
+      "digital-signals",
+      "modulations",
+      "emissions"
+    ],
+    "c20-l02": [
+      "digital-signals",
+      "modulations"
+    ],
+    "c20-l03": [
+      "digital-signals"
+    ],
+    "c20-l04": [
+      "digital-signals",
+      "binary-logic"
+    ],
+    "c01-l04": [
+      "bands",
+      "itu-regions"
+    ],
+    "l-band-plans": [
+      "bands",
+      "itu-regions"
+    ],
+    "c02-l02": [
+      "qcodes"
     ],
     "c11-l01": [
       "antennas",
@@ -301,9 +379,8 @@
       "transmission-lines",
       "decibels"
     ],
-    "c19-l04": [
-      "transmission-lines",
-      "measurements"
+    "l-logique-commandes": [
+      "binary-logic"
     ],
     "c12-l01": [
       "propagation"
@@ -323,6 +400,10 @@
       "propagation",
       "emissions"
     ],
+    "c15-l03": [
+      "morse",
+      "morse-rhythm"
+    ],
     "c13-l01": [
       "station-safety",
       "diodes-power"
@@ -334,27 +415,58 @@
     "c13-l03": [
       "emc-noise"
     ],
+    "l-emission-puissances": [
+      "transmitter-limits",
+      "antennas",
+      "emc-noise"
+    ],
+    "l-morse-rappel-durk": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-mots-durk": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-identification-carnet": [
+      "operating-rules",
+      "callsigns"
+    ],
     "c13-l04": [
       "operating-rules",
       "callsigns"
     ],
+    "l-cept-voyage": [
+      "callsigns",
+      "operating-rules"
+    ],
+    "l-installation-droits": [
+      "station-safety",
+      "operating-rules"
+    ],
+    "l-emissions-designation": [
+      "emissions",
+      "modulations"
+    ],
+    "l-messages-amateur": [
+      "radio-regulations",
+      "operating-rules"
+    ],
+    "l-controle-responsabilite": [
+      "operating-rules",
+      "radio-regulations"
+    ],
     "c21-l01": [
       "reports"
-    ],
-    "c21-l02": [
-      "measurements",
-      "station-safety",
-      "emc-noise"
     ],
     "c21-l03": [
       "transmitter-limits",
       "emc-noise",
       "modulations"
     ],
-    "c21-l04": [
-      "operating-rules",
-      "qcodes",
-      "reports"
+    "l-synthese-calculs": [
+      "formulas",
+      "math-basics"
     ],
     "c14-l01": [
       "radio-regulations",
@@ -368,6 +480,10 @@
       "antennas",
       "radio-blocks"
     ],
+    "l-examen-materiel": [
+      "exam-rules",
+      "math-basics"
+    ],
     "c14-l03": [
       "exam-rules",
       "math-basics"
@@ -377,6 +493,180 @@
       "antennas",
       "bands",
       "operating-rules"
+    ],
+    "c02-l04": [
+      "operating-rules",
+      "reports",
+      "abbreviations"
+    ],
+    "c15-l04": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c10-l04": [
+      "measurements"
+    ],
+    "c19-l04": [
+      "transmission-lines",
+      "measurements"
+    ],
+    "c21-l02": [
+      "measurements",
+      "station-safety",
+      "emc-noise"
+    ],
+    "c21-l04": [
+      "operating-rules",
+      "qcodes",
+      "reports"
+    ],
+    "l-morse-rappel-gwbv": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l05": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-dipole-projet": [
+      "antennas",
+      "transmission-lines",
+      "station-safety"
+    ],
+    "l-antenne-mesures": [
+      "antennas",
+      "measurements"
+    ],
+    "l-morse-rappel-flpj": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-mots-longs": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-portable-energie": [
+      "transformers-batteries",
+      "station-safety"
+    ],
+    "l-pota-decouverte": [
+      "operating-rules",
+      "station-safety"
+    ],
+    "l-pota-contacts": [
+      "operating-rules"
+    ],
+    "l-sota-sommets": [
+      "station-safety",
+      "operating-rules"
+    ],
+    "l-iss-passage": [
+      "propagation",
+      "antennas"
+    ],
+    "l-satellite-monte-descente": [
+      "propagation",
+      "radio-blocks"
+    ],
+    "c15-l06": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l13": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-sdr-premiers": [
+      "radio-blocks",
+      "digital-signals"
+    ],
+    "l-cascade-spectre": [
+      "radio-blocks",
+      "modulations"
+    ],
+    "l-morse-rappel-cqxyzh": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l07": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-sstv-image-son": [
+      "modulations",
+      "digital-signals"
+    ],
+    "l-sstv-reception": [
+      "radio-blocks",
+      "measurements"
+    ],
+    "l-morse-rappel-12345": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l08": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-aprs-paquets": [
+      "digital-signals",
+      "operating-rules"
+    ],
+    "l-numerique-faibles-signaux": [
+      "digital-signals",
+      "modulations"
+    ],
+    "l-morse-rappel-67890": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-chiffres-groupes": [
+      "morse",
+      "reports"
+    ],
+    "c15-l10": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l11": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "c15-l12": [
+      "morse",
+      "morse-rhythm",
+      "callsigns"
+    ],
+    "l-morse-vers-epellation": [
+      "morse",
+      "nato"
+    ],
+    "c15-l14": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-automatisme-controle": [
+      "operating-rules",
+      "emc-noise"
+    ],
+    "l-projet-experience": [
+      "measurements",
+      "station-safety"
+    ],
+    "l-morse-rappel-ponctuation": [
+      "morse",
+      "morse-rhythm"
+    ],
+    "l-morse-qso-appel": [
+      "morse",
+      "qcodes",
+      "abbreviations",
+      "operating-rules"
+    ],
+    "l-morse-qso-comprendre": [
+      "morse",
+      "reports",
+      "qcodes"
     ]
   },
   "courseSources": {

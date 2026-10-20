@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,6 +41,7 @@ enum class QuestionAnswerPlacement(val alignment: Alignment.Vertical) {
 // Also used by the isolated comparative boards; no player setting or persisted preference.
 internal val LocalQuestionAnswerPlacement=compositionLocalOf {QuestionAnswerPlacement.TOP}
 internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compose.ui.unit.Dp.Unspecified}
+internal val LocalQuestionInputMaximumHeight=compositionLocalOf {androidx.compose.ui.unit.Dp.Unspecified}
 
 /** Window structure is independent of the keyboard; resizing the app window can still change it. */
 @Composable internal fun questionToolsHorizontal():Boolean {
@@ -48,42 +50,61 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
     return window.height>0 && height<600.dp
 }
 
+/** Keep the original right-hand tool row clear without shifting it or shrinking its targets. */
+@Composable internal fun spokenControlsBottomMargin():androidx.compose.ui.unit.Dp {
+    val width=with(LocalDensity.current){LocalWindowInfo.current.containerSize.width.toDp()}
+    return if(questionToolsHorizontal()&&width<380.dp)80.dp else 40.dp
+}
+/** The waveform and the larger microphone are part of the occupied area too. */
+@Composable internal fun spokenControlsHeight()=if(questionToolsHorizontal())128.dp else 168.dp
+
 /** One page scrolls. The prompt can grow beyond its preferred share without clipping its content. */
 @Composable internal fun QuestionStage(modifier:Modifier=Modifier,scroll:ScrollState,
-    compact:Boolean=false,illustrated:Boolean=false,prompt:@Composable ()->Unit,
-    tools:(@Composable ()->Unit)?=null,answers:@Composable ColumnScope.()->Unit) {
+    compact:Boolean=false,illustrated:Boolean=false,answerEndPadding:androidx.compose.ui.unit.Dp=16.dp,promptAttachment:(@Composable ()->Unit)?=null,prompt:@Composable ()->Unit,
+    tools:(@Composable ()->Unit)?=null,bottomControls:(@Composable ()->Unit)?=null,answers:@Composable ColumnScope.()->Unit) {
     val placement=LocalQuestionAnswerPlacement.current
     BoxWithConstraints(modifier.testTag("question-stage")) {
         val viewportHeight=maxHeight
         val horizontalTools=questionToolsHorizontal()
-        val answerClearance=if(tools==null)0.dp else if(horizontalTools)80.dp else 144.dp
+        val controlsBottomMargin=spokenControlsBottomMargin()
+        val speechHeight=spokenControlsHeight()
+        val answerClearance=maxOf(if(tools==null)0.dp else if(horizontalTools)80.dp else 144.dp,
+            if(bottomControls==null)0.dp else controlsBottomMargin+speechHeight+12.dp)
+        val occupiedBottom=maxOf(if(tools==null)0.dp else if(horizontalTools)72.dp else 138.dp,
+            if(bottomControls==null)0.dp else controlsBottomMargin+speechHeight)
+        val inputMaximum=if(compact)(viewportHeight-occupiedBottom-12.dp).coerceAtLeast(64.dp) else androidx.compose.ui.unit.Dp.Unspecified
         val promptHeight=maxHeight*.40f
         Column(Modifier.fillMaxSize().verticalScroll(scroll).testTag("question-answers")) {
             Box(Modifier.fillMaxWidth().heightIn(min=promptHeight).testTag("question-prompt-area")
                 .padding(horizontal=16.dp,vertical=4.dp),contentAlignment=Alignment.Center) {
-                CompositionLocalProvider(LocalQuestionPromptMinimumHeight provides (promptHeight-8.dp).coerceAtLeast(1.dp)) {prompt()}
+                CompositionLocalProvider(LocalQuestionPromptMinimumHeight provides (promptHeight-8.dp).coerceAtLeast(1.dp)) {
+                    Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {prompt();promptAttachment?.invoke()}
+                }
             }
             Column(Modifier.fillMaxWidth().heightIn(min=(viewportHeight-promptHeight).coerceAtLeast(0.dp))
-                .padding(start=16.dp,end=16.dp,top=if(compact)4.dp else 10.dp,bottom=answerClearance+(if(compact)4.dp else 10.dp)).testTag("question-answer-area"),
-                verticalArrangement=Arrangement.spacedBy(if(compact)8.dp else 12.dp,placement.alignment),content=answers)
+                .padding(start=16.dp,end=answerEndPadding,top=if(promptAttachment!=null)24.dp else if(compact)4.dp else 10.dp,bottom=answerClearance+(if(compact)4.dp else 10.dp)).testTag("question-answer-area"),
+                verticalArrangement=Arrangement.spacedBy(if(compact)8.dp else 12.dp,placement.alignment)) {
+                CompositionLocalProvider(LocalQuestionInputMaximumHeight provides inputMaximum) {answers()}
+            }
         }
         if(tools!=null) {
             val toolModifier=Modifier.align(Alignment.BottomEnd).padding(start=16.dp,end=16.dp,bottom=16.dp).testTag("question-tools")
             if(horizontalTools)Row(toolModifier,horizontalArrangement=Arrangement.spacedBy(10.dp),verticalAlignment=Alignment.CenterVertically) {tools()}
             else Column(toolModifier,verticalArrangement=Arrangement.spacedBy(10.dp),horizontalAlignment=Alignment.End) {tools()}
         }
+        if(bottomControls!=null)Box(Modifier.align(Alignment.BottomCenter).padding(bottom=controlsBottomMargin)) {bottomControls()}
     }
 }
 
-@Composable internal fun QuestionPrompt(q:Question,questionKey:String,feedback:Boolean?,stacked:Boolean=false,flashFlipped:Boolean=false,
+@Composable internal fun QuestionPrompt(q:Question,questionKey:String,feedback:Boolean?,stacked:Boolean=false,listening:Boolean=false,flashFlipped:Boolean=false,reservePreferredHeight:Boolean=true,
     spokenOrder:List<String> = initialQuestionOrder(q).map(q.choices::get),
     content:@Composable (Boolean)->Unit) {
     val context=LocalContext.current
     val lifecycle=LocalLifecycleOwner.current.lifecycle
     val speech=remember(context) {LessonSpeech(context,eager=false)}
     val accessibleTap=rememberTouchExploration()
-    val onLeft=remember(questionKey) {Random.nextBoolean()}
-    val expression=remember(questionKey) {listOf(MascotMood.HAPPY,MascotMood.GOOFY,MascotMood.DETERMINED,MascotMood.THINKING).random()}
+    val onLeft=rememberSaveable(questionKey) {Random.nextBoolean()}
+    val expression=rememberSaveable(questionKey) {listOf(MascotMood.HAPPY,MascotMood.GOOFY,MascotMood.DETERMINED,MascotMood.THINKING).random()}
     val flash=q.kind=="flash"
     val companion=rememberPicoCompanion(questionKey,enabled=flash)
     var previousFlip by remember(questionKey) {mutableStateOf(flashFlipped)}
@@ -92,7 +113,7 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
         previousFlip=flashFlipped
     }
     val touch=rememberPicoNarrationTap(questionKey)
-    LaunchedEffect(feedback) {if(feedback!=null)speech.stop()}
+    LaunchedEffect(feedback,listening) {if(feedback!=null||listening)speech.stop()}
     LaunchedEffect(questionKey) {speech.stop()}
     val diagnosticsCovered=LocalDiagnosticsCovered.current
     LaunchedEffect(diagnosticsCovered){if(diagnosticsCovered)speech.stop()}
@@ -106,13 +127,13 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
     val spoken=QuestionNarration.text(q,spokenOrder,flashFlipped)
     val toggleSpeech={speech.toggleText(spoken)}
     LaunchedEffect(flashFlipped){speech.stop()}
-    val mood=if(touch.playful)touch.mood else if(speech.preparing)MascotMood.THINKING else if(reading)MascotMood.HAPPY else if(feedback==true)MascotMood.CELEBRATE else if(feedback==false)MascotMood.THINKING else if(flash)companion.mood else expression
+    val mood=if(listening)MascotMood.LISTENING else if(touch.playful)touch.mood else if(speech.preparing)MascotMood.THINKING else if(reading)MascotMood.HAPPY else if(feedback==true)MascotMood.CELEBRATE else if(feedback==false)MascotMood.THINKING else if(flash)companion.mood else expression
     val textMeasurer=rememberTextMeasurer()
     val textStyle=LocalTextStyle.current
     val density=LocalDensity.current
     val requestedHeight=LocalQuestionPromptMinimumHeight.current
     val narrationModifier=if(q.image==null&&q.kind!="flash")Modifier.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,
-        onClickLabel=if(reading)"Arrêter la lecture" else "Lire la question et les choix") {touch.audio(toggleSpeech)} else Modifier
+        onClickLabel=if(reading)"Arrêter la lecture" else "Lire la question et les choix") {if(accessibleTap)touch.audio(toggleSpeech) else touch.tap(SystemClock.uptimeMillis(),toggleSpeech,speech::stop)} else Modifier
     BoxWithConstraints(Modifier.fillMaxWidth().testTag("question-narration-actions").semantics {
         customActions=listOf(CustomAccessibilityAction(if(reading)"Arrêter la lecture" else "Lire la question et les choix") {touch.audio(toggleSpeech);true})
     }) {
@@ -121,8 +142,9 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
             else if(stacked)(preferredHeight*.40f).coerceIn(76.dp,116.dp) else (preferredHeight*.76f).coerceIn(76.dp,132.dp).coerceAtMost(maxWidth*.31f)
         // Measure with the regular layout first, avoiding a resize/line-wrap feedback loop.
         val regularTextWidth=with(density){(maxWidth-baseMascotSize-10.dp).roundToPx().coerceAtLeast(1)}
-        val regularLines=remember(q.prompt,regularTextWidth,textStyle,textMeasurer) {
-            textMeasurer.measure(AnnotatedString(q.prompt),style=textStyle.copy(fontSize=24.sp,lineHeight=31.68.sp,fontWeight=FontWeight.ExtraBold),
+        val prose=remember(q.prompt){formattedProse(q.prompt)}
+        val regularLines=remember(prose,regularTextWidth,textStyle,textMeasurer) {
+            textMeasurer.measure(prose.text,placeholders=prose.placeholders,style=textStyle.copy(fontSize=24.sp,lineHeight=31.68.sp,fontWeight=FontWeight.ExtraBold),
                 constraints=Constraints(maxWidth=regularTextWidth)).lineCount
         }
         val textPressure=((regularLines-4)/5f).coerceIn(0f,1f)
@@ -136,11 +158,11 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
             Box(modifier.size(mascotSize).testTag("question-pico")
                 .semantics {
                     contentDescription=if(reading)"Arrêter la lecture de la question" else "Écouter la question avec Pico"
-                    stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(talking)"Pico parle" else if(reading)"Lecture audio en préparation" else if(flash)companion.mood.description else "Pico présente la question"
+                    stateDescription=if(listening)"Pico écoute" else if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(talking)"Pico parle" else if(reading)"Lecture audio en préparation" else if(flash)companion.mood.description else "Pico présente la question"
                 }.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button) {
                     if(accessibleTap)touch.audio(toggleSpeech) else touch.tap(SystemClock.uptimeMillis(),toggleSpeech,speech::stop)
                 }) {
-                TalkingPico(Modifier.fillMaxSize(),talking=talking,speechActive=reading,mouthActivity=speech.mouthActivity,mood=mood,pose=if(touch.playful)MascotPose.HUG else if(flash)companion.pose else if(above)MascotPose.WAVE else MascotPose.POINT,
+                TalkingPico(Modifier.fillMaxSize(),talking=talking,listening=listening,speechActive=reading,mouthActivity=speech.mouthActivity,mood=mood,pose=if(listening)MascotPose.LISTEN else if(touch.playful)MascotPose.HUG else if(flash)companion.pose else if(above)MascotPose.WAVE else MascotPose.POINT,
                     mirrored=onLeft&&!above,pointLeft=!above,eyesClosed=touch.closedEyes,idleMotion=speech.preparing||flash&&companion.active,reaction=if(touch.playful)touch.burst else if(flash)companion.reaction else 0)
                 Box(Modifier.align(if(onLeft&&!above)Alignment.BottomStart else Alignment.BottomEnd)
                     .offset(x=if(onLeft&&!above)(-8).dp else 8.dp).size(24.dp).background(Cream,CircleShape).testTag("question-pico-audio-hint")
@@ -153,7 +175,7 @@ internal val LocalQuestionPromptMinimumHeight=compositionLocalOf {androidx.compo
         }
         // Keep the intrinsically measured group centred in the preferred prompt area.
         // A minimum on the aligned Row itself would leave its alignment-line group at the top.
-        Box(Modifier.fillMaxWidth().heightIn(min=preferredHeight),contentAlignment=Alignment.Center) {
+        Box(Modifier.fillMaxWidth().heightIn(min=if(reservePreferredHeight)preferredHeight else 0.dp),contentAlignment=Alignment.Center) {
             if(above)Column(Modifier.fillMaxWidth().testTag("question-prompt-group"),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(8.dp)) {
                 Mascot()
                 Box(Modifier.fillMaxWidth().then(narrationModifier).testTag("question-text-region"),contentAlignment=Alignment.Center) {

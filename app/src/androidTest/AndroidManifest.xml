@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- RecognitionService checks the service UID as well as the attributed client UID,
+         even though this fixture never creates AudioRecord. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <application>
+        <!-- Explicitly selected only by SpokenCaptureInstrumentedTest; never records audio. -->
+        <service android:name="com.malfreyt.alexandre.hamigo.FakeAnswerRecognitionService"
+            android:exported="true" android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
+            <intent-filter><action android:name="android.speech.RecognitionService" /></intent-filter>
+        </service>
+    </application>
+</manifest>

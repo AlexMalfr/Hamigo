@@ -1,0 +1,2445 @@
+{
+  "schema": 1,
+  "baseRevision": "37ccc612e339d481ff22657a1691a613b8914721",
+  "fields": [
+    "kind",
+    "prompt",
+    "answer",
+    "choices",
+    "value",
+    "unit",
+    "tolerance",
+    "bands",
+    "pairs"
+  ],
+  "revisions": [
+    {
+      "id": "q-f39b165e-c14d-43f1-be43-a5084daf9db4",
+      "before": "9891b3a0de38ec1dca341a643fd5e9f774c19a2ac748862ca402409d863c5607",
+      "after": "db99920220ef3e9f11d07cb6277d55562ec4ed911cf63191f83235e55d4031fc",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-d64a0b27-feea-48dd-87e6-36a2ebff6a40",
+      "before": "47cb7da79eda9bbc5e00ee714e12746455dcd05d79da2333a0c758c256980fbf",
+      "after": "37dfad1ac89b84a1c62f9893972e43815967c388e7a101fedbaed19e7497811b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-76d57161-e6c1-4d56-8c49-04c348923c80",
+      "before": "1f7e3bac60b03959cb6792b006fc17fd0b09965f7a7d5729b1c156a3401f9372",
+      "after": "a0e3518fee1928539f60f63ee21172524b435133a63a1ebeff66df829c280729",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-08e46ab6-24f3-4cc6-a23b-a0d8661cfee4",
+      "before": "19380d009950f27d35fe59a9a1ea2eb6c0ada9315c861f426b7ab406225e063f",
+      "after": "dccaa1d1158d9e1721edbdaa9eb9cf3c872d8cef8fa466a21e6efd36d1d5b75d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-8d34dd1b-fc49-483b-901a-59e44e0d54af",
+      "before": "d98fe3b0c837cfcebec0ad7f7d92b34972f4eb6058f1ddf1a463b4c2b4331a4f",
+      "after": "1331e1e546823fe191e6f485a47b1458661998ef1e4c31b60df6fe2fb51f0c2b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-1dc485d7-88a6-4ae7-b19c-389809a0d64b",
+      "before": "cfdb0ce7716f9fde9cafa85aa0e0c540e300ccea922084eeb25bd74ab48a3146",
+      "after": "604aefa16c1a3d270fdbd456e49638ad2bf267034d4166817ca6745e1e632209",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-20fa8fb4-6f4d-4527-a3d5-149b3a4ba0bd",
+      "before": "6d6afb0534faea95dbfb50d8bcd0d2c0b8dbd59231817d2a4a066ba655de3911",
+      "after": "e19b8931da0f2714b8da9bf07ccd840ae84bb4b30963d3c30e1af79ac987c26c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-19"
+      ]
+    },
+    {
+      "id": "q-fba02eae-4dcc-4f4e-b32b-daebfeb21ef1",
+      "before": "cdeace8a94a31c3948e96cb1957b5ea1336c1075f5aa89f781e18ee1194a3a9a",
+      "after": "b7c6a71f0ee3d1e5ec5cde3ba6794bb9af31ac78da074a53b102d73ef30ef147",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-19"
+      ]
+    },
+    {
+      "id": "q-ba4d50d3-a661-4334-9554-56f3e2273e64",
+      "before": "9d0fa7eb1313e0fe7968a5baef1997cf910fcb453c7a4938ebcdc1a7617457c2",
+      "after": "95f2e31dbacad722c4a8f26cce63bc9e54891e6c77e41ed114fd70a2b9db3409",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-8893043a-64be-4d29-9a9f-84345d84d378",
+      "before": "d5923c89db766cd182798dd3c8feabf20540edc5ba7adf35cb8480543a24a2c2",
+      "after": "61fac42872fb3c32f93b69c9206990b539aa2572ac691e1f03462df07c288bc3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-b8ca2bd5-935e-4235-af10-2d442d43153f",
+      "before": "d44e599190c6ffb725fef821c56e4593e17f2000e9f5a057eb174b280230eea9",
+      "after": "5277548b7081ac203a95c6f57af99ce2f5086f6ce1a5854693d7ce5846ba4744",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-8877ae84-181c-41d9-a4da-66a1d74170a9",
+      "before": "68b80a73f26ecfdd4961fe70194b6fa7bcb2ff76066f4e9be9246bd1b7e78ce3",
+      "after": "608ac70700da9bded5278bd8495e652c24cfcd29f516f84e3373e4a9af63e888",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals"
+      ]
+    },
+    {
+      "id": "q-26911c26-a2e1-42cb-88af-7e596272c947",
+      "before": "830b1e3a7bed8aa04d6b7f2a6452fe976696f3fc647d529cd60d2337a73a876e",
+      "after": "337161462d42185c2a610e4cb144a7c0fe80e8c180ef5b991b4a73fe843549f4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-597c056b-8e5a-4a5c-bdde-da8d679138b2",
+      "before": "0d6a962bd8d4d283bfec7d154cca1fa9ae701a6fdd34b152f042b0e8b8d9df26",
+      "after": "e4adeb526de4ca957077d42fdd21a67fd95c4c2b1d356078b9ee34cd7383bad8",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-c508d5c4-3954-4c6e-94e8-f84aec085cd1",
+      "before": "54cb467f5942db3e66e914d253fcc610e317f52f110ba2b9996e2585babbdebd",
+      "after": "616246a2d5ce23bedf63736702ce022c42df426cf87811a46bd1e883916a297f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-a5d36619-8faa-4416-b8f5-59da2cd32076",
+      "before": "a1003e01610e72f4bf0bc9694b07c6a17bb1e06ee54204c7b309fdeeb30fd149",
+      "after": "3422a491f622e4a721033ea9d2e2d0a2a770b68a556545e1e3d7d7a4cb7e7e8c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-3655dbd5-b4bc-459d-a0a2-a2e79f69acc4",
+      "before": "d52903afb99204dbf5bedf9e3ca1a1c8f13cc25fdb832a7448e69fd89e8bf4a3",
+      "after": "aa101293e5ce2511b593396a49bf979dfa519fd958cf82ef8889ac338fbd92c4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-c1b219f5-afef-4c5e-994f-f977949d257d",
+      "before": "c8cc399a64556ed92fca6a6a1690dcc30f7d69e425a8e73d2ef77d9cd8ac2b8d",
+      "after": "b3f00b0a99fe614a533e11399b6d5f5884d94670b9bf09b5e53f9a5608e1c24c",
+      "reason": "Juliette et Juliett se prononcent de façon proche. Préciser que l’exercice porte sur la graphie officielle, et comparer quatre graphies plausibles.",
+      "sources": [
+        "https://www.nato.int/en/news-and-events/articles/news/2017/12/21/nato-phonetic-alphabet-codes-and-signals"
+      ]
+    },
+    {
+      "id": "q-d88d940f-c6ae-4dc2-b71c-8fe633e760f7",
+      "before": "4821b11dc96d16ae0a5cfdd81095bf55d0ddade863ba8951bcbcd1346b83ad4d",
+      "after": "4f0b4d4e3548483eeb8d16a50f5d226ae5f6c726f82c6f4624a917d5a36b2620",
+      "reason": "Même connaissance et solution ; distracteurs variables ou consigne autonome, revus dans la refonte.",
+      "sources": []
+    },
+    {
+      "id": "q-0cf15a01-2d3d-4e12-bb0e-1cfb09a122a2",
+      "before": "875ffb612ebc58e9d0b9eeb4bf9fa52072e66ebc73f6581dcdd3543e4f0b47ec",
+      "after": "b261f119db327041b3a6117ddcf6f02993669b9f993282d59319ddf3989a36c6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-94738c08-2b41-4a07-aeeb-ccd30e298368",
+      "before": "526cc67d19dbe8630a54a311dc631c67818420375a775e28aedc5e86e08f8a19",
+      "after": "b6926c22b36a7272fef9410e3b4da6a653dca000ab3e25752cd6e6d08e85016c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-fc06a941-31e8-4c48-83b5-4cc327e9b51f",
+      "before": "67e0c16ca7fcce2dd382fc142622ef4116d5e75da1316fa6125f3f5317e3588b",
+      "after": "74179f82d4a600d08dca794a20da164a949e27f488a0dcede8cb00d6448cbdf7",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-510786b6-b362-4011-88b2-b70023c5a777",
+      "before": "9ff06bf02385a90ac588159754a09b299a76fa4c794080ca4ffc4be0096f1d59",
+      "after": "8518568c05cec00d85208013ed78a5ab5d206f258b2483445abd23cd5af040db",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-11688cfb-7510-4035-a3d4-da215ba260e2",
+      "before": "194fa6078f00037d25b867242a5ec67203faf43c26d01935a3e40e5051a9346d",
+      "after": "b7d1dde768ddb95ccc49089c87c10146d4bc8233c3ba9161943a6eb68a95a0ef",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-b7011ec1-b7cb-44d4-8982-512ae020574f",
+      "before": "cab007b005e1a03bf640e913c15b8773a1a7b836e71a2c4f2b66c812b2ef5cdf",
+      "after": "b31753a478fdc81e31537faf3df055d44e3203b93c1dfc4fb388a58d82060c04",
+      "reason": "La consigne « cet appel général » révélait CQ aux utilisateurs connaissant le trafic, sans devoir reconnaître le Morse. Même signal et mêmes choix.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-096f17cf-6cad-4fb2-86ea-bb19d185b11b",
+      "before": "6f184c4fcef6e20e04fd4b0ff5c02bf7085bc44052280d7ec0af3ebcf9ccfac7",
+      "after": "794e71c2dbe894d3f8ace86f0ef4b2b80adad18e4a21a795646f0d4416c2c4dc",
+      "reason": "La mention « du report » révélait l’ordre RST sans devoir écouter. Même signal et mêmes choix.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-038934ef-42b1-4bd1-8e37-8f63768b6fd6",
+      "before": "c540b0f9ea15a9087b871e61777fe991c7b4d53f8745ecb1c8ead486c89e7101",
+      "after": "dc089093fba980f10e88f9197be5b57cae5d66485343e5e53dfb7934a24b00b9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a62539b0-423c-430d-85ec-4d520f51148e",
+      "before": "8f318ee5f74d2434db6f340558f67356681377d54b6fef97a0a2e38843d9d9dd",
+      "after": "1f2869fe18a571ed6788a3cd3d0c98cac7c43e90783ee672e1979f75c7dd5b55",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bc1ff288-c2ec-4423-b766-46952cbb9cba",
+      "before": "12c233f263666e2d1ed01c1dd04c72dfd5060cabeffba0900facd1cfcd18fbfd",
+      "after": "2099770ad6435a75ddcd0f9a056e4bc92e9279f38386c0918105769e2da32e11",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0c0db3b6-fc3c-4f5e-9e0c-41f497e0121c",
+      "before": "f7f56a7d2d71da208957716ac85341d576ffe5c1e7c7e1b580cf53e942422cee",
+      "after": "98849ca83055e5f87a671b74e79155b67c6230b7454b218c5e4957fda6ea07cf",
+      "reason": "Même conversion et même réponse ; la consigne ne suppose plus de connaître τ = RC avant le cours sur les condensateurs.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1f1751b8-599a-43bb-93cc-cea11f9f8905",
+      "before": "85e8c1a086c0849f06255db84d6a7791ae819a5e454aaff005df8894e7d54319",
+      "after": "5142ed608fcd3fc9ea577e4d8e0567c73a9ccdc3179c8f38d42f6e2db70e66a4",
+      "reason": "Même formule I=P/U, avec son cadre continu explicite pour les révisions hors contexte de leçon.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bf45f9d0-a852-438d-8f68-c483fa747ea3",
+      "before": "68d675a48ae918d460749b1479c7f77140150b7cbb9a8e8f8acd68ab804be34b",
+      "after": "862c50e3cd74fec196c87c1809b3e799e9be972a41a1c50491b54f3e577db179",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-907c517f-2e0b-405f-8a27-6629b516d191",
+      "before": "739072ed91a87165a6484f521acd4580505c3c00e6ec7196e34d6913b4811ed6",
+      "after": "c021dadb0f24c5540578f95adda97716e9815db302971e65fc0b9c1d8addd2a2",
+      "reason": "Même calcul d’erreur relative2/100 et même réponse. L’ohm n’est pas encore défini à cette position précoce de c16-l03 ; son sens physique n’est pas nécessaire à cette question de pourcentage.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3cb103f6-cd68-4117-884e-7baf7afa6734",
+      "before": "4f7906556235bd0660736eb0b4f85a2a9ba3e767ce07023cd26bd1fb54da7aa4",
+      "after": "49662c85322e57080ab27842a4c30b199d0f65567dfb601d9d7ad7b13f0f6a2e",
+      "reason": "Même rapport final/initial8/2 et même réponse. Supprimer la référence à des watts encore non définis dans cette leçon de mathématiques.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8dde1164-0917-43a7-958c-578578dd09e7",
+      "before": "a96c79e1dde77c3eea349017654f1c0daae110a5dde65a2ed99e2188b502d0ce",
+      "after": "90ce04dfbd7c7efd728be337fc2b170be95267da101e681b247d67285e3bae18",
+      "reason": "Un retard peut être noté avec une phase négative selon la référence. Le résultat historique+90° est une amplitude : le demander explicitement plutôt que rejeter−90° sans convention.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-45977e89-4e44-4cb7-bebc-4b359179ff75",
+      "before": "5046b1d55c6fb60783a1d794784db88ac07a6116a69fc9f5a9a77297dd260aa9",
+      "after": "80b4769dbe67a03effb3b900ee84390d9a2eeda9c2429eb5701c820c5e25ffa5",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9b83bc39-2cd1-4e70-a1d3-29735dce86b8",
+      "before": "38f707a58cc722e7e284e163999e21df801375282d41f7425a1cf1bffb6a61e8",
+      "after": "870a2fa4833034ca35b0709c84f98ced8d53d2a80ac954dc36b7471ef47597a9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-04d688fd-fba6-4da0-815c-0bb5070d6450",
+      "before": "8925a0e1eefdf0ecb683c521639fa911ed1265d14b5ba98ceba040d703bffd7d",
+      "after": "e553cfea06ac6ef2cc11e11cb101e8801e54de4568ec6c7e2e139f36f78aa17d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e0ea9bc7-d251-41dc-b0a3-b43e6a9cd85a",
+      "before": "af30b78d4bfd1751ebacf7712e5ca08fabe286a07a3c9683b8a771d759e0c620",
+      "after": "74862451ebd3dbb744a62ea7a439b4bba2c2c07d2c43d2b9bc85f858aaac6ff4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-24b789dc-72b5-4b42-85ea-c69a74467640",
+      "before": "a983af2787f75d3897c0b908fe58cf5a0486adfade712e11a66f70d8a876cafd",
+      "after": "ba11e0cc81ae6e326112f0b5f2f3ef90f72072212244d86c7f0e8b8406f0a099",
+      "reason": "P = UI donne la puissance active en continu ; en alternatif général, le produit des valeurs efficaces serait une puissance apparente. Contexte continu du cours rendu explicite.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3b0e64c6-4282-435b-acf7-1f46316e9d5b",
+      "before": "27d38304a3ca8ae6f63eaf99fbb1425b9f31b24ff397f1c66110cfa9f10e304e",
+      "after": "ec9887041827c4aba485684b2dc1cf5450d2c17a0e511465d50bcab03b144e6b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d516b941-85a9-4464-be8a-e8d1d8060c95",
+      "before": "98309b32d0b93d2dc2a58cf89820634242387efd84b606315b42ce4c0da3e939",
+      "after": "e9b0faeee4871faa58da6c99170263ff137d0f3ee543ba42b4f316d052ee9586",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-afa27523-2b26-44a9-b005-8faccde1e546",
+      "before": "8c5a685a757882c307d7b2af0084c1e89251a7b94781607180f5f1aa5fc9df51",
+      "after": "085126af3c7d00437fcd0b9ed5cbd5416ecce4abe3df8c419fe4edcd08159444",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c07204fd-2bb5-404c-8458-5cdf2338f3ef",
+      "before": "159cb9d7613e7de5d364c2db84d082a50d25e4985ad52e0b7e038446cd55baa3",
+      "after": "af2dcc3a0fe4395a3c97e07dbc3752e4e8f9cb9f87edc52ce3583303901cd20a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9313d5a5-5379-4143-a76c-6189f9770a2f",
+      "before": "a44d6f4507f21bca962d52c2ab8c091bd3916e7a96c7cc1bf5288517434f3a7f",
+      "after": "ea897ec1629c5b88875da925f56e9ce46511d93ca8a6351477f86c6cf28a3c29",
+      "reason": "La numérotation d’un pont n’est pas universelle. Préciser la même implantation que celle enseignée, sans changer le rapport ni la réponse600 Ω.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-7983a12c-a3a4-42aa-9254-ed4b60eabfe6",
+      "before": "9c4aaab4f53d69d15fd78e4cd039f6904079b8eef595ec49aa4e8ac64b959f86",
+      "after": "ecf4de58f848fcb6db3d3b6e26474f55bc65b4573784a7f14fb9566a42b0823e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-958af8ad-2159-485b-aaa5-534afb0bc542",
+      "before": "dff2f44803e54ceabe6c4fb18b8c05811df3b724e1b204f34c6be5bb38f04142",
+      "after": "c628a344f89c0d56e4f7564e51f78fc7c5e76b0f4191419697bd3050a47c9c15",
+      "reason": "Au centième,3,33 est correct ; la tolérance0,015 acceptait aussi3,32 et3,34. La nouvelle tolérance conserve le résultat exact10/3 et son arrondi au centième.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a2888c8f-9ce9-4254-933f-091d1599e977",
+      "before": "e834f69650f38d88298471d5fdc9bd5c61e5e3ba8915f1c4a6d4bce7c70b3d16",
+      "after": "c65408c526a9f8786deb04e8245e997b77f0291f930c8cd4c0bc9eb8c661e97f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-789efbe9-d675-4199-9645-c21c34b5d022",
+      "before": "d83cb424e95b4ddf0b05bbd4c790d95891c2821ca4610f8f82aecb2422390971",
+      "after": "f386dacbff02f27bf02f09dda3683d19b49e29f0a494623d0dd1178a00be616c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-342db4f5-1f4c-40c1-ace5-1ed0cda17b06",
+      "before": "995df4968b1332d5f7d2d9ef5b65ee50f2c8e7292fb9729d5e774373b8b29150",
+      "after": "22542b4ce34f189ebc43498d73988be08727ebd5a3dd4fe275eecca22b6a2bc4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-73f19ed6-03c2-4e23-8f6d-9b3557a7185c",
+      "before": "deb84c1a87e5ba125291962239e6fe50b56d98b8c2cb050572a8a4b4a51e8e78",
+      "after": "96c2b9faf89a146c221ddf78e1bf5d795e4c23d4c27df8297f9e5e026738d295",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bceeba59-a33a-448c-ab3b-c928a0990676",
+      "before": "57f89915cc4dfb7025fa74637dc913c1f59ae136a2a265c952ae1d62c6b8d20c",
+      "after": "a267fadc86f67ed6f785240b2d5d4711b9b365f989940e2f2cc9ed8c08f2e8b9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a87f61fc-1d2f-4e7a-98a1-2740b94a2a4a",
+      "before": "713b935103853c5ee1b30d1c26f1d5ef37833f0e2057015b466ec01e9f31f75b",
+      "after": "35c2b082bb501008e3258256677c0d2c0aeaba5e175a2de0d47d8852b29ee780",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ded87835-f027-4aa4-aa1a-505368521693",
+      "before": "dca4baf9527ec09ef5efa19bbe6c4d29c7efd9873c6061f16b7024ace307c63f",
+      "after": "81792b8ecbe9dfdd1664e8b373ed5d48c88996108aaed8951eca532579316aa8",
+      "reason": "Au dixième,62,8 est correct. La tolérance0,15 acceptait62,7 et62,9 ; la demi-unité du dernier chiffre demandé accepte le résultat exact et le bon arrondi.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-142a72dc-39cd-4cc1-bcb5-c1c02392fed7",
+      "before": "b3139df2b6cf3bc12798321f44234c4e92b5be4d53e06d58ee225969aa62eab0",
+      "after": "0acf99fdfc31109760b0ffdbdac1fd7c633e135838abecca71a3433e6fa5185f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a5854bd2-e35a-492f-9a79-be2f70861de9",
+      "before": "4f66c880add093a4d06ae2553ef6ffc7b3655a1c79605f48de655cef9f5e2e31",
+      "after": "d45e4be65c41b41b38566d18b9764757c0fab5f4de58441af6e9bf702617537a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-92322a6e-18d0-414b-9df7-4a6ce6f18e71",
+      "before": "6fbff45bddb37633b9a3958862dc53e5eb7d54f774505db0782b915b32871dab",
+      "after": "bd482214076cf17b3bafb705da6cc84cc56b95841ba65b455c24eaac6632c8c2",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6562317b-bf5a-4d39-b88e-bb6571002025",
+      "before": "7296bec0672ab816894cae3ec3b49344ddfe70cdad5a66fe86cfdaf2db45d0d6",
+      "after": "41df05efbf1a7dae6b76189ff2a1d90f8183a80a8ae05f17128bd97684d50708",
+      "reason": "Les noms du signal au-dessus des dessins permettaient de répondre sans lire le tracé. Les labels deviennent neutres, les mêmes bonnes formes sont conservées. Ajout explicite de bands lorsque ce champ manque : sans lui, QuizScreen affiche trois sinusoïdes par défaut.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-fef77f11-733c-4c14-b763-912c24be3082",
+      "before": "930a5edbffec23c8f4c52bc2c969a4b12d7587864c623e11955bb48342af1e92",
+      "after": "f971f5a18fb4715f6c3019dc24fe2efcd2faf6f510ab5fe23d41e183f7cd0faf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-097e9715-d10d-4d73-90ca-91582493bd7b",
+      "before": "15481bdb9377b748b07ba86f7fb20269290025f8e966ade531c4ab51353c815b",
+      "after": "02b81237c25779e345a822d81565131f9d5be95bfe826df479ebdfbbbe536326",
+      "reason": "Préciser la condition sans composante continue et conserver la valeur exacte comme centre. La tolérance0,02 acceptait des arrondis incorrects7,06 et7,08.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-92c5f281-7353-4876-9aeb-1b384ec0d08e",
+      "before": "abe2500452d9e873547de6b1c7d78b47f696ab8c5a0aa1df4e164edd704659b4",
+      "after": "9c6990073dabeefac5728664842c23fb259faf3e8f78ee9f36b7107188cae0cc",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6df12405-129a-4faf-8fff-d51757f17047",
+      "before": "839cf4f81bda97e0f8ba54593165c868439bbddaa32aa0b982eb5fcede73d692",
+      "after": "701d5aa7efbd5b3fdd2ecebec6aa5a07e88f0b1a76d0f091d425bf4e8b7e1cf4",
+      "reason": "La relation crête/√2 doit préciser que la sinusoïde ne possède pas de composante continue.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1a6a395c-2dd4-4652-be0f-d939a66d4f34",
+      "before": "4b8fa72617fbaf76c66366670b638b1980628d9dd8b31e1cf666d82ca99a2d4e",
+      "after": "6b7fe51bf995371e83d58a3cccb4f57e9d35f0953afca4ba1a4d30228d266200",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bc9f3f03-f80e-4cab-80d9-2c68b315671b",
+      "before": "63fc6f5227b40971e8483611f9151e0d7c36a99f2d1f5cdb4fd65f0726a88bff",
+      "after": "c1a6ebf39cd5d9e815bcb8de478084eeeedf493a95ba88d3f30010415f9e646a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f1e8118f-b20b-46ae-b181-e796849d279f",
+      "before": "3cc5d6cc91b971bb5b57ae3179ff9508f8c375fc558cc7658ed79a1709091d47",
+      "after": "2931dd5cbc0e92e2c29d70fbb6951102ca2b096ef779d04d4d22fbfa7a23769b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0b502af3-ab9a-41b4-af8f-9beba7591440",
+      "before": "3f0744f84c4f7547f3cf563ae915e61c8669a32ebdde5989074517f5f3d4c51a",
+      "after": "af41f122151772927a698d4573f98bad728d7dcdec172ff845d51a02193e2ef6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c87c42c8-7523-4386-95d1-76796ba8e426",
+      "before": "b3e71648212b1eff63bdecf2850eec8c65cc6d1dfb29e41e9b374eaa92e32ae1",
+      "after": "cb346f57dceae7d632a90f127d8dcc2dfe51519a9731a99f9a6443a90df52f79",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e9018eab-112f-467f-9429-f202ab2b77f1",
+      "before": "07bb96d8f2974b570a5d3b0e1557575cc078a8c9663ff5df6d81b5cb36218cfb",
+      "after": "bdbcb281e8ca31fdfb8251a4a77399d72431efc09bc47a6cb2f9fc40aa6d107e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d353d203-edcc-4945-8c80-e8ad04b151e3",
+      "before": "888b30dd81fab24a0b7f3de1e8e1614777df7e67b18d2bd1cfbab979b15c360d",
+      "after": "f264e4c86bb2494906523fe1bc453439b11038597097eb34e206baba87c4b082",
+      "reason": "L’ancienne association reprenait « bas/basses », « haut/hautes » et « bande/plage ». Les mêmes quatre fonctions sont maintenant rappelées à partir d’intervalles numériques.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-89595e5f-d827-415f-bb1c-a7756d3aa484",
+      "before": "6ce9b8c227719e57c671f296b37641fe18c72a528275e5f389862f740f11d60b",
+      "after": "95508267ab7e6acd5c77dfdcedd230783c38db1d4e03a637fa062da7319c10cc",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-541c1c16-bb1d-44ad-ae25-1a60618d676d",
+      "before": "5e6fa9c87de387013fec5f8c3518d67bd70f617e58133ed263beaebac0e90b9b",
+      "after": "88cc975e33c39c0ef3a4045aa6b4f8d741db6ee5af705006b177175ee563c91a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-fb0fa77f-8232-4257-b9dd-5e34c0c7262c",
+      "before": "fc77c5611ded2c67b039a0615a3ccb3e4edf7f6dd6d5d32f68b3507b4f247830",
+      "after": "0fe9ce65571a58a2787684163b16e2db84b8e057532a7f370587787c86a3bc33",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-21821e7d-f719-4752-bcd4-1af3c7919197",
+      "before": "567b95b74284179cf5c653074221f9f5c0567d24664b51639fa98f81b89ecd6f",
+      "after": "b45098a022c87e50e7a8ec6e7e0fbdf5869e1741045d6e9dba6ed95ff7d6afbb",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9ea80f91-6127-4e8f-af95-c4b697f848d7",
+      "before": "ee6db98224a7970c860e73d953e5f7317a2b889d1aec2e0af0883287742e65ea",
+      "after": "c61f73e31ff18b880fd8ef70a6f1f73b72e2a4595cc3edfeba1f6c27bf61ff97",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-32e69d10-1fe7-45d2-920b-d6c3f10bdf56",
+      "before": "6fdad73250005a9bc39c7f5d92f333b1711069389ef69d0e8614e2536a135356",
+      "after": "25efebb20afe3b07f089e3c03fd90e6126d0dbf023846b2fb5ac25a47eed34b9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d3d160ee-a9eb-4fb1-a8d7-a65100beeb91",
+      "before": "41b048f485a91b153cdf181d8f4bbf52ea1c362521465afa6dbf806ce5ead074",
+      "after": "7f7bdc31569c3e1b29866f43e51052afe78aa7fc3973c1cc25529d84f145f2dc",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8b5e9280-ef9b-4ecd-8ccb-4645a39e27db",
+      "before": "995d7ba5d228e8b3441298a71e7605ad49aacb2f0f53482b14cec2e200df1fc0",
+      "after": "0f3af5b1ec856429c4b59bab84ccdb3e1ddbe01723ec2d0ec1890131961d315a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-016cc604-203a-4494-896d-84278b05ac0d",
+      "before": "52c7dfe52e48b9dca3ab6cffc2f2339bf09a8133ae712bf2301bd33417a7427f",
+      "after": "be5a14cf501ad227eab153497c0240c054a22178fca966874f190b72da6c2f4b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bd57061b-e808-49bb-ad4c-cb1812ee3bcd",
+      "before": "cf1863a4724df9e21a1646548539c13ca4d557dd8ad6c0e9528b106e8c014d3b",
+      "after": "54514af963b7ed955f2d620b249dcafaf41297c1bbf145af840469b81aa4bd95",
+      "reason": "Au dixième,125,7 est correct. Le résultat exact est conservé pour ne pas centrer la tolérance sur un arrondi intermédiaire.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5ee7e999-2598-4b42-a1c3-8c00c3c511cb",
+      "before": "e3109643de7c802da215f765aeded1470eec52445bbc4282f3b97511ff4d9420",
+      "after": "d4a83d665d20f78ab1de822c3365bada9a3572d7622a9365f92a3dfd5092cc3f",
+      "reason": "Au dixième,159,2 est correct. La tolérance0,15 acceptait159,1 ; le centre exact évite que159,1 tombe sur une frontière de tolérance artificielle.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0849ea32-8626-4f08-964e-bc543c1e3db8",
+      "before": "c90f343de7fe71467df5a98b8c6b020e766cb51b373a6d6cb235b1c243da5684",
+      "after": "4462f89e33cb665d9a9c46817814dce9243ca303b9301cc028a38ace62b2f5ec",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1e53c703-d2ac-4313-89e8-7896cb53b829",
+      "before": "5a860e4e2d6b52a057041017050a3ba26e411a334751f8b90a0c4a02029727b6",
+      "after": "14045ba36d0d3a9917b4bf71b802f4b1471488fc42d58904c70c514832261315",
+      "reason": "Le calcul attendu suppose R,L,C en série ; cette topologie doit figurer dans l’énoncé autonome.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-39671c97-d97a-4c34-a314-a29d00cca386",
+      "before": "0e704c844e99c9ed85fc4c975c85460b0b37ec36f2703c4838e5b428a78b256b",
+      "after": "e736655230713e8bd056872c931dd15d2ec659440799a860d615ed118feec4a8",
+      "reason": "La relation entre valeurs efficaces et un module unique d’impédance demande une fréquence et un régime sinusoïdal. Même division10/20.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bb04ce3d-35bc-40d6-b25c-248eb9357975",
+      "before": "f74c5dcdde2ec24f0252bf91063119f3285f43bab02c9786909abda6256a6542",
+      "after": "02a0cf250eaea79dfd4ed3a3fb8caf7573d14652690239c4bdff6700102b3508",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b84728e6-0f8c-4f06-a1a2-edc7187c0f0e",
+      "before": "ed05d62516f14c1abda00954f5d6c7cc83603bb25ce0a8ba5cf2d637ae9d96bd",
+      "after": "f48add556e8c02f14ee49d83e59da252a6cb28632c72ae2ea505541b9421132d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1cdfc2af-1c4b-4723-9343-42a93216674c",
+      "before": "b36a555b65fa27e1b7ab6584e20c46c0ca7cd304c4ca0554ca8c0a3af1ab61a7",
+      "after": "9e25a76ba2309dc52c1a4069871ddffec7d85a2d3aa4f6e33476086502562b88",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-05d6e9eb-18c8-4e77-8b2e-ff01d356e4b7",
+      "before": "9e066d2f1f4b9e57415d136f099017fc08ff32bb1cf23fb161d2e50bcdca647f",
+      "after": "1a8e0117ec2955f8dde3bf05897fc1f606e74ee26b0809e77b482c66feffa826",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-825dc480-00e5-4cf1-afab-cd3b9c856712",
+      "before": "a2f731d13586f61ced3325b7f634d86ce0710aa4b84ec1ebfcc62f6a359355c3",
+      "after": "62b57412246896c8fb74de4b948a99421948a0dfa530a4695b54b15af0a1ff43",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6b1687a1-8a56-4e34-ace2-724dcd6096e1",
+      "before": "2e190842c088cecac87203124ccee28a668e25b97fc296f781e5939c7b4b79e7",
+      "after": "b6a8e0e911cfd0ec98568fcb647e7e251217444967a5b849468dfa43d1b72c9a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-45529e02-18d5-473d-8f90-fb35ad3c8163",
+      "before": "9f4fb377d0fda7a0d7db2927ad5829da15e0894fa68d72c726ae6243fced4e61",
+      "after": "5b1149b433f9e280aa14b83c776c06fd4bc7a6c6d9ad617c5880f806d306d94d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2222e7de-8f4e-4f82-b414-3c64d22ae4d0",
+      "before": "e7a3c147abae7cc2fbbd63ea4dc0455a93199fb7ff073bf8e89493d557aaa14c",
+      "after": "b7990f4c45e541d004560c814f7fefbaa3c3a8572a7386f496314b5eb9f680cd",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f194561c-3f5e-486f-bdba-4901d0564259",
+      "before": "977381bcf21297f1d2408456403d73515f250377863d42add14c0b3d45f673c6",
+      "after": "4ee0555f8618e17864e5d156c66488f0b0d926d8ab51fd617379a49ff51a47b8",
+      "reason": "Remplacement des distracteurs de pression et de 50 Hz par des formes de conversion d’énergie proches du rôle d’une diode.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2f3de973-2229-4f51-a9fd-c1f21abe1e0c",
+      "before": "1ca8547c0169b1a705ec99bf51482f6095197f8caf6596911b8083815ad9df9d",
+      "after": "9ac163421d9e70c20d0eb957c6123572f4b452c4e9326cba05a0f24ee4e7eef7",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0d48c64c-7827-49de-8bef-2c3853ce046e",
+      "before": "dffa83e2dd378f0a74e191591124c2f3c2bdb3f543d74145474722347556dabe",
+      "after": "687d2341bc26b66e2b5d8ec7e0e1d5e97ee05a0783866ec5a1a262a181517da8",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b5f5a526-bbb3-480b-976e-af0b80889e66",
+      "before": "d159ad6ce2f22c183d858d714d183ad0b8fde036ed88bba1adddd4092bb30923",
+      "after": "23cb257847bd0607336c1a3e55f6d2fc22eab8e335aea1471d1d29d6ffa6abec",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-101b2463-d724-4cd9-baba-c3c2f32f36dd",
+      "before": "d40cfe96beb35a0bae6e0708b358e55670da624f0a60282a7b6bb1439b4780a3",
+      "after": "72d78b131a36bec60d08f5d2e4fc0c3d49d1d489490891f11a8dd6208bdce7c2",
+      "reason": "Le contexte « même amplificateur » n’existe plus lorsque la séance est mélangée. Rétablir les deux données originales, même soustraction et même réponse.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-777a61a3-455a-44bc-8f7f-35d4ca0f1513",
+      "before": "23ddab96c5e1491c40e6d42056afcb8522f9cf65218a1ee3d94cec1385ace8a1",
+      "after": "de53ba3f9fe97a37b08faa909ccb1f64dd603565cc5e1ca0c796cc5d17f73969",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-03bf3eec-c6cb-442a-8c43-68765a09ace9",
+      "before": "e87a05d5c8afc2a374091a03ed1b4ac76460eb52afbd3153a0a91f242ba885d8",
+      "after": "815eccbed9da08d68218032fad9d6a5165f2f7ba6bd864bd49859cbe8d29323c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-aa83cf45-8c2a-4a0d-8e31-134eeaff3878",
+      "before": "b40beb106122442ef6f9cb286d5cb0695a41103378b62f7ad77cd764b5fde183",
+      "after": "46919b0f9d72b82db95903770422b3a8e59c4b7a2c0aab6b08e39cbf357c3970",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ae6d0adb-503c-4c3e-974c-41937e646253",
+      "before": "70e85e3ec22500d58220272d22e5b1e421a031a7d4382d48e77e283eca76c334",
+      "after": "b3db13818f82af4aae302671fbd628e727b8b7c756ee5af0ea7669d7768dcedf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-471fba70-e3b6-40c8-9452-ecbacf4c8052",
+      "before": "a1887d5d73066c7417260ec0cbfa6b135fbb88f326ceb697daebae80a80955f2",
+      "after": "5d9a8a59bd87c340459c47417d3977e83baabaa9b4c2c8f9119690034a25816f",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d4195976-e326-42a4-bdff-ed2fdd8ee128",
+      "before": "ce1dab3a2dc1fda2205aeadf61338d3dc0819a3ae2838b021963ac172006ada2",
+      "after": "df3360c1de6863e71f8b765e45f11e4dbffdd2382ae65c38d388df8b74471d57",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d0471255-9ed8-4e5b-8229-ee8cc892d4a0",
+      "before": "c1cb07c9c6a9d7e92d8a9f4b874c6e38fa2941e7217ab83be24ee07f4a9bca9e",
+      "after": "9f251f7aee4ca03ba72b7662e223fe39aad8206e2b94d821f6e7db1072023653",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d2bb25be-440a-4a71-b6ea-46b7d4864af8",
+      "before": "0b7864408b566ec80bd760ed791a35333131616a7406e914c348e0bfa013e3df",
+      "after": "8fcea2fe0fac728e8b082fa8ce24bc0e361a0fd38ef66e12560a4913a398a54a",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-7855380a-08ba-40e4-ad30-6fd797d2a7cd",
+      "before": "85e63fcdbbe95c1334f30e8d6c9f31927c0377c98148f73bc27130f1935c6fae",
+      "after": "95c04933a3903c3a7d1fa696d7a22cdebfb4538b7dd4c9290c2d27fdfcf5eefd",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a6119e22-15ef-4803-b89e-2440c32778be",
+      "before": "02808c366cf6e9925fbd00667d3b7a8b75f5026db1adf3f17c99c329b53a43eb",
+      "after": "085b09d71ef911ac3238d4d83175a05efdbb0d1bcc6f06163756db1eb8f37414",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ed8f65ef-e73a-4d30-b079-3a0b5fd62410",
+      "before": "c3a7a87954dbc9989941461a03594acf5d0153bc3334ce1d7929c1d02ef70e15",
+      "after": "dd48c2be084f9105011acb852cc60d7bd4dd655ce040fa419e63122ea5e6ebcf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0f25ccdf-636b-45fb-97a1-80f222682820",
+      "before": "d3bf75a75b2436970d556146fb9df97ea23a63e3277eeac4e3668eb7c3eb27a2",
+      "after": "8bf3ab2242bca31d96eac99b5ecbea257dafd033f865ec2582aa0a7183889c26",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e4c4ec43-5cba-4cf8-9d14-cdb1fddceede",
+      "before": "34bda209c14ec714cc5207141780fd6ce64fffe3885a3bef3b5fc5eaedc15281",
+      "after": "5db1e7d7892fa4d798a346e381944bafbe56e3dd30059629e540967a49404b59",
+      "reason": "« Même signal » ne donne aucune fréquence après mélange. Reprendre les fréquences originales de la question supérieure, même composante inférieure.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b3993a55-fd14-43bc-a693-dc76fe8d8c5a",
+      "before": "feb7696c38c6f94e94a78dadebdc48c0f5749cb899312a83df9f5818c46e11f3",
+      "after": "dde12a2361ed9796af10ffd6ede40010f90187ce96e234ef87ba6283d98122c6",
+      "reason": "Les noms du signal au-dessus des dessins permettaient de répondre sans lire le tracé. Les labels deviennent neutres, les mêmes bonnes formes sont conservées. Ajout explicite de bands lorsque ce champ manque : sans lui, QuizScreen affiche trois sinusoïdes par défaut.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-095a54e3-7535-499a-bcc3-523e00b63876",
+      "before": "dae28611e20cd841e22f08b7f1f6264260014e5a27040e035f7889cc1106e108",
+      "after": "c82fa6fcc9a80c01a7230276560033586e5aa32292e86011ddc2a27ff9704f6e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-4774368b-d782-40d3-bbe3-4383989d796e",
+      "before": "9b2e4b206f6b6027da9b3ddfe9f54eb76d696ed32ef2e1790cab52454ba1ebaa",
+      "after": "e797a72563e9fb44fa5294ab69b2ce28712e683768506d19ceae51a1e31e88a9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5ea69575-3920-4fbb-8f1f-35fdda2f0b5a",
+      "before": "5f1a6646a3133bf58e709040e035ced6d8109ed775880b562898e87f2d48b3b6",
+      "after": "41c1e3447c233b9c460de8ce919826cc182155f5f4037aab2d692abbdf6fefab",
+      "reason": "Les noms du signal au-dessus des dessins permettaient de répondre sans lire le tracé. Les labels deviennent neutres, les mêmes bonnes formes sont conservées. Ajout explicite de bands lorsque ce champ manque : sans lui, QuizScreen affiche trois sinusoïdes par défaut.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-82f93f23-41b2-4c56-b340-8d07c1cbc2b4",
+      "before": "df7358b5f519370aa7f18b9da34c8e0227c655aea045d88f9cfc683fa98b0688",
+      "after": "2a5b3d3c5f71e957e49e416e73b8af40477f74b3329401f35e1f72b578392cb8",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a6ea29a9-b2ce-4807-abfa-66af712a6d68",
+      "before": "75b40217ba077bfef7e8bffcf0a391e8a9044afcac3f199e706de6d90453e7bb",
+      "after": "ea1824364ef2b16b3b64a53a98d46b6e295c17e160686b1b684dfab498b26229",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2f447c9f-4836-40bf-be2d-04fe39755c9a",
+      "before": "0324e8bc1d21164933024cc3b8b3d7e69ce0b414dc4692285e6934d51691597b",
+      "after": "c0498744376189be909ac00bbdc28be047604e02a96b726e849f282efd3be39b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-47c373bf-4f09-44e4-9aff-60a845f171e3",
+      "before": "fc0614d8e4fa1830867f36cf99db54dce6dbaf956071a30262b2820d32240eff",
+      "after": "0d3abe480a65e1e259467f1f5962c07196ab003afa6f7206208da14be9d017b3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9424c3b8-b666-4df4-a1ed-34ae47a5e652",
+      "before": "0c4c461eb34b195c3355c3794e764fd2542269416c9a1fc6dc88cb4e8be03ea7",
+      "after": "f48b1b9df7a1b3ac21b21710b9a93a8963a655a6643bfeadb088c568a5ddcaeb",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b39d580c-e55d-4e4f-a7e5-6530f84c6571",
+      "before": "025fe90c3052b4a2970c6fa31e85b99794e677ae3bdf10d1d89b50f68a36b963",
+      "after": "93c36027c000de492fcfea85fd092992d88042302576aad6a4b171dbe8f43289",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6e406591-53ab-4dde-b633-3eafebd3fb06",
+      "before": "e00273d60e83228051c98825ba6fc690ff359e18e0ac27f91b32a903994943ea",
+      "after": "9bd20fcb6eb11ce7b8a90cf6b3004b4bebc42f2d5494d75927497f2e4e437cd6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e3abfa4f-2578-4ce0-8be0-b8721ded8997",
+      "before": "46d03969ed3418577c12c07ed05d1260802f72c08cc609a59f9607ca9f98e5cf",
+      "after": "f30bbd4365f7adc41b2bce2333ca05bf5f5605401353167a33442357bf85cf38",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-370f8f7b-aa99-47a1-8719-1dbb79b3ac42",
+      "before": "8dcd505e7370d879f42a3b60d2f1f7a510be1aea393d64a67dbe3a30cfb288a2",
+      "after": "1b401fe9f6ee44d90f2ab979b232167ca16bd64a6f465530fcdf82f8de40215f",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8316c47f-2d9e-42d9-bd0d-05679c5c3558",
+      "before": "678632e0f2c8ec752016e978c2f265337b9a5a25790aa92ca83ec7f7a8452ad8",
+      "after": "69e89ffb787fff4a80db15789f0f004742d7e77bc5e19c73cd45f2ec96bbc772",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-dad59f03-8430-40e9-94d8-4d053476f285",
+      "before": "7ca53b1ff3f2956227a33bf7abcf1ec4c6d91787e6ed77ff856a3c34c64695c7",
+      "after": "5e23f9a2c18bb50b7db00ce35e5ec7707d9d760aa2a7a965648b9f3915eccea5",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6c6c074e-96cc-472f-8de5-cfd595b5ec70",
+      "before": "f1ccac6ed03f19480b5ba92e40742fa7b9dd82eba67626f4455a19b21b70cb8c",
+      "after": "5f815bf042e7cfd9127b538f807691b88ab69124c29bc115844624aa075d0905",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e81656e7-8f49-469a-846e-3bd35a425761",
+      "before": "7bf7d4f98ac18b981ed7b4609ce1e2b2f2d88098905e28ffb0dec99e8835f29d",
+      "after": "5e23f9a2c18bb50b7db00ce35e5ec7707d9d760aa2a7a965648b9f3915eccea5",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9ed3ab86-87aa-4f71-aca8-491e84f40c19",
+      "before": "621460883b1dbcc9bfb647544b2680bd5493307a4a68d13d97a32bbe260ddf50",
+      "after": "134970c984de4c78fa37ac294e5b244d21ed67746bb048dbfb9adfa4018ef9a1",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-47edd5b8-8530-4326-9adc-c4e8dd2817c5",
+      "before": "de64546ef62eb9f005ee151e69009a5c24d8764730dd30a1652e04c363f69744",
+      "after": "c5d5600b7b479bc6c6688dabf3461220914dc38a669cbafa9a56924a45942572",
+      "reason": "Conversion explicite du QCM en saisie numérique 0/1. Les distracteurs 2, sinusoïde ou oscillation sont impossibles pour cette sortie combinatoire. Même porte, mêmes entrées, même sortie et même UUID ; aucune notion ni solution réattribuée.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-535e52b3-df6c-4aef-a45b-d6e77e508b2f",
+      "before": "eb90df73225b93e75f7e17299986968d023a011dcfc8f8bc9d8d003601d7807a",
+      "after": "9779784ca963488d2a7d211155f1c337e1f7535c0f795146507fb5bc64d9ae9c",
+      "reason": "La consigne précédente « condition à la porte donnant 1 » rendait ET et OU tous deux valables pour le cas 11. Les mêmes définitions sont maintenant demandées comme conditions exactes.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-29be6ca6-fdff-4a34-a0af-58419fa0bb80",
+      "before": "35ab7a00d41cf835e8f3b46c323d9e36b53d84c0ea56da693d88dd9b515178a6",
+      "after": "22784e7950188d7e35ec6121e164dfc3bce5803ac967f159b3fb0125ea463faf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2ad7d5c2-6b09-476a-99fc-4acb7a8b522f",
+      "before": "11371ef8c88c44f746416ddaf2991d67b5da6605c99ec695f30bcc9f32e10b4d",
+      "after": "a3924143d943d7bf86bc982cd1d3b9e4a1ba787cbcec746f87cb323d7bab095e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9f4ef5f4-bf72-4c00-9e76-3331b6662ef6",
+      "before": "cc0566906e88edacdc4f8208e4e49b188656cd6712b01d0b98f047a55f06f2e0",
+      "after": "44d881da73d0de2e88f6015327c24f01ddf7cd96f9b1e21412094f7bef139a0b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c0747150-bbd8-46ef-8a0e-f9ac0ed2785c",
+      "before": "8f887f3d815dd362088f59b96ea5180396b0e501c360e4c750942f6128412ce4",
+      "after": "a90a9d9781611f7d5515dceb1541d31877c548a60f99625e3e035f10cad408ad",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-98533dba-f07b-4d86-a05e-9481a16ebeef",
+      "before": "059631af9631689b86b9535fa7f675753ce0e482e4b34915212faf84fb400d7d",
+      "after": "b50fd0ff1cb675c0f94a19435fe55de721f897fc5e266e31e5a2861268e3afa6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d8986210-1756-432f-b45e-e11737448de1",
+      "before": "632025731fb0d273835b5eec9ea3c4d0de216a7940fdf34c8f5bfaf37ca99bb0",
+      "after": "2dcfaca95c080f34ae143636bf52aa60b18105c6065dfb8e615c2f5e1285720f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8de686bf-f4ed-4be4-b979-055bf431aa82",
+      "before": "569a8d1b4d8cc545ac6db61683df942e53c5d9dc39145b299c68f9b185698cf9",
+      "after": "acc82054f6a56212b22308725922019b302a915b3a75e68e5e1a670a2f059214",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5a60410b-66f6-4d64-a722-5519e36eead3",
+      "before": "47a448cc46bf47c443e88cad668a2494ea01029b1b2b5885c59f22b93ce768bb",
+      "after": "206731d686c2fff6881797a0101d890d9c0bb441adde46a7537b3993bcdb1b4b",
+      "reason": "« Même mélange » ne contient pas les entrées nécessaires après mélange. Même calcul |10−2| et même réponse.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f9e7834d-d204-415b-bddc-78ebfc2b22f8",
+      "before": "75b996a0e7f48663ec9f31e659a84c8da25a03b43fc3714d3758efa61d7aeee8",
+      "after": "13be491bfc1155c54d821c44515d4fd6053b2d567d18b465d772f063f0dc7a42",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9cbb65a9-cb29-4db1-b5f7-16bf212ea709",
+      "before": "361b10194b18886fb6fda23adee1a9f95ba90377c41d55a8436a4232142eff79",
+      "after": "a3c58547c21bf498dafe8a238dad012b5ad6231c24e702e7595cbebca6f20273",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ce5d14d4-446e-401c-b785-ef5bb23d73a3",
+      "before": "34e153a52b93e8bdfa502c3beee1d0d825916d803f31f3f353573a576fe9c2d2",
+      "after": "50968d733232f270b658ffdcf2147cdf27f552c5c2ec7480b914b58e3e45a6b1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-554b0c80-e289-414b-b2cb-f4a5c8e6ee33",
+      "before": "e5dc8d383953dfb9372199fa71f6f1b3fcff7242d298a49ec3706f99197bb7d2",
+      "after": "e6e9debe1b5c3f5f1c55209bc91559717fb03700191aef9fe70b8730535e2bb1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9cd2048f-1bdf-43b1-85cd-f52999deb08a",
+      "before": "a3d71b9c8675d04e3ac5dee0ed797639ecd135cd2a6dbfc59d3ad28e3945a033",
+      "after": "ce5302d8ff8c31853782411cccabe76cfc6bf13e2b0e922d813de5f119cf9397",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-feb20954-efb0-4b05-a3de-7bac30eb9cbd",
+      "before": "977d0f01ff6b87206d1308c87f0d135afdd36df58021764b6203ef78a68b4e0b",
+      "after": "90c5368e3dc78939acdd10263b3a21822061e1c5dece4796ee0e52568f68d7bb",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-03e6ae81-6a81-44c7-b65c-30f2098b6bd6",
+      "before": "abebe43d218502529674e5f3617a472bf974fb8e8ddb47befcddcb58ba2d4982",
+      "after": "d30b934753d3086cdb8e466e479407ca853015681dbffbf4091d39e5f170f620",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c15f4ea1-5172-45be-86aa-304d8f9ad48e",
+      "before": "f80b9446637d7004a4a9caa73b39dbba1ebeae8ec4bf55be7e7c4c45ac770b08",
+      "after": "d5625920357912da19470dbf9729741b22c9ab0be28e03b9272f5b19e5e701da",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-615d2072-36db-49e6-ad85-50a40a8c797d",
+      "before": "80f8ba54db6b334200bfb604199cb385ead62a5151dc89b40f24e8c331fc8b49",
+      "after": "6acb8ce6507bc6a4b1482035232ae8c4d4f259306966ee0bbd491855fb874def",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-fe39f773-12c8-4594-ab86-ffe1f7fbde1c",
+      "before": "582ba38ad7ecf5f43281f91cd9451f05421088d96041670c12d4950db1299e1a",
+      "after": "fbeff7a960363fe0ba9e4e9e890beadd3b4c09bd1e2fbf3e5b3e0944fe128971",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8d0c0983-6391-4aab-9525-b3e6776cc6b4",
+      "before": "9317624f0dd1afc4624f4fe6ad352654ebc4ec1e119a1446d185074255b96f37",
+      "after": "ef1ffd955614d61058bec7ee75ce0b3a7483308906607853019699b0fe269434",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-663e6c05-3fdf-4352-a106-3e217ba90adb",
+      "before": "b4dbfbab0e9aa6b6920b6042bd63c1dc9f0b79440210f6d65eb32a150b9f591d",
+      "after": "87546967c5587aa85573d6c8a80bb535256bfac98a4c8055e3c143b108a1021f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f7856090-b951-4ca3-a3dd-ea20f6269963",
+      "before": "748c21dbd530b4d015649b9d8d1e595a1abf27304e02d009464127a86cd20da3",
+      "after": "f6c8c32791772353255d535d60ec504beb1f4e9e1acdf4716f739027660771f6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b604977a-f1b7-4c98-b471-20d09e34e4a0",
+      "before": "667d13cdc9dbab337826d525901854a32c4448d980dbc16486c2b2f88d06165d",
+      "after": "e8c6ea50db8c87dc02d478a49544cf736e37a45d5811828ba7326be1d4ed001b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-bcbc9851-1356-413b-adb1-2c8fba954ffd",
+      "before": "884694189a3d98f1834e80e346fc64d996ffdddcbb6a945502625b9bbb590783",
+      "after": "0e680ddb3e395648378624d896e91401be3e2c08c243dbcee5e28c5faf243db3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-101e3160-ded1-4c9b-a13a-4b288f1e4455",
+      "before": "61a88ceff4e87b30a7c6eb8e9ae98ebcf2cedd0030df6868d17b65b47624f603",
+      "after": "e290a561c5733689cff4844035c67b40f3fc1d9aed5933d7db4b2b1143e4a953",
+      "reason": "Les noms du signal au-dessus des dessins permettaient de répondre sans lire le tracé. Les labels deviennent neutres, les mêmes bonnes formes sont conservées. Ajout explicite de bands lorsque ce champ manque : sans lui, QuizScreen affiche trois sinusoïdes par défaut.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f2243fee-279d-40e5-bccf-05231481c906",
+      "before": "a466c1de5e103db3f37fa69d5db87a3e980dffb8bfdcbc145c03199b9c2f2b98",
+      "after": "52e71283509a76ca1e440e62e17047750d923eba634187737225be7f90ee1542",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-da13b913-d974-465b-9f9f-d54c95169b28",
+      "before": "e6bb86b4c8540cf34d80ebff5aa38031c0c056a7a79ecd62879252359098f260",
+      "after": "7713edd62cce235e7e34a827c6ae8c636a074b072a1630b287ee894292d348db",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-67da01bc-f623-45ba-86f0-8bf5e9725e51",
+      "before": "ed047d5239e6fdaea1f7d441a00e3409baef6a83cd8c054ae0eb9ffb8c4d2a31",
+      "after": "380a6f52049c445cb343aa2b319886d50b9a4d45a9af23c7aef928b98c156417",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-28fcf803-4237-401b-af1c-7b1dd4d818eb",
+      "before": "5def5d251e2df8300976e8200f714c5d09620a9106ab198d83f209d12fdb9417",
+      "after": "e27b9c7abce9f6ef382f2697c3010bc893a2bbbb3537787baa386fb8d3b286b7",
+      "reason": "« Mêmes entrées » ne définit pas les signaux une fois les questions mélangées. Données originales conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-caaec494-abc2-4172-ae4b-3429f893a437",
+      "before": "e34e325a61d0b2f5cad39e218c84dfa1c212c9f6854e4ee66634908f84b2d4ee",
+      "after": "7a084d2a74286b5100c6a05fa9694ea42c9d25f2e25398ba5abac0e043539436",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f9714d8f-f513-452c-8137-63c83979f95b",
+      "before": "796f705e49de8899aad94645e78d84378ca99cfa993fe25daca8c2366f4fde9d",
+      "after": "177ef2c93f62dbd9e832217eaad40fe143e2b139e096b39a612f9c6dbb066104",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-95afa68c-0574-4008-a0a1-f2e0d56bdb62",
+      "before": "e2d6af63ed692e5e95f45a0d29b53dc48ed9df1515b5ddf4a6e00956c4522170",
+      "after": "0b0fc8115c16e161a1314b9fda635c77f70e25d302e4acc0c1a2afcbefcae228",
+      "reason": "« Mêmes tons » dépendait d’une question précédente qui ne reste pas voisine après mélange. Même produit IM3 et mêmes fréquences.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3ba38ea4-3d30-4380-a8ba-cf58c371fcd0",
+      "before": "eba71b8c52dd9c981e5357ca0e9a256c1f9c60ac77ef8f51ac33dc469564aab7",
+      "after": "6329214f1607d1f7344d4fa2a7871ebf35496564d42b88fc2318909ddcd32a7a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c5ba8b16-1df0-4ee8-84ec-0d3f33d29dd4",
+      "before": "d8b0999b870a4c28dea23fbd9740c183e1decda7e04dcd40ecf20a1bca36d4ef",
+      "after": "dca0be788e6e560425dddc2760cb724b9f45e59fb5fa7af39c2f09b6bc852b59",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1c02755c-8a1d-43c1-8bf8-21e54bd412b2",
+      "before": "039b02d2ef16de4ab368b76b457a2adcf568222e9fa4c85a4f05262054571895",
+      "after": "824c57fe1d085df19484f748fec6c973db5c40b6198d75357eeb9bc14b18574e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-91c74446-03c1-4751-92bc-c7034890500d",
+      "before": "b5822af20d7c01a379f54fb8536b10c5e3f9bb4d3aadbb7fff5c0e4339d21907",
+      "after": "2b9fe600f17c0b689aa8efb9dc14c7847784989a9118e2790fc5bf779b76d7d2",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-60122829-3ce0-4332-b03b-8dfe2b2a0656",
+      "before": "6998ff857c187309b6a8fb5ce5de3ba2b7716bd3f228a4cc1bc72d4d178db8d6",
+      "after": "bc75a7d51cee22bf7d15878ba305b27c10a70e2cb793c18e215371ef35d3629f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d5fc0f9e-c902-4e5f-b9ae-65437579a1f8",
+      "before": "916fe023d3e2a3d89d4bbfe584a9fd8f69b99a864fb91864679ef1cf9ab9f368",
+      "after": "9ff252d652c4f29c2da9579b27f2bdc47ec96ba5e1b0475b4b62d6ee4539ff41",
+      "reason": "Au centième,0,67 est correct. La tolérance0,015 acceptait0,66 et0,68 ;0,005 accepte encore la valeur exacte2/3 et son bon arrondi.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-83c41935-804b-4423-ab9d-face92582a9c",
+      "before": "4318a3127841b9c771c6b78f74abf7e36c635e69667c03385937d35bb60c2887",
+      "after": "4c1e962297b1c5fe731847c7e12323ab078d9ebdb748a6607505532f6d510ad6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-84e0fd90-3e6d-4671-ab05-b57e7f02b2a8",
+      "before": "05da91a93c2d92e7625c924c20981acb560b6429e1f0947f0e903ddaa71be550",
+      "after": "3de00bf9a1edc6ccd9ba652c10c41491bef0908129be75c175be76acfb9dd885",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-17bfa538-1e8e-4e03-9b6b-242f84e87570",
+      "before": "cf34748571155bf4880939564bd569a7b9806eab16818c7f9e2eb0e949279eae",
+      "after": "63503019c6f2dd63262a706f7490959da1c2413576ca61f493fe39e784381c66",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cfab6af4-6680-41f7-845e-945c2d44d57e",
+      "before": "4019591697ca5444d7df198751806dd90e2f174e702d56546bd35f0793d9a830",
+      "after": "4cf85cccd3bd987bd7bae373918fe706261ebccbafef8515e34a470e2f475956",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2ea24e29-a57e-4b4a-8c1a-3e126cc4db28",
+      "before": "20b2d4f8e66f0e5b5f8fc229bc2de83472d533a74133b58b7328b0b8abb16ebc",
+      "after": "67c54125f1d394114aacc573e788071015022e0118ff07c678d5d05244b61ebe",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5f8b60bd-4398-4245-84a5-3614d263e33f",
+      "before": "77a152b187b6857cc9c0faa20fa370772f6d7480b22d794aa5a256aa8ed51a9e",
+      "after": "5ac712d04b7cfb79cae17834f23960600630b113b0d459e071f80aa2bcfda6d3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5c1972c2-9e5a-4e64-ae2b-94be25dd2fce",
+      "before": "623a6bd7a0788b93d1d0e162131cd1e7bf56a15073ca5b01bbd33621dd93a527",
+      "after": "40b78afd5264a641e5f09c036bec0186ca0faf8e5f4f58de4546b1a7904cadb9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-948b174d-11cb-400a-9cce-cd2eb2a6b319",
+      "before": "d92345b849ca5dc84658e063484c76e7580f12f0ac5ad771aae745de51e3a32f",
+      "after": "d585fdd1f2d0b304c3ef16c27292755d12eac77c28add1316ce862fc30a5d9c1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-885b324f-7f0f-46aa-836c-5c80525a8353",
+      "before": "1fbcda1983f541ea81129b8b5b4e520e2f200b64e17188f78b88b8d75eeeb4ee",
+      "after": "45c439a1f0bb4bdfdd0d1be6e5d9172c8279cdc465f98fb2315199b69f4cf009",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b0926bec-8ea8-4600-b6b7-c9dfa247463f",
+      "before": "2539d99de431f92ee69fe928ed3a0916b98965edff0d56bb2202cd938d8a7ead",
+      "after": "804390e58d8e77518ddb120b54a65fc7b15502824ee3c83b771e84fd6ecf5968",
+      "reason": "La tolérance0,01 autour de50 W refusait le calcul logarithmique exact50,1187 W, pourtant plus précis que le raccourci enseigné. Accepter les deux méthodes correctes.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a1e73bb6-dad4-4ff0-8ba6-2f1d5eb0b81d",
+      "before": "a88237902aeec173db1dd8d6dd27fdb7ccc48d7b793a96c3478cb04ae63f0bde",
+      "after": "37bfaa41a543629803eb4ed5e54194ecdae8d2a14044a8c1a5f6ce80dfebb985",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-27b6b72a-5755-4253-8607-ed2b1d4ddb0c",
+      "before": "130005c7dfc14b26a504b53fbb208ea12f610751be19ace2e2761de20be07eb5",
+      "after": "4c990f64bfc444936c9042b4972dbcf55f78f918031ed81d4a39793699e082ff",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-06d7a27f-f911-4f99-a0d5-749e4e1de9d4",
+      "before": "f673b5eb10e644aa1883842bda88174f91782f3e869a35f7402a7427eb141462",
+      "after": "1f42612097d5bd0877cb79bf868f708956bd3574f595c5e93d04faa8cb61a856",
+      "reason": "« Même ligne » omet fréquence et facteur de vélocité en séance mélangée. Même ligne originale et même résultat0,6 m.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cd99686a-1b33-4337-885e-df63de945d04",
+      "before": "7c37a6639ff8b4905930f6796694374fb736cddaf7ad90069c414afcf899f998",
+      "after": "99f31c85bbd95e64557337014c13b65bd7ee2bc14781572cba23eb01dcddda76",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-458d4bc7-0782-4325-9afc-d40f04790686",
+      "before": "ae850b4b63a47f3ef0571dc16913c524c4bb94569dabc003f29b5383a27f013c",
+      "after": "8c045c953ee49fff8848ee012de0f0c2b6b93567653175d1c4d210a897150be2",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3773d2fe-560a-4f1c-9045-76c0f51376e2",
+      "before": "670d0f73b82bdee77956804b02cb42550add70e3e9a85c10ed16068f94b21005",
+      "after": "12398f42d775f2eee19c04aead0d53c28051d906978ecc403af871fa34cc5fab",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-7d5fd6a8-fe55-40c7-8231-a20b718a31e4",
+      "before": "fbbe45f5df5378b014b5c22945d5b0066b86cbc3fd890198e1cdad26d2f3e7d2",
+      "after": "f7de303437b33ce0a6e03ac2d5af80f67995871237749ac5000ee24446c5a8f2",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3bde9431-602b-46ee-845f-d307b01d7f1d",
+      "before": "8c52f44cf8a3c6a705ea4de6f09119834a2cbc0bab9807853a130e2f192b68cf",
+      "after": "bf331bfcf4c4deeccd3a371396d04ccd15e9cc83bccdae7fdb8b4b2a90db3137",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2890100a-55fa-42a0-a8d3-c54ff5ba60a3",
+      "before": "2e7e3f390214fc3e879cef8147de3f0d3bb98c6ebf121405cb6bf61f5818cfd4",
+      "after": "75d079e9943c9ddc469ad26aa453f75dc38ae7d5ec25fb946f9259b8a87fec42",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-831cd2b8-c02d-4d4f-bebf-85183eeac994",
+      "before": "17745ea8414863cd98e8f8c755c83c0d7fe232d3e776eed4961e0ca5ee24c339",
+      "after": "5f4b40ea4198ba7806f20f1ea59070d5292404e09c606ec37f6a1b4b8ba01203",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cee1f493-9b7e-4272-b10f-324f78642c37",
+      "before": "a4deb543648d3f48ae921dc42ddaced50d25996a3b14b3ac6eb48e060e5fe1dd",
+      "after": "e095ac147a1d21cbb314ee1c0d1c54f99c3d7d86c2db602580bbfc361c3c5d90",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6fed8f39-1392-4e35-9e08-f30f10f95f19",
+      "before": "82bad6700696b1ffbc6f1fd98658cec655ec34d323f351a6da77edf5c2be2f17",
+      "after": "5af3e8abd2a3b5026f3f6663f862c0cf907a0f3cda36ff1ca830b6dde9b488f0",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-92c841b9-15a0-42e6-be3d-b696653d5e65",
+      "before": "0b04939670e0d4132282bd26588f5610f68d4543cc85bb61fd6e62b8d63aa476",
+      "after": "5616bfb4878c8757b5ef7b1a926ae7dce8dafae2fd171026c997cd6836d949c4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c42ff5c3-099d-4e40-842a-683157fe5e1a",
+      "before": "5ddc50b8d61db31eddf907e4e77294cb44e58509c9b63c3cc080b0b0c503dd4d",
+      "after": "723b1675413c8a326472787328fca7f4af503dc885f3d8a0d3130ee855c62271",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cf4f7d49-7ba2-415a-91fd-20d2d71bda74",
+      "before": "316c6109d5129efc5e113b224aa852d61421dbca47e8e7db8f2f01cb8a8adba0",
+      "after": "5c4bc18d86cd61b5b995aaded18300701a49982a5012b9ae611b8910ea1a4a7d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9ccd824e-1918-42c3-9dcb-e3409687b3bf",
+      "before": "d863d5e65f4ef82b9880e31396cf8d0d091ffdc819ad6e10ae12a124ed278ee7",
+      "after": "9fe78fb3b08a447833e62cacaf5c05c80ae28edff9d433a7e655a7409bc72d55",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c4057d52-3002-4488-9226-89a448c413a4",
+      "before": "196c5a7bd7b330cd3ad312bfb2ef0bc590f1296e46120c9c947717b59977ad37",
+      "after": "8ec2339869e333e5ea07de79af0060ebeae1e6c1762dff43f1361d0132ad8ac1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-998f9a5f-b74f-41b8-9120-4b07b20ffb90",
+      "before": "4352d416cc84b87275104267df401d5228698df75376e3bf40f563724f3de547",
+      "after": "99f48698475f3fc25e351581ad5e5d2e68b96b4e16cad5ee5d96e7f4036b7992",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8a1d91c9-cb1b-4c30-b275-fc8872ac5bfc",
+      "before": "851264dc11039bf1c7b07dc3c66fd094f2bfe19016ac2a62f97ddf93df898a09",
+      "after": "7e8d96bb20efe604046af296a0223fd63472f889ea6190b12de6dc407bcd185c",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6bbf38c8-ca46-4b13-976a-2b13a39c8e50",
+      "before": "5627de08d4868517f4a16ef19abc8e71c257edf3c2008f3c9d8b1e75ee672f9e",
+      "after": "948ed030656cd8182cf44d45d0e99b49984bdc47afbc3f107658596cc95d002a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-42b6467b-9033-41b7-9d2f-cff9be00a27f",
+      "before": "ce4f94f38664f14c1741aa88e1bbc4e39d1aa89766267e28cbb132bd972c16b4",
+      "after": "c8127defc7c43df14486eb3364f54ea3b3493edfc86ca9d1a03f3911f4890515",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-88890d3b-c759-4ca4-89dd-c07749bebcfb",
+      "before": "c1e2055993ca10dd482b7af32ab00bf810ae76fdcbde34c43a9151bea314db97",
+      "after": "48bbde0156041bbf75984542d5af70308d3dfce3df73dd2269e1dcaaa9acbc00",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-c05f254b-728d-41b6-8de4-1898ca7b2618",
+      "before": "a04d89fb8775fd7591f82451563dc96c1fe5bab1aff4ca2a685802fef26cfc3f",
+      "after": "41465199ee5aba70ff8835a7ee0fd3afd8190ba92cb69f396d2479c18a8bbf9b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5a7667e1-6fdb-472e-902d-2a8202b6aeb3",
+      "before": "404cd6005511ec5148e08d4add1254d9bc5993ed45147dce710a69f0a3e37e86",
+      "after": "e0f3bf228315ed5f58d7f577fc046ddd44ff37dbc9eb675904ef154f34543ca1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ed1449fc-8e33-411f-9a29-0dbd9610c0cb",
+      "before": "8fc9ce076236cb9145baa6a0943e03752219e4cbe71ff6f711daae3c3685244a",
+      "after": "0db081f9a7545426daedcc9bec3b0cd211f9c1d6855dd3c8297f574d69e2c1e0",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a2420176-90a6-4e01-81d7-19ec75420a30",
+      "before": "bfe7e5edeb728fe5e252a0e1a5856afb59335cb1508d2c38e14fbc7d5e1c1fde",
+      "after": "3a5f2f348a499127c08391ca472596bfea626e63479adece50737222c8cf8aa3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-33ecdcc5-631c-4708-98a9-e248c31fb137",
+      "before": "e295d72a5daeaf680505ca65ec60f6a35cac3bb57dbf5176cb920dccdf9c842d",
+      "after": "f874048a24d9f60cc4d08613c3f913bb7f8ae0677effa2f618bff832fd09526e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-1b2f1d77-e2d6-45f9-a4e0-8c439882ade0",
+      "before": "163173023e088f39e71ecd08c997eda2fbe5e7bb5d4e6d14dc91bbf5cdd67dfc",
+      "after": "b12e04f58d68bd5d62deeb58761f4fd9eef700fdc9404fc9efc3a53be43c3797",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3b636d46-ce91-4a3f-b07a-90187029663a",
+      "before": "b0acb827a90180d7b292a981178752513d89d2c8d988267b4fa6d70160670e2c",
+      "after": "7e35aa79d3f25c5b6e6fd15bf4a10a11955382d00d5633782b65808b93ebfd75",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cbef970d-ebac-408d-9204-bbe2cf6a1b15",
+      "before": "c29b8564355a7833bb03d2109ab6c0a156aba948f2776efbb88874a7f8181189",
+      "after": "90dc0cabda8454fd3e3bcb5410ca5df149ffe334dbbda40b7ff3be578f4d847a",
+      "reason": "Préciser le point de référence de la puissance afin de ne pas soustraire deux fois la perte de câble si l’on interprète20 dBm comme la puissance déjà livrée à l’antenne.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8ed6ff9e-c705-4ac8-b8cd-94c116a65f50",
+      "before": "085ea8801b82382a4a05cb5c4b237934eb55922e8fdf9ce85df3db198c6b7746",
+      "after": "cde7f9a58a450c7a7f51e22a4b7af6e9f882b12a300d7e01b1c02384bfd66e04",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-6645b2df-7588-4a5f-bfc4-ddc4ba442f4f",
+      "before": "f78e1263f92bff9cc748afc420fba944c0f9947aa58ff8e34c0392f82b563a55",
+      "after": "74dc242061a4858ba6b46094e998374b987c59f7cba98b8f43049af4889443b0",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-740c358d-453a-4617-9145-7f23fcc06515",
+      "before": "84d67ee02b45bcc3b5e978a439faa72b21a3aedc3d7718add7fc0a08cc660cf0",
+      "after": "cb72348090d3d2b94c7e3dd725fdeb34ecd496d3cbf85ae9c0b48c44fbdcc61a",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-0cd2a1c9-cd60-4d9f-85e9-cb38670ebd3d",
+      "before": "3959b19848a4b04d8d95101376d0c721ad83753af7cc89a2386612ebff556a79",
+      "after": "16debe452c3f457e671d114b3e45787f7ef1db3721bfef5c15069ef2755049f8",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9b99446c-d1b4-4238-aa86-c820064b0d5a",
+      "before": "5a5ea9ed8bde5e23922852076dea1ab858df70a3d4c9e9453518423d6d8c4f6b",
+      "after": "2fcb6b4f5d2006cc9d36ec0edaaa3558a3d5c4b8e3c5ed57acadeff784f63af8",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d9b398f0-ad17-478c-b95e-8bdd25c016c1",
+      "before": "8eae0683be22892d3ded69f1bdf56fbc270e211379fd682f19cf556d347d77ef",
+      "after": "a0ff2a5e33f94da4da04f0b74652030f88d7ce26da0b99836be56b4a1ac6fef6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-264d94f0-70b1-40cd-97a1-830d830d0061",
+      "before": "6df98976a81df04d9d75c95d18c4147aa531e8c9adce75a7efc5e9fa06ead1c3",
+      "after": "874808284bd43ffbf9a1c6fad652afeae9fac479ca0bb2964a54683601b06b54",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-d038a39f-02a4-45c6-ac9c-71466d22ef15",
+      "before": "b32971a9c48909f4313b293f8b52b6964c064afae3246a8d671eb2fe164eda00",
+      "after": "bb1bb888c55a3cb0b384d1d93e07887dc66806125e5dc0efbeb221fe76464cbf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-93148d8c-c862-466a-ac79-d0c19d736028",
+      "before": "d6a1072ca766eb9380bb3e0ffaf4d68569448c9d26f3d13f26d857a6be8f99da",
+      "after": "ee60de9f115f10d3b0c3647a321197ed3414d285d69bccb05dda4f763277dbaf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9937a46e-7455-4fa1-a081-97fe3ef7bb3f",
+      "before": "0596faed786f74f8ccfd8c24ff6a45b9f80f96fba50ea925332d833206c2e9db",
+      "after": "da87cecfb06b82c23fb242eeeaa835f89dbaf14fdba13889477705c78b646ae7",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e7283771-d8fb-4d03-8127-6d666ccb37be",
+      "before": "58fa5735b8d54df9d45142ee8fcc24d631da6b5aba86988693f257cae021664a",
+      "after": "ba94c3077dc07eb838c7457969a0e3210f841bcf0e006d1fbea51020bf1fe3ec",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-2b5fc32d-d4d3-4025-8ff9-b0b862627ecc",
+      "before": "00eb9603448802b4bd38fdf358f80559d623504906205a00d134f5738fcd20fc",
+      "after": "7c2dba1268913ced0cdca689ab4b187ebfbecac5a361d26fa394bcd84271f0da",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-dce2ce7d-d742-4b7d-b6e6-c8c84be3979a",
+      "before": "12d1b1090cb1c82a967a634f980841018465b3b619cdd6d58d31d5166cebf39b",
+      "after": "40cf25faa8e6b65cdf9903af2dd5c09d44dc1d12d17f51c2a830235febf02058",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-830d55f1-e8e9-4cb0-86c1-5f3c6986bbda",
+      "before": "a53f333d7f4a50b5ffaf1d4764e1192519e9978194b48ee9c1ea831518583fe8",
+      "after": "562545f34e22cd5c1bdb2030fa9f7f659a2a6ec7f26bf241c842348b7472f249",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-aafa99c4-79a2-45b2-a19e-e83ad40ca087",
+      "before": "bd363b227c33aae693f38cf1d80e182cd1381b5ed393defdb56a942f0a8894f4",
+      "after": "438c366a212ad759e46b742a75bc4e1042534aa73bc023cc802e20cec36cda87",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-43c5955d-1cb9-44bc-8e74-adc91ef0a246",
+      "before": "8e34256efe296de687dc44a7a814665f280b283acccd5a4683ca0b87345bc644",
+      "after": "f19f1cc032a7157187db1acc884249d5dae48c179954ffaa22dd3c05efa8ce07",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-07dd0158-157f-4f39-9e2b-05cba304a71e",
+      "before": "ef172bc25b041635652b33de158f1ed76a0771d63945cd30253c7b21ef5ae6bb",
+      "after": "0131276b401b0b9bf87b4001fe6a502743241b22f30fa7d72e0c0749afc467f3",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8a4e76f3-c8f4-48b8-b2c0-b46c4a291bbe",
+      "before": "65543de523b336436c323e66b81d8493f8f1f2716183f579e2061b9b8d7b5bf7",
+      "after": "47c0cfeb8d7dbe2119f24949facca125e53c6e1f3831a3728d8d5671a138a90d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-7a87b012-8c18-481d-ade8-06e0946fe971",
+      "before": "6647ff03c9ad7f0f071e063859c484dc6d0e3c1cd11818bd366dea1017a799ef",
+      "after": "8e0a6c1e76e9e68d8063da14b066ab62b96942f1d1c75112f08fc9b1cd0d854e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-21d975c3-1f66-40dd-96e4-0abcba645d51",
+      "before": "232df5fa0f30bedcb8b1bb2695a5c09777a23bb6614bf9b66cd75f23fb1d70ca",
+      "after": "887b79cb6fbe4e9459d3cf199aa9dd40f2854b7a6fdb2f5f49460d4bc28b2a14",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-13afbe52-c9db-40e2-8eab-e901d0e36351",
+      "before": "cd4778672b71d2b7aaf68de739a7fb43bd81659138d8a21d169f66eece8da06b",
+      "after": "33571fdaddab0d1d0676d14ff52225d1c013e37ab16014a1c87c985524918dff",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-8aaa8ac9-6ca0-4550-acfa-918d6c8f48d8",
+      "before": "39d3b17b100d4667a9c4187148723973d1c8624e662186124bb29cdb3187699b",
+      "after": "9b67d0273f4ce54062416548624c3977f5999d74dd40752edd3e267551c4f310",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-a015e9f6-ec7c-4cd0-87fa-29842a20b440",
+      "before": "0f08a01187b21f9d87eb7d000789864750304ce03e03672d4522d5191691b179",
+      "after": "9d6435865a55ce49c295de2fc79da30796f7c2764239b3673ef75de90fc8bb64",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-836bb05e-3387-42e5-91cf-997116c95b80",
+      "before": "ec9f70da83aa520ddd17e17827a20397bcf28a37793cbc4d518ee39dfdbc0135",
+      "after": "6e0e740e415e16759fd423c3500188d46228db6855284e146befa6e6e7eddcc6",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-771fa9cb-bb86-42cd-89a9-7a72b01dbc71",
+      "before": "73d8f41a6a05bd195b2a67c4b5a77968414d5cc246702e06a911fad11ad79125",
+      "after": "d6751bcaef1087b1daba7ddedd05c9ca228f1043822ff1eb3c4fb23ca2b375ca",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-719ac140-e349-444c-aaa3-36a795b67aab",
+      "before": "973d275e02d8a6a350c09b906df0c98bd75dd352366ccd95291e396b5efea77b",
+      "after": "c2e22616226d001a882aa31db1a558cee18bc18b317de883e0a4a37ecff587d7",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-ec39c7b9-2f60-4ef3-8577-4c562e16d6f2",
+      "before": "55e603060ef6aa14488df6e70703552de560875045464cdfe8e76cd5fdec42c0",
+      "after": "5121d3d3f252b7ad9b3d5783d0acba792a22e8f98883f983cd5ed34826bc31b5",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-0393ff08-093f-4d34-bddc-b7aa948d0bff",
+      "before": "cb8600a25535f865acf7b1a099e40945cc796e28d258b987fba7177faeaf1dfd",
+      "after": "55ff394b3d9cf2d3abd4a596890d7fe15620a7802c10977fae3e3685b016428e",
+      "reason": "La question générale « concernent un contact » ne permet pas de distinguer une information utile d’une mention obligatoire. Précision de l’objectif journal et distracteur report RS proche du contexte. La mention « fréquence ou bande » est resserrée à la fréquence, que demande l’article 6.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-e1900e2b-9928-4d9f-9941-dffe259f202c",
+      "before": "cee5c6b2e3b8f6bf4860e7387e591fc78b38f8c2e2fed0d3a0e6b56ea11fb96e",
+      "after": "70d5bf7524a7be4481da615d7cd4743d6f9ebfdf046ca14e33be7435be71faef",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-7fa1b6ee-b129-4df4-b0ca-a544ab7c0ff3",
+      "before": "2dd62ded974b3a3d89bedd95aefda48c497c3b79f094e6fef81c79111d8e405f",
+      "after": "cb2354fcce88f56e56fc1f862c1fbac7b61ff5c9e8cd4893dd9ffb460c5fb86d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-7bc19560-e17f-4695-8fcb-5639ac6d0419",
+      "before": "925638ea35a23ea6ffb5dac0038d0d2eae00876aa92b283f8f141a7cdd017a1d",
+      "after": "3f3b241450c5b8772869adfc86351613f24b324438c2d74a92ddb05ccd65d530",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-620bfe60-add8-49bc-a608-2064af2ae941",
+      "before": "4506408422d90186d013b317bebf58d7d3b256afaf1a99414a914ff4d474636f",
+      "after": "bf741f42ab452ce5f3f9880b262883c7d4390fe4fd15e21b80cecb83733861dd",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a97bd23b-54bb-4585-a794-d3e1dc109cdb",
+      "before": "362e656b7a95ea3e9342093925cc9e47dc2290616fbf9a7e28e26045482b83a1",
+      "after": "5c26aa5105fa8d325a2800be7eff70b5a1cf44f37ddfc6a806207ef70ea7083f",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-9ac37cd2-455d-4d5c-9b63-1bfc11068be1",
+      "before": "a42e27feff47697bd79cecae24a414241308f154b3e036edf27c03b150821b0b",
+      "after": "726173326bd2b19614cb25d93c74a82d5ccc1f38a32088883fa6d0f16f7baf75",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-74f88418-a5c8-4878-bfcd-0c4b73fe31be",
+      "before": "aabf2255c846608c6db30e2232a481227dc4e9f018b2cb222c6c16b97a5b64af",
+      "after": "be114e0676f9fcc0fd3604a6a72116a90a10961ff32e694cf3461d03b7056669",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8d316b0d-3b72-4544-9f51-cc0e339c3c27",
+      "before": "06e8bb4563cd6a99e77691373aeccf8bad81ae97454cf72a7690cfe3ddf9d8ae",
+      "after": "0527c2b74b9a302170c1ce3f1e1846e252b424bc3d5602de876eb60759ce22b9",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-3a0322a4-026d-4aba-b615-61a860ff1a46",
+      "before": "157acb35175a005fc2049a6073e5f1de3230861e92c9a896dd067858ffbab569",
+      "after": "68b2d9382b7acaff2f7c85f351ee0cc77b74d893dd2de8ef141da966007a23ee",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-95cc0318-9f4b-4818-98da-4738896e2876",
+      "before": "ce1cd33ddb5e9e93e5c9c79fb0eb784bce0cb4daa537e04b5746ada158fa66d4",
+      "after": "003d64e6c1a3694cb3f30170ec599d8602bae441f16de45b6006bf8a27466e2b",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-5c5427d3-fc68-4b00-bbf7-a7d6d2b73e2f",
+      "before": "f8320afbd0500c2df15d8b35a41c01c07eceae52fc7814af2bcaa08bce863e8b",
+      "after": "30f535073c26dfd2c1069c8d74b621a5420ff2ad3b58348a69089554d1cb4088",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-8b6b996d-38e8-4a86-8b47-80a87ec8dc1c",
+      "before": "492093344127faad58f004c650349afa197f45d0b6556af154ab1a1544e4dfa7",
+      "after": "c704a076de3ae5d5efbff2f55ead0c08108f334556e6a4b4d777c3c1107e6934",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-b53b0193-9360-4d29-8f5a-fadeca39f8c2",
+      "before": "84b92734186a2129c4d7ec8f4d6c3b2fef732dfc12f3c6c6d4002efd34b7e957",
+      "after": "55bc575aee55258230c302192daa499181fb886c29aca6f92e92777e4c751f75",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-ce3cb789-6262-479a-804e-907661de6b54",
+      "before": "4e93a369b1745fd9303c332bea123597bde6d9e66ea03ae1857ccc6800d7efd0",
+      "after": "957c371c5429e4f4087c5c9c2cb687293b3a5344bdbe9772e96452b36ba61cdf",
+      "reason": "Les noms du signal au-dessus des dessins permettaient de répondre sans lire le tracé. Les labels deviennent neutres, les mêmes bonnes formes sont conservées. Ajout explicite de bands lorsque ce champ manque : sans lui, QuizScreen affiche trois sinusoïdes par défaut.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e2765c2e-34c4-460c-a5c1-1787ebe61677",
+      "before": "82a09147cabf5dafe801fe9a092469e98ea8643db2dc3ee9af9e1ba410c99b39",
+      "after": "8b7547149fa402607bfa763818cd2ffa9c28130ff3b07b7694decf25c1718c30",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-004f350f-5c5c-4c73-b2e8-13379249fbf5",
+      "before": "22e22fa16228da94b53be4bc461fdd99b2e8685636e02af676616808c99d30d3",
+      "after": "25edddbeace244fcc3db698436b012cef2f412f0869a3450d7721ae1945236bb",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-f08df675-e6fd-4caf-b5e2-8e4006583c5d",
+      "before": "3dd095203446f008443cc77350877cc686da3c4b78eb54f952d1418c7c10b6a5",
+      "after": "0e33690ff934ce374a1875ebb25c5e66b0837ca62bd499dcfbb301b969d6231e",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-a38009d4-397d-4d77-917e-6c688ca78d02",
+      "before": "0f0243cc9c260352b41439705cc1e1b80a5664f64681ed301bd112529ac2d04e",
+      "after": "6a9e3c385953ed50d21554316cb2af6330198c85cd035abef9e8bac4d0db53d0",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-784d38b7-d8a4-4ea0-9759-671cd2547c88",
+      "before": "3925a94146321d8acba5d984fc2f07e47a3717d6092faba4a817baad1481d7ec",
+      "after": "e72017db6cc2c12adf3104315f075019bd6c6341f6e8e963c31a4abf253e4128",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-53c672c5-c2c7-4d4a-9636-6f9169e9c2bd",
+      "before": "24ad088dcf425598f4556ba74951391d8b33c097705708600618e5c70459ceb2",
+      "after": "b839c80c98d4ebd9580f2c22531e353d2741f911fa5414130595a8b429f69dc0",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-cacf7487-7bbb-4179-a7a2-1bcbe83a0f14",
+      "before": "f137ebea6149663533d2868f4151ca1a5f2ff7e4a14fbbd201c07c88b50e390f",
+      "after": "637ddb056e681864b22576c197bcee609489dae8cb7b83d57d36f00c9cae87d4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-d20cd391-da81-4528-8454-2e0689c5ecee",
+      "before": "fa5010c8750991e69ad00070568510e3c18e4b2048c023bb68a17d6b5921173f",
+      "after": "ecf0e725971a2c26a7559e34b04d3cb6cb5a5bb654109d31a49fe1ba16bc76d1",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-59c2967f-8d1e-46b7-b41f-6953658438df",
+      "before": "39298fbcbfbac7ae00cdadbb265d8478f9238ee4ce1ede71b7b6822b0d0dc14f",
+      "after": "60499b8f7fdb382abf68502d04590f05c725fee36686836873cb46ca6fe0bbf7",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-966d17a5-29f9-46de-b8b1-c1a61a77a877",
+      "before": "7966dc53dfb6ad2407bd1e13fdb7d08f4de9991bd660d529d232dc385ea28671",
+      "after": "e8ddf372dfebf387f076ccde175264010a2a978bb2752b1405f7f529cf28ff6d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-3c28d4f3-cbc0-4103-a07d-985613c6332d",
+      "before": "ea2092555b2116dec3ebe944482e8fb4dba5acdcbcad847b9cc710f05e49ebdd",
+      "after": "1b4b28ee7bbfa1e132907bb09de8ebb5a55c47af2e45cabdf2fb4ade603749e4",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-4d05d761-4966-4300-9b2d-53c1562546a6",
+      "before": "4a0053ce018c214c1656d485e9c3e9c6d13e5050130685be03925a8e3a3fbd87",
+      "after": "be625bb6324e384b7b7d93ab06a4d77124b7582045174e0950a79190477570f2",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-f5a68c7a-3ba9-4c00-beed-45e5994d18c3",
+      "before": "ed7990e42e2fcd257651337c887d7e4f8b26670d88ed670492be47a713720a64",
+      "after": "9e0f9e16fc0fd8d5ca54537fd8afa28e08a94a51717acb0f6c7efaba53ccfe81",
+      "reason": "Préciser le cadre continu pour le produit UI en watts, sans ajouter une hypothèse implicite sur un facteur de puissance.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-921e8478-0ad0-4c65-9c7d-cad240093be4",
+      "before": "9e59b57dec669cbb76162fe716f9c41e8ea01e4e1f4ef812a18a1c743b5bf2dc",
+      "after": "71912ea5d7e1d44776f7bd4c9620e0f67e8b636b32884cd93a7485ede0d0d68d",
+      "reason": "Au dixième,21,4 est correct. La tolérance0,1 autour de21,4 acceptait21,5. Le centre exact300/14 avec0,05 accepte aussi l’emploi de la vitesse physique299792458 m/s.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-578db80a-0926-4f24-92b5-cf9c526c5b03",
+      "before": "cdf07aef869a1050e995a60afb792c9fea41ddcd9a455cd44ecebf95acb8059a",
+      "after": "e2debef0c45c65a86039f1e8ec72486fc60cbfd04dbf77a33a40e325ac1d5600",
+      "reason": "Même calcul en watts, cadre continu explicite.",
+      "sources": [
+        "http://f6kgl.free.fr/COURS.html"
+      ]
+    },
+    {
+      "id": "q-e825d4c0-0bc4-4aa8-825c-b63236870e2a",
+      "before": "de4957c31b2b293a6b43d84c731187d005c7f693269a708c20f3daa400091e00",
+      "after": "c249f48144d2caf29ba49f40137f874e4186136925bd5000cedd23f75e4988ba",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-19"
+      ]
+    },
+    {
+      "id": "q-4d8258e6-8bf8-475c-9678-a1a4a9585095",
+      "before": "e5ee8d56904289e3f851cb9a83c04598be3e008084ded9a383af6a451fed3cf8",
+      "after": "03d5a90f7dfff4a76f8e66a4becef913e45eef904bcb1e2b0e5a4ff3f2e327fe",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000401783/2026-10-19"
+      ]
+    },
+    {
+      "id": "q-34d23d2f-6ea6-4f98-aa57-325290e36eea",
+      "before": "7e2c3ad7864cab22660f9dd69886bbb8a543bccc5dcb2b67eeec69a0efc7fa7c",
+      "after": "4cb4f9f9e00e7f29bd66e230691130e399222014e51458a71c41337c7d9c5437",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-cea9c1d3-354c-4a46-995c-9b14e50099c6",
+      "before": "c355b5bbeb10d64304f6d4a1bd3435da42b2c06c9aa9cd1efa783984be29824d",
+      "after": "21bbc9ce50787ff513c847a8543ef6f02670dd311b9dd300cb7b74da04f026bf",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-178fe597-298d-460e-ab2b-c8bdb4d9b9a9",
+      "before": "3221fc2fe0b712bb223fa72d8f464e6fdfd01e30610b79eded036347df8de7c1",
+      "after": "7afa0247e417771baaa2929bdb7859b0e676ed7fe1433d4023ec666a24178482",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-6005295e-f651-47be-836e-bcff20eb4d31",
+      "before": "ed7f80acec96d19c159cceb146e161298b260c47d6819558ec0e1de5405a642d",
+      "after": "20a236d074e0c26c29cb67c904ce1637f8ce288a1fdd4de3e07dd1d8c0ced58d",
+      "reason": "Les distracteurs hors sujet ou impossibles à comparer sont remplacés par des confusions de la même notion. La connaissance et la bonne réponse sont conservées.",
+      "sources": [
+        "https://www.legifrance.gouv.fr/jorf/id/JORFSCTA000027144465"
+      ]
+    },
+    {
+      "id": "q-cbda851c-5849-444a-8804-f5da7799ae18",
+      "before": "a24ccb9d6b5cc513e4c0dfeaad209070210aaf325bc85047deec0f81bc2eb89b",
+      "after": "5554f0894f5704eab59e0fb899af8428a4a22a9bbd59092ce458064f5696f254",
+      "reason": "15 + 30 minutes sont vérifiés ; aucune source officielle lue ne garantit le déroulement sans pause. Conserver l’UUID et la valeur 45.",
+      "sources": [
+        "https://www.anfr.fr/gerer/radioamateurs/les-certificats"
+      ]
+    }
+  ]
+}

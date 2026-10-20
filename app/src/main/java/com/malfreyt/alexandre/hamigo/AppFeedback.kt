@@ -18,8 +18,7 @@ internal object FeedbackPreferences {
     const val HAPTICS="interactionHaptics"
     fun read(prefs:SharedPreferences)=FeedbackSettings(prefs.getBoolean(SOUND,true),prefs.getBoolean(HAPTICS,true))
     fun save(prefs:SharedPreferences,value:FeedbackSettings)=synchronized(Progress.CLOUD_LOCK) {
-        prefs.edit().putBoolean(SOUND,value.sound).putBoolean(HAPTICS,value.haptics)
-            .apply() // Device preferences: do not overwrite another device's audio choices via GitHub.
+        SyncedAppSettings.save(prefs,mapOf(SOUND to value.sound,HAPTICS to value.haptics))
     }
 }
 
@@ -28,6 +27,7 @@ internal object FeedbackAudioGate {
     private val owners=java.util.Collections.synchronizedSet(mutableSetOf<Any>())
     val busy get()=owners.isNotEmpty()
     fun ownedBy(owner:Any)=owners.contains(owner)
+    fun ownedOnlyBy(owner:Any)=synchronized(owners){owners.size==1&&owners.contains(owner)}
     fun reserve(owner:Any){owners.add(owner);MorseSidetone.stopOthers(owner);FrequencyReceiverFeedback.stopOthers(owner);AppFeedback.active?.silence()}
     /** The receiver may resume only when no educational playback owns the audio. */
     fun tryReserveReceiver(owner:Any):Boolean {
@@ -70,7 +70,8 @@ internal class AppFeedback(context:Context) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
         pool.setOnLoadCompleteListener {_,id,status->if(status==0)loaded.add(id)}
         val resources=mapOf("ui_click" to R.raw.ui_click,"ui_success" to R.raw.ui_success,"ui_error" to R.raw.ui_error,
-            "ui_complete" to R.raw.ui_complete,"ui_finish" to R.raw.ui_finish,"ui_pico" to R.raw.ui_pico)
+            "ui_complete" to R.raw.ui_complete,"ui_finish" to R.raw.ui_finish,"ui_pico" to R.raw.ui_pico,
+            "ui_pico_footer" to R.raw.ui_pico_footer,"ui_mic_open" to R.raw.ui_mic_open,"ui_mic_close" to R.raw.ui_mic_close)
         val samples=resources.mapValues {pool.load(app,it.value,1)}
         FeedbackCue.entries.forEach {cue->FeedbackDesign.sound(cue)?.let {ids[cue]=samples.getValue(it)}}
     }
@@ -94,9 +95,14 @@ internal class AppFeedback(context:Context) {
         pendingClick?.let(main::removeCallbacks);pendingClick=null
         emit(cue)
     }
-    private fun emit(cue:FeedbackCue) {
+    fun microphone(cue:FeedbackCue,owner:Any) {
+        require(cue==FeedbackCue.MIC_OPEN||cue==FeedbackCue.MIC_CLOSE)
+        pendingClick?.let(main::removeCallbacks);pendingClick=null
+        emit(cue,owner)
+    }
+    private fun emit(cue:FeedbackCue,audioOwner:Any?=null) {
         if(closed||!foreground||!throttle.allow(cue,SystemClock.uptimeMillis()))return
-        val audible=settings.sound&&FeedbackDesign.sound(cue)!=null&&!FeedbackAudioGate.busy&&manager.getStreamVolume(AudioManager.STREAM_MUSIC)>0
+        val audible=settings.sound&&FeedbackDesign.sound(cue)!=null&&(!FeedbackAudioGate.busy||(audioOwner!=null&&FeedbackAudioGate.ownedOnlyBy(audioOwner)))&&manager.getStreamVolume(AudioManager.STREAM_MUSIC)>0
         val tactile=settings.haptics&&vibrator?.hasVibrator()==true&&
             Settings.System.getInt(app.contentResolver,Settings.System.HAPTIC_FEEDBACK_ENABLED,1)!=0&&FeedbackDesign.haptic(cue)!=null
         observer?.invoke(cue,audible,tactile)

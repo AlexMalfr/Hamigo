@@ -6,7 +6,10 @@ const readRegistry=()=>fs.existsSync(registryFile)?JSON.parse(fs.readFileSync(re
 export const authoredIdFor=(legacy)=>{const r=readRegistry();return r.bindings?.[legacy] || Object.entries(r.entries).find(([,e])=>e.legacyId===legacy)?.[0] || legacy;};
 function signature(q) {
   const correct=['choice','cloze','truefalse','resistor','morseListen','waveform'].includes(q.kind)?q.choices[q.answer]:null;
-  return createHash('sha256').update(JSON.stringify([q.kind,q.prompt,correct,q.value??null,q.unit??'',q.bands??[],q.pairs??[],q.kind==='order'?q.choices:[]])).digest('hex');
+  const fields=[q.kind,q.prompt,correct,q.value??null,q.unit??'',q.bands??[],q.pairs??[],q.kind==='order'?q.choices:[]];
+  // Preserve all earlier fingerprints; independent row answers are part of the new type's meaning.
+  if(q.kind==='rows')fields.push(q.rows);
+  return createHash('sha256').update(JSON.stringify(fields)).digest('hex');
 }
 export function persistCourseQuestions(data,{bootstrap=false,dryRun=false}={}) {
   if(bootstrap && data.chapters.some(c=>c.lessons.some(l=>l.questions.some(q=>q.id.startsWith('q-')))))
@@ -31,12 +34,16 @@ export function persistCourseQuestions(data,{bootstrap=false,dryRun=false}={}) {
     registry.bindings[q.id]=id;q.id=id;
   }
   const questions=data.chapters.flatMap(c=>c.lessons.flatMap(l=>l.questions));
-  if(new Set(questions.map(q=>q.id)).size!==questions.length)throw Error('Duplicate authored UUID');
+  const archivedQuestions=data.archivedQuestions||[];
+  const everyQuestion=[...questions,...archivedQuestions];
+  if(new Set(everyQuestion.map(q=>q.id)).size!==everyQuestion.length)throw Error('Duplicate authored UUID');
+  for(const question of archivedQuestions)if(!registry.entries[question.id])throw Error('Unregistered archived UUID '+question.id);
   if(dryRun)return questions;
   fs.writeFileSync(registryFile,JSON.stringify(registry,null,2)+'\n');
   const curriculum=structuredClone(data);
   for(const l of curriculum.chapters.flatMap(c=>c.lessons)) {l.questionIds=l.questions.map(q=>q.id);delete l.questions;}
-  const bank=JSON.stringify({schema:1,questions},null,2)+'\n';
+  delete curriculum.archivedQuestions;
+  const bank=JSON.stringify({schema:1,questions,archivedQuestions},null,2)+'\n';
   fs.writeFileSync('data/course-questions.json',bank);
   fs.writeFileSync('app/src/main/assets/course-questions.json',bank);
   fs.writeFileSync('data/curriculum.json',JSON.stringify(data,null,2)+'\n');

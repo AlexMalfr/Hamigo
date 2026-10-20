@@ -12,6 +12,7 @@ class LessonSessionBuilderTest {
             Question("blank", "Une case ___", listOf("Alpha", "Bravo", "Charlie"), 2, "", kind = "cloze"),
             Question("multi", "Plusieurs réponses", listOf("A", "B", "C", "D"), 0, "", kind = "multiselect", bands = listOf("1", "3")),
             Question("wave", "Un tracé", listOf("A", "B", "C", "D"), 2, "", kind = "waveform", bands = listOf("am", "fm", "sine", "square")),
+            Question("resistor", "Valeur de la résistance", listOf("10 Ω", "100 Ω", "1 kΩ", "10 kΩ"), 2, "", kind = "resistor", bands = listOf("brun", "noir", "rouge", "or")),
             Question("sequence", "Des étapes", listOf("D'abord", "Ensuite", "Enfin"), 0, "", kind = "order"),
             Question("pairs", "Des paires", emptyList(), 0, "", kind = "match", pairs = listOf(PairItem("A", "1"), PairItem("B", "2")))
         )
@@ -24,7 +25,10 @@ class LessonSessionBuilderTest {
                 val before = original.single { it.id == question.id }
                 when (question.kind) {
                     "multiselect" -> assertEquals(selectedTexts(before), selectedTexts(question))
-                    "waveform" -> assertEquals(before.bands[before.answer], question.bands[question.answer])
+                    "waveform" -> {
+                        assertEquals(before.bands[before.answer], question.bands[question.answer])
+                        assertEquals(listOf("Tracé A","Tracé B","Tracé C","Tracé D"),question.choices)
+                    }
                     "order" -> assertEquals(before.choices, question.choices)
                     "match" -> assertEquals(before.pairs, question.pairs)
                     else -> assertEquals(before.choices[before.answer], question.choices[question.answer])
@@ -37,7 +41,8 @@ class LessonSessionBuilderTest {
     @Test fun aSeedReplaysTheSameLessonWhileNewSeedsRenewMorsePractice() {
         val alphabet = ('A'..'Z').map(Char::toString)
         val question = Question("alphabet", "Reconnais le caractère Morse", alphabet, 0, "", topic = "Morse")
-        val lesson = Lesson("morse-test", "Alphabet morse", "", emptyList(), "", "Morse", listOf(question))
+        val lesson = Lesson("morse-test", "Alphabet morse", "", emptyList(), "", "Morse", listOf(question),
+            skillIds=listOf("morse-listening","morse-encoding"),knownCharacters=alphabet.joinToString(""))
         val replay = LessonSessionBuilder.create(lesson, 42)
         assertEquals(replay, LessonSessionBuilder.create(lesson, 42))
         assertEquals(3, replay.size)

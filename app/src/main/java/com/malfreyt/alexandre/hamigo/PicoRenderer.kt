@@ -10,9 +10,10 @@ import kotlin.math.sin
 enum class MascotMood(val description: String) {
     HAPPY("Pico sourit"), THINKING("Pico réfléchit"), CELEBRATE("Pico fête ta réussite"),
     SAD("Pico t'encourage après une erreur"), GOOFY("Pico fait le clown"),
-    DETERMINED("Pico se concentre"), SLEEPY("Pico a sommeil"), SHOCKED("Pico est surpris")
+    DETERMINED("Pico se concentre"), SLEEPY("Pico a sommeil"), SHOCKED("Pico est surpris"),
+    COOL("Pico te salue avec ses lunettes de soleil"), LISTENING("Pico écoute")
 }
-enum class MascotPose { IDLE, WAVE, JUMP, DANCE, POINT, HUG }
+enum class MascotPose { IDLE, WAVE, JUMP, DANCE, POINT, HUG, LISTEN }
 
 /** One transparent vector drawing shared by Compose, notification artwork and share cards. */
 object PicoRenderer {

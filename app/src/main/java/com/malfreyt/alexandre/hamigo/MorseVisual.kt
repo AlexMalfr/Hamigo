@@ -108,7 +108,7 @@ fun morseTextParts(text: String): List<MorseTextPart> {
     }
     val parts = morseTextParts(text)
     if (parts.none { it.code }) {
-        Text(text, modifier, fontSize = fontSize, color = color, fontWeight = fontWeight, lineHeight = lineHeight, textAlign = textAlign,maxLines=maxLines,overflow=overflow)
+        AppReferenceText(text, modifier, fontSize = fontSize, color = color, fontWeight = fontWeight, lineHeight = lineHeight, textAlign = textAlign,maxLines=maxLines,overflow=overflow)
         return
     }
     FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(3.dp,alignment), verticalArrangement = Arrangement.spacedBy(3.dp)) {

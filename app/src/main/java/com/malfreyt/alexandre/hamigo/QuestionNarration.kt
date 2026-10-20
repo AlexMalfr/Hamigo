@@ -27,7 +27,16 @@ internal object QuestionNarration {
             "truefalse"->"Cette affirmation est-elle vraie ou fausse ?"
             "multiselect"->"Choisis toutes les réponses qui conviennent parmi : $choices. Plusieurs réponses sont possibles."
             "order","sort"->"Remets ces éléments dans l’ordre demandé : ${displayedOrder.joinToString(" ; ")}. Déplace les éléments pour les réordonner."
-            "match"->"Dans le premier groupe : ${q.pairs.joinToString(" ; "){it.left}}. Dans le second groupe : ${q.pairs.indices.shuffled(kotlin.random.Random(q.id.hashCode())).joinToString(" ; "){q.pairs[it].right}}. Relie chaque élément du premier groupe à un élément du second."
+            "match"->"Dans le premier groupe : ${q.pairs.joinToString(" ; "){it.left}}. Dans le second groupe : ${rightQuestionOrder(q).joinToString(" ; "){q.pairs[it].right}}. Relie chaque élément du premier groupe à un élément du second."
+            "text"->"Retrouve la réponse et écris-la au clavier."
+            "spoken"->"Tu peux donner ta réponse avec le microphone ou l’écrire au clavier. Vérifie le texte reconnu avant de valider."
+            "rows"->q.rows.mapIndexed {index,row->
+                val label=if(row.prompt.matches(Regex("[A-Z]")))"La lettre ${row.prompt}" else row.prompt
+                val instruction=if(row.choices.isEmpty())"Écris ta réponse."
+                    else "Choisis parmi : ${alternatives(row.choices.map(FrenchSpeech::option))}."
+                "Ligne ${index+1}. ${sentence(label)} $instruction"
+            }.joinToString(" ")
+            "circuit"->"Complète les emplacements ${q.pairs.joinToString(" ; "){it.left}}. Les composants proposés sont : ${q.choices.joinToString(" ; ")}. Tu peux les déplacer ou toucher un emplacement pour choisir."
             "number"->(scoreScale(q)?.let {"Saisis une note sur $it."}
                 ?: "Saisis une valeur${q.unit.takeIf {it.isNotBlank()}?.let {" en $it"}.orEmpty()}.")+" ${precision(q)}"
             "frequency"->"Règle la fréquence avec le curseur, entre 143 et 148 mégahertz. ${precision(q.copy(unit="MHz"))}"
@@ -50,6 +59,4 @@ internal object QuestionNarration {
     } else "La valeur doit être exacte."
 }
 
-internal fun initialQuestionOrder(q:Question):List<Int> = q.choices.indices.shuffled(kotlin.random.Random(q.id.hashCode())).let {list->
-    if(list.size>1&&list==q.choices.indices.toList())list.drop(1)+list.first() else list
-}
+internal fun initialQuestionOrder(q:Question):List<Int> = questionDerangement(q.choices.size,if(q.presentationSeed==0)q.id.hashCode() else q.presentationSeed)

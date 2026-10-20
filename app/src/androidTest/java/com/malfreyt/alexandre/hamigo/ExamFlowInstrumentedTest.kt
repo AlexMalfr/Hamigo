@@ -50,12 +50,12 @@ class ExamFlowInstrumentedTest {
             model.answer(true)
             assertTrue(s.responses.isEmpty())
             model.beginExamPart()
-            repeat(20) {model.answer(true,display="Oui",choiceIndex=0)}
+            repeat(20) {model.answer(true,display="Oui",choiceIndex=s.current!!.answer)}
             assertTrue(s.examReviewing)
             assertEquals(0,model.progress.xp)
             assertEquals(0,s.regulationScore)
             model.revisitExamQuestion(0)
-            model.answer(false,display="Non",choiceIndex=1)
+            model.answer(false,display="Non",choiceIndex=s.current!!.choices.indexOf("Non"))
             assertEquals("Non",s.responses[0]!!.display)
             model.reviewExamPart(); model.finishExamPart()
             assertEquals(19,s.regulationScore)
@@ -67,7 +67,7 @@ class ExamFlowInstrumentedTest {
             assertEquals(58,model.progress.xp)
             assertEquals(20,s.index)
             model.beginExamPart()
-            repeat(20) {model.answer(true,display="Oui",choiceIndex=0)}
+            repeat(20) {model.answer(true,display="Oui",choiceIndex=s.current!!.answer)}
             model.finishExamPart()
             assertTrue(s.done)
             assertEquals(20,s.techniqueScore)
@@ -82,8 +82,8 @@ class ExamFlowInstrumentedTest {
         instrumentation.runOnMainSync {
             val s=model.session!!
             model.beginExamPart()
-            model.answer(true,display="Oui",choiceIndex=0)
-            model.answer(false,display="Non",choiceIndex=1)
+            model.answer(true,display="Oui",choiceIndex=s.current!!.answer)
+            model.answer(false,display="Non",choiceIndex=s.current!!.choices.indexOf("Non"))
             s.started=System.currentTimeMillis()-16*60_000L
             model.timeoutExamPart()
             assertEquals(1,s.regulationScore)

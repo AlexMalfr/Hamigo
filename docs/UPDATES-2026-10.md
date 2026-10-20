@@ -471,3 +471,66 @@ Référence pour les proportions temporelles : [UIT-R M.1677-1, annexe 1, §2](h
 - Dans l’accueil, le manipulateur reste masqué jusqu’au clic sur « Essayer », centré en bas au-dessus de Continuer. Il remplace le bouton et se met en vue si nécessaire.
 - « Revenir aux profils » suit les réglages manuels, juste avant l’essai, comme « Réglages avancés » en mode profils. L’essai reste ouvert lors du changement de mode.
 - Sous-texte raccourci à « Tu pourras le changer dans les paramètres. ». Préférences Morse et autres étapes conservées.
+
+### Parcours progressif — mise à jour en préparation, non publiée
+
+- Un seul parcours de 13 sections, 64 chapitres et 173 leçons, avec fondations mathématiques/électriques, retours espacés et jalon certificat avant les dernières explorations. Identifiants publiés conservés et corrections éditoriales tracées.
+- Revue ciblée de la pratique : 99 questions supplémentaires, avec applications graduées, erreurs fréquentes, choix de méthode et transferts, sans quota par séance. Parmi les 66 leçons ajoutées initialement, 11 restent à quatre questions, contre 51 avant cette revue ; moyenne de 5,88 au lieu de 4,42. Puissance et énergie sont spécialisées, la logique prématurée quitte les oscillateurs et revient après d’autres notions ; neuf anciens cours Morse de 13 à 19 questions séparent reconnaissance et production. Les reprises portent aussi sur les proportions, mesures, énergie, décibels, bruit, diagnostic et usages pratiques. [Choix pédagogiques et limites](PRACTICE-DENSITY-55.md).
+- Les validations anciennes sont reprises depuis une preuve historique distincte : un succès récent à une première partie ne valide pas ses suites. UUID, XP, réponses et journal de synchronisation restent conservés.
+- Morse des premières lettres aux échanges simulés complets ; rappels libres, prénoms locaux, indicatifs variables, distracteurs renouvelés, circuits à compléter et mires d’entraînement SSTV. Réponse vocale facultative avec clavier disponible ; micro centré, clavier à gauche, outils habituels à droite et marge basse augmentée.
+- Deux cours concrets sur l’inscription et le jour de l’examen : liens ANFR, documents, matériel et préparation. Consignes nationales et locales distinguées. Calculatrice et brouillon disponibles aussi dans les introductions et Mémo, avec une astuce utilisant leurs icônes natives.
+- Suivi des compétences et révisions variées, diagnostics bruts et valeurs notionnelles ; les questions sur l’utilisation de Hamigo sont exclues du SRS. Progression certificat/exploration en bas de Moi sous « Bilan d’apprentissage », avec une explication courte, et repères de parcours chez les amis.
+- Sections numérotées, ancrage au dépliage des chapitres, raccourci vers le prochain cours et guide d’accueil avec Pico, entièrement passable.
+- Historique des examens blancs, corrections conservées, sujets à retravailler, courbes et prolongement descriptif ; examen personnalisé après trois examens complets.
+
+Les contrôles et leurs limites sont détaillés dans `VALIDATION.md`. Cette version est destinée à un essai local avant toute publication ; l’installation effective et l’APK utilisé sont consignés séparément dans la preuve locale de livraison.
+
+### Finitions du 21 octobre — même candidate locale 0.55
+
+- Parcours : cible du raccourci au tiers de la fenêtre, chapitre nouvellement ouvert recentré en douceur, séparateur avant la première section et Pico avec lunettes au pied du parcours. L’astuce de Moi revient après les barres de progression.
+- Tutoriel : voile sombre limité au premier cours, cible à hauteur de pouce, lecture/lancement réunis dans une aide fixe à gauche des outils, aucune sollicitation pendant les questions, reprise au bilan puis visite automatique des onglets. Les navigations hors visite sont bloquées avec un message ; scroll et interactions locales restent possibles. Encouragement final sans boutons de passage.
+- Voix : états préparation/écoute/analyse, annulation des démarrages tardifs, service système avec repli borné, choix local appui maintenu/bascule, orthographe OTAN canonique, micro agrandi et relevé, respiration et niveau RMS. Le clavier garde son accès à gauche ; la réserve tient compte du bouton agrandi et des ondes. La reconnaissance au chuchotement demande encore un essai acoustique sur le téléphone.
+- Montages : glissement immédiat depuis toute la carte, retrait des composants utilisés, réserve centrée et remplacement/retrait au toucher. Réponses par lignes libres ou menus réellement ajoutées au Parcours avec deux nouveaux UUID : 1 231 questions actives ; variante mixte fictive dans Diagnostics.
+- Diagnostics : recherche/scroll conservés au retour, recherche mise en cache, variantes d’interfaces accessibles, compétences en arbre, liens vers leurs questions, aperçus regroupés avec recherche et historiques fictifs à zéro/deux/trois examens. Les exemples fictifs ont leur banque distincte.
+- Révisions : au plus un cinquième de variantes de compétences voisines déjà étudiées dans une famille en difficulté, sans remplacer les rappels à échéance sélectionnés. Les familles ne deviennent pas des preuves de maîtrise et n’ouvrent pas de leçon intacte.
+- Accueil réécrit, désignations/suffixes/sigles TTS corrigés et quatorze adaptations orales explicites. Les références documentaires natives sont distinguées des questions importées Exam1. Le statut de redistribution de la banque Exam1 reste non établi ; aucun APK ne l’embarque.
+
+- Calculatrice en paysage : panneau élargi à deux colonnes, avec saisie/résultat/fonctions scientifiques à gauche et chiffres/opérateurs à droite. L’insertion du résultat rejoint l’en-tête ; la composition s’adapte aux fenêtres courtes, conserve l’expression et le mode DEG/RAD et garde un défilement de secours pour les erreurs ou résultats longs.
+
+- Examen blanc : les introductions des deux épreuves deviennent défilantes dans les fenêtres courtes ; les boutons de démarrage et de retour restent accessibles en paysage et avec une police agrandie.
+
+Voir [la revue critique et ses limites](AUDIT-FINITIONS-2026-10.md) et [la liste détaillée des essais utilisateur](TESTS-UTILISATEUR-0.55.md).
+
+
+### Formulaire Tally — préparation du 21 octobre 2026
+
+- Un formulaire unique est créé en brouillon sur le compte Tally : bugs, erreurs de contenu, suggestions et aide, avec branches selon la question, la fiche Mémo, l’introduction ou la page d’origine. Il accepte des pièces jointes facultatives et un contact par e-mail facultatif.
+- Le modèle JSON, les neuf conditions, les 33 champs d’URL et le script de création sont conservés dans `data/tally/`, `tools/tally/` et [le guide Tally](tally/FORMULAIRE-HAMIGO.md). La clé reste locale et hors Git.
+- Le formulaire est maintenant publié : https://tally.so/r/9NqlpK. Les sources de l’app l’utilisent pour les questions, Mémo, introductions et réglages, avec un contexte technique enrichi et sans réponses personnelles ni credentials. Le lien public avec paramètres de question a été observé ; aucune soumission ni pièce jointe envoyée.
+
+### Derniers retours intégrés — révision locale de la 0.55
+
+- Cours ignorés avec confirmation explicative, gris et barrés, sautés par le prochain cours et comptés dans les barres ; aucun XP pour ignorer, récompenses habituelles lors de la vraie réalisation après réintégration. Aucun entraînement SRS fictif. Garde commune avant toute ouverture.
+- Parcours : centrage sur la zone dépliée mesurée, longs chapitres ancrés en haut utile, raccourci fluide au centre ; Pico du pied animé avec son distinct. Tutoriel plus compact, lecture à droite en paysage, retour/passage confirmés, prochain chapitre sélectionné par la règle générale.
+- Diagnostics : présentations courantes puis variantes repliables et dédupliquées, trois modes de lancement, recherche/scroll conservés. Réponses longues, flashcard Morse et schémas logiques multiples accessibles.
+- Micro réel aussi dans Diagnostics, essai dans l’accueil, refus expliqués sans boucle, liens vers les autorisations ; ondes pleine largeur, Pico en écoute et sons ouverture/fermeture. Reconnaissance par le service Android, aucun modèle téléchargé par Hamigo.
+- Brouillon : dessin/texte par icônes, gomme, couleurs/tailles, undo/redo, effacement confirmé, long papier défilant, outils latéraux en paysage. Calculatrice paysage avec saisie à gauche et résultat/actions à droite.
+- Conservation des pages, filtres, scroll, outils et saisies à la rotation et aux retours ; réglages audio et vocaux synchronisés par registres indépendants. Détails des vérifications réellement exécutées dans VALIDATION.md.
+- Les en-têtes de cours gardent des zones distinctes pour retour, titre et signalement. Le widget du tutoriel réserve aussi les outils en petit paysage et avec police agrandie ; son texte peut défiler sans déplacer ses actions.
+
+### Retours du 22 octobre — correction de la candidate
+
+Ignorer un cours ne donne plus d’XP ; les récompenses restent liées aux réponses et à la vraie réussite après réintégration. Les anciens bonus synthétiques identifiables sont neutralisés sans effacer le journal. Le contour de chapitre commencé suit désormais le futur badge doré. Calculatrice, signe numérique, SSTV, accueil micro, highlight et brouillon ont été repris selon les derniers retours ; détails et recette dans [RETOURS-2026-10-22.md](RETOURS-2026-10-22.md).
+
+Le badge commencé inclut aussi son anneau et sa coche en pointillés ; le highlight initial est plus contenu. Le brouillon unifie les sélecteurs de trait/couleur et compacte la puce stylet. Le formulaire Tally existant est publié avec diagnostic repliable, préremplissages signalés seulement quand présents, champs simplifiés et notifications propriétaire activées. Aucun retour ni e-mail de test envoyé.
+
+Les introductions deviennent des pages de lecture sans calculatrice ni brouillon. L’aide du premier cours utilise cet espace libéré et le halo du Parcours se rapproche de la ligne du cours. Le raccourci vers la gestion des assistants vocaux est retiré de Gameplay ; les autorisations de Hamigo restent accessibles.
+
+Le micro attend le résultat final sans nouvelle écoute ni validation concurrente ; le résultat tardif peut compléter les mots provisoires. Le brouillon paysage affiche le libellé Stylet uniquement et réunit épaisseur/couleur dans deux menus si la hauteur manque. Parcours et introductions utilisent un seul repère de finalité, avec priorité au certificat.
+
+
+### Introductions mises en forme — révision locale de la 0.55
+
+Les 173 fiches d’introduction ont une présentation éditoriale distincte du texte lu : sous-titres aux transitions utiles, idées clés en gras et astuce de Pico détachée en italique. Les onglets, repères Certificat/Exploration et mentions du drapeau reprennent leurs icônes et couleurs, y compris dans les questions. Les descriptions des onglets dans la bienvenue commencent par une phrase mise en avant. Quelques références de cours choisies ouvrent un aperçu défilant et facilement fermable, en conservant le cours et sa position de lecture. Les identifiants, exercices et règles de progression ne changent pas. Voir [le format de présentation](LESSON-PRESENTATION.md).
+
+La première bulle du tutoriel est limitée par la position réellement mesurée du cours et celui-ci est placé plus bas, pour garder sa cible accessible sur écran étroit avec grande police.

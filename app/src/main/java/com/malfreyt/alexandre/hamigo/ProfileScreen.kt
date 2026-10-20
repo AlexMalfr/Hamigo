@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
@@ -62,11 +63,15 @@ fun ProfileScreen(model: AppModel, content: Content) {
     val weeks = maxOf(4, ChronoUnit.WEEKS.between(CalendarWeek.days(earliest).first(),CalendarWeek.days(today).first()).toInt() + 1)
     val months = maxOf(4, ChronoUnit.MONTHS.between(YearMonth.from(earliest), YearMonth.from(today)).toInt() + 1)
     val listState = rememberLazyListState()
+    // These histories also survive leaving the page while their lazy items are off screen.
+    val monthHistory = rememberPagerState(pageCount = { months })
+    val weekHistory = rememberPagerState(pageCount = { weeks })
+    val tourClearance=tourContentClearance(model)
     var headerSurfaceHeight by remember { mutableIntStateOf(0) }
     var avatarBounds by remember { mutableStateOf<Rect?>(null) }
     LazyColumn(
         Modifier.fillMaxSize().testTag("profile-list"), state = listState,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 56.dp + LocalNavigationContentOverlap.current),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 56.dp + LocalNavigationContentOverlap.current+tourClearance),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         stickyHeader(key = "profile-header") {
@@ -105,7 +110,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 LinearProgressIndicator(progress = { (p.xp % 250) / 250f }, modifier = Modifier.fillMaxWidth(), color = Teal, trackColor = Color.White)
                 Text("${250 - p.xp % 250} XP avant le prochain niveau", fontSize = 12.sp, color = Muted)
                 FilledTonalButton(
-                    onClick = { NativeShare.progressImage(context, p.snapshot(),model.sync.accountIdentity) },
+                    onClick = tourNavigation { NativeShare.progressImage(context, p.snapshot(content),model.sync.accountIdentity) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color.White, contentColor = Teal)
                 ) {
@@ -115,14 +120,14 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 }
             }
         }
-        item(key = "profile-goal") { DailyGoalSummary(p.todayXp,p.dailyGoal,onEdit={model.settingsGoalFocusRequest=System.nanoTime();model.route="settings"}) }
-        item(key = "profile-calendar") { ActivityCalendar(p, today, months) }
-        item(key = "profile-weekly-chart") { WeeklyProgress(p, today, weeks) }
+        item(key = "profile-goal") { DailyGoalSummary(p.todayXp,p.dailyGoal,onEdit={if(model.allowTourNavigation()){model.settingsGoalFocusRequest=System.nanoTime();model.route="settings"}}) }
+        item(key = "profile-calendar") { ActivityCalendar(p, today, months, monthHistory) }
+        item(key = "profile-weekly-chart") { WeeklyProgress(p, today, weekHistory) }
         item(key = "profile-learning-summary") {
             Panel {
                 Text("Bilan d’apprentissage", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    LearningStat("${p.completed.size} / ${content.lessons.size}", "Leçons terminées", Modifier.weight(1f))
+                    LearningStat("${content.lessons.count {it.id in p.completed}} / ${content.lessons.size}", "Leçons terminées", Modifier.weight(1f))
                     LearningStat("${p.reviews.values.count { it.repetitions >= 3 }}", "Notions consolidées", Modifier.weight(1f))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -131,8 +136,9 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 }
             }
         }
+        item(key = "profile-course-progress") { CourseProgressBars(content.pathCompletion(p.pathCompleted)) }
         item(key = "profile-memory-tip") {
-            Panel(color = Color(0xFFFFF2CD)) {
+            Panel(modifier=Modifier.testTag("profile-memory-tip"),color = Color(0xFFFFF2CD)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Rounded.Lightbulb, null, tint = Color(0xFF936411), modifier = Modifier.size(18.dp))
                     Text("Astuce", fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, color = Color(0xFF936411))
@@ -140,7 +146,7 @@ fun ProfileScreen(model: AppModel, content: Content) {
                 Text("Mieux retenir", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text("Après une bonne réponse, la notion revient après 1 jour, puis 6 jours. Les rappels s’espacent ensuite selon ta facilité.", fontSize = 14.sp, color = Ink, lineHeight = 21.sp)
                 Text("Une erreur ? Un nouveau rappel arrive après 10 minutes.\n\nAvec les flashcards, indique la difficulté pour adapter le prochain rappel.", fontSize = 14.sp, color = Ink, lineHeight = 21.sp)
-                TextButton(feedbackClick {model.practiceFocusRequest=System.nanoTime();model.route="practice"},contentPadding=PaddingValues(0.dp),modifier=Modifier.testTag("open-reviews-from-profile")) {
+                TextButton(feedbackClick {if(model.allowTourNavigation()){model.practiceFocusRequest=System.nanoTime();model.route="practice"}},contentPadding=PaddingValues(0.dp),modifier=Modifier.testTag("open-reviews-from-profile")) {
                     Text("Retrouver mes révisions");Spacer(Modifier.width(5.dp));Icon(Icons.Rounded.ChevronRight,null,Modifier.size(18.dp))
                 }
             }
@@ -157,13 +163,12 @@ private fun LearningStat(value: String, label: String, modifier: Modifier) {
 }
 
 @Composable
-private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int) {
-    ActivityCalendar(today,months,p.dailyGoal,{p.dayXp(it)})
+private fun ActivityCalendar(p: Progress, today: LocalDate, months: Int, history: PagerState) {
+    ActivityCalendar(today,months,p.dailyGoal,{p.dayXp(it)},history=history)
 }
 
 @Composable
-internal fun ActivityCalendar(today:LocalDate,months:Int,goal:Int?,xp:(LocalDate)->Int?,tag:String="activity-calendar") {
-    val history = rememberPagerState(pageCount = { months })
+internal fun ActivityCalendar(today:LocalDate,months:Int,goal:Int?,xp:(LocalDate)->Int?,tag:String="activity-calendar",history:PagerState=rememberPagerState(pageCount={months})) {
     val scope = rememberCoroutineScope()
     val currentMonth = YearMonth.from(today)
     Panel {
@@ -235,8 +240,7 @@ private fun CalendarDay(date: LocalDate, today: LocalDate, xp: Int?, goal: Int?)
 }
 
 @Composable
-private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
-    val history = rememberPagerState(pageCount = { weeks })
+private fun WeeklyProgress(p: Progress, today: LocalDate, history: PagerState) {
     val scope = rememberCoroutineScope()
     val visibleWeekXp=CalendarWeek.days(today.minusWeeks(history.currentPage.toLong())).sumOf {p.dayXp(it)}
     Panel {
@@ -245,7 +249,7 @@ private fun WeeklyProgress(p: Progress, today: LocalDate, weeks: Int) {
                 Text(if (history.currentPage == 0) "Cette semaine" else "Ton historique", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 Text("$visibleWeekXp XP",fontSize=12.sp,fontWeight=FontWeight.Bold,color=Teal)
             }
-            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < weeks - 1) {
+            IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage + 1) } }, enabled = history.currentPage < history.pageCount - 1) {
                 Icon(Icons.Rounded.History, "Voir la semaine précédente")
             }
             IconButton(feedbackClick { scope.launch { history.animateScrollToPage(history.currentPage - 1) } }, enabled = history.currentPage > 0) {

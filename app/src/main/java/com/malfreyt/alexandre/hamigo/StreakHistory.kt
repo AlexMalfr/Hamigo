@@ -21,8 +21,12 @@ internal object StreakHistory {
         val h=state.getJSONObject("streakHistory")
         val active=days(h).toMutableSet()
         val events=state.optJSONObject("syncEvents") ?: JSONObject()
+        val legacySkipped=IgnoredLessons.legacyBonusLessons(events)
+        val historicalCompletions=state.optJSONObject("syncBase")?.optJSONArray("completed")?.let {array->
+            (0 until array.length()).map {array.getString(it)}.toSet()}.orEmpty()
         events.keys().forEach {id->val e=events.getJSONObject(id)
-            if(e.optInt("xp")>0&&e.optLong("at")>=h.getLong("cutoverAt")) {
+            val earned=if(e.optInt("xp")==0&&e.optString("completed") in historicalCompletions)0 else StudyActivity.rewardXp(e,legacySkipped)
+            if(earned>0&&e.optLong("at")>=h.getLong("cutoverAt")) {
                 active+=e.optString("streakDay").ifBlank {StudyDay.date(Instant.ofEpochMilli(e.getLong("at"))).toString()}
             }
         }

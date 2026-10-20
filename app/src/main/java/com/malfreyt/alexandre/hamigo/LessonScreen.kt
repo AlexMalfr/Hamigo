@@ -10,9 +10,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +25,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -31,15 +37,13 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import java.util.WeakHashMap
 
+internal data class LessonIntroNavigationState(val id:String,val opening:Int,val list:LazyListState=LazyListState())
 private object LessonIntroNavigation {
-    private data class Entry(val id:String,val opening:Int,val list:LazyListState=LazyListState())
-    private val states=WeakHashMap<AppModel,Entry>()
     fun state(model:AppModel,lesson:Lesson):LazyListState {
-        val old=states[model]
+        val old=model.lessonIntroNavigationState
         if(old!=null && old.id==lesson.id && old.opening==model.lessonOpening) return old.list
-        return Entry(lesson.id,model.lessonOpening).also {states[model]=it}.list
+        return LessonIntroNavigationState(lesson.id,model.lessonOpening).also {model.lessonIntroNavigationState=it}.list
     }
 }
 
@@ -61,6 +65,18 @@ private object LessonIntroNavigation {
     val saved=remember(model,lesson.id,model.lessonOpening) {LessonIntroNavigation.state(model,lesson)}
     val list=remember(saved,returnTarget) {if(returnTarget==null)saved else LazyListState(saved.firstVisibleItemIndex,saved.firstVisibleItemScrollOffset)}
     val references=model.content?.referencesFor(lesson).orEmpty()
+    var referencedLessonId by rememberSaveable(lesson.id,model.lessonOpening) {mutableStateOf<String?>(null)}
+    val openLessonReference:((String)->Unit)?=if(returnTarget==null)({id->speech?.stop();stopMorsePlayback();referencedLessonId=id}) else null
+    referencedLessonId?.let {id->model.content?.lessons?.firstOrNull {it.id==id}?.let {referenced->
+        LessonReferenceDialog(referenced) {referencedLessonId=null}
+    }}
+    val density=LocalDensity.current
+    val guided=model.tour.step==1&&lesson.id==HamigoWelcomeLesson&&returnTarget==null
+    var guideHeight by remember {mutableIntStateOf(0)}
+    val guideClearance=with(density){guideHeight.toDp()}+32.dp
+    val window=LocalWindowInfo.current.containerSize
+    val guideBeside=guided&&window.width>window.height&&with(density){window.width.toDp()}>=600.dp
+    val guideWidth=with(density){(window.width.toDp()*.42f).coerceAtMost(280.dp)}
     var viewport by remember {mutableStateOf<Rect?>(null)}
     DisposableEffect(returnTarget) {
         returnTarget?.let { target ->
@@ -80,16 +96,30 @@ private object LessonIntroNavigation {
         onDispose { }
     }
     Column(Modifier.fillMaxSize().testTag("lesson-introduction")) {
-        LazyColumn(Modifier.weight(1f).testTag("lesson-introduction-list").onGloballyPositioned {viewport=it.boundsInWindow()},state=list,contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
-            item {PageHeader(lesson.title,lesson.summary){model.lesson=null}}
+        BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
+        LazyColumn(Modifier.fillMaxSize().testTag("lesson-introduction-list").hamigoTourTarget("lesson-read").onGloballyPositioned {viewport=it.boundsInWindow()},state=list,contentPadding=PaddingValues(start=16.dp,end=if(guideBeside)guideWidth+32.dp else 16.dp,top=16.dp,bottom=if(guided&&!guideBeside)guideClearance else 24.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             item {
+                Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                    Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+                        IconButton(feedbackClick {model.backFromLesson()},Modifier.offset(x=(-12).dp)) {
+                            Icon(androidx.compose.material.icons.Icons.AutoMirrored.Rounded.ArrowBack,"Retour")
+                        }
+                        Spacer(Modifier.weight(1f))
+                        LessonFeedbackButton(lesson,enabled=returnTarget==null)
+                    }
+                    Column {BigTitle(lesson.title,lesson.summary)}
+                    CoursePurposeBadge(lesson)
+                }
+            }
+            item {
+                Column(verticalArrangement=Arrangement.spacedBy(14.dp)) {
                 BoxWithConstraints(Modifier.fillMaxWidth()) {
                 val picoSize=if(maxWidth<340.dp)108.dp else 124.dp
                 Row(Modifier.fillMaxWidth().testTag("lesson-narration-band").semantics {
                     contentDescription="Lecture vocale du cours"
                     stateDescription=if(speech?.preparing==true)"Préparation de l’audio" else if(speech?.speaking==true)"Lecture en cours" else "Lecture arrêtée"
                     customActions=listOf(CustomAccessibilityAction(if(speech?.reading==true)"Arrêter la lecture" else "Lire le cours") {touch.audio {speech?.toggle(lesson)};true})
-                }.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {touch.audio {speech?.toggle(lesson)}},verticalAlignment=Alignment.CenterVertically) {
+                }.clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {if(accessibleTap)touch.audio {speech?.toggle(lesson)} else touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},verticalAlignment=Alignment.CenterVertically) {
                     TalkingPico(Modifier.size(picoSize).alignBy(PicoBodyCenter).testTag("lesson-pico")
                         .semantics {contentDescription=if(speech?.reading==true)"Arrêter la lecture du cours avec Pico" else "Écouter le cours avec Pico";stateDescription=if(touch.closedEyes)"Pico ferme les yeux" else if(touch.playful)"Pico fait le clown" else if(speech?.preparing==true)"Pico prépare la lecture" else if(speech?.speaking==true)"Pico parle" else companion.mood.description}
                         .clickable(interactionSource=remember {MutableInteractionSource()},indication=null,role=Role.Button,enabled=returnTarget==null) {if(accessibleTap)touch.audio {speech?.toggle(lesson)} else touch.tap(android.os.SystemClock.uptimeMillis(),{speech?.toggle(lesson)},{speech?.stop()})},talking=speech?.speaking==true,speechActive=speech?.reading==true,mouthActivity=speech?.mouthActivity ?: 0f,
@@ -102,12 +132,15 @@ private object LessonIntroNavigation {
                     }
                 }
                 }
+                }
             }
             lesson.body.forEachIndexed { index,paragraph -> item {
                 Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
                     val examples=remember(paragraph) {MorseExamples.table(paragraph)}
-                    if(examples.isNotEmpty() && examples.all {it.label.length==1})MorseLessonExamples(examples,enabled=returnTarget==null) {code->speech?.stop();playMorse(code)}
-                    else MorseAwareText(paragraph,fontSize=16.sp,lineHeight=24.sp)
+                    LessonParagraph(lesson,index,Modifier.testTag("lesson-paragraph-$index"),onOpenLesson=openLessonReference,
+                        morseContent=if(examples.isNotEmpty() && examples.all {it.label.length==1})({
+                            MorseLessonExamples(examples,enabled=returnTarget==null) {code->speech?.stop();playMorse(code)}
+                        }) else null)
                     lesson.visuals.getOrNull(index)?.takeIf {it.isNotBlank()}?.let {visual -> Panel(color=Color.White) {LogicLearningVisual(visual,showNames=false,showCaption=false)} }
                 }
             } }
@@ -117,8 +150,23 @@ private object LessonIntroNavigation {
                     if(returnTarget?.categoryId==category.id) {returnTarget.rowBounds=it.boundsInWindow();returnTarget.fullRowHeight=it.size.height}
                 },color=Color.White,shape=RoundedCornerShape(18.dp)) {MemoMorphRow(category)}
             }
+            if(lesson.links.isNotEmpty())item(key="official-links") {
+                Panel {
+                    Eyebrow("POUR PRÉPARER TA DÉMARCHE")
+                    ActionLinks(Modifier.testTag("lesson-official-links")) {
+                        lesson.links.forEach {link->
+                            ActionLink(link.label,icon=Icons.AutoMirrored.Rounded.OpenInNew,enabled=returnTarget==null) {openLink(context,link.url)}
+                        }
+                    }
+                }
+            }
         }
-        if(!model.lessonPreviewOnly) Action("À toi de jouer",Modifier.padding(16.dp)) {
+        if(guided)TourLessonHint(model,Modifier.align(if(guideBeside)Alignment.BottomEnd else Alignment.BottomCenter)
+            .padding(horizontal=16.dp,vertical=12.dp)
+            .widthIn(max=if(guideBeside)guideWidth else 360.dp).fillMaxWidth()
+            .heightIn(max=(maxHeight-24.dp).coerceAtLeast(0.dp).coerceAtMost(220.dp)).onSizeChanged {guideHeight=it.height})
+        }
+        if(!model.lessonPreviewOnly) Action("À toi de jouer",Modifier.padding(16.dp).hamigoTourTarget("lesson-start")) {
             model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)
         }
     }
