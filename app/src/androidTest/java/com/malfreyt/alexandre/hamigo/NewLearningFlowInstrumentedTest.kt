@@ -444,7 +444,9 @@ class NewLearningFlowInstrumentedTest {
         ui.runOnIdle {assertEquals(0,model.tour.step);assertFalse(model.tour.skipRequested)}
         ui.onNodeWithTag("hamigo-tour-skip-all").performClick()
         ui.onNodeWithTag("hamigo-tour-confirm-skip").performClick()
-        ui.runOnIdle {assertFalse(model.tour.active);assertEquals(before,owner.progress.export())}
+        ui.runOnIdle {assertEquals(8,model.tour.step);assertEquals("path",model.route);assertEquals(before,owner.progress.export())}
+        ui.onNodeWithTag("hamigo-tour-finish").performClick()
+        ui.runOnIdle {assertFalse(model.tour.active)}
     }
 
     @Test fun ignoredLessonsChangeOnlyThePathAndExplainHowToEarnXpAfterReintegration() {
@@ -628,12 +630,46 @@ class NewLearningFlowInstrumentedTest {
         val before=owner.progress.export()
         ui.runOnIdle {model.beginTour();model.startLesson(content.lessons.first {it.id==HamigoWelcomeLesson})}
         show()
-        ui.runOnIdle {model.tour.requestSkip(exitToPath=true)}
+        ui.runOnIdle {model.tour.requestSkip()}
         ui.onNodeWithTag("hamigo-tour-continue-guide").performClick()
         ui.runOnIdle {assertEquals(1,model.tour.step);assertEquals(HamigoWelcomeLesson,model.lesson?.id)}
-        ui.runOnIdle {model.tour.requestSkip(exitToPath=true)}
+        ui.runOnIdle {model.tour.requestSkip()}
         ui.onNodeWithTag("hamigo-tour-confirm-skip").performClick()
-        ui.runOnIdle {assertFalse(model.tour.active);assertNull(model.lesson);assertNull(model.session);assertEquals("path",model.route);assertEquals(before,owner.progress.export())}
+        ui.runOnIdle {assertEquals(8,model.tour.step);assertNull(model.lesson);assertNull(model.session);assertEquals("path",model.route);assertEquals(before,owner.progress.export())}
+        ui.onNodeWithTag("hamigo-tour-finish").assertIsDisplayed()
+        capture("guide-skipped-from-introduction")
+    }
+
+    @Test fun skippingTheGuideFromEveryTabOrAnUnfinishedQuestionShowsItsFinalWelcomeOnPath() {
+        val ownerBefore=owner.progress.export()
+        show()
+        (listOf("path","practice","resources","friends","profile")+"question").forEachIndexed {index,origin->
+            ui.runOnIdle {
+                model.tour.finish();model.session=null;model.lesson=null;model.resource=null
+                if(origin=="question") {
+                    model.beginTour()
+                    val lesson=content.lessons.first {it.id==HamigoWelcomeLesson}
+                    model.startLesson(lesson)
+                    model.startQuestions(lesson.title,LessonSessionBuilder.create(lesson),lesson.id)
+                    assertFalse(model.session!!.done);assertEquals(2,model.tour.step)
+                } else {model.route=origin;model.tour.move(index+3)}
+            }
+            val before=model.progress.export()
+            if(origin=="question")ui.runOnIdle {model.tour.requestSkip()}
+            else ui.onNodeWithTag("hamigo-tour-skip-all").performClick()
+            ui.onNodeWithTag("hamigo-tour-confirm-skip").performClick()
+            ui.runOnIdle {
+                assertEquals("path",model.route);assertEquals(8,model.tour.step)
+                assertNull(model.session);assertNull(model.lesson);assertNull(model.resource)
+                assertEquals(8,HamigoTourState(model.progress.prefs).step)
+                assertEquals(before,model.progress.export());assertEquals(ownerBefore,owner.progress.export())
+            }
+            ui.onNodeWithTag("path-list").assertExists()
+            ui.onNodeWithTag("hamigo-tour-final-pico").assertIsDisplayed()
+            if(origin in listOf("friends","question"))capture("guide-skipped-from-$origin")
+            ui.onNodeWithTag("hamigo-tour-finish").performClick()
+            ui.runOnIdle {assertFalse(model.tour.active);assertEquals("path",model.route)}
+        }
     }
 
 }

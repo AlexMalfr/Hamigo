@@ -17,6 +17,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     private val gateway:FriendInboxGateway=FriendInbox(),private val now:()->Instant=Instant::now) {
     private data class Binding(val own:String,val login:String,val token:String)
     private fun binding():Binding? {
+        if(!SocialRules.accepted(context)||SocialRules.deletionPending(context))return null
         val token=runCatching { sync.tokens.get() }.getOrNull() ?: return null
         val login=sync.accountLogin ?: return null
         val own=sync.savedGistUrl?.let { runCatching { GitHubSync.gistId(it) }.getOrNull() } ?: return null
@@ -33,7 +34,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
         val state=progress.socialInboxState();val records=progress.friendRecords()
         return (0 until minOf(requests.length(),100)).mapNotNull { index ->
             runCatching { FriendInboxState.requestFromJson(requests.getJSONObject(index)) }.getOrNull()
-        }.filter { it.recipientGistId==bound.own && FriendInboxState.recent(it.createdAt,now()) && !handled(it,state,records) }
+        }.filter { it.recipientGistId==bound.own && !sync.isBlocked(it.author) && FriendInboxState.recent(it.createdAt,now()) && !handled(it,state,records) }
     }
     private fun handled(request:FriendRequest,state:JSONObject,records:JSONObject):Boolean {
         val decisions=state.getJSONObject("decisions")
@@ -55,6 +56,8 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     suspend fun refresh():FriendInboxRefresh = operationLock.withLock {
         val bound=binding() ?: return@withLock FriendInboxRefresh(emptyList(),emptyList())
+        sync.refreshBlocks(progress)
+        assertCurrent(bound)
         val previous=pending().map { "${it.senderGistId}:${it.id}" }.toSet()
         val initial=progress.socialInboxState()
         val decisions=initial.getJSONObject("decisions")
@@ -63,7 +66,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
             decision.getString("ownGistId")==bound.own &&
                 (decision.getString("status")=="ignored" || decision.getBoolean("acknowledged"))
         }.map { it.substringAfter(':') }.toSet()
-        val incoming=gateway.readIncoming(bound.own,bound.token,exclude)
+        val incoming=gateway.readIncoming(bound.own,bound.token,exclude).filterNot {sync.isBlocked(it.author)}
         assertCurrent(bound)
         val activeOutgoing=FriendInboxState.outgoing(progress.socialInboxState(),bound.own,now()).filter { it.status != "accepted" }.take(100)
         val accepted=if(activeOutgoing.isEmpty()) emptySet() else gateway.acceptedOutgoing(bound.own,activeOutgoing.map { it.request },bound.token)
@@ -98,8 +101,10 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     suspend fun send(recipientGist:String,name:String):OutgoingFriendRequestState = operationLock.withLock {
         val bound=binding() ?: throw SocialException("Connecte GitHub et synchronise ta progression pour envoyer une demande.")
+        sync.refreshBlocks(progress)
         val target=GitHubSync.gistId(recipientGist)
         require(target!=bound.own)
+        sync.readProfile(target)
         val existing=FriendInboxState.outgoing(progress.socialInboxState(),bound.own,now()).firstOrNull { it.request.recipientGistId==target }
         if(existing?.status in setOf("sent","accepted")) return@withLock existing!!
         val request=existing?.request ?: OutgoingFriendRequest(UUID.randomUUID().toString(),bound.own,target,now().toString())
@@ -107,6 +112,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     suspend fun retry(outgoing:OutgoingFriendRequestState):OutgoingFriendRequestState = operationLock.withLock {
         val bound=binding() ?: throw SocialException("Reconnecte GitHub pour réessayer.")
+        sync.refreshBlocks(progress)
         val current=FriendInboxState.outgoing(progress.socialInboxState(),bound.own,now()).firstOrNull { it.request.id==outgoing.request.id }
             ?: throw SocialException("Cette demande n’est plus disponible ou a expiré.")
         require(current.request.senderGistId==bound.own)
@@ -115,6 +121,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     private suspend fun sendSaved(bound:Binding,request:OutgoingFriendRequest,name:String):OutgoingFriendRequestState {
         assertCurrent(bound)
+        sync.readProfile(request.recipientGistId)
         synchronized(Progress.CLOUD_LOCK) { progress.saveSocialInboxState(FriendInboxState.updateOutgoing(progress.socialInboxState(),request,"pending",name,now().toEpochMilli())) }
         ProgressSyncScheduler.enqueue(context)
         try {
@@ -134,11 +141,14 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     suspend fun accept(request:FriendRequest) = operationLock.withLock {
         val bound=binding() ?: throw SocialException("Reconnecte GitHub pour accepter cette demande.")
+        sync.refreshBlocks(progress)
+        require(!sync.isBlocked(request.author)){"Ce compte est bloqué sur GitHub."}
         require(request.recipientGistId==bound.own)
         val verified=gateway.readIncoming(bound.own,bound.token).firstOrNull {
             it.id==request.id && it.senderGistId==request.senderGistId && it.author.id==request.author.id
         } ?: throw SocialException("Cette demande n’est plus disponible ou a expiré.")
         assertCurrent(bound)
+        require(!sync.isBlocked(verified.author)){"Ce compte est bloqué sur GitHub."}
         synchronized(Progress.CLOUD_LOCK) {
             val state=progress.socialInboxState();val records=progress.friendRecords()
             require(!handled(verified,state,records)) { "Cette demande a déjà été traitée." }
@@ -168,6 +178,7 @@ class FriendInboxCoordinator(private val context:Context,private val progress:Pr
     }
     private suspend fun acknowledge(bound:Binding,request:FriendRequest) {
         assertCurrent(bound)
+        require(!sync.isBlocked(request.author)){"Ce compte est bloqué sur GitHub."}
         val decision=progress.socialInboxState().getJSONObject("decisions").optJSONObject(FriendInboxState.decisionKey(request))
         val relation=progress.friendRecords().optJSONObject(request.senderGistId)
         require(decision?.optString("status")=="accepted" && relation?.optBoolean("deleted")==false &&

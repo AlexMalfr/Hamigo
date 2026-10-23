@@ -1,4 +1,4 @@
 <resources>
-    <!-- Full-bleed adaptive background; keep transparency in the separate foreground artwork. -->
-    <color name="ic_launcher_background">#087F82</color>
+    <!-- Keep the colour character transparent for launchers that expose it without a background. -->
+    <color name="ic_launcher_background">#00000000</color>
 </resources>

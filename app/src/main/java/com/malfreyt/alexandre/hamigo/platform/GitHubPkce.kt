@@ -43,7 +43,7 @@ internal object GitHubPkce {
         return "https://github.com/login/oauth/authorize?" + form(
             "client_id" to clientId,
             "redirect_uri" to CALLBACK,
-            "scope" to "gist",
+            "scope" to GitHubApp.OAUTH_SCOPE,
             "state" to session.state,
             "code_challenge" to challenge(session.verifier),
             "code_challenge_method" to "S256"
@@ -105,8 +105,8 @@ internal object GitHubPkce {
         if (!type.equals("bearer", ignoreCase = true)) invalidReply()
         val scope = reply.opt("scope") as? String ?: invalidReply()
         if (scope.length > 4096 || scope.any { it.code !in 32..126 }) invalidReply()
-        if ("gist" !in scope.split(Regex("[, ]+")).filter(String::isNotEmpty)) {
-            throw SocialException("L’autorisation GitHub doit inclure l’accès aux Gists. Relance la connexion.")
+        if (!GitHubApp.hasRequiredScopes(scope)) {
+            throw SocialException("L’autorisation GitHub doit inclure les Gists et le profil pour lire les blocages. Relance la connexion.")
         }
         return token
     }

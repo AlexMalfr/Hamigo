@@ -137,7 +137,14 @@ class FriendInboxCoordinatorInstrumentedTest {
 
     private val socialPreferences=mutableMapOf<Progress,SharedPreferences>()
     private fun syncContextPreferences(progress:Progress)=socialPreferences.getValue(progress)
-    private suspend fun fixture(block:suspend (Progress,GitHubSync,FakeGateway,FriendInboxCoordinator)->Unit) {
+    @Test fun unacceptedRulesCannotSendEvenWithAnExistingToken()=runBlocking {
+        fixture(accepted=false) {_,_,gateway,coordinator->
+            assertTrue(runCatching {coordinator.send(peer,"Friend")}.isFailure)
+            assertTrue(coordinator.refresh().pending.isEmpty())
+            assertEquals(0,gateway.sends);assertEquals(0,gateway.acks)
+        }
+    }
+    private suspend fun fixture(accepted:Boolean=true,block:suspend (Progress,GitHubSync,FakeGateway,FriendInboxCoordinator)->Unit) {
         val base=InstrumentationRegistry.getInstrumentation().targetContext
         val suffix=UUID.randomUUID().toString()
         val context=object : ContextWrapper(base) {
@@ -145,17 +152,42 @@ class FriendInboxCoordinatorInstrumentedTest {
             override fun getPackageName():String=base.packageName+".inbox."+suffix
             override fun getSharedPreferences(name:String,mode:Int)=base.getSharedPreferences("coordinator-$suffix-$name",mode)
         }
+        if(accepted)SocialRules.accept(context)
         val progress=Progress(context)
         progress.prefs.edit().putBoolean("autoSync",false).commit()
-        val sync=GitHubSync(context)
+        val gateway=FakeGateway()
+        val sync=GitHubSync(context,gateway)
         sync.tokens.store("synthetic-inbox-test-token")
         val social=context.getSharedPreferences("hamigo_social",Context.MODE_PRIVATE)
         social.edit().putString("ownerLogin","me").putLong("ownerId",99L)
             .putString("ownGistId",own).putString("ownGistUrl","https://gist.github.com/$own").commit()
         socialPreferences[progress]=social
-        val gateway=FakeGateway()
         try { block(progress,sync,gateway,FriendInboxCoordinator(context,progress,sync,gateway){fixed}) }
         finally {sync.tokens.delete();socialPreferences.remove(progress)}
+    }
+
+    @Test fun githubBlockRemovesFriendAndCachedRequestAndStopsAcceptanceAndPosts() = runBlocking {
+        fixture {progress,sync,gateway,coordinator->
+            gateway.incoming=listOf(request())
+            coordinator.refresh()
+            val pending=coordinator.pending().single()
+            coordinator.accept(pending)
+            val old=progress.cloudExport()
+            gateway.blocked=true
+            coordinator.refresh()
+            assertTrue(coordinator.pending().isEmpty())
+            assertEquals(0,CloudProgress.activeFriends(progress.friendRecords()).length())
+            assertTrue(progress.friendRecords().getJSONObject(peer).getBoolean("deleted"))
+            val acks=gateway.acks
+            try {coordinator.accept(pending);fail("Blocked request accepted")} catch(_:IllegalArgumentException){}
+            try {coordinator.send(peer,"Friend");fail("Blocked request sent")} catch(_:SocialException){}
+            assertEquals(acks,gateway.acks);assertEquals(0,gateway.sends)
+            progress.mergeCloud(old);sync.applyBlocks(progress)
+            assertEquals(0,CloudProgress.activeFriends(progress.friendRecords()).length())
+            gateway.blocked=false
+            coordinator.refresh()
+            assertEquals(0,CloudProgress.activeFriends(progress.friendRecords()).length())
+        }
     }
 
     @Test fun acceptedOutgoingStaysDurableWithoutFurtherChecksOrDuplicateRequests() = runBlocking {
@@ -173,7 +205,16 @@ class FriendInboxCoordinatorInstrumentedTest {
         }
     }
 
-    private inner class FakeGateway : FriendInboxGateway {
+    private inner class FakeGateway : FriendInboxGateway,GitHubGateway {
+        var blocked=false
+        override suspend fun api(method:String,path:String,token:String?,body:String?):String {
+            check(method=="GET")
+            if(path.startsWith("/user/blocks?"))return if(blocked)"[{\"login\":\"friend\",\"id\":42}]" else "[]"
+            if(path=="/gists/$peer")return JSONObject().put("owner",GitHubIdentity("friend",42).toJson())
+                .put("files",JSONObject().put(GitHubSync.FILE_NAME,JSONObject().put("content",ShareProgress("Friend",9,1,0).toJson()))).toString()
+            error("Unexpected isolated request: $path")
+        }
+        override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String=error("No raw downloads")
         var incoming=emptyList<FriendRequest>()
         var sends=0;var acks=0;var failAck=false
         var accepted = emptySet<String>(); var acceptanceChecks = 0

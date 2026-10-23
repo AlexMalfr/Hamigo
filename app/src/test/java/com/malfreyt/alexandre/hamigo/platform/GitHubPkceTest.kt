@@ -32,7 +32,7 @@ class GitHubPkceTest {
         assertEquals("/login/oauth/authorize", uri.path)
         assertEquals(mapOf(
             "client_id" to "test-client-id", "redirect_uri" to GitHubPkce.CALLBACK,
-            "scope" to "gist", "state" to state,
+            "scope" to "gist user", "state" to state,
             "code_challenge" to "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", "code_challenge_method" to "S256"
         ), query(uri.rawQuery))
         assertFalse(uri.toString().contains(verifier))

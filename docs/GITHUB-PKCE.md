@@ -4,7 +4,7 @@
 
 Le formulaire Device Flow de GitHub répartit le collage natif mais pas certaines insertions des claviers logiciels. Un onglet du navigateur habituel ne permet pas à Hamigo de modifier le JavaScript de GitHub. La connexion directe avec Authorization Code + PKCE évite ce formulaire : autorisation sur GitHub, retour HTTPS dans Hamigo, échange du code puis vérification du compte et synchronisation.
 
-Ce parcours réutilise l'application OAuth Hamigo et son scope `gist`. Le callback `https://alexmalfr.github.io/hamigo/oauth/` est déjà enregistré sans wildcard dans son portail. Le domaine est associé au package et au certificat release par Digital Asset Links ; son état Android a été vérifié sur le téléphone. Aucune modification de permission ni backend n'est nécessaire.
+Ce parcours réutilise l'application OAuth Hamigo et ses scopes `gist user`. Le callback `https://alexmalfr.github.io/hamigo/oauth/` est déjà enregistré sans wildcard dans son portail. Le domaine est associé au package et au certificat release par Digital Asset Links ; son état Android a été vérifié sur le téléphone. Aucune modification de permission ni backend n'est nécessaire.
 
 GitHub demande encore un `client_secret` pour l'échange PKCE. Son guide recommande ce flux pour les clients natifs, tout en précisant que le secret distribué dans une application ne peut pas rester confidentiel. Ce paramètre commun n'est pas un jeton utilisateur et ne donne pas seul accès à un compte. Hamigo ne s'en sert pas pour prouver qu'une installation est authentique.
 
@@ -18,7 +18,7 @@ Chaque tentative possède un état aléatoire et un vérificateur de 256 bits, a
 
 Le vérificateur et l'état sont conservés temporairement sous AES-GCM avec une clé Android Keystore, séparément du jeton utilisateur et des sauvegardes. Ils expirent après dix minutes. Une reconstruction du processus reprend l'attente avant de traiter l'intent reçu. Dès qu'un callback est accepté, la transaction est consommée avant l'échange réseau ; un deuxième callback ne peut pas déclencher une seconde requête. Annuler, expirer ou échouer supprime les données temporaires.
 
-Le transport OAuth garde ses destinations fixes, sans redirections HTTP. L'échange demande `client_id`, `client_secret`, `code`, `redirect_uri` et `code_verifier`. Seule une réponse Bearer contenant le scope `gist` est acceptée. Les descriptions d'erreur du serveur ne sont pas recopiées dans l'interface. Après échange, le compte est vérifié comme auparavant avant de conserver le jeton dans Keystore et de synchroniser.
+Le transport OAuth garde ses destinations fixes, sans redirections HTTP. L'échange demande `client_id`, `client_secret`, `code`, `redirect_uri` et `code_verifier`. Seule une réponse Bearer contenant les scopes exacts `gist` et `user` est acceptée. La permission `user` sert à lire les blocages GitHub ; Hamigo ne modifie pas le profil ni les blocages. Les descriptions d'erreur du serveur ne sont pas recopiées dans l'interface. Après échange, le compte est vérifié comme auparavant avant de conserver le jeton dans Keystore et de synchroniser.
 
 ## Navigateur et retour
 

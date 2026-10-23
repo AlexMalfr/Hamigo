@@ -49,12 +49,14 @@ internal object HomeWidgets {
 
     /** Debounce successive answer/save events, keeping rendering off the question screen's UI thread. */
     @Synchronized fun progressChanged(context: Context) {
+        if(com.malfreyt.alexandre.hamigo.ReviewAccess.active(context))return
         val app = context.applicationContext
         pendingRefresh?.cancel(false)
         pendingRefresh = executor.schedule({ refresh(app) },600,TimeUnit.MILLISECONDS)
     }
 
     fun refresh(context: Context) {
+        if(com.malfreyt.alexandre.hamigo.ReviewAccess.active(context))return
         val manager = AppWidgetManager.getInstance(context)
         val installed = providers.map { (provider,kind) -> kind to manager.getAppWidgetIds(ComponentName(context,provider)) }
         if(installed.any { it.second.isNotEmpty() }) {

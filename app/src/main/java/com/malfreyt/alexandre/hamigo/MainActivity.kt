@@ -12,6 +12,7 @@ import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.BackEventCompat
 import androidx.activity.compose.setContent
 import androidx.activity.compose.LocalActivityResultRegistryOwner
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -136,6 +137,12 @@ class MainActivity : ComponentActivity() {
             return
         }
         intent?.getStringExtra("hamigo_route")?.takeIf {it in setOf("path","friends")}?.let {model.route=it}
+        if(intent?.action==Intent.ACTION_VIEW&&callback!=null&&HamigoLinks.isFeedbackReturn(callback)) {
+            // Keep the question, memo, scroll and draft that were present before opening Tally.
+            intent.data=null
+            if(this.intent?.dataString?.let(HamigoLinks::isFeedbackReturn)==true)this.intent.data=null
+            return
+        }
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
         @Suppress("DEPRECATION")
         val uri=if(intent?.action==Intent.ACTION_SEND) intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) else intent?.data
@@ -190,14 +197,17 @@ private data class BackScreenSnapshot(
 }
 
 @Composable fun HamigoApp(model: AppModel) {
+    var reviewDialog by rememberSaveable {mutableStateOf(false)}
+    var reviewApproved by rememberSaveable {mutableStateOf(false)}
     val permissionOwner=LocalActivityResultRegistryOwner.current
     val hostContext=LocalContext.current.applicationContext
     val speechHost=remember(hostContext,permissionOwner){SpeechInputHost(hostContext,permissionOwner)}
     FeedbackHost(model.interactionFeedback) {
-        CompositionLocalProvider(LocalSpeechInputHost provides speechHost,LocalOpenDiagnostics provides {model.debugToolsOpen=true},LocalDiagnosticsCovered provides model.debugToolsOpen) {
+        CompositionLocalProvider(LocalSpeechInputHost provides speechHost,LocalOpenDiagnostics provides {model.debugToolsOpen=true},LocalOpenReview provides {approved->reviewApproved=approved;reviewDialog=true},LocalDiagnosticsCovered provides model.debugToolsOpen) {
             val shown=model.diagnostics.sandbox ?: model
             FeedbackPreferenceScope(model.interactionFeedback,shown.progress.prefs) {key(shown){HamigoAppContent(shown,model)}}
             if(model.debugToolsOpen)DiagnosticsScreen(model)
+            if(reviewDialog)ReviewAccessDialog(reviewApproved){reviewDialog=false}
         }
     }
 }
@@ -293,13 +303,13 @@ private data class BackScreenSnapshot(
             }
         };return
     }
-    if(model.showWelcome) {OnboardingScreen(model);return}
+    if(model.showWelcome) {OnboardingScreen(model);SocialRulesDialog(model);return}
     val p=model.progress
     LaunchedEffect(model.route,model.session,model.lesson,model.resource) {
         if(backSource?.isCurrent(model)==false) resetBackMotion()
     }
     BackHandler(enabled=model.session?.done==false) { quit=true }
-    BackHandler(enabled=model.tour.step in 1..2) {model.tour.requestSkip(exitToPath=true)}
+    BackHandler(enabled=model.tour.step in 1..2) {model.tour.requestSkip()}
     BackHandler(enabled=model.tour.navigationPhase) {model.allowTourNavigation()}
     PredictiveBackHandler(enabled=!model.tour.navigationPhase&&model.tour.step !in 1..2&&model.session?.done!=false && (model.session!=null || model.lesson!=null || model.resource!=null || model.route!="path")) {events ->
         resetBackMotion()
@@ -389,7 +399,7 @@ private data class BackScreenSnapshot(
     }
     CompositionLocalProvider(LocalHamigoTourTargets provides tourTargets,LocalTourNavigationGuard provides model::allowTourNavigation) {
     Box(Modifier.fillMaxSize()) {
-    Scaffold(modifier=Modifier.onGloballyPositioned {windowBounds=it.boundsInWindow()}.then(if(guideAccessible)Modifier.clearAndSetSemantics {} else Modifier),containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},bottomBar={
+    Scaffold(modifier=Modifier.onGloballyPositioned {windowBounds=it.boundsInWindow()}.then(if(guideAccessible)Modifier.clearAndSetSemantics {} else Modifier),containerColor=Cream,snackbarHost={SnackbarHost(snackbar)},topBar={if(model.reviewMode)ReviewBanner()},bottomBar={
         if(raisedBarVisible) {
             HamigoBottomBar(model.route,onDestination={destination ->
                 resetBackMotion()
@@ -492,13 +502,14 @@ private data class BackScreenSnapshot(
             confirmButton={TextButton(feedbackClick {model.confirmIgnoredLessonLaunch()}){Text("Désignorer et ouvrir")}},
             dismissButton={TextButton(feedbackClick {model.ignoredLessonRequest=null}){Text("Annuler")}})
     }
+    SocialRulesDialog(model)
     model.incoming?.let { json ->
         AlertDialog(onDismissRequest={model.incoming=null},title={Text("Restaurer la sauvegarde ?")},
             text={Text("La sauvegarde remplacera ta progression locale actuelle. Ton compte GitHub reste connecté.")},
             confirmButton={TextButton(feedbackClick {model.restore(json);model.incoming=null}){Text("Restaurer")}},
             dismissButton={TextButton(feedbackClick {model.incoming=null}){Text("Annuler")}})
     }
-    if(!model.showWelcome && model.oauthSession==null && model.authSession==null) model.pendingInvite?.let {
+    if(!model.showWelcome && !model.socialConsentPending&&!model.socialDataConsentPending && model.oauthSession==null && model.authSession==null) model.pendingInvite?.let {
         val canRequest=model.sync.tokens.hasToken() && model.sync.savedGistUrl!=null
         AlertDialog(onDismissRequest={model.pendingInvite=null},icon={Pico(Modifier.size(64.dp),mood=MascotMood.GOOFY,pose=MascotPose.WAVE)},
             title={Text("Rejoindre cette équipe ?")},text={Text(if(canRequest)

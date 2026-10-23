@@ -61,7 +61,7 @@ object DailyReminder {
 
     /** Schedule one inexact alarm, then recalculate the next local day after each delivery. */
     fun schedule(context: Context) {
-        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext || com.malfreyt.alexandre.hamigo.ReviewAccess.active(context))return
         createChannel(context)
         val manager = context.getSystemService(AlarmManager::class.java)
         val pending = PendingIntent.getBroadcast(
@@ -160,7 +160,7 @@ object DailyReminder {
 
     /** Also used by visual QA: the same artwork and Android template as a scheduled reminder. */
     fun showPreview(context: Context, reminder: ReminderMessage): Boolean {
-        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return false
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext || com.malfreyt.alexandre.hamigo.ReviewAccess.active(context))return false
         createChannel(context)
         val manager = context.getSystemService(NotificationManager::class.java)
         if (!manager.areNotificationsEnabled()) return false

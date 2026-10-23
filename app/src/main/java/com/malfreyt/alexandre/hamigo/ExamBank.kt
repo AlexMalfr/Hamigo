@@ -235,7 +235,7 @@ internal class ExamBankRepository(
         private val instances=ConcurrentHashMap<String,ExamBankRepository>()
         fun forContext(context:Context):ExamBankRepository {
             val app=context.applicationContext;val store=ExamBankStore.forContext(app)
-            return instances.computeIfAbsent(store.directory.absolutePath){ExamBankRepository(store,allowed={app !is DiagnosticContext&&!DiagnosticAccess.syncPaused(app)})}
+            return instances.computeIfAbsent(store.directory.absolutePath){ExamBankRepository(store,allowed={app !is DiagnosticContext&&!DiagnosticAccess.syncPaused(app)&&ExamBankDownloads.allowed(app)})}
         }
     }
 }

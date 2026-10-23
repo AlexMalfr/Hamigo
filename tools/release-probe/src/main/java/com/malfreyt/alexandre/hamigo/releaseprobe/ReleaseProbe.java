@@ -62,6 +62,9 @@ public final class ReleaseProbe extends Instrumentation {
             if(mode.equals("speech"))speech();
             if(mode.equals("narration"))narration();
             if(mode.equals("learning"))learning();
+            if(mode.equals("feedback"))feedback();
+            if(mode.equals("icons"))icons();
+            if(mode.equals("review"))review();
             recordStorage();((Application)context.getApplicationContext()).unregisterActivityLifecycleCallbacks(lifecycle);output.putString("stream","OK: "+mode+" on the actual signed release\n");finish(Activity.RESULT_OK,output);
         } catch(Throwable e) {
             if(context!=null)((Application)context.getApplicationContext()).unregisterActivityLifecycleCallbacks(lifecycle);
@@ -100,6 +103,161 @@ public final class ReleaseProbe extends Instrumentation {
         }
         throw new AssertionError("No resumed activity in the requested format");
     }
+    /** Exercise the published reviewer route and normal connected screens against their local demo service. */
+    private void review() throws Exception {
+        String[] stores={"hamigo","hamigo_social","hamigo_secure","hamigo_diagnostics","hamigo_privacy","hamigo_review_access","hamigo_pending_oauth",
+            "play_review_hamigo","play_review_hamigo_social","play_review_hamigo_secure","play_review_hamigo_diagnostics",
+            "play_review_hamigo_privacy","play_review_hamigo_pending_oauth","play_review_review_state","play_review_review_cloud"};
+        java.util.Map<String,java.util.Map<String,?>> saved=new java.util.LinkedHashMap<>();
+        for(String name:stores)saved.put(name,new java.util.HashMap<>(context.getSharedPreferences(name,Context.MODE_PRIVATE).getAll()));
+        Activity activity=null;
+        try {
+            for(String name:stores)check(context.getSharedPreferences(name,Context.MODE_PRIVATE).edit().clear().commit(),"Clear isolated reviewer fixture");
+            context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",false).putInt("onboardingStep",5).putBoolean("autoSync",false)
+                .putBoolean("interactionSound",false).putBoolean("interactionHaptics",false).putBoolean("reminderEnabled",false)
+                .putString("name","Personal Fixture").putInt("hamigoTourStep",-1).commit();
+            try(java.io.InputStream license=context.getAssets().open("licenses/LICENSE")) {
+                check(new String(license.readAllBytes(),StandardCharsets.UTF_8).contains("GNU GENERAL PUBLIC LICENSE"),"GPL text is available offline in the actual APK");
+            }
+            activity=open();waitText("HAMIGO",30000);String original=learningProgress();
+            waitText("Retrouve ta progression",10000);click("Se connecter avec GitHub",false);waitText("Avant de rejoindre l’équipe",10000);
+            check(!context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getBoolean("welcomed",true),"Opening consent does not finish onboarding");
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getInt("hamigoTourStep",-1)==-1,"Consent does not start the tutorial behind the sheet");
+            captureLearning("review-onboarding-team-rules");click("Accepter et continuer",false);waitText("Tes données sur GitHub",10000);
+            captureLearning("review-onboarding-data-consent");click("Sans connexion",false);waitText("Retrouve ta progression",10000);
+            click("Données et confidentialité",false);reveal("Politique de confidentialité",false);
+            check(find("Accès de démonstration",false)==null,"No visible demonstration entry in onboarding");
+            click("Commencer sans compte",false);waitText("Passer le tutoriel",10000);click("Passer le tutoriel",false);
+            waitText("Passer le tutoriel ?",10000);click("Passer le tutoriel",false);waitText("Le parcours est à toi !",10000);click("Commencer",false);
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getBoolean("welcomed",false),"Ordinary onboarding completed without an account");
+            click("Mémo",false);click("Ouvrir la calculatrice",true);waitText("Calculatrice",10000);
+            setText("691427083519640782135906");click("=",false);waitText("Accès de démonstration",10000);
+            captureLearning("review-calculator-entry");click("Entrer dans la démonstration",false);
+            waitText("DÉMONSTRATION",30000);
+            long until=SystemClock.uptimeMillis()+30000;
+            while(context.getSharedPreferences("play_review_hamigo_social",Context.MODE_PRIVATE).getString("ownGistId",null)==null&&SystemClock.uptimeMillis()<until)SystemClock.sleep(100);
+            check(context.getSharedPreferences("play_review_hamigo_social",Context.MODE_PRIVATE).getString("ownGistId",null)!=null,"Normal sync creates the demo social Gist");
+            check(original.equals(learningProgress()),"Entering demo never changes personal progression");
+            reveal("Accepter",false);click("Accepter",false);SystemClock.sleep(500);
+            captureLearning("review-team");
+            Activity previous=resumedActivity;runOnMainSync(previous::finishAndRemoveTask);waitForIdleSync();activity=open();
+            waitText("DÉMONSTRATION",30000);
+            check(context.getSharedPreferences("hamigo_review_access",Context.MODE_PRIVATE).getBoolean("active",false),"Demo access persists after a new activity/model");
+            click("Moi",false);click("Réglages",true);reveal("Synchroniser maintenant",false);click("Synchroniser maintenant",false);
+            waitText("Progressions actualisées.",10000);
+            String demoBefore=context.getSharedPreferences("play_review_hamigo",Context.MODE_PRIVATE).getString("progress","");
+            reveal("Licences et attributions",false);click("Licences et attributions",false);
+            click("Périmètre des licences et attribution du cours",false);waitText("Licences de Hamigo",10000);
+            reveal("Banque Exam’1 et illustrations téléchargées depuis le REF",false);captureLearning("review-licenses-markdown");
+            click("Fermer",false);
+            reveal("Mes données",false);click("Mes données",false);click("Supprimer mes données sur GitHub",false);
+            waitText("Supprimer les Gists Hamigo ?",10000);captureLearning("review-delete-confirmation");click("Supprimer",false);
+            until=SystemClock.uptimeMillis()+15000;
+            while(context.getSharedPreferences("play_review_hamigo_social",Context.MODE_PRIVATE).contains("ownerLogin")&&SystemClock.uptimeMillis()<until)SystemClock.sleep(100);
+            check(!context.getSharedPreferences("play_review_hamigo_social",Context.MODE_PRIVATE).contains("ownerLogin"),"Deleting demo Gists disconnects only the demo account");
+            check(demoBefore.equals(context.getSharedPreferences("play_review_hamigo",Context.MODE_PRIVATE).getString("progress","")),"Demo deletion preserves demo learning");
+            click("Fermer",false);click("Quitter",false);waitText("Salut Personal",30000);
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getBoolean("welcomed",false),"Leaving demo keeps completed onboarding");
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getInt("hamigoTourStep",0)==-1,"Leaving demo keeps the skipped tutorial finished");
+            check(!context.getSharedPreferences("hamigo_review_access",Context.MODE_PRIVATE).getBoolean("active",false),"Exit returns to personal data");
+            check(original.equals(learningProgress()),"Personal progression restored unchanged");
+            check("Personal Fixture".equals(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("name",null)),"Personal profile retained");
+            File directory=new File(context.getExternalFilesDir(null),"review-release");directory.mkdirs();
+            Files.write(new File(directory,"review-probe.json").toPath(),new JSONObject().put("version",context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName)
+                .put("reviewerCodeWorks",true).put("calculatorEntryOnly",true).put("onboardingConsentKeepsPage",true).put("personalPathRestored",true).put("normalSyncAndInbox",true).put("persistentDemo",true).put("demoDeletion",true)
+                .put("personalProgressUnchanged",true).put("offlineLicense",true).put("nativeLicenseMarkdown",true).put("realGitHubAccountUsed",false).toString(2).getBytes(StandardCharsets.UTF_8));
+        } finally {
+            Activity closing=resumedActivity!=null?resumedActivity:activity;
+            if(closing!=null)runOnMainSync(closing::finishAndRemoveTask);waitForIdleSync();
+            for(String name:stores)restoreLearningPreferences(name,saved.get(name));
+        }
+    }
+    /** Render the packaged adaptive layers through Android, without touching launcher preferences. */
+    private void icons() throws Exception {
+        android.graphics.drawable.Drawable packaged=context.getPackageManager().getApplicationIcon(context.getPackageName());
+        check(packaged instanceof android.graphics.drawable.AdaptiveIconDrawable,"Application icon is adaptive");
+        android.graphics.drawable.AdaptiveIconDrawable icon=(android.graphics.drawable.AdaptiveIconDrawable)packaged;
+        check(icon.getBackground() instanceof android.graphics.drawable.ColorDrawable,"Separate adaptive background");
+        check(android.graphics.Color.alpha(((android.graphics.drawable.ColorDrawable)icon.getBackground()).getColor())==0,"Colour foreground has a transparent background");
+        android.graphics.drawable.Drawable mono=icon.getMonochrome();check(mono!=null,"Android 13 monochrome layer is packaged");
+        File directory=new File(context.getExternalFilesDir(null),"icons-release");check(directory.isDirectory()||directory.mkdirs(),"Icon output directory");
+        String[] names={"colour-transparent","theme-light","theme-dark"};
+        for(int index=0;index<names.length;index++) {
+            android.graphics.drawable.Drawable artwork=icon;
+            if(index>0) {
+                android.graphics.drawable.Drawable tinted=mono.getConstantState().newDrawable().mutate();
+                tinted.setTint(index==1?0xff173f42:0xff9ae1d8);
+                artwork=new android.graphics.drawable.AdaptiveIconDrawable(new android.graphics.drawable.ColorDrawable(index==1?0xffe1f2ef:0xff173f42),tinted);
+            }
+            for(int size:new int[]{384,48}) {
+                Bitmap bitmap=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);
+                artwork.setBounds(0,0,size,size);artwork.draw(new android.graphics.Canvas(bitmap));
+                check(android.graphics.Color.alpha(bitmap.getPixel(0,0))==0,"Android applies its launcher mask");
+                try(FileOutputStream stream=new FileOutputStream(new File(directory,names[index]+"-"+size+".png"))){bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);}
+                bitmap.recycle();
+            }
+        }
+        JSONObject report=new JSONObject().put("version",context.getPackageManager().getPackageInfo(context.getPackageName(),0).versionName)
+            .put("adaptive",true).put("transparentColourBackground",true).put("monochromePresent",true).put("renderer","Android AdaptiveIconDrawable");
+        Files.write(new File(directory,"icons-probe.json").toPath(),report.toString(2).getBytes(StandardCharsets.UTF_8));
+    }
+    private AccessibilityNodeInfo feedbackCheckbox() {
+        long until=SystemClock.uptimeMillis()+10000;
+        while(SystemClock.uptimeMillis()<until) {
+            AccessibilityNodeInfo node=find("Joindre les données de diagnostic",false);
+            while(node!=null) { if(node.refresh()&&node.isCheckable())return node;node=node.getParent(); }
+            SystemClock.sleep(100);
+        }
+        throw new AssertionError("Missing checkable diagnostic row");
+    }
+    /** Verify the real R8 dialog and outgoing URL while intercepting every browser intent. */
+    private void feedback() throws Exception {
+        String[] stores={"hamigo","hamigo_social","hamigo_secure","hamigo_diagnostics"};
+        java.util.Map<String,java.util.Map<String,?>> saved=new java.util.LinkedHashMap<>();
+        for(String file:stores)saved.put(file,new java.util.HashMap<>(context.getSharedPreferences(file,Context.MODE_PRIVATE).getAll()));
+        java.util.List<Intent> outgoing=new java.util.concurrent.CopyOnWriteArrayList<>();
+        ActivityMonitor monitor=new ActivityMonitor(){
+            @Override public ActivityResult onStartActivity(Intent intent){
+                if(Intent.ACTION_VIEW.equals(intent.getAction())){outgoing.add(new Intent(intent));return new ActivityResult(0,null);}
+                return null;
+            }
+        };
+        Activity activity=null;addMonitor(monitor);
+        try {
+            for(String file:stores)check(context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear().commit(),"Clear emulator feedback fixture");
+            check(context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",true).putBoolean("autoSync",false)
+                .putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).putBoolean("interactionHaptics",false)
+                .putInt("hamigoTourStep",-1).putString("name","Release Fixture").commit(),"Prepare isolated feedback fixture");
+            activity=open();waitText("HAMIGO",30000);click("Moi",false);click("Réglages",true);
+            reveal("Contacter / faire un retour",false);String before=learningProgress();
+            click("Contacter / faire un retour",false);waitText("Faire un retour",10000);
+            check(feedbackCheckbox().isChecked(),"Diagnostics checked by default");
+            captureLearning("feedback-diagnostics-default");
+            click("Joindre les données de diagnostic",false);
+            check(!feedbackCheckbox().isChecked(),"Opt-out checkbox changes");
+            captureLearning("feedback-diagnostics-opt-out");click("Annuler",false);check(outgoing.isEmpty(),"Cancel never opens the browser");
+            click("Contacter / faire un retour",false);waitText("Faire un retour",10000);
+            check(feedbackCheckbox().isChecked(),"New report resets to the requested default");
+            click("Joindre les données de diagnostic",false);click("Ouvrir le formulaire",false);
+            check(outgoing.size()==1,"One opt-out intent intercepted");
+            check("https://tally.so/r/9NqlpK".equals(outgoing.get(0).getDataString()),"Opt-out has no URL parameters at all");
+            click("Contacter / faire un retour",false);waitText("Faire un retour",10000);click("Ouvrir le formulaire",false);
+            check(outgoing.size()==2,"One default report intercepted");
+            android.net.Uri uri=outgoing.get(1).getData();
+            check("app".equals(uri.getQueryParameter("content"))&&"settings".equals(uri.getQueryParameter("page")),"Settings origin retained with diagnostics");
+            check(uri.getQueryParameter("app_version")!=null&&uri.getQueryParameter("device_model")!=null,"Diagnostics present when checked");
+            check(before.equals(learningProgress()),"Feedback does not change progression");
+            JSONObject report=new JSONObject().put("signedRelease",true).put("checkedByDefault",true).put("cancelDoesNotOpenBrowser",true)
+                .put("optOutUrlHasNoParameters",true).put("defaultIncludesContext",true).put("progressUnchanged",true).put("realBrowserOpened",false);
+            File dir=new File(context.getExternalFilesDir(null),"feedback-release");dir.mkdirs();
+            Files.write(new File(dir,"feedback-probe.json").toPath(),report.toString(2).getBytes(StandardCharsets.UTF_8));
+        } finally {
+            removeMonitor(monitor);Activity closing=resumedActivity!=null?resumedActivity:activity;
+            if(closing!=null)runOnMainSync(closing::finishAndRemoveTask);waitForIdleSync();
+            for(String file:stores)restoreLearningPreferences(file,saved.get(file));
+        }
+    }
+
     /** Asset contracts, native learning and persisted evidence; no app class is reflected or imported. */
     private void learning() throws Exception {
         // The spoken fixture tests the keyboard, without starting audio capture. Prepare its
@@ -564,9 +722,11 @@ public final class ReleaseProbe extends Instrumentation {
     }
     private void flow() throws Exception {
         check(context.getAssets().list("exam1").length==0,"Bank must not be bundled");
-        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",false).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).commit();
+        context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",false).putInt("onboardingStep",0).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).commit();
         Activity activity=open();waitText("Bienvenue dans Hamigo",30000);capture("release-onboarding");
         check(find("Banque Exam",false)==null,"No download UI during onboarding");
+        setText("Release Fixture");click("Continuer",false);waitText("Un objectif à ton rythme",10000);
+        check(context.getSharedPreferences("hamigo_exam_download",Context.MODE_PRIVATE).getBoolean("confirmed",false),"The first Continue confirms the background download");
         File bank=new File(context.getNoBackupFilesDir(),"exam-bank");File current=new File(bank,"current.json");
         long until=SystemClock.uptimeMillis()+180000;
         while(!current.isFile()&&SystemClock.uptimeMillis()<until)SystemClock.sleep(200);
@@ -693,7 +853,7 @@ public final class ReleaseProbe extends Instrumentation {
         SystemClock.sleep(600);
     }
     private void capture(String name) throws Exception {
-        File directory=new File(context.getExternalFilesDir(null),mode.equals("learning")?"learning-release":mode.equals("social")?"social-0.49-release":"storage-0.48-release");directory.mkdirs();
+        File directory=new File(context.getExternalFilesDir(null),mode.equals("review")?"review-release":mode.equals("learning")?"learning-release":mode.equals("social")?"social-0.49-release":"storage-0.48-release");directory.mkdirs();
         Bitmap bitmap=getUiAutomation().takeScreenshot();check(bitmap!=null,"Screenshot available");
         int width=bitmap.getWidth(),height=bitmap.getHeight();
         try(FileOutputStream out=new FileOutputStream(new File(directory,name+".png"))){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}finally{bitmap.recycle();}

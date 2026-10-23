@@ -18,6 +18,31 @@ import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(AndroidJUnit4::class)
 class AvatarImageCacheInstrumentedTest {
+    @Test fun demonstrationNeverFetchesAnAvatarButKeepsExistingPicturesReadable()=runBlocking {
+        check(android.os.Build.HARDWARE in listOf("ranchu","goldfish"))
+        val context=InstrumentationRegistry.getInstrumentation().targetContext
+        val original=ReviewAccess.active(context)
+        val dir=File(context.cacheDir,"avatar-review-fixture-${UUID.randomUUID()}")
+        val picture=Bitmap.createBitmap(16,16,Bitmap.Config.ARGB_8888).apply {eraseColor(Color.CYAN)}
+        val bytes=ByteArrayOutputStream().also {picture.compress(Bitmap.CompressFormat.PNG,100,it)}.toByteArray();picture.recycle()
+        val calls=AtomicInteger();var clock=System.currentTimeMillis()
+        val client=OkHttpClient.Builder().addInterceptor {chain->
+            calls.incrementAndGet()
+            Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("OK").body(bytes.toResponseBody()).build()
+        }.build()
+        try {
+            val cache=AvatarImageCache(dir,client){clock};val url="https://avatars.githubusercontent.com/u/42?s=128&v=4"
+            ReviewAccess.setActive(context,true)
+            assertNull(cache.load(url));assertEquals(0,calls.get())
+            ReviewAccess.setActive(context,false)
+            assertNotNull(cache.load(url));assertEquals(1,calls.get())
+            clock+=AvatarImageCache.FRESH_MS+1;ReviewAccess.setActive(context,true)
+            assertNotNull(AvatarImageCache(dir,client){clock}.load(url));assertEquals(1,calls.get())
+        } finally {
+            ReviewAccess.setActive(context,original);dir.deleteRecursively()
+            client.dispatcher.executorService.shutdown();client.connectionPool.evictAll()
+        }
+    }
     @Test fun picturesSurviveMemoryLossAndOfflineRefreshWithoutRefetchingEveryView()=runBlocking {
         check(android.os.Build.HARDWARE in listOf("ranchu","goldfish"))
         val dir=File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir,"avatar-fixture-${UUID.randomUUID()}")

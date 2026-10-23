@@ -31,7 +31,12 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
     private val transport=gateway
     private val gateway=object:GitHubGateway {
         private fun checkPaused(){if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(appContext))throw kotlinx.coroutines.CancellationException("Bac à sable actif")}
-        override suspend fun api(method:String,path:String,token:String?,body:String?):String {checkPaused();return transport.api(method,path,token,body)}
+        override suspend fun api(method:String,path:String,token:String?,body:String?):String {
+            checkPaused()
+            if(method in setOf("POST","PATCH") && SocialRules.deletionPending(appContext))
+                throw SocialException("Suppression en cours : la publication GitHub est suspendue.")
+            return transport.api(method,path,token,body)
+        }
         override suspend fun rawBackup(rawUrl:String,owner:String,gist:String,fileName:String):String {checkPaused();return transport.rawBackup(rawUrl,owner,gist,fileName)}
     }
     private val prefs = appContext.getSharedPreferences("hamigo_social", Context.MODE_PRIVATE)
@@ -48,6 +53,49 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
         }) }.getOrNull()
     }
     val lastSyncError: String? get() = prefs.getString("lastSyncError", null)
+
+    // This cache is scoped to the connected account and never exported to a Gist.
+    private fun blockOwner()=accountIdentity?.let {it.id?.toString() ?: it.login.lowercase(java.util.Locale.ROOT)}
+    private fun blocks()=GitHubBlocks.parse(if(prefs.getString("githubBlocksOwner",null)==blockOwner())prefs.getString("githubBlocks","[]") ?: "[]" else "[]")
+    fun isBlocked(identity:GitHubIdentity?)=blocks().contains(identity)
+    fun isBlockedGist(value:String):Boolean {
+        val owners=JSONObject(prefs.getString("blockedGistOwners","{}") ?: "{}")
+        return isBlocked(GitHubIdentity.fromApi(owners.optJSONObject(gistId(value))))
+    }
+    suspend fun refreshBlocks(progress:Progress) = blockReadLock.withLock {
+        val token=tokens.get() ?: return@withLock
+        val owner=blockOwner() ?: return@withLock
+        val updated=GitHubBlocks.read(gateway,token)
+        ensureConnected(token)
+        val known=JSONObject(prefs.getString("blockedGistOwners","{}") ?: "{}")
+        known.keys().asSequence().toList().filter { !updated.contains(GitHubIdentity.fromApi(known.optJSONObject(it))) }.forEach(known::remove)
+        check(prefs.edit().putString("githubBlocksOwner",owner).putString("githubBlocks",updated.toJson()).putString("blockedGistOwners",known.toString()).commit())
+        applyBlocks(progress)
+    }
+    /** Ordinary friend tombstones prevent an older backup from restoring a blocked relationship. */
+    fun applyBlocks(progress:Progress) = synchronized(Progress.CLOUD_LOCK) {
+        val records=progress.friendRecords();val removed=mutableSetOf<String>()
+        records.keys().forEach { id ->
+            val relation=records.getJSONObject(id)
+            if(!relation.optBoolean("deleted") && (isBlocked(GitHubIdentity.fromApi(relation.optJSONObject("githubIdentity"))) || isBlockedGist(id))) {
+                removed+=id
+                records.put(id,JSONObject().put("deleted",true).put("modifiedAt",maxOf(now().toEpochMilli(),relation.getLong("modifiedAt")+1)))
+            }
+        }
+        if(removed.isNotEmpty()) {
+            progress.saveFriendRecords(records)
+            val state=progress.socialInboxState();val outgoing=state.getJSONObject("outgoing")
+            outgoing.keys().asSequence().toList().filter {outgoing.getJSONObject(it).optString("recipientGistId") in removed}.forEach(outgoing::remove)
+            progress.saveSocialInboxState(state)
+            prefs.edit().also {editor->removed.forEach {editor.remove("friendRead_$it")}}.apply()
+        }
+        val cached=runCatching {JSONObject(progress.prefs.getString("friendIncomingCache","{}") ?: "{}")}.getOrDefault(JSONObject())
+        cached.optJSONArray("requests")?.let {requests->
+            val kept=(0 until requests.length()).mapNotNull {runCatching {FriendInboxState.requestFromJson(requests.getJSONObject(it))}.getOrNull()}
+                .filterNot {isBlocked(it.author)}
+            if(kept.size!=requests.length())progress.prefs.edit().putString("friendIncomingCache",cached.put("requests",JSONArray(kept.map {FriendInboxState.requestJson(it)})).toString()).commit()
+        }
+    }
 
     /** Device-local read metadata, deliberately absent from both progress Gists. */
     fun friendReadStatus(gistUrlOrId: String): FriendReadStatus {
@@ -81,11 +129,41 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
         prefs.edit().clear().apply()
     }
 
+    /** Delete only complete, owned Hamigo Gists. Never erase another file in a mixed Gist. */
+    suspend fun deleteRemoteData():Int = writeLock.withLock {
+        val token=tokens.get() ?: throw SocialException("Reconnecte GitHub pour supprimer tes Gists Hamigo.")
+        require(SocialRules.deletionPending(appContext)) {"La suppression doit être confirmée dans Hamigo."}
+        val owner=ensureOwner(token)
+        val candidates=(findExisting(token,owner,BACKUP_FILE_NAME)+findExisting(token,owner,FILE_NAME))
+            .distinctBy {it.getString("id")}
+        require(candidates.size<=16){"Trop de Gists Hamigo ont été trouvés. Consulte tes Gists sur GitHub."}
+        val targets=candidates.map {candidate->
+            val id=gistId(candidate.getString("id"))
+            val gist=JSONObject(gateway.api("GET","/gists/$id",token))
+            require(matchesOwn(gist,owner,BACKUP_FILE_NAME)||matchesOwn(gist,owner,FILE_NAME)){"Le propriétaire d’un Gist a changé."}
+            val files=gist.getJSONObject("files").keys().asSequence().toSet()
+            require(files.all {it==FILE_NAME||it==BACKUP_FILE_NAME||DEVICE_FILE_PATTERN.matches(it)}) {
+                "Un Gist Hamigo contient aussi d’autres fichiers. Supprime ses données manuellement sur GitHub pour conserver ces fichiers."
+            }
+            id
+        }
+        // Validate every destination before the first DELETE. A failed partial operation can be retried.
+        for(id in targets) {
+            ensureConnected(token)
+            try {gateway.api("DELETE","/gists/$id",token)}
+            catch(e:SocialException){if(e.httpStatus!=404)throw e}
+        }
+        disconnect()
+        SocialRules.setDeletionPending(appContext,false)
+        targets.size
+    }
+
     /** Full account restore/merge and publication, serialized against foreground and background sync. */
     suspend fun synchronize(progress: Progress): SyncReport = writeLock.withLock {
         val token = tokens.get() ?: throw SocialException("Connecte ton compte GitHub pour synchroniser ta progression.")
         try {
             val owner = ensureOwner(token)
+            refreshBlocks(progress)
             val device = prefs.getString("installationId", null) ?: UUID.randomUUID().toString().also {
                 prefs.edit().putString("installationId", it).commit()
             }
@@ -102,6 +180,7 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
                     synchronized(Progress.CLOUD_LOCK) {
                         progress.reload()
                         if (progress.mergeCloud(json)) restored = true
+                        applyBlocks(progress)
                     }
                 }
             }
@@ -126,6 +205,7 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
                 synchronized(Progress.CLOUD_LOCK) {
                     progress.reload()
                     if (progress.mergeCloud(json)) restored = true
+                    applyBlocks(progress)
                 }
             }
             val social = publish(synchronized(Progress.CLOUD_LOCK) { progress.reload(); progress.snapshot() }, token, owner)
@@ -186,6 +266,12 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
     suspend fun readProfile(gistUrlOrId: String): GitHubFriendProfile {
         val id = gistId(gistUrlOrId)
         val gist = JSONObject(gateway.api("GET", "/gists/$id", tokens.get()))
+        val owner=GitHubIdentity.fromApi(gist.optJSONObject("owner"))
+        if(isBlocked(owner)) {
+            val known=JSONObject(prefs.getString("blockedGistOwners","{}") ?: "{}")
+            if(known.length()<2_000 || known.has(id))prefs.edit().putString("blockedGistOwners",known.put(id,owner!!.toJson()).toString()).commit()
+            throw SocialException("Ce compte est bloqué sur GitHub. Débloque-le sur GitHub pour l’ajouter à ton équipe.")
+        }
         val file = gist.optJSONObject("files")?.optJSONObject(FILE_NAME)
             ?: throw SocialException("Ce lien ne contient pas de progression Hamigo.")
         if (file.optBoolean("truncated", false)) throw SocialException("Le fichier de progression est trop volumineux.")
@@ -265,6 +351,7 @@ class GitHubSync(context: Context, gateway: GitHubGateway = GitHubHttp, private 
         private val ID_PATTERN = Regex("[a-fA-F0-9]{5,64}")
         private val DEVICE_FILE_PATTERN = Regex("hamigo-device-[a-fA-F0-9-]{36}\\.json")
         private val writeLock = Mutex()
+        private val blockReadLock = Mutex()
 
         /** Incoming URLs supply an ID, never a browser destination. */
         fun gistPageUrl(value: String): String = "https://gist.github.com/${gistId(value)}"

@@ -1,75 +1,73 @@
-# Formulaire Tally de Hamigo
+# Formulaire Hamigo
 
-Le [formulaire « Un retour sur Hamigo »](https://tally.so/r/9NqlpK) est **mis à jour et publié le 22 octobre 2026**, sur le même identifiant `9NqlpK`. Il est déjà branché dans Hamigo. Son [éditeur Tally](https://tally.so/forms/9NqlpK/edit) reste disponible pour les modifications manuelles.
+Formulaire publié : https://tally.so/r/9NqlpK. Conserver cet ID et les UUID des champs/options ; mettre à jour le formulaire existant, sans en créer un nouveau pour l’app.
 
-La nouvelle configuration contient **76 blocs, 33 champs cachés d’URL, 14 champs dans le contrat et 11 règles conditionnelles**. Les champs ne sont pas tous visibles à la fois. Les pièces jointes disposent en plus de leur propre bloc. La clé API sert uniquement à administrer le formulaire depuis les outils locaux ; elle ne doit jamais être embarquée dans l’APK ni versionnée.
+## Choix des diagnostics dans Hamigo
 
-## Ce qui a été simplifié
+À partir de 0.56, les quatre entrées (question, Mémo, introduction et Contact) ouvrent d’abord un dialogue. « Joindre les données de diagnostic » est cochée par défaut. La décocher ouvre exactement `https://tally.so/r/9NqlpK`, sans aucun paramètre, y compris le titre et l’identifiant du contenu. Annuler conserve l’écran. Le choix vaut pour ce retour ; l’ouverture suivante repart cochée.
 
-Le formulaire commence par le type de retour, **Objet** et **Ton message**. Les champs séparés qui répétaient le message (résultat observé, correction proposée, situation d’usage, essais précédents), le choix préalable d’une réponse par mail et le prénom ont été retirés. Un seul e-mail facultatif permet de demander une réponse.
+Ce choix doit précéder le navigateur : Tally enregistre les champs cachés issus de l’URL même si une condition masque leurs blocs. Les actions de calcul ne permettent pas non plus de vider un champ caché ou une saisie de cette façon. Deux essais fictifs sur une copie sans notifications ont reproduit ces limites. Une case dans Tally qui ne ferait que masquer les diagnostics ne constituerait donc pas un opt-out.
 
-| Choix | Complément affiché |
+Les anciennes versions de l’app continuent d’ajouter leur contexte à l’URL. Le nouveau choix exige l’APK 0.56 ou ultérieur. Les données de diagnostic ne comprennent ni réponses de l’utilisateur, progression, amis, identifiant de sauvegarde, jeton ni secret. Les pièces jointes sont choisies volontairement dans Tally.
+
+## Présentation du formulaire
+
+Le type de retour, l’objet et le message sont requis. L’e-mail et les fichiers sont facultatifs, avec au plus cinq fichiers de 10 Mo. Aucun e-mail automatique n’est envoyé au répondant ; les notifications du propriétaire restent activées.
+
+**« Quelle partie de l’app est concernée ? » apparaît uniquement pour Bug, Erreur dans le contenu et Suggestion.** Il reste masqué avant sélection du type, pour Question ou besoin d’aide et pour Autre. Ce choix est requis lorsqu’il est visible. Les champs Question ou exercice, Fiche Mémo et Introduction de cours sont placés juste en dessous et suivent le même filtre de type, même après un changement de réponse.
+
+Le choix manuel de la partie de l’app prime sur l’origine URL. Sans choix manuel, une origine question, memo ou lesson détermine le contexte. Le titre et l’ID de question, le titre Mémo et le titre d’introduction deviennent des textes en lecture seule seulement si leur paramètre est non vide et si l’origine URL correspond au contexte actif. Leurs titres portent « (pré-rempli) » en italique. Choisir une autre partie affiche une saisie vide adaptée ; le titre d’une fiche Mémo ne devient jamais celui d’une question. Aucun input ne possède de defaultAnswer global : une valeur cachée pouvait sinon être enregistrée dans une branche invisible, d’où les contextes multiples observés dans les anciennes notifications.
+
+Objet et Ton message conservent chacun leur champ et leur placeholder. Les actions conditionnelles Tally ne modifient pas les placeholders ; dupliquer ces champs créerait des réponses distinctes. Un même UUID désigne un seul bloc et ne permet pas deux variantes conditionnelles indépendantes.
+
+La case **« Cocher cette case pour afficher les données de diagnostic envoyées avec ce formulaire »** est décochée à l’ouverture. Elle apparaît seulement si au moins un des 33 paramètres URL reconnus est non vide. Elle affiche toute la liste et les trois paragraphes explicatifs. Le choix de transmission reste effectué dans Hamigo, avant l’ouverture du navigateur.
+
+Sans paramètre de diagnostic non vide, l’introduction consacrée aux diagnostics, la case, la liste et tous ses paragraphes sont masqués. Seule la ligne en italique **« Aucune donnée de diagnostic n’est envoyée avec ce formulaire. »** apparaît. Un paramètre tiers comme utm_source, ou des paramètres reconnus vides, ne déclenchent pas la section. La règle d’absence est appliquée en dernier pour neutraliser aussi une réponse d’affichage conservée.
+
+Les **25 lignes à puces** présentent les **33 valeurs** : libellés en gras, valeurs en italique, teinte gris-vert #597678. Une information absente vaut « Non transmis ». La liste constitue un seul bloc pour éviter des lignes visibles isolément après une modification de mise en page. Tally filtre les conteneurs HTML ul/li : les puces Unicode, spans enrichis et sauts de ligne sont conservés à la publication.
+
+## Thème gratuit et Pico
+
+Les réglages natifs gratuits donnent un fond crème #FAF8F2, du texte #173F42, un accent turquoise #087F82 et un bouton corail #FF7869 avec texte #173F42. La police Inter et la marque Tally restent présentes ; aucun CSS ni réglage Pro n’est employé. Pico est le logo visible en tête de page, depuis l’image publique du site Hamigo. Ce logo ne constitue pas une personnalisation du favicon payant.
+
+La palette et l’URL du logo sont consignées dans data/tally/hamigo-feedback.theme.json. Appliquer les cinq couleurs via Customize et le logo via Add logo. Ne pas envoyer settings.styles dans le PATCH : la réponse serveur contient un objet pour le thème natif, alors que le schéma public d’entrée attend une chaîne de CSS. Le script ne modifie que les réglages documentés du modèle et préserve ainsi le thème gratuit existant. La relecture vérifie les cinq couleurs et Pico.
+
+## Treize règles
+
+| Condition | Action |
 | --- | --- |
-| Bug ou comportement inattendu | Étapes pour reproduire, résultat attendu et fréquence |
-| Erreur dans le contenu | Partie concernée : énoncé, réponses, correction, illustration, TTS ou autre |
-| Suggestion, Question ou Autre | Le message suffit |
+| Nature = Bug, Erreur dans le contenu ou Suggestion | Afficher le choix de partie de l’app |
+| Type autorisé ET contexte actif question | Titre et référence de question |
+| Type autorisé ET contexte actif memo | Titre de fiche Mémo |
+| Type autorisé ET contexte actif lesson | Titre d’introduction |
+| Nature = Bug | Étapes, résultat attendu et fréquence, requis si visibles |
+| Nature = Erreur de contenu ET contexte actif question | Partie de la question concernée |
+| Contexte question actif, origine URL question et titre présent | Valeur en lecture seule ; saisie normale masquée |
+| Contexte question actif, origine URL question et ID présent | Même traitement, indépendamment du titre |
+| Contexte memo actif, origine URL memo et titre présent | Valeur Mémo en lecture seule |
+| Contexte lesson actif, origine URL lesson et titre présent | Valeur de cours en lecture seule |
+| Au moins un des 33 paramètres non vide | Introduction diagnostics et case d’affichage |
+| Case d’affichage cochée | Liste complète, trois paragraphes et espace de fin |
+| Les 33 paramètres sont vides | Ligne d’absence ; masquer tout le reste de la section diagnostics |
 
-L’origine ajoute uniquement le titre de la question et son identifiant, le titre de la fiche Mémo, ou le titre de l’introduction de cours. Sans origine spécialisée, le formulaire propose le choix de la page de l’app.
+Les conditions de contexte utilisent des groupes AND/OR imbriqués. Elles filtrent aussi les valeurs préremplies afin qu’un choix de partie conservé n’affiche rien pour Question/aide ou Autre. Le passage de Bug à Suggestion masque les étapes, le résultat attendu et la fréquence. Les champs requis d’une branche masquée ne sont pas demandés dans les autres branches.
 
-Les titres de contexte portent **« (pré-rempli, ne pas modifier) » uniquement lorsque leur propre paramètre URL est non vide**. Le titre et l’identifiant d’une question sont indépendants : fournir uniquement le titre ne marque pas l’identifiant vide comme prérempli. Ces champs restent techniquement modifiables ; le suffixe est une consigne, pas un verrou de sécurité.
+## Paramètres d’URL
 
-Les captures et fichiers sont facultatifs : **5 fichiers maximum, 10 Mo chacun**. Le formulaire accepte les fichiers généraux, sans restriction ajoutée aux seules images. La limite correspond à celle du [plan gratuit Tally](https://tally.so/help/file-uploads).
+Conserver les noms exacts :
 
-## Partie de diagnostic repliée
-
-En bas du formulaire, la case discrète **« Données de diagnostic envoyées avec ce formulaire »** affiche ou masque huit paragraphes de contexte en lecture seule. Elle est décochée à l’ouverture. Il s’agit d’un affichage conditionnel natif de Tally ; ce n’est pas un accordéon HTML ni une zone de saisie supplémentaire. Les 33 valeurs y figurent, avec **« Non transmis »** lorsqu’un paramètre manque.
-
-Le dépliant en syntaxe Markdown essayé sur le formulaire de test apparaît dans l’éditeur, mais l’utilisateur a constaté qu’il disparaît dans l’aperçu. Le formulaire publié conserve donc la case conditionnelle ci-dessus, dont l’affichage et le masquage ont été observés. Ce constat porte sur cet essai ; il ne présume pas des possibilités futures de Tally.
-
-Ces données restent jointes au retour même si le récapitulatif est fermé. Elles proviennent du lien fourni par Hamigo. Ni progression, réponse personnelle, liste d’amis, identifiant de sauvegarde, jeton ni fichier local n’est ajouté automatiquement. Les pièces jointes sont choisies volontairement.
-
-Tally conservait par défaut les réponses et les champs cachés entre deux ouvertures. Cela pouvait réutiliser le contexte d’une ancienne question dans un nouveau retour sans paramètres. **`saveForLater` est désormais désactivé** : une réouverture repart des paramètres courants, avec le message vierge. Un retour en cours n’est donc pas conservé si la page est fermée puis rouverte.
-
-## Notifications par e-mail
-
-**Les notifications au propriétaire sont activées** (`hasSelfEmailNotifications=true`), puis leur activation a été relue par API après publication. Aucun destinataire supplémentaire n’a été ajouté ; Tally utilise son comportement standard pour le propriétaire du formulaire. [Documentation des notifications Tally](https://tally.so/help/self-email-notifications).
-
-Aucune vraie soumission ni aucun e-mail de test n’a été envoyé pendant la recette. L’activation est vérifiée ; la réception effective dans la boîte mail reste à constater au prochain vrai retour. Le formulaire n’envoie pas de réponse automatique à la personne qui le remplit.
-
-## Onze règles présentes dans le modèle
-
-| Nº | Condition | Action |
-| --- | --- | --- |
-| 1 | `content=question` | Afficher le titre et l’identifiant de question |
-| 2 | `content=memo` | Afficher le titre de fiche Mémo |
-| 3 | `content=lesson` | Afficher le titre d’introduction |
-| 4 | `content=app` ou vide | Afficher le choix de page |
-| 5 | Nature = Bug | Afficher étapes, résultat attendu, fréquence |
-| 6 | Nature = Erreur de contenu | Afficher la partie concernée |
-| 7 | Origine question et `title` non vide | Remplacer le titre normal par le titre avec suffixe |
-| 8 | Origine question et `question_id` non vide | Ajouter le suffixe uniquement au titre de l’identifiant |
-| 9 | Origine Mémo et `title` non vide | Ajouter le suffixe au titre Mémo |
-| 10 | Origine introduction et `title` non vide | Ajouter le suffixe au titre d’introduction |
-| 11 | Case de diagnostic cochée | Afficher les paragraphes de diagnostic |
-
-Les conditions utilisent les UUID stables des champs/options. Les champs requis d’une branche ne doivent bloquer l’envoi que lorsqu’elle est visible. Le contrat lisible est conservé dans `data/tally/hamigo-feedback.contract.json`.
-
-## Champs cachés : conserver ces noms exacts
-
-Tally [récupère les paramètres d’URL portant le nom d’un champ caché](https://tally.so/help/hidden-fields). Ces valeurs servent au contexte ; elles ne prouvent pas l’identité de la personne et peuvent être modifiées dans l’URL.
-
-| Contexte | Paramètres |
+| Famille | Noms |
 | --- | --- |
-| Origine et contenu | `content`, `entry_point`, `page`, `title`, `source`, `source_kind` |
+| Origine/contenu | `content`, `entry_point`, `page`, `title`, `source`, `source_kind` |
 | Question | `question_id`, `question_number`, `question_count`, `question_type`, `question_variant`, `topic`, `section`, `lesson_id`, `image`, `visual`, `session_title` |
-| Fiche Mémo | `memo_id` |
-| Version et appareil | `app_version`, `app_version_code`, `android_api`, `android_version`, `device_manufacturer`, `device_model`, `locale` |
+| Mémo | `memo_id` |
+| Appareil | `app_version`, `app_version_code`, `android_api`, `android_version`, `device_manufacturer`, `device_model`, `locale` |
 | Affichage | `screen_width_px`, `screen_height_px`, `window_width_dp`, `window_height_dp`, `density_dpi`, `font_scale`, `orientation` |
-| Mode de diagnostic | `diagnostic_mode` |
+| Diagnostics | `diagnostic_mode` |
 
-## Mettre à jour le formulaire existant
+Les valeurs URL peuvent être modifiées par la personne qui ouvre le lien : elles ne prouvent aucune identité. `saveForLater=false` évite la réutilisation du contexte d’un précédent retour après réouverture.
 
-Ne pas relancer la création pour modifier le formulaire utilisé par l’app. Le script de mise à jour refuse tout autre ID que `9NqlpK`, conserve une copie de l’état initial sous `output/tally-retours-22/`, fusionne les réglages existants, remplace les blocs puis relit l’état publié.
+## Outils et recette
 
 ```powershell
 node tools/tally/build_form.mjs
@@ -78,28 +76,14 @@ node tools/tally/validate_form.mjs
 node tools/tally/verify_readback.mjs
 ```
 
-Le script lit `TALLY_API_KEY` dans `tools/.env`, ou demande une saisie masquée si ce fichier n’existe pas. `-ApiKeyFile <chemin>` permet de réutiliser le fichier d’un autre checkout sans le copier. `-SnapshotOnly` effectue uniquement la lecture et la sauvegarde de la configuration. Aucun secret n’est imprimé.
+Le script d’administration lit la clé locale dans tools/.env, ou accepte -ApiKeyFile pour un autre checkout. Ne jamais afficher ni versionner cette clé. -SnapshotOnly effectue uniquement une sauvegarde locale. Avant publication, relever updatedAt et vérifier les éventuels brouillons. -ExpectedUpdatedAt bloque une modification concurrente ; -IncludeReviewedDraft exige cette date et ne doit être employé qu’après examen et préservation du brouillon. Le corps de création reste DRAFT ; la mise à jour existante publie explicitement les blocs complets.
 
-Le modèle local reste au statut **DRAFT** pour une éventuelle création volontaire sur un autre compte avec `Create-HamigoForm.ps1`. Le script de mise à jour applique explicitement **PUBLISHED** au formulaire existant. Le JSON est un corps d’API ; l’import Markdown/JSON du site ne garantit pas la reprise des conditions. [Documentation de l’API de mise à jour](https://developers.tally.so/api-reference/endpoint/forms/patch).
+Le modèle comporte **82 blocs, 33 paramètres/mentions et 13 règles**. Le validateur couvre **2 952 combinaisons**, dont six origines, six états de type (aucun compris), dix états de partie de l’app, titre/ID manquants et diagnostic ouvert/fermé. Il vérifie aussi chaque paramètre individuellement, les paramètres vides, l’absence et une réponse d’affichage conservée. La relecture serveur parcourt récursivement les spans de safeHTMLSchema et vérifie les 33 mentions, les 25 titres gras, 25 valeurs italiques et 24 sauts de ligne de la liste. Les mentions sont enregistrées dans FORM_TITLE.payload.mentions, jamais dans TEXT.payload. Un TEXT vide est refusé par l’API ; les espaces éditoriaux conservés utilisent un saut de ligne.
 
-Pour le récapitulatif dynamique, les `span.mention` des paragraphes `TEXT` référencent les 33 mentions enregistrées globalement dans `FORM_TITLE.payload.mentions`. **Ne pas placer `mentions` dans `TEXT.payload`** : l’API rejette cette propriété, même si son union OpenAPI générique l’accepte. Le validateur contrôle aussi les clés autorisées pour chaque type de bloc. [Exemple officiel de mention](https://developers.tally.so/documentation/creating-a-mention).
+La recette du 23 octobre confirme dans le navigateur les cinq types, les changements de type avec choix conservé, les trois contextes manuels sans paramètres, la priorité du choix manuel sur l’URL, le préremplissage adapté, l’ouverture/fermeture des diagnostics et leur absence complète hors ligne d’information. Captures du rendu publié inspectées sur ordinateur et à 390 pixels de large. La nouvelle recette n’a envoyé aucune soumission de production, pièce jointe ni notification de test. Les essais fictifs de la réparation précédente sur une copie sans notifications restent documentés dans VALIDATION.md ; les emails historiques ne sont pas modifiés.
 
-## Recette exécutée et limites
+Sources officielles : [API de mise à jour](https://developers.tally.so/api-reference/endpoint/forms/patch), [champs cachés](https://tally.so/help/hidden-fields), [conditions](https://tally.so/help/conditional-form-logic), [personnalisation gratuite](https://tally.so/help/customize-your-form), [placeholders](https://tally.so/help/how-to-add-placeholder-text-to-form-fields). Résultats réellement exécutés et limites : [VALIDATION.md](../VALIDATION.md). Preuves locales : output/tally-theme-2026-10-23/, output/tally-repair-2026-10-23/ et output/tally-retours-22/.
 
-La validation locale passe **200 combinaisons** : cinq origines, cinq natures de retour, quatre états de préremplissage du titre/identifiant et volet ouvert/fermé. La relecture serveur confirme les 76 blocs, 11 règles, 33 champs cachés, 33 mentions dynamiques, préremplissages, limites de pièces jointes et notifications activées.
+## Retour vers Hamigo après envoi
 
-Le formulaire publié a été contrôlé dans le navigateur : titre et identifiant préremplis, aucun suffixe quand les deux valeurs manquent, suffixe du titre seul, origines Mémo et introduction, Bug puis Suggestion avec disparition des champs de bug, affichage/masquage du diagnostic et **33 valeurs fictives effectivement visibles**. Une nouvelle ouverture sans paramètres retrouve maintenant le choix de page et aucun ancien contexte. Les captures repliée et dépliée ont été inspectées.
-
-Les preuves locales se trouvent dans `output/tally-retours-22/` : `validation.json`, `server-validation.json`, `browser-validation.json`, `published-form.json`, `published-form.readback.json`, `published-collapsed.png`, `published-expanded.png` et `diagnostics-visible.png`. Les erreurs API conservées datent des essais réparés ; le reçu et la relecture finale attestent la publication réussie.
-
-Restent à observer lors d’un usage réel : réception du mail, envoi de pièces jointes et refus des dépassements de limites. Aucun clic sur **Envoyer mon retour**, aucun upload et aucun e-mail de test n’a été effectué.
-
-Exemples fictifs pour compléter les essais sur mobile :
-
-```text
-https://tally.so/r/9NqlpK?content=question&question_id=demo-nato&question_type=spoken&title=Alphabet%20international&app_version=TEST&orientation=portrait
-https://tally.so/r/9NqlpK?content=question&title=Alphabet%20international
-https://tally.so/r/9NqlpK?content=memo&memo_id=demo-ohm&title=Loi%20d%27Ohm
-https://tally.so/r/9NqlpK?content=lesson&lesson_id=demo-intro&title=Pr%C3%A9parer%20le%20jour%20de%20l%27examen
-https://tally.so/r/9NqlpK?content=app&page=Parcours&app_version=TEST
-```
+La redirection publiée est https://alexandre.malfre.yt/projects/Hamigo/retour.html. Cette page HTTPS est désormais en ligne et propose le retour vers Hamigo. Le PATCH et la relecture conservent ce réglage ; aucun nouvel APK n’est produit pour les changements de thème et de visibilité réalisés uniquement dans Tally.

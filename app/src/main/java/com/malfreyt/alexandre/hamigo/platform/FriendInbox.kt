@@ -91,7 +91,8 @@ class FriendInbox(
         require(ownId != recipientId) { "Tu ne peux pas t’envoyer une demande." }
         val id = cleanUuid(requestId)
         val me = currentIdentity(token)
-        requireOwner(socialGist(ownId, token), me)
+        val own=socialGist(ownId, token)
+        requireOwner(own, me)
         val recipient = socialGist(recipientId, token)
         require(recipient.owner.id != me.id) { "Ce Gist appartient déjà à ton compte." }
         // Scan all bounded pages before writing: a timeout can hide a successful previous POST.
@@ -106,7 +107,7 @@ class FriendInbox(
             return@withLock existing.message.outgoing()
         }
         val message = Message(REQUEST, id, ownId, recipientId, now().toString())
-        val posted = postComment(recipientId, token, message)
+        val posted = postComment(recipientId, token, message,own.progress.name)
         require(posted.author.id == me.id && posted.message == message) {
             "GitHub a renvoyé une demande inattendue. Réessaie avec le même identifiant."
         }
@@ -121,7 +122,8 @@ class FriendInbox(
         val id = cleanUuid(request.id)
         require(request.commentId > 0)
         val me = currentIdentity(token)
-        requireOwner(socialGist(ownId, token), me)
+        val own=socialGist(ownId, token)
+        requireOwner(own, me)
         require(senderId != ownId && request.author.id != me.id)
         val sender = socialGist(senderId, token)
         require(sender.owner.id == request.author.id) { "L’auteur de la demande a changé." }
@@ -135,7 +137,7 @@ class FriendInbox(
                 it.message.recipient == ownId && it.author.id == me.id
         }) return@withLock
         val message = Message(ACCEPTED, id, senderId, ownId, now().toString())
-        val posted = postComment(ownId, token, message)
+        val posted = postComment(ownId, token, message,own.progress.name)
         require(posted.author.id == me.id && posted.message == message) { "Confirmation GitHub inattendue." }
     }
 
@@ -215,16 +217,27 @@ class FriendInbox(
         throw SocialException("La boîte de réception atteint la limite de 1 000 commentaires. Les demandes restent conservées.")
     }
 
-    private suspend fun postComment(gist: String, token: String, message: Message): ParsedComment {
-        val body = JSONObject().put("body", message.encode()).toString()
+    private suspend fun postComment(gist: String, token: String, message: Message,name:String): ParsedComment {
+        val body = JSONObject().put("body", message.encode(name)).toString()
         return parseComment(JSONObject(gateway.api("POST", "/gists/${cleanGist(gist)}/comments", token, body)))
             ?: throw SocialException("GitHub n’a pas confirmé la demande. Réessaie avec le même identifiant.")
     }
 
     private data class Message(val type: String, val id: String, val sender: String, val recipient: String, val createdAt: String) {
         fun outgoing() = OutgoingFriendRequest(id, sender, recipient, createdAt)
-        fun encode() = PREFIX + JSONObject().put("app", APP).put("schema", 1).put("type", type)
-            .put("id", id).put("senderGist", sender).put("recipientGist", recipient).put("createdAt", createdAt) + SUFFIX
+        fun encode(name:String):String {
+            // A profile name cannot inject Markdown links, HTML or notifications to other GitHub users.
+            val safeName=name.take(80).replace(Regex("[\\r\\n\\p{Cc}]")," ")
+                .replace("@","＠").replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
+                .replace(Regex("([\\\\`*_{}\\[\\]()#!|~])"),"\\\\$1")
+            val introduction=if(type==REQUEST) "Vous avez reçu une demande d’ami sur Hamigo de **$safeName** !"
+                else "**$safeName** a accepté votre demande d’ami sur Hamigo !"
+            val link=FriendInvite.link(if(type==REQUEST)sender else recipient)
+            val action=if(type==REQUEST) "Ouvrir la demande dans Hamigo" else "Retrouver mon équipier dans Hamigo"
+            val data=JSONObject().put("app",APP).put("schema",1).put("type",type).put("id",id)
+                .put("senderGist",sender).put("recipientGist",recipient).put("createdAt",createdAt)
+            return "$introduction\n\n[$action]($link)\n\nSi Hamigo n’est pas installé, le lien propose aussi son téléchargement.\n\n$HIDDEN_PREFIX$data$HIDDEN_SUFFIX"
+        }
     }
     private data class ParsedComment(val message: Message, val author: GitHubIdentity, val commentId: Long) {
         fun request(profile: ShareProgress) = FriendRequest(message.id, message.sender, message.recipient,
@@ -233,8 +246,14 @@ class FriendInbox(
 
     private fun parseComment(comment: JSONObject, allowExpired: Boolean = false): ParsedComment? = runCatching {
         val body = comment.opt("body") as? String ?: return null
-        require(body.length <= 4096 && body.startsWith(PREFIX) && body.endsWith(SUFFIX))
-        val data = JSONObject(body.substring(PREFIX.length, body.length - SUFFIX.length))
+        require(body.length <= 4096)
+        val encoded=if(body.startsWith(PREFIX)&&body.endsWith(SUFFIX)) body.substring(PREFIX.length,body.length-SUFFIX.length)
+            else {
+                val start=body.indexOf(HIDDEN_PREFIX)
+                require(start>=0&&body.indexOf(HIDDEN_PREFIX,start+1)==-1&&body.endsWith(HIDDEN_SUFFIX))
+                body.substring(start+HIDDEN_PREFIX.length,body.length-HIDDEN_SUFFIX.length)
+            }
+        val data = JSONObject(encoded)
         require(data.keys().asSequence().toSet() == FIELDS && data.opt("app") == APP && data.opt("schema") == 1)
         require(listOf("type", "id", "senderGist", "recipientGist", "createdAt").all { data.opt(it) is String })
         val type = data.getString("type")
@@ -272,6 +291,8 @@ class FriendInbox(
         private const val APP = "hamigo-friends"
         private const val PREFIX = "Hamigo • demande d’ajout réciproque\n\n```json\n"
         private const val SUFFIX = "\n```"
+        private const val HIDDEN_PREFIX = "<!-- hamigo-friends:v1\n"
+        private const val HIDDEN_SUFFIX = "\n-->"
         private val FIELDS = setOf("app", "schema", "type", "id", "senderGist", "recipientGist", "createdAt")
         private val GIST_PATTERN = Regex("[a-fA-F0-9]{5,64}")
         private val UUID_PATTERN = Regex("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")

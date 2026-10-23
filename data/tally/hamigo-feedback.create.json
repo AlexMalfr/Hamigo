@@ -3,7 +3,10 @@
   "settings": {
     "language": "fr",
     "hasSelfEmailNotifications": true,
-    "saveForLater": false
+    "saveForLater": false,
+    "redirectOnCompletion": {
+      "html": "https://alexandre.malfre.yt/projects/Hamigo/retour.html"
+    }
   },
   "blocks": [
     {
@@ -14,6 +17,7 @@
       "payload": {
         "title": "Un retour sur Hamigo",
         "html": "Un retour sur Hamigo",
+        "logo": "https://alexandre.malfre.yt/projects/Hamigo/pico.png",
         "button": {
           "label": "Envoyer mon retour"
         },
@@ -390,7 +394,17 @@
       "groupUuid": "c1ad632d-e10c-5b9b-b14a-fa61a3707e73",
       "groupType": "TEXT",
       "payload": {
-        "html": "Une question, une idée ou un problème ? Le contexte technique transmis par Hamigo est consultable en bas du formulaire."
+        "html": "Une question, une idée ou un problème ? Ton retour aide à améliorer Hamigo."
+      }
+    },
+    {
+      "uuid": "f653e06b-02ad-5590-8f73-48d060835ea6",
+      "type": "TEXT",
+      "groupUuid": "f653e06b-02ad-5590-8f73-48d060835ea6",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "Les données de contexte jointes par Hamigo sont consultables en bas du formulaire.",
+        "isHidden": true
       }
     },
     {
@@ -662,6 +676,151 @@
       }
     },
     {
+      "uuid": "afd311e0-6cc6-585f-864c-da1ed7c718eb",
+      "type": "TITLE",
+      "groupUuid": "afd311e0-6cc6-585f-864c-da1ed7c718eb",
+      "groupType": "QUESTION",
+      "payload": {
+        "html": "Quelle partie de l’app est concernée ?",
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "754f9cde-fa9f-5ff5-a682-2a7a3ce6645f",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Parcours",
+        "index": 0,
+        "isFirst": true,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Question ou exercice",
+        "index": 1,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "a9932d33-308b-5421-98f9-87e0a62b4de3",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Introduction de cours",
+        "index": 2,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "53f5d90d-9f06-580e-9e6c-c983a31fbdf3",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Défis / examens / révisions",
+        "index": 3,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "f32f42d9-d2a7-5993-bb05-6de0fd88f416",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Mémo",
+        "index": 4,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "d198c8f3-69d6-5b7c-bf54-83224b026223",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Équipe",
+        "index": 5,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "21afb562-26e0-5902-95c4-be3a4b684745",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Moi",
+        "index": 6,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "f439f455-dc64-5143-83ba-6d53634e73da",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Réglages",
+        "index": 7,
+        "isFirst": false,
+        "isLast": false,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
+      "uuid": "70b0adec-c307-548f-8357-61f5828785d7",
+      "type": "DROPDOWN_OPTION",
+      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+      "groupType": "DROPDOWN",
+      "payload": {
+        "text": "Autre / je ne sais pas",
+        "index": 8,
+        "isFirst": false,
+        "isLast": true,
+        "isHidden": true,
+        "isRequired": true,
+        "name": "app_area"
+      }
+    },
+    {
       "uuid": "ec50b5f5-d1c3-5c9a-b4ca-01f5702a95f7",
       "type": "TITLE",
       "groupUuid": "ec50b5f5-d1c3-5c9a-b4ca-01f5702a95f7",
@@ -677,7 +836,7 @@
       "groupUuid": "66ecbc9d-cf4e-516a-a059-97b4ab569283",
       "groupType": "QUESTION",
       "payload": {
-        "html": "Question concernée (pré-rempli, ne pas modifier)",
+        "html": "Question concernée <span style=\"font-style: italic;\">(pré-rempli)</span>",
         "isHidden": true
       }
     },
@@ -689,15 +848,17 @@
       "payload": {
         "name": "question_context",
         "isRequired": false,
-        "isHidden": true,
-        "hasDefaultAnswer": true,
-        "defaultAnswer": {
-          "uuid": "72f66561-4c9b-5f83-9ff0-c6283e505f2a",
-          "type": "HIDDEN_FIELD",
-          "questionType": "HIDDEN_FIELDS",
-          "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-          "title": "title"
-        }
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "5e87d5e2-c2d6-55ab-bf55-a40bc075bb98",
+      "type": "TEXT",
+      "groupUuid": "5e87d5e2-c2d6-55ab-bf55-a40bc075bb98",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span class=\"mention\" data-uuid=\"72f66561-4c9b-5f83-9ff0-c6283e505f2a\" contenteditable=\"false\">@title</span>",
+        "isHidden": true
       }
     },
     {
@@ -716,7 +877,7 @@
       "groupUuid": "6af0c0fc-15d1-5ba0-9bf5-7fc073eee12a",
       "groupType": "QUESTION",
       "payload": {
-        "html": "Identifiant de la question (pré-rempli, ne pas modifier)",
+        "html": "Identifiant de la question <span style=\"font-style: italic;\">(pré-rempli)</span>",
         "isHidden": true
       }
     },
@@ -728,15 +889,17 @@
       "payload": {
         "name": "question_reference",
         "isRequired": false,
-        "isHidden": true,
-        "hasDefaultAnswer": true,
-        "defaultAnswer": {
-          "uuid": "0411cad0-39e0-5036-9827-5fb1b4f38539",
-          "type": "HIDDEN_FIELD",
-          "questionType": "HIDDEN_FIELDS",
-          "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-          "title": "question_id"
-        }
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "f3f08e2a-3a48-544f-81fa-7897cb2b6e90",
+      "type": "TEXT",
+      "groupUuid": "f3f08e2a-3a48-544f-81fa-7897cb2b6e90",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span class=\"mention\" data-uuid=\"0411cad0-39e0-5036-9827-5fb1b4f38539\" contenteditable=\"false\">@question_id</span>",
+        "isHidden": true
       }
     },
     {
@@ -855,7 +1018,7 @@
       "groupUuid": "d2345027-a13b-50be-94f6-b5c49ce51744",
       "groupType": "QUESTION",
       "payload": {
-        "html": "Fiche Mémo concernée (pré-rempli, ne pas modifier)",
+        "html": "Fiche Mémo concernée <span style=\"font-style: italic;\">(pré-rempli)</span>",
         "isHidden": true
       }
     },
@@ -867,15 +1030,17 @@
       "payload": {
         "name": "memo_context",
         "isRequired": false,
-        "isHidden": true,
-        "hasDefaultAnswer": true,
-        "defaultAnswer": {
-          "uuid": "72f66561-4c9b-5f83-9ff0-c6283e505f2a",
-          "type": "HIDDEN_FIELD",
-          "questionType": "HIDDEN_FIELDS",
-          "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-          "title": "title"
-        }
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "515b0f7b-4f30-5bef-b661-24b21de543ea",
+      "type": "TEXT",
+      "groupUuid": "515b0f7b-4f30-5bef-b661-24b21de543ea",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span class=\"mention\" data-uuid=\"72f66561-4c9b-5f83-9ff0-c6283e505f2a\" contenteditable=\"false\">@title</span>",
+        "isHidden": true
       }
     },
     {
@@ -894,7 +1059,7 @@
       "groupUuid": "0a985d11-48e5-558f-b521-abcec4b2a85a",
       "groupType": "QUESTION",
       "payload": {
-        "html": "Introduction de cours concernée (pré-rempli, ne pas modifier)",
+        "html": "Introduction de cours concernée <span style=\"font-style: italic;\">(pré-rempli)</span>",
         "isHidden": true
       }
     },
@@ -906,145 +1071,17 @@
       "payload": {
         "name": "lesson_context",
         "isRequired": false,
-        "isHidden": true,
-        "hasDefaultAnswer": true,
-        "defaultAnswer": {
-          "uuid": "72f66561-4c9b-5f83-9ff0-c6283e505f2a",
-          "type": "HIDDEN_FIELD",
-          "questionType": "HIDDEN_FIELDS",
-          "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-          "title": "title"
-        }
-      }
-    },
-    {
-      "uuid": "afd311e0-6cc6-585f-864c-da1ed7c718eb",
-      "type": "TITLE",
-      "groupUuid": "afd311e0-6cc6-585f-864c-da1ed7c718eb",
-      "groupType": "QUESTION",
-      "payload": {
-        "html": "Dans quelle partie de l’app ?",
         "isHidden": true
       }
     },
     {
-      "uuid": "754f9cde-fa9f-5ff5-a682-2a7a3ce6645f",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
+      "uuid": "9db35458-7d7c-595a-8a93-6162f28debc5",
+      "type": "TEXT",
+      "groupUuid": "9db35458-7d7c-595a-8a93-6162f28debc5",
+      "groupType": "TEXT",
       "payload": {
-        "text": "Parcours",
-        "index": 0,
-        "isFirst": true,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Cours ou questions",
-        "index": 1,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "53f5d90d-9f06-580e-9e6c-c983a31fbdf3",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Défis / examens / révisions",
-        "index": 2,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "f32f42d9-d2a7-5993-bb05-6de0fd88f416",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Mémo",
-        "index": 3,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "d198c8f3-69d6-5b7c-bf54-83224b026223",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Équipe",
-        "index": 4,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "21afb562-26e0-5902-95c4-be3a4b684745",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Moi",
-        "index": 5,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "f439f455-dc64-5143-83ba-6d53634e73da",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Réglages",
-        "index": 6,
-        "isFirst": false,
-        "isLast": false,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
-      }
-    },
-    {
-      "uuid": "70b0adec-c307-548f-8357-61f5828785d7",
-      "type": "DROPDOWN_OPTION",
-      "groupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
-      "groupType": "DROPDOWN",
-      "payload": {
-        "text": "Autre / je ne sais pas",
-        "index": 7,
-        "isFirst": false,
-        "isLast": true,
-        "isHidden": true,
-        "isRequired": false,
-        "name": "app_area"
+        "html": "<span class=\"mention\" data-uuid=\"72f66561-4c9b-5f83-9ff0-c6283e505f2a\" contenteditable=\"false\">@title</span>",
+        "isHidden": true
       }
     },
     {
@@ -1066,7 +1103,7 @@
         "name": "steps",
         "isRequired": true,
         "isHidden": true,
-        "placeholder": "1. J’ouvre…\n2. Je touche…\n3. Le problème apparaît…"
+        "placeholder": "1. J’ouvre…\n2. J'appuie sur…\n3. Il se passe…"
       }
     },
     {
@@ -1087,7 +1124,8 @@
       "payload": {
         "name": "expected",
         "isRequired": true,
-        "isHidden": true
+        "isHidden": true,
+        "placeholder": "Il devrait se passer..."
       }
     },
     {
@@ -1111,7 +1149,7 @@
         "isFirst": true,
         "isLast": false,
         "isHidden": true,
-        "isRequired": false,
+        "isRequired": true,
         "name": "frequency"
       }
     },
@@ -1126,7 +1164,7 @@
         "isFirst": false,
         "isLast": false,
         "isHidden": true,
-        "isRequired": false,
+        "isRequired": true,
         "name": "frequency"
       }
     },
@@ -1141,7 +1179,7 @@
         "isFirst": false,
         "isLast": false,
         "isHidden": true,
-        "isRequired": false,
+        "isRequired": true,
         "name": "frequency"
       }
     },
@@ -1156,7 +1194,7 @@
         "isFirst": false,
         "isLast": true,
         "isHidden": true,
-        "isRequired": false,
+        "isRequired": true,
         "name": "frequency"
       }
     },
@@ -1166,7 +1204,7 @@
       "groupUuid": "18fdc8bc-b269-552a-9c4f-3b1a0d9a119b",
       "groupType": "QUESTION",
       "payload": {
-        "html": "Captures ou fichiers (facultatif)"
+        "html": "Captures ou fichiers <span style=\"font-style: italic;\">(facultatif)</span>"
       }
     },
     {
@@ -1200,7 +1238,7 @@
       "groupUuid": "216ce235-738f-5b97-aabd-35bb12c41f78",
       "groupType": "QUESTION",
       "payload": {
-        "html": "E-mail (facultatif, pour recevoir une réponse)"
+        "html": "E-mail <span style=\"font-style: italic;\">(facultatif, pour recevoir une réponse)</span>"
       }
     },
     {
@@ -1216,17 +1254,37 @@
       }
     },
     {
+      "uuid": "09af38ce-d7da-4e88-9cae-84ff860aa282",
+      "type": "TEXT",
+      "groupUuid": "cfe64a0a-ceb0-4b1f-a7c3-4dc1b5fa2b81",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<br>"
+      }
+    },
+    {
+      "uuid": "eb50d9e9-fc05-546f-975d-e1012025acc6",
+      "type": "TEXT",
+      "groupUuid": "eb50d9e9-fc05-546f-975d-e1012025acc6",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span style=\"color: rgb(89, 118, 120);\"><span style=\"font-style: italic;\">Aucune donnée de diagnostic n’est envoyée avec ce formulaire.\n</span></span>",
+        "isHidden": true
+      }
+    },
+    {
       "uuid": "b97e9a71-d846-57bf-b6b6-38a9cfb76474",
       "type": "CHECKBOX",
       "groupUuid": "4fecaa16-b90e-5d41-9363-22bafcf1683a",
       "groupType": "CHECKBOXES",
       "payload": {
-        "name": "Données de diagnostic envoyées avec ce formulaire",
-        "text": "Données de diagnostic envoyées avec ce formulaire",
+        "name": "Cocher cette case pour afficher les données de diagnostic envoyées avec ce formulaire",
+        "text": "Cocher cette case pour afficher les données de diagnostic envoyées avec ce formulaire",
         "index": 0,
         "isFirst": true,
         "isLast": true,
-        "isRequired": false
+        "isRequired": false,
+        "isHidden": true
       }
     },
     {
@@ -1235,77 +1293,17 @@
       "groupUuid": "bb0e167b-44c3-58e9-9a4c-303c200cd72c",
       "groupType": "TEXT",
       "payload": {
-        "html": "Application : <span class=\"mention\" data-uuid=\"26056d43-2c76-57d1-9057-a03a2fe8b220\" contenteditable=\"false\">@app_version</span> (code <span class=\"mention\" data-uuid=\"140ed127-12c8-518d-9a60-aad36bad1a05\" contenteditable=\"false\">@app_version_code</span>). Android : <span class=\"mention\" data-uuid=\"cb9e89fd-e6be-5601-a6ec-d733d015bbcd\" contenteditable=\"false\">@android_version</span> (API <span class=\"mention\" data-uuid=\"61c58f30-e8a0-5430-ade1-6bed32e29720\" contenteditable=\"false\">@android_api</span>).",
+        "html": "<span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Application :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"26056d43-2c76-57d1-9057-a03a2fe8b220\" contenteditable=\"false\">@app_version</span> (code <span class=\"mention\" data-uuid=\"140ed127-12c8-518d-9a60-aad36bad1a05\" contenteditable=\"false\">@app_version_code</span>)</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Android :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"cb9e89fd-e6be-5601-a6ec-d733d015bbcd\" contenteditable=\"false\">@android_version</span> (API <span class=\"mention\" data-uuid=\"61c58f30-e8a0-5430-ade1-6bed32e29720\" contenteditable=\"false\">@android_api</span>)</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Appareil :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"1eece0bc-204c-597b-87bb-785d85a7ada9\" contenteditable=\"false\">@device_manufacturer</span> <span class=\"mention\" data-uuid=\"e2e894ff-f0c0-5113-ac85-8b8c0199a27b\" contenteditable=\"false\">@device_model</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Langue de l’appareil :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"111fe1ce-d28d-5707-b1b2-2c0f6c02ed0f\" contenteditable=\"false\">@locale</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Écran :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"1e3442b5-becc-5fd2-aced-4362a2390ee7\" contenteditable=\"false\">@screen_width_px</span> × <span class=\"mention\" data-uuid=\"d38b8167-6ea5-58a9-a2d1-98d24eed55c8\" contenteditable=\"false\">@screen_height_px</span> px</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Fenêtre :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"6ac00ff7-28c7-519f-8b78-63edf05c54df\" contenteditable=\"false\">@window_width_dp</span> × <span class=\"mention\" data-uuid=\"41f61315-781f-5a59-bf65-580940bc0133\" contenteditable=\"false\">@window_height_dp</span> dp</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Densité :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"26719eed-6edf-53cb-8155-f9dd1133847f\" contenteditable=\"false\">@density_dpi</span> dpi</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Taille du texte :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"cc00b6e2-6bdf-53db-939f-c4622265b906\" contenteditable=\"false\">@font_scale</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Orientation :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"feaa2c24-4720-5b1a-9b54-3a587c170c01\" contenteditable=\"false\">@orientation</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Origine :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"e965cf14-330e-5c68-9902-ab18cbf5fbd9\" contenteditable=\"false\">@entry_point</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Page :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"36e74016-a015-5289-a0a9-30ecc48a56fa\" contenteditable=\"false\">@page</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Nature du contenu :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"bb19772b-dc96-595f-b930-32ad503c80dc\" contenteditable=\"false\">@content</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Contenu :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"72f66561-4c9b-5f83-9ff0-c6283e505f2a\" contenteditable=\"false\">@title</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Source :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"484d31be-e295-5dfe-b5b9-11a657a526ec\" contenteditable=\"false\">@source</span> (<span class=\"mention\" data-uuid=\"8bbaf714-cd14-53b8-aa71-9fb3c93c392d\" contenteditable=\"false\">@source_kind</span>)</span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Question :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"0411cad0-39e0-5036-9827-5fb1b4f38539\" contenteditable=\"false\">@question_id</span> · position <span class=\"mention\" data-uuid=\"99e6fcfc-c776-50e3-9abf-8a155e091553\" contenteditable=\"false\">@question_number</span> sur <span class=\"mention\" data-uuid=\"d0c0af52-12eb-5e74-8950-219f2155be6b\" contenteditable=\"false\">@question_count</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Type :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"c6505ffa-78d6-524a-a79c-6397af5c505c\" contenteditable=\"false\">@question_type</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Présentation :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"aa056a81-28ab-5768-9567-cecdfc841e61\" contenteditable=\"false\">@question_variant</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Thème :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"dcea1876-ab86-5487-9de2-c0526627363d\" contenteditable=\"false\">@topic</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Section :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"84c68f30-4628-5d86-b21f-4eaab54f3284\" contenteditable=\"false\">@section</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Cours :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"df39434e-ab8d-5ab2-9c66-9ebe3f657a52\" contenteditable=\"false\">@lesson_id</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Séance :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"b7083dc8-2b9a-5082-8e81-5ee2e8f4843c\" contenteditable=\"false\">@session_title</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Fiche Mémo :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"89aedb05-2512-5612-856f-449a96daaea5\" contenteditable=\"false\">@memo_id</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Image :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"592b3c87-e723-56f1-8356-ae2e70c2612f\" contenteditable=\"false\">@image</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Illustration :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"b97ee635-8dd0-5f7f-97a2-42f6df96022e\" contenteditable=\"false\">@visual</span></span></span><br><span style=\"color: #597678;\">• <span style=\"font-weight: bold;\">Mode diagnostics :</span> <span style=\"font-style: italic;\"><span class=\"mention\" data-uuid=\"b15623f4-baf3-5435-98b7-39643eda645a\" contenteditable=\"false\">@diagnostic_mode</span></span></span>",
         "isHidden": true
       }
     },
     {
-      "uuid": "69d9230d-2717-5c27-a385-27d6305b13b9",
+      "uuid": "29fb94fa-e36c-4769-9b58-027eac6eaa8f",
       "type": "TEXT",
-      "groupUuid": "69d9230d-2717-5c27-a385-27d6305b13b9",
+      "groupUuid": "39988c72-bbd7-4efd-ac8a-f7f48c5cdaab",
       "groupType": "TEXT",
       "payload": {
-        "html": "Appareil : <span class=\"mention\" data-uuid=\"1eece0bc-204c-597b-87bb-785d85a7ada9\" contenteditable=\"false\">@device_manufacturer</span> <span class=\"mention\" data-uuid=\"e2e894ff-f0c0-5113-ac85-8b8c0199a27b\" contenteditable=\"false\">@device_model</span>. Langue : <span class=\"mention\" data-uuid=\"111fe1ce-d28d-5707-b1b2-2c0f6c02ed0f\" contenteditable=\"false\">@locale</span>.",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "adb91a78-14b1-5a37-ae58-8171b8c43635",
-      "type": "TEXT",
-      "groupUuid": "adb91a78-14b1-5a37-ae58-8171b8c43635",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Écran : <span class=\"mention\" data-uuid=\"1e3442b5-becc-5fd2-aced-4362a2390ee7\" contenteditable=\"false\">@screen_width_px</span> × <span class=\"mention\" data-uuid=\"d38b8167-6ea5-58a9-a2d1-98d24eed55c8\" contenteditable=\"false\">@screen_height_px</span> px. Fenêtre : <span class=\"mention\" data-uuid=\"6ac00ff7-28c7-519f-8b78-63edf05c54df\" contenteditable=\"false\">@window_width_dp</span> × <span class=\"mention\" data-uuid=\"41f61315-781f-5a59-bf65-580940bc0133\" contenteditable=\"false\">@window_height_dp</span> dp. Densité : <span class=\"mention\" data-uuid=\"26719eed-6edf-53cb-8155-f9dd1133847f\" contenteditable=\"false\">@density_dpi</span> dpi. Taille du texte : <span class=\"mention\" data-uuid=\"cc00b6e2-6bdf-53db-939f-c4622265b906\" contenteditable=\"false\">@font_scale</span>. Orientation : <span class=\"mention\" data-uuid=\"feaa2c24-4720-5b1a-9b54-3a587c170c01\" contenteditable=\"false\">@orientation</span>.",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "e6dfca96-547d-5865-b0bd-86bec0d20a46",
-      "type": "TEXT",
-      "groupUuid": "e6dfca96-547d-5865-b0bd-86bec0d20a46",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Origine : <span class=\"mention\" data-uuid=\"e965cf14-330e-5c68-9902-ab18cbf5fbd9\" contenteditable=\"false\">@entry_point</span>. Page : <span class=\"mention\" data-uuid=\"36e74016-a015-5289-a0a9-30ecc48a56fa\" contenteditable=\"false\">@page</span>. Nature du contenu : <span class=\"mention\" data-uuid=\"bb19772b-dc96-595f-b930-32ad503c80dc\" contenteditable=\"false\">@content</span>.",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "448627c0-7f5e-5b40-b3d8-03b58382ebbb",
-      "type": "TEXT",
-      "groupUuid": "448627c0-7f5e-5b40-b3d8-03b58382ebbb",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Contenu : <span class=\"mention\" data-uuid=\"72f66561-4c9b-5f83-9ff0-c6283e505f2a\" contenteditable=\"false\">@title</span>. Source : <span class=\"mention\" data-uuid=\"484d31be-e295-5dfe-b5b9-11a657a526ec\" contenteditable=\"false\">@source</span> (<span class=\"mention\" data-uuid=\"8bbaf714-cd14-53b8-aa71-9fb3c93c392d\" contenteditable=\"false\">@source_kind</span>).",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "414833b8-56c9-5f07-9166-4b02a1365ba7",
-      "type": "TEXT",
-      "groupUuid": "414833b8-56c9-5f07-9166-4b02a1365ba7",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Question : <span class=\"mention\" data-uuid=\"0411cad0-39e0-5036-9827-5fb1b4f38539\" contenteditable=\"false\">@question_id</span> · position <span class=\"mention\" data-uuid=\"99e6fcfc-c776-50e3-9abf-8a155e091553\" contenteditable=\"false\">@question_number</span> sur <span class=\"mention\" data-uuid=\"d0c0af52-12eb-5e74-8950-219f2155be6b\" contenteditable=\"false\">@question_count</span>. Type : <span class=\"mention\" data-uuid=\"c6505ffa-78d6-524a-a79c-6397af5c505c\" contenteditable=\"false\">@question_type</span>. Présentation : <span class=\"mention\" data-uuid=\"aa056a81-28ab-5768-9567-cecdfc841e61\" contenteditable=\"false\">@question_variant</span>.",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "f98902f3-5f3c-5ab8-9b4c-0e7d99a8c98b",
-      "type": "TEXT",
-      "groupUuid": "f98902f3-5f3c-5ab8-9b4c-0e7d99a8c98b",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Thème : <span class=\"mention\" data-uuid=\"dcea1876-ab86-5487-9de2-c0526627363d\" contenteditable=\"false\">@topic</span>. Section : <span class=\"mention\" data-uuid=\"84c68f30-4628-5d86-b21f-4eaab54f3284\" contenteditable=\"false\">@section</span>. Cours : <span class=\"mention\" data-uuid=\"df39434e-ab8d-5ab2-9c66-9ebe3f657a52\" contenteditable=\"false\">@lesson_id</span>. Séance : <span class=\"mention\" data-uuid=\"b7083dc8-2b9a-5082-8e81-5ee2e8f4843c\" contenteditable=\"false\">@session_title</span>.",
-        "isHidden": true
-      }
-    },
-    {
-      "uuid": "71fe9dda-afed-5d6f-b0c4-f09540bb1d0e",
-      "type": "TEXT",
-      "groupUuid": "71fe9dda-afed-5d6f-b0c4-f09540bb1d0e",
-      "groupType": "TEXT",
-      "payload": {
-        "html": "Fiche Mémo : <span class=\"mention\" data-uuid=\"89aedb05-2512-5612-856f-449a96daaea5\" contenteditable=\"false\">@memo_id</span>. Image : <span class=\"mention\" data-uuid=\"592b3c87-e723-56f1-8356-ae2e70c2612f\" contenteditable=\"false\">@image</span>. Illustration : <span class=\"mention\" data-uuid=\"b97ee635-8dd0-5f7f-97a2-42f6df96022e\" contenteditable=\"false\">@visual</span>. Mode diagnostics : <span class=\"mention\" data-uuid=\"b15623f4-baf3-5435-98b7-39643eda645a\" contenteditable=\"false\">@diagnostic_mode</span>.",
+        "html": "<span style=\"font-style: italic;\">« Non transmis » signifie que cette information ne figure pas dans le lien. Hamigo n’ajoute ni réponse personnelle, progression, liste d’amis, identifiant de sauvegarde ni clé secrète.</span>",
         "isHidden": true
       }
     },
@@ -1315,8 +1313,113 @@
       "groupUuid": "a3f1f717-95c7-555a-989d-d8775177e5bb",
       "groupType": "TEXT",
       "payload": {
-        "html": "Ces données de contexte sont jointes même si cette section reste repliée. « Non transmis » signifie que cette information ne figure pas dans le lien. Hamigo n’ajoute ni réponse personnelle, progression, liste d’amis, identifiant de sauvegarde ni clé secrète.",
+        "html": "<span style=\"font-style: italic;\">Ces données de diagnostic (utiles pour identifier un problème dans certains cas) sont jointes même si cette section reste repliée. Pour ne pas inclure ces données, tu peux décocher « Joindre les données de diagnostic » avant d’ouvrir le formulaire dans Hamigo pour ne pas les transmettre.</span>",
         "isHidden": true
+      }
+    },
+    {
+      "uuid": "21242298-c790-41a5-b76c-c774adc0d6ae",
+      "type": "TEXT",
+      "groupUuid": "a917e397-a0bd-4f83-9e88-60951f63f399",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span style=\"font-style: italic;\">Ces données ne seront pas utilisées à d'autres fins que l'amélioration de l'application Hamigo.</span>",
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "6aad5627-5966-475c-8f5e-7a19e143400c",
+      "type": "TEXT",
+      "groupUuid": "d97f8eb7-aa9b-4fba-93b0-00b8e3b1257f",
+      "groupType": "TEXT",
+      "payload": {
+        "html": "<span style=\"font-style: italic;\">\n</span>",
+        "isHidden": true
+      }
+    },
+    {
+      "uuid": "6ea456b7-b3b4-5b8b-a39b-3fddc3588d69",
+      "type": "CONDITIONAL_LOGIC",
+      "groupUuid": "6ea456b7-b3b4-5b8b-a39b-3fddc3588d69",
+      "groupType": "CONDITIONAL_LOGIC",
+      "payload": {
+        "conditionals": [
+          {
+            "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "OR",
+              "conditionals": [
+                {
+                  "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                  "type": "SINGLE",
+                  "payload": {
+                    "field": {
+                      "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "type": "INPUT_FIELD",
+                      "questionType": "DROPDOWN_OPTION",
+                      "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "title": "Quel type de retour veux-tu faire ?"
+                    },
+                    "comparison": "IS",
+                    "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                  }
+                },
+                {
+                  "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                  "type": "SINGLE",
+                  "payload": {
+                    "field": {
+                      "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "type": "INPUT_FIELD",
+                      "questionType": "DROPDOWN_OPTION",
+                      "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "title": "Quel type de retour veux-tu faire ?"
+                    },
+                    "comparison": "IS",
+                    "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                  }
+                },
+                {
+                  "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                  "type": "SINGLE",
+                  "payload": {
+                    "field": {
+                      "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "type": "INPUT_FIELD",
+                      "questionType": "DROPDOWN_OPTION",
+                      "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                      "title": "Quel type de retour veux-tu faire ?"
+                    },
+                    "comparison": "IS",
+                    "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "logicalOperator": "AND",
+        "actions": [
+          {
+            "uuid": "4d3267fe-9445-5702-ac15-d5db249b9818",
+            "type": "SHOW_BLOCKS",
+            "payload": {
+              "showBlocks": [
+                "afd311e0-6cc6-585f-864c-da1ed7c718eb",
+                "754f9cde-fa9f-5ff5-a682-2a7a3ce6645f",
+                "f2268ff2-5dce-586c-9c99-eb6b3c8244b7",
+                "a9932d33-308b-5421-98f9-87e0a62b4de3",
+                "53f5d90d-9f06-580e-9e6c-c983a31fbdf3",
+                "f32f42d9-d2a7-5993-bb05-6de0fd88f416",
+                "d198c8f3-69d6-5b7c-bf54-83224b026223",
+                "21afb562-26e0-5902-95c4-be3a4b684745",
+                "f439f455-dc64-5143-83ba-6d53634e73da",
+                "70b0adec-c307-548f-8357-61f5828785d7"
+              ]
+            }
+          }
+        ]
       }
     },
     {
@@ -1327,18 +1430,128 @@
       "payload": {
         "conditionals": [
           {
-            "uuid": "4b3331f6-bb9d-5957-9402-8cd96c209b71",
-            "type": "SINGLE",
+            "uuid": "a0ec5aa2-4e99-5c77-b3ce-4f761f2062f3",
+            "type": "GROUP",
             "payload": {
-              "field": {
-                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
-                "type": "HIDDEN_FIELD",
-                "questionType": "HIDDEN_FIELDS",
-                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-                "title": "content"
-              },
-              "comparison": "IS",
-              "value": "question"
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "a9d2d8a2-bdc4-586d-b382-273aeb359f1f",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "84988ffe-ff54-5d87-9e82-a8d536f47391",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7"
+                        }
+                      },
+                      {
+                        "uuid": "717fdfd6-f3a8-57e3-b0cf-2b2cc52ed371",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "4b3331f6-bb9d-5957-9402-8cd96c209b71",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "question"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           }
         ],
@@ -1367,18 +1580,128 @@
       "payload": {
         "conditionals": [
           {
-            "uuid": "3e126f48-7ecb-5a91-9433-80a023bd1d02",
-            "type": "SINGLE",
+            "uuid": "7aad7b67-87d4-5909-a458-aef733995543",
+            "type": "GROUP",
             "payload": {
-              "field": {
-                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
-                "type": "HIDDEN_FIELD",
-                "questionType": "HIDDEN_FIELDS",
-                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-                "title": "content"
-              },
-              "comparison": "IS",
-              "value": "memo"
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "101c8ba2-bd43-50d0-8022-26d1ebb7cf41",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "07c7c72a-ca81-55d8-9a96-fb2e3b7d4053",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f32f42d9-d2a7-5993-bb05-6de0fd88f416"
+                        }
+                      },
+                      {
+                        "uuid": "c49d8f99-5aa6-559c-a588-899d38374ce8",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "3e126f48-7ecb-5a91-9433-80a023bd1d02",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "memo"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           }
         ],
@@ -1405,18 +1728,128 @@
       "payload": {
         "conditionals": [
           {
-            "uuid": "626f3fec-210c-59e0-bf3b-b115a0bd14fe",
-            "type": "SINGLE",
+            "uuid": "b6f32946-4801-531e-ba36-3cc014e730af",
+            "type": "GROUP",
             "payload": {
-              "field": {
-                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
-                "type": "HIDDEN_FIELD",
-                "questionType": "HIDDEN_FIELDS",
-                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-                "title": "content"
-              },
-              "comparison": "IS",
-              "value": "lesson"
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "5c23f4b2-3aa1-5d65-aabf-a70f76ae9628",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "c810fc2d-b5db-5176-9497-820fc0f0c94c",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "a9932d33-308b-5421-98f9-87e0a62b4de3"
+                        }
+                      },
+                      {
+                        "uuid": "cd9ab462-007f-5f38-a9b3-6743201c71a4",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "626f3fec-210c-59e0-bf3b-b115a0bd14fe",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "lesson"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
             }
           }
         ],
@@ -1429,65 +1862,6 @@
               "showBlocks": [
                 "66dd37b5-25ab-5383-8c45-a3f02f58a477",
                 "c40f9b4e-860c-500e-92b9-895c40ee835f"
-              ]
-            }
-          }
-        ]
-      }
-    },
-    {
-      "uuid": "ecd3ba23-c8f9-5f2b-8cc6-4a3775483f31",
-      "type": "CONDITIONAL_LOGIC",
-      "groupUuid": "ecd3ba23-c8f9-5f2b-8cc6-4a3775483f31",
-      "groupType": "CONDITIONAL_LOGIC",
-      "payload": {
-        "conditionals": [
-          {
-            "uuid": "f604a9b3-f7ea-5545-8c36-8b0e8b06ac9e",
-            "type": "SINGLE",
-            "payload": {
-              "field": {
-                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
-                "type": "HIDDEN_FIELD",
-                "questionType": "HIDDEN_FIELDS",
-                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-                "title": "content"
-              },
-              "comparison": "IS",
-              "value": "app"
-            }
-          },
-          {
-            "uuid": "094c04f6-db9e-5ab4-88bf-ae65a5cadd5f",
-            "type": "SINGLE",
-            "payload": {
-              "field": {
-                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
-                "type": "HIDDEN_FIELD",
-                "questionType": "HIDDEN_FIELDS",
-                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
-                "title": "content"
-              },
-              "comparison": "IS_EMPTY"
-            }
-          }
-        ],
-        "logicalOperator": "OR",
-        "actions": [
-          {
-            "uuid": "480048f5-e4de-57dc-9fd3-f766810577f0",
-            "type": "SHOW_BLOCKS",
-            "payload": {
-              "showBlocks": [
-                "afd311e0-6cc6-585f-864c-da1ed7c718eb",
-                "754f9cde-fa9f-5ff5-a682-2a7a3ce6645f",
-                "f2268ff2-5dce-586c-9c99-eb6b3c8244b7",
-                "53f5d90d-9f06-580e-9e6c-c983a31fbdf3",
-                "f32f42d9-d2a7-5993-bb05-6de0fd88f416",
-                "d198c8f3-69d6-5b7c-bf54-83224b026223",
-                "21afb562-26e0-5902-95c4-be3a4b684745",
-                "f439f455-dc64-5143-83ba-6d53634e73da",
-                "70b0adec-c307-548f-8357-61f5828785d7"
               ]
             }
           }
@@ -1560,6 +1934,131 @@
               "comparison": "IS",
               "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
             }
+          },
+          {
+            "uuid": "a0ec5aa2-4e99-5c77-b3ce-4f761f2062f3",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "a9d2d8a2-bdc4-586d-b382-273aeb359f1f",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "84988ffe-ff54-5d87-9e82-a8d536f47391",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7"
+                        }
+                      },
+                      {
+                        "uuid": "717fdfd6-f3a8-57e3-b0cf-2b2cc52ed371",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "4b3331f6-bb9d-5957-9402-8cd96c209b71",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "question"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ],
         "logicalOperator": "AND",
@@ -1617,6 +2116,131 @@
               },
               "comparison": "IS_NOT_EMPTY"
             }
+          },
+          {
+            "uuid": "a0ec5aa2-4e99-5c77-b3ce-4f761f2062f3",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "a9d2d8a2-bdc4-586d-b382-273aeb359f1f",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "84988ffe-ff54-5d87-9e82-a8d536f47391",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7"
+                        }
+                      },
+                      {
+                        "uuid": "717fdfd6-f3a8-57e3-b0cf-2b2cc52ed371",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "4b3331f6-bb9d-5957-9402-8cd96c209b71",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "question"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ],
         "logicalOperator": "AND",
@@ -1626,7 +2250,8 @@
             "type": "SHOW_BLOCKS",
             "payload": {
               "showBlocks": [
-                "66ecbc9d-cf4e-516a-a059-97b4ab569283"
+                "66ecbc9d-cf4e-516a-a059-97b4ab569283",
+                "5e87d5e2-c2d6-55ab-bf55-a40bc075bb98"
               ]
             }
           },
@@ -1635,7 +2260,8 @@
             "type": "HIDE_BLOCKS",
             "payload": {
               "hideBlocks": [
-                "ec50b5f5-d1c3-5c9a-b4ca-01f5702a95f7"
+                "ec50b5f5-d1c3-5c9a-b4ca-01f5702a95f7",
+                "e494a5dc-5e5f-5461-9521-c15f24cb3f2b"
               ]
             }
           }
@@ -1677,6 +2303,131 @@
               },
               "comparison": "IS_NOT_EMPTY"
             }
+          },
+          {
+            "uuid": "a0ec5aa2-4e99-5c77-b3ce-4f761f2062f3",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "a9d2d8a2-bdc4-586d-b382-273aeb359f1f",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "84988ffe-ff54-5d87-9e82-a8d536f47391",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f2268ff2-5dce-586c-9c99-eb6b3c8244b7"
+                        }
+                      },
+                      {
+                        "uuid": "717fdfd6-f3a8-57e3-b0cf-2b2cc52ed371",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "4b3331f6-bb9d-5957-9402-8cd96c209b71",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "question"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ],
         "logicalOperator": "AND",
@@ -1686,7 +2437,8 @@
             "type": "SHOW_BLOCKS",
             "payload": {
               "showBlocks": [
-                "6af0c0fc-15d1-5ba0-9bf5-7fc073eee12a"
+                "6af0c0fc-15d1-5ba0-9bf5-7fc073eee12a",
+                "f3f08e2a-3a48-544f-81fa-7897cb2b6e90"
               ]
             }
           },
@@ -1695,7 +2447,8 @@
             "type": "HIDE_BLOCKS",
             "payload": {
               "hideBlocks": [
-                "557f3f41-8f30-5f22-a56c-9bdc31568451"
+                "557f3f41-8f30-5f22-a56c-9bdc31568451",
+                "8263c63d-7945-54aa-9e6b-043203ef44bd"
               ]
             }
           }
@@ -1737,6 +2490,131 @@
               },
               "comparison": "IS_NOT_EMPTY"
             }
+          },
+          {
+            "uuid": "7aad7b67-87d4-5909-a458-aef733995543",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "101c8ba2-bd43-50d0-8022-26d1ebb7cf41",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "07c7c72a-ca81-55d8-9a96-fb2e3b7d4053",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "f32f42d9-d2a7-5993-bb05-6de0fd88f416"
+                        }
+                      },
+                      {
+                        "uuid": "c49d8f99-5aa6-559c-a588-899d38374ce8",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "3e126f48-7ecb-5a91-9433-80a023bd1d02",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "memo"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ],
         "logicalOperator": "AND",
@@ -1746,7 +2624,8 @@
             "type": "SHOW_BLOCKS",
             "payload": {
               "showBlocks": [
-                "d2345027-a13b-50be-94f6-b5c49ce51744"
+                "d2345027-a13b-50be-94f6-b5c49ce51744",
+                "515b0f7b-4f30-5bef-b661-24b21de543ea"
               ]
             }
           },
@@ -1755,7 +2634,8 @@
             "type": "HIDE_BLOCKS",
             "payload": {
               "hideBlocks": [
-                "f74dc30a-fd04-53bb-83b7-5816137919e7"
+                "f74dc30a-fd04-53bb-83b7-5816137919e7",
+                "c9791654-afdc-5d0d-9666-b9b85d734ce3"
               ]
             }
           }
@@ -1797,6 +2677,131 @@
               },
               "comparison": "IS_NOT_EMPTY"
             }
+          },
+          {
+            "uuid": "b6f32946-4801-531e-ba36-3cc014e730af",
+            "type": "GROUP",
+            "payload": {
+              "logicalOperator": "AND",
+              "conditionals": [
+                {
+                  "uuid": "a318cea6-cf6f-55c9-a1d9-c01d9f5f4b48",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "48bad010-7c87-5eea-935a-0b92c5a56312",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "def3b0d9-29af-5260-bd4c-1dc6d7e0a972"
+                        }
+                      },
+                      {
+                        "uuid": "e630894f-0df7-5351-9067-9c16d34f5f14",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "6336ca00-71c2-5ea3-aca1-d786fcdd6603"
+                        }
+                      },
+                      {
+                        "uuid": "f57f2e8e-2c85-5f79-bcc9-2f08c1f60af5",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "6246f84c-0f65-5413-8f78-6ce464667b04",
+                            "title": "Quel type de retour veux-tu faire ?"
+                          },
+                          "comparison": "IS",
+                          "value": "ca903256-556f-5290-a534-0fadc581cfb3"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "uuid": "5c23f4b2-3aa1-5d65-aabf-a70f76ae9628",
+                  "type": "GROUP",
+                  "payload": {
+                    "logicalOperator": "OR",
+                    "conditionals": [
+                      {
+                        "uuid": "c810fc2d-b5db-5176-9497-820fc0f0c94c",
+                        "type": "SINGLE",
+                        "payload": {
+                          "field": {
+                            "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "type": "INPUT_FIELD",
+                            "questionType": "DROPDOWN_OPTION",
+                            "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                            "title": "Quelle partie de l’app est concernée ?"
+                          },
+                          "comparison": "IS",
+                          "value": "a9932d33-308b-5421-98f9-87e0a62b4de3"
+                        }
+                      },
+                      {
+                        "uuid": "cd9ab462-007f-5f38-a9b3-6743201c71a4",
+                        "type": "GROUP",
+                        "payload": {
+                          "logicalOperator": "AND",
+                          "conditionals": [
+                            {
+                              "uuid": "6dcc6fa6-800c-5e5a-9273-33530c0210d7",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "type": "INPUT_FIELD",
+                                  "questionType": "DROPDOWN_OPTION",
+                                  "blockGroupUuid": "0f26f5dc-1b50-5705-a080-0335e398c296",
+                                  "title": "Quelle partie de l’app est concernée ?"
+                                },
+                                "comparison": "IS_EMPTY"
+                              }
+                            },
+                            {
+                              "uuid": "626f3fec-210c-59e0-bf3b-b115a0bd14fe",
+                              "type": "SINGLE",
+                              "payload": {
+                                "field": {
+                                  "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                                  "type": "HIDDEN_FIELD",
+                                  "questionType": "HIDDEN_FIELDS",
+                                  "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                                  "title": "content"
+                                },
+                                "comparison": "IS",
+                                "value": "lesson"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ],
         "logicalOperator": "AND",
@@ -1806,7 +2811,8 @@
             "type": "SHOW_BLOCKS",
             "payload": {
               "showBlocks": [
-                "0a985d11-48e5-558f-b521-abcec4b2a85a"
+                "0a985d11-48e5-558f-b521-abcec4b2a85a",
+                "9db35458-7d7c-595a-8a93-6162f28debc5"
               ]
             }
           },
@@ -1815,7 +2821,493 @@
             "type": "HIDE_BLOCKS",
             "payload": {
               "hideBlocks": [
-                "66dd37b5-25ab-5383-8c45-a3f02f58a477"
+                "66dd37b5-25ab-5383-8c45-a3f02f58a477",
+                "c40f9b4e-860c-500e-92b9-895c40ee835f"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "uuid": "ce2c445f-c1fd-5bdf-afdf-d0626f3c573b",
+      "type": "CONDITIONAL_LOGIC",
+      "groupUuid": "ce2c445f-c1fd-5bdf-afdf-d0626f3c573b",
+      "groupType": "CONDITIONAL_LOGIC",
+      "payload": {
+        "conditionals": [
+          {
+            "uuid": "5fdc4f00-0848-5e95-9683-c3e9c3e12d37",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "content"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "66a24185-a093-59d7-bfb8-5d988c6a4d5c",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "0411cad0-39e0-5036-9827-5fb1b4f38539",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_id"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "ed7d6a64-de5c-5cef-b1ea-869d48f7ad9e",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "99e6fcfc-c776-50e3-9abf-8a155e091553",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_number"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "3b77fdc2-85b6-5da9-966f-416b65d1a6f8",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "d0c0af52-12eb-5e74-8950-219f2155be6b",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_count"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "f912019e-aa10-5b30-bf8f-9993a024290e",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "c6505ffa-78d6-524a-a79c-6397af5c505c",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_type"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "c28d5405-6649-5bae-8313-206b6d294752",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "aa056a81-28ab-5768-9567-cecdfc841e61",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_variant"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "acd6edf6-a879-5ea5-8b44-0350ea193c60",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "dcea1876-ab86-5487-9de2-c0526627363d",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "topic"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "d12e04b1-b7d3-5a20-a622-c3a1eed24e01",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "84c68f30-4628-5d86-b21f-4eaab54f3284",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "section"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "bf9be2ed-e3be-5bac-988b-3cb29afa44fb",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "484d31be-e295-5dfe-b5b9-11a657a526ec",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "source"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "8959f666-4628-5aa3-aee6-103088f3a9c8",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "8bbaf714-cd14-53b8-aa71-9fb3c93c392d",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "source_kind"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "7efb05f0-860f-538f-b4df-7bc77472754f",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "df39434e-ab8d-5ab2-9c66-9ebe3f657a52",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "lesson_id"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "d85ec6d0-f37b-567c-b609-ea2bad39b286",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "592b3c87-e723-56f1-8356-ae2e70c2612f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "image"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "43a000e1-868c-57f3-92a1-258ec8fabe13",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b97ee635-8dd0-5f7f-97a2-42f6df96022e",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "visual"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "de6d34a1-128b-543a-a5b9-d12a882de966",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "72f66561-4c9b-5f83-9ff0-c6283e505f2a",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "title"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "de89d6f4-4ca1-5250-9896-3a11e53db6d0",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b7083dc8-2b9a-5082-8e81-5ee2e8f4843c",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "session_title"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "7dc3b6e8-28ee-5502-8997-c3df9c9f6583",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "89aedb05-2512-5612-856f-449a96daaea5",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "memo_id"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "97f573e6-a013-5204-b85b-34d3439865cb",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "26056d43-2c76-57d1-9057-a03a2fe8b220",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "app_version"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "f77de306-61ec-5618-b46e-16dac76b1185",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "140ed127-12c8-518d-9a60-aad36bad1a05",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "app_version_code"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "04afa4eb-0ae0-53ce-a4ca-54add61af04b",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "61c58f30-e8a0-5430-ade1-6bed32e29720",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "android_api"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "da09fc96-e0cd-5619-abb2-07064b452d42",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "cb9e89fd-e6be-5601-a6ec-d733d015bbcd",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "android_version"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "8b45ee31-1d55-5584-b621-31401da597c9",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "1eece0bc-204c-597b-87bb-785d85a7ada9",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "device_manufacturer"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "b4a31e53-041e-526c-9b16-58e83d9d7ad2",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "e2e894ff-f0c0-5113-ac85-8b8c0199a27b",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "device_model"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "dd8af7f6-1a06-5bf7-a029-7d9ab511a548",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "111fe1ce-d28d-5707-b1b2-2c0f6c02ed0f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "locale"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "d5c02ace-ceae-5c31-b879-536a230c4552",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "1e3442b5-becc-5fd2-aced-4362a2390ee7",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "screen_width_px"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "2cc2ed28-0599-5866-8abe-190605c52ad6",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "d38b8167-6ea5-58a9-a2d1-98d24eed55c8",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "screen_height_px"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "b6539808-73c3-5bcd-ab65-4f61f60bcb11",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "6ac00ff7-28c7-519f-8b78-63edf05c54df",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "window_width_dp"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "e08e8247-1925-55cc-aad9-bbbd39bfdeec",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "41f61315-781f-5a59-bf65-580940bc0133",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "window_height_dp"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "1c06c017-8252-54b7-ad3c-c9c6c6daa944",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "26719eed-6edf-53cb-8155-f9dd1133847f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "density_dpi"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "dac31a5d-a103-58b3-978e-73637b3f95d7",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "cc00b6e2-6bdf-53db-939f-c4622265b906",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "font_scale"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "b39478b5-bb3a-5b26-be89-51ac3a977e51",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "feaa2c24-4720-5b1a-9b54-3a587c170c01",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "orientation"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "0591723c-6b5d-5142-98a8-552c4a77e39c",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "36e74016-a015-5289-a0a9-30ecc48a56fa",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "page"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "90701aca-9a3b-5edd-b492-5ea32ff9f5ad",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b15623f4-baf3-5435-98b7-39643eda645a",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "diagnostic_mode"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          },
+          {
+            "uuid": "f01aa22d-b30b-5687-8d70-2839c486e838",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "e965cf14-330e-5c68-9902-ab18cbf5fbd9",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "entry_point"
+              },
+              "comparison": "IS_NOT_EMPTY"
+            }
+          }
+        ],
+        "logicalOperator": "OR",
+        "actions": [
+          {
+            "uuid": "b57d7c19-72b1-554a-a080-f9e8d4dd1649",
+            "type": "SHOW_BLOCKS",
+            "payload": {
+              "showBlocks": [
+                "f653e06b-02ad-5590-8f73-48d060835ea6",
+                "b97e9a71-d846-57bf-b6b6-38a9cfb76474"
               ]
             }
           }
@@ -1838,7 +3330,7 @@
                 "type": "INPUT_FIELD",
                 "questionType": "CHECKBOX",
                 "blockGroupUuid": "4fecaa16-b90e-5d41-9363-22bafcf1683a",
-                "title": "Données de diagnostic envoyées avec ce formulaire"
+                "title": "Cocher cette case pour afficher les données de diagnostic envoyées avec ce formulaire"
               },
               "comparison": "IS_NOT_EMPTY"
             }
@@ -1852,14 +3344,509 @@
             "payload": {
               "showBlocks": [
                 "bb0e167b-44c3-58e9-9a4c-303c200cd72c",
-                "69d9230d-2717-5c27-a385-27d6305b13b9",
-                "adb91a78-14b1-5a37-ae58-8171b8c43635",
-                "e6dfca96-547d-5865-b0bd-86bec0d20a46",
-                "448627c0-7f5e-5b40-b3d8-03b58382ebbb",
-                "414833b8-56c9-5f07-9166-4b02a1365ba7",
-                "f98902f3-5f3c-5ab8-9b4c-0e7d99a8c98b",
-                "71fe9dda-afed-5d6f-b0c4-f09540bb1d0e",
-                "a3f1f717-95c7-555a-989d-d8775177e5bb"
+                "29fb94fa-e36c-4769-9b58-027eac6eaa8f",
+                "a3f1f717-95c7-555a-989d-d8775177e5bb",
+                "21242298-c790-41a5-b76c-c774adc0d6ae",
+                "6aad5627-5966-475c-8f5e-7a19e143400c"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "uuid": "4844a936-c334-5b57-95fa-097f2951aede",
+      "type": "CONDITIONAL_LOGIC",
+      "groupUuid": "4844a936-c334-5b57-95fa-097f2951aede",
+      "groupType": "CONDITIONAL_LOGIC",
+      "payload": {
+        "conditionals": [
+          {
+            "uuid": "094c04f6-db9e-5ab4-88bf-ae65a5cadd5f",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "bb19772b-dc96-595f-b930-32ad503c80dc",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "content"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "6d165c39-8a0f-5e34-8ee1-a4f30b17abe0",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "0411cad0-39e0-5036-9827-5fb1b4f38539",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_id"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "818ae142-b731-5b31-a91c-d018ad6d4d5d",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "99e6fcfc-c776-50e3-9abf-8a155e091553",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_number"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "c5d16fd0-052b-5801-8e0b-fe53ebb512a1",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "d0c0af52-12eb-5e74-8950-219f2155be6b",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_count"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "efc4565c-3f4e-5069-8265-2a73ad58df6a",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "c6505ffa-78d6-524a-a79c-6397af5c505c",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_type"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "061047d8-f15b-50ed-97bb-198796372622",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "aa056a81-28ab-5768-9567-cecdfc841e61",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "question_variant"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "c0c2e07b-3051-5cf9-b268-1dbb14ef6bc8",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "dcea1876-ab86-5487-9de2-c0526627363d",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "topic"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "48477fd7-c153-5087-8796-5c8eca854298",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "84c68f30-4628-5d86-b21f-4eaab54f3284",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "section"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "cf3d3497-5af5-556a-b366-2d194d58a7ea",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "484d31be-e295-5dfe-b5b9-11a657a526ec",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "source"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "77903c49-6591-5d55-b1cc-392f247db0c3",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "8bbaf714-cd14-53b8-aa71-9fb3c93c392d",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "source_kind"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "de2918c4-694c-50a4-9f12-65156933d753",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "df39434e-ab8d-5ab2-9c66-9ebe3f657a52",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "lesson_id"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "3417930c-f312-5587-9f69-ff0bee728be0",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "592b3c87-e723-56f1-8356-ae2e70c2612f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "image"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "7b23dc0e-ddf1-54b0-af0d-d1ccaa61671d",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b97ee635-8dd0-5f7f-97a2-42f6df96022e",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "visual"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "fa9ca5a0-66d1-515b-a741-c40d7fc20cf0",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "72f66561-4c9b-5f83-9ff0-c6283e505f2a",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "title"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "cd9145c1-4ca8-5979-9e5d-e0d743cb55cc",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b7083dc8-2b9a-5082-8e81-5ee2e8f4843c",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "session_title"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "ff1c28d1-c15e-5d1d-b8c8-0b3a1ea1e4ac",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "89aedb05-2512-5612-856f-449a96daaea5",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "memo_id"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "1bebb8ff-9899-51dc-a14e-576cef66c933",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "26056d43-2c76-57d1-9057-a03a2fe8b220",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "app_version"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "f02e905d-68b1-5357-9506-3f5cca1fb5ea",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "140ed127-12c8-518d-9a60-aad36bad1a05",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "app_version_code"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "777fe10a-a202-5cf9-92e1-87170740f596",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "61c58f30-e8a0-5430-ade1-6bed32e29720",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "android_api"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "bc5d056f-b5ab-5d1a-925f-d615a303f73e",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "cb9e89fd-e6be-5601-a6ec-d733d015bbcd",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "android_version"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "5dd2e987-4060-53a6-8320-57c15e51d5aa",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "1eece0bc-204c-597b-87bb-785d85a7ada9",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "device_manufacturer"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "591adb8b-55c8-5e8f-942c-17b1c1d28911",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "e2e894ff-f0c0-5113-ac85-8b8c0199a27b",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "device_model"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "1082424b-e31d-5e98-b423-a638f7879cbc",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "111fe1ce-d28d-5707-b1b2-2c0f6c02ed0f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "locale"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "72e913dd-2df7-5db5-b340-16fd09620f20",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "1e3442b5-becc-5fd2-aced-4362a2390ee7",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "screen_width_px"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "47c7035a-c490-5345-96f7-2bf9ffb9847d",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "d38b8167-6ea5-58a9-a2d1-98d24eed55c8",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "screen_height_px"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "a92322b0-8f6c-589e-93af-feb87ad16064",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "6ac00ff7-28c7-519f-8b78-63edf05c54df",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "window_width_dp"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "359c8b85-26f7-531a-ad4e-c21f34bdc244",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "41f61315-781f-5a59-bf65-580940bc0133",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "window_height_dp"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "68f50df7-c9df-5872-b6f6-c9bbf0e0cdcd",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "26719eed-6edf-53cb-8155-f9dd1133847f",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "density_dpi"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "c44e5364-6b7f-55f4-a37e-d0fa3594719b",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "cc00b6e2-6bdf-53db-939f-c4622265b906",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "font_scale"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "5d826d7b-f7fb-5edc-be63-eb9cb082542d",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "feaa2c24-4720-5b1a-9b54-3a587c170c01",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "orientation"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "eeb35cfe-f5ad-5f5c-9388-c10d580efaa9",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "36e74016-a015-5289-a0a9-30ecc48a56fa",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "page"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "e5f049dd-28f1-5de2-b635-fefb7034c538",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "b15623f4-baf3-5435-98b7-39643eda645a",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "diagnostic_mode"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          },
+          {
+            "uuid": "39882a90-7e2f-55ad-9539-a2b804a31512",
+            "type": "SINGLE",
+            "payload": {
+              "field": {
+                "uuid": "e965cf14-330e-5c68-9902-ab18cbf5fbd9",
+                "type": "HIDDEN_FIELD",
+                "questionType": "HIDDEN_FIELDS",
+                "blockGroupUuid": "6d2adb47-d9e1-5f11-a214-c91790ab019a",
+                "title": "entry_point"
+              },
+              "comparison": "IS_EMPTY"
+            }
+          }
+        ],
+        "logicalOperator": "AND",
+        "actions": [
+          {
+            "uuid": "ea4fdfa1-36b0-5c9e-8650-34ea3e7b7119",
+            "type": "SHOW_BLOCKS",
+            "payload": {
+              "showBlocks": [
+                "eb50d9e9-fc05-546f-975d-e1012025acc6"
+              ]
+            }
+          },
+          {
+            "uuid": "a5be0c7b-6350-581f-a5b1-de1ac1d16ef2",
+            "type": "HIDE_BLOCKS",
+            "payload": {
+              "hideBlocks": [
+                "f653e06b-02ad-5590-8f73-48d060835ea6",
+                "b97e9a71-d846-57bf-b6b6-38a9cfb76474",
+                "bb0e167b-44c3-58e9-9a4c-303c200cd72c",
+                "29fb94fa-e36c-4769-9b58-027eac6eaa8f",
+                "a3f1f717-95c7-555a-989d-d8775177e5bb",
+                "21242298-c790-41a5-b76c-c774adc0d6ae",
+                "6aad5627-5966-475c-8f5e-7a19e143400c"
               ]
             }
           }

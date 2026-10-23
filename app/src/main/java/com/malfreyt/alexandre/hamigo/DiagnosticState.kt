@@ -152,9 +152,12 @@ internal object DiagnosticData {
         model.progress.prefs.edit().putString("name","Camille · Démo").putString("progress",root.toString()).putInt("dailyGoal",60)
             .putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).commit()
         model.refresh()
-        model.friends=listOf(Friend(ShareProgress("Léa · Démo",960,5,6,180),"https://gist.github.com/00000000000000000000000000000001"),
-            Friend(ShareProgress("Sam · Démo",1720,12,11,240),"https://gist.github.com/00000000000000000000000000000002"))
-        val relations=JSONArray(model.friends.map {f->JSONObject().put("gist",f.gist).put("modifiedAt",f.modifiedAt).put("progress",JSONObject(f.progress.toJson()))})
+        // Use current social fixtures, including identity, goal, history and version metadata.
+        model.friends=ReviewGitHubGateway.peers().take(2).mapIndexed {index,(_,identity,profile)->
+            Friend(profile.copy(hourlyDay=today.toString(),hourlyXp=listOf(HourlyPoint(9,12+index*3)),hourlyComplete=true),
+                "https://gist.github.com/"+"%032x".format(index+1),githubIdentity=identity)
+        }
+        val relations=JSONArray(model.friends.map {f->JSONObject().put("gist",f.gist).put("modifiedAt",f.modifiedAt).put("progress",JSONObject(f.progress.toJson())).put("githubIdentity",f.githubIdentity!!.toJson())})
         model.progress.saveFriendRecords(com.malfreyt.alexandre.hamigo.platform.CloudProgress.localFriends(relations,JSONObject()))
     }
     fun origin(q:Question)=when {q.id.startsWith("diagnostic-ui-")->"Exemple";q.id.startsWith("exam1-")||q.image?.startsWith("exam1/")==true||q.image?.startsWith("exam-bank/")==true||q.source.startsWith("https://exam1.r-e-f.org/")->"Exam1";q.kind=="flash"->"Mémo";q.id.startsWith("proc-")||q.id.startsWith("extra-")||q.source.contains("procédurale")->"Variante";else->"Hamigo"}
