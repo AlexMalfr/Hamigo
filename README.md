@@ -22,9 +22,13 @@ Hamigo est une application Android en français pour préparer le **certificat d
 - **Garder le rythme** avec un objectif quotidien, des XP, une série de jours, un calendrier, des rappels et des widgets redimensionnables, avec un fond transparent facultatif par widget.
 - **Ressentir les interactions** avec de petits sons inspirés des commandes radio, des vibrations mesurées et des confettis de fin de séance. Sons et vibrations se désactivent séparément ; la composition Morse peut être écoutée en direct, avec un réglage dédié.
 - **Jouer en équipe** : consulter le calendrier et les semaines d’un ami, son objectif et sa progression d’aujourd’hui, les ajouter par lien ou QR, comparer les XP dans un widget social avec Pico et partager un bilan avec les photos GitHub. Encourager partage une petite carte et ses statistiques. L’historique disponible dépend de son dernier résumé synchronisé. Les fins de séance montrent aussi l’objectif du jour et proposent leur propre image de résultats.
-- **Faire un retour** depuis une question ou une fiche mémo : son identifiant et le contexte technique accompagnent le formulaire Tally commun, avec pièces jointes facultatives. Les introductions disposent aussi d’un drapeau.
+- **Faire un retour** depuis une question ou une fiche mémo : un choix apparaît avant le formulaire Tally commun. La case « Joindre les données de diagnostic » est cochée par défaut ; la décocher ouvre le formulaire sans aucun paramètre. Les valeurs jointes sont consultables dans une liste repliable. Les introductions disposent aussi d’un drapeau et les pièces jointes restent facultatives.
 
 Les cours peuvent être ignorés depuis leur menu, ou par appui long sur un chapitre. Après confirmation, ils comptent comme faits pour avancer, sans donner d’XP ni de preuve de maîtrise. Il faut les réintégrer pour les suivre et gagner les récompenses habituelles ; les révisions restent basées sur les réponses réelles.
+
+Le premier cours présente les cinq onglets avec une association, puis les outils,
+la liberté de parcours et les repères « Utile au certificat » / « Explorer la radio ».
+Ses sept exercices utilisent quatre formats de questions, sans notion technique préalable.
 
 Les révisions s’adaptent aux réponses. Une leçon demande au moins 80 % de bonnes réponses au premier essai et la correction des erreurs pour être validée.
 
@@ -51,7 +55,7 @@ Captures de l’application sur émulateur, avec des profils de démonstration. 
 
 **Android 8.0 ou plus récent.** Télécharge le fichier `Hamigo-…apk` depuis la [dernière release](https://github.com/AlexMalfr/Hamigo/releases/latest), puis installe-le sur ton téléphone.
 
-Au premier lancement, tu choisis ton pseudo, ton objectif, l’heure de ton rappel et ta façon de saisir le Morse. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. La banque Exam’1 se télécharge automatiquement pendant l’accueil, puis reste disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
+Au premier lancement, tu choisis ton pseudo, ton objectif, l’heure de ton rappel et ta façon de saisir le Morse. La connexion GitHub est proposée ensuite ; elle reste facultative. Les cours, les fiches et les révisions fonctionnent **hors ligne**. Le premier bouton Continuer de l’accueil annonce la taille puis lance le téléchargement d’Exam’1 en arrière-plan. La banque reste ensuite disponible hors ligne. Ses mises à jour sont vérifiées en arrière-plan ; sa version et la vérification manuelle se trouvent dans les paramètres.
 
 Un guide avec Pico présente ensuite le cours de bienvenue et les autres onglets. La première étape assombrit la page, puis le dernier encouragement se détache sur un voile léger ; le guide laisse lire le cours et répondre aux questions, puis reprend au bilan. La visite des onglets avance en les touchant. Le tutoriel peut être passé après confirmation. Un essai du micro dans l’accueil explique la permission ; le clavier reste disponible en cas de refus. Le service Android traite l’audio, sans enregistrement par Hamigo. Le mode appui maintenu ou bascule est synchronisé avec les autres réglages de jeu.
 
@@ -62,6 +66,12 @@ GitHub sert à retrouver sa progression sur plusieurs appareils et à partager s
 Deux Gists séparés conservent la sauvegarde complète et le résumé social. Ils sont **non répertoriés, mais accessibles à toute personne possédant leur lien** ; la sauvegarde n’est pas chiffrée. L’invitation ne donne accès qu’au résumé social.
 
 Pour les échanges, les demandes d’amis et la fusion des sauvegardes : [fonctionnement de la synchronisation](docs/SOCIAL.md).
+
+Les paramètres donnent accès à la politique de confidentialité, à la suppression des Gists et aux licences intégrales hors ligne. Avant la connexion, une confirmation distincte explique les transferts automatiques, y compris en arrière-plan.
+
+Dans l’accueil initial, ouvrir les confirmations GitHub ne termine pas l’onboarding. Cette étape reste ouverte pendant l’autorisation et en cas d’annulation ou d’erreur ; le tutoriel commence après la connexion effective ou le choix de continuer sans compte. Passer le tutoriel ramène à Parcours sur sa dernière fiche de bienvenue ; Commencer termine ensuite la visite.
+
+Un accès de démonstration isolé, activé uniquement par un code dans la calculatrice, permet d’essayer les écrans connectés et leur logique avec un service GitHub local fictif. Il est signalé par un bandeau et se quitte sans modifier les données personnelles. Les notices Markdown des licences sont mises en forme dans l’app ; les textes juridiques complets restent disponibles hors ligne. [Instructions d’accès pour la revue Google Play](docs/PLAY-REVIEW-ACCESS.md).
 
 ## Développer
 
@@ -90,3 +100,13 @@ Hamigo est un projet indépendant de l’ANFR. Le contenu continue d’être rev
 - [ANFR](https://www.anfr.fr/gerer/radioamateurs/les-certificats) — informations officielles sur le certificat.
 
 Pour aller plus loin : [couverture des fiches mémo](docs/MEMO-COVERAGE-2026-10.md) · [validation et limites](docs/VALIDATION.md) · [historique des mises à jour](docs/UPDATES-2026-10.md) · [consignes de contribution pour les agents](AGENTS.md).
+
+## Confidentialité et distribution
+
+La [page Hamigo](https://alexandre.malfre.yt/projects/Hamigo/) donne accès à la [politique de confidentialité](https://alexandre.malfre.yt/projects/Hamigo/confidentialite.html), à la [procédure de suppression](https://alexandre.malfre.yt/projects/Hamigo/donnees.html) et aux [règles de l’équipe](https://alexandre.malfre.yt/projects/Hamigo/conditions.html). Ces liens sont également dans Paramètres. La connexion présente les informations sur les données dans une section repliée et demande l’acceptation des règles avant les fonctions sociales.
+
+Mes données permet de supprimer les Gists Hamigo du compte connecté puis de déconnecter l’app, sans effacer l’apprentissage local. Une interruption suspend les publications jusqu’à la reprise de la suppression. Les Gists mixtes contenant d’autres fichiers sont protégés ; les commentaires envoyés sur les Gists d’autres personnes se suppriment depuis GitHub. Les actions de blocage et de signalement ouvrent les outils GitHub. Les blocages décidés sur GitHub sont lus à la synchronisation pour retirer les équipiers concernés et filtrer leurs demandes ; leur cache reste sur l’appareil. Les scopes GitHub demandés sont `gist` et `user` ; Hamigo ne modifie pas le profil ni les blocages.
+
+Le code original est sous [GPL-3.0-or-later](LICENSE). Les contenus pédagogiques adaptés du cours F6KGL/F5KFF sont sous CC BY-NC-SA 4.0 ; les autres ressources conservent leurs droits propres. Voir les [périmètres des licences](LICENSES/README.md) et [attributions tierces](THIRD_PARTY_NOTICES.md). La banque Exam’1 reste téléchargée séparément, sans présumer de sa licence.
+
+La préparation Play, les ressources web et les points restant à fournir sont décrits dans [PLAY-STORE.md](docs/PLAY-STORE.md).

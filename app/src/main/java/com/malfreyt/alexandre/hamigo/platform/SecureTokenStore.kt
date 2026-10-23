@@ -13,7 +13,7 @@ import javax.crypto.spec.GCMParameterSpec
 /** AES-GCM ciphertext in app-private preferences; the encryption key never leaves Android Keystore. */
 class SecureTokenStore(context: Context) {
     private val prefs = context.applicationContext.getSharedPreferences("hamigo_secure", Context.MODE_PRIVATE)
-    private val alias = "${context.packageName}.github-token.v1"
+    private val alias = "${context.packageName}." + if(context.applicationContext is com.malfreyt.alexandre.hamigo.ReviewContext) "play-review-token.v1" else "github-token.v1"
 
     @Synchronized
     fun store(token: String) {

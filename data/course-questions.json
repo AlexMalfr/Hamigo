@@ -2,72 +2,95 @@
   "schema": 1,
   "questions": [
     {
-      "id": "q-6df48b73-1d15-4561-8a3b-8f769f727e46",
-      "kind": "choice",
-      "prompt": "Où retrouver rapidement une formule déjà étudiée ?",
-      "choices": [
-        "Dans Mémo",
-        "Dans le classement d’Équipe",
-        "Dans le calendrier d’activité de Moi",
-        "Dans le suivi de l’objectif quotidien"
-      ],
-      "answer": 0,
-      "explanation": "Mémo conserve les connaissances et les outils consultables.",
-      "skillIds": [
-        "hamigo-tools"
-      ],
-      "source": "https://github.com/AlexMalfr/Hamigo",
-      "section": "technique",
-      "topic": "Choisir le bon outil Hamigo"
-    },
-    {
-      "id": "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
-      "kind": "choice",
-      "prompt": "Tu révises avec une flashcard. Quelle habitude fait travailler ta mémoire ?",
-      "choices": [
-        "Chercher la réponse avant de la révéler, puis réessayer plus tard",
-        "Relire plusieurs fois la réponse en la gardant affichée",
-        "Afficher d’abord la réponse, puis la recopier",
-        "Revoir seulement les cartes dont la réponse est visible"
-      ],
-      "answer": 0,
-      "explanation": "Essaie de retrouver la réponse avant de la lire. Un nouvel essai après un délai entraîne le rappel ; la correction aide ensuite à comprendre ce qui manque.",
-      "skillIds": [
-        "hamigo-tools"
-      ],
-      "source": "https://github.com/AlexMalfr/Hamigo",
-      "section": "technique",
-      "topic": "Choisir le bon outil Hamigo"
-    },
-    {
-      "id": "q-43915fda-a73a-4fe8-bc90-7605a230e502",
-      "kind": "text",
-      "prompt": "Quel onglet rassemble les examens blancs ?",
+      "id": "q-32f55ac6-298b-450e-b23e-984df118f96f",
+      "kind": "match",
+      "prompt": "Relie chaque onglet à ce que tu peux y faire.",
       "choices": [],
       "answer": 0,
-      "explanation": "Défis propose les entraînements et examens blancs.",
-      "acceptedAnswers": [
-        "Défis"
-      ],
+      "explanation": "Parcours rassemble les cours, Mémo les fiches et outils, Défis les révisions et examens blancs. Équipe permet de suivre tes amis ; Moi regroupe ton activité et tes réglages.",
       "skillIds": [
         "hamigo-tools"
       ],
       "source": "https://github.com/AlexMalfr/Hamigo",
       "section": "technique",
-      "topic": "Choisir le bon outil Hamigo"
+      "topic": "Choisir le bon outil Hamigo",
+      "pairs": [
+        {
+          "left": "Défis",
+          "right": "Révisions et examens blancs"
+        },
+        {
+          "left": "Mémo",
+          "right": "Fiches et outils"
+        },
+        {
+          "left": "Parcours",
+          "right": "Cours dans l’ordre conseillé"
+        },
+        {
+          "left": "Équipe",
+          "right": "Suivi des amis"
+        },
+        {
+          "left": "Moi",
+          "right": "Activité et réglages"
+        }
+      ]
+    },
+    {
+      "id": "q-050433d8-7816-4a21-8011-740c8a0ebc69",
+      "kind": "cloze",
+      "prompt": "Pour une réponse à dicter, je peux aussi utiliser le ___.",
+      "answer": 0,
+      "explanation": "Le micro est facultatif : le bouton clavier permet d’écrire la même réponse.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "choices": [
+        "clavier",
+        "drapeau",
+        "classement",
+        "calendrier"
+      ]
+    },
+    {
+      "id": "q-3b4f8fc7-fd38-4d36-a58a-2700d7a2f8f5",
+      "kind": "multiselect",
+      "prompt": "Quels outils peux-tu ouvrir directement pendant une question ?",
+      "answer": 0,
+      "explanation": "La calculatrice et le brouillon sont accessibles pendant les questions et les examens blancs. Le classement et le calendrier se consultent dans les autres pages de l’app.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "choices": [
+        "La calculatrice",
+        "Le classement de l’équipe",
+        "Le brouillon",
+        "Le calendrier d’activité"
+      ],
+      "bands": [
+        "0",
+        "2"
+      ]
     },
     {
       "id": "q-81b000df-b465-4abc-be6c-c46d60eff363",
       "kind": "choice",
       "prompt": "Tu connais déjà les bases d’un cours. Comment poursuivre ton apprentissage ?",
       "choices": [
-        "Ouvrir un autre cours du parcours qui t’intéresse",
-        "Attendre qu’un examen blanc rende les autres cours accessibles",
-        "Terminer tous les cours précédents avant de pouvoir en ouvrir un autre",
-        "Faire ajouter un déblocage par un ami dans Équipe"
+        "Je peux choisir un autre cours et ignorer ceux que je connais déjà",
+        "Je dois réussir un examen blanc pour débloquer les autres cours",
+        "Je suis obligé de terminer tous les cours dans l’ordre avant de faire ceux d’après",
+        "Un ami doit débloquer la suite pour moi dans Équipe"
       ],
       "answer": 0,
-      "explanation": "Tu peux ouvrir les cours dans l’ordre choisi. L’ordre conseillé sert à rencontrer les bases avant les applications ; il ne verrouille pas les leçons.",
+      "explanation": "Les cours sont accessibles dans l’ordre de ton choix. Ignorer un cours le compte comme fait pour avancer, sans donner d’XP ni de maîtrise. Pour le suivre ensuite, réintègre-le : sa réalisation normale peut alors donner les récompenses habituelles.",
       "skillIds": [
         "hamigo-tools"
       ],
@@ -76,9 +99,52 @@
       "topic": "Choisir le bon outil Hamigo"
     },
     {
+      "id": "q-2f99076c-a0c4-4fab-bc6f-6d4a625e959b",
+      "kind": "choice",
+      "prompt": "Que signifie le repère « Utile au certificat » sur un cours ?",
+      "answer": 0,
+      "explanation": "Il signale des notions utiles pour préparer l’examen. « Explorer la radio » met en avant la découverte et la pratique radio. Ces repères n’imposent pas d’ordre et ne garantissent pas une réussite à l’examen.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "choices": [
+        "Ce cours enseigne des notions utiles pour préparer l’examen",
+        "Ce cours doit être terminé pour ouvrir tous les suivants",
+        "Ce cours est réservé aux personnes ayant déjà le certificat",
+        "Terminer ce cours garantit de réussir l’examen"
+      ]
+    },
+    {
+      "id": "q-2d16cbad-09c7-4da6-8cd0-1d844f680890",
+      "kind": "multiselect",
+      "prompt": "Où retrouver les repères des cours ou l’avancement Certificat et Exploration ?",
+      "answer": 0,
+      "explanation": "Les repères apparaissent dans la liste des cours et en haut des introductions concernées. Dans Moi, les deux barres « Ton parcours » suivent l’avancement des cours pour le certificat et l’exploration ; elles ne mesurent pas une probabilité de réussir l’examen.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "choices": [
+        "Dans Parcours, à côté des titres des cours",
+        "En haut des introductions des cours concernés",
+        "Dans Moi, avec les deux barres « Ton parcours »",
+        "Dans Défis, dans la note de chaque examen blanc"
+      ],
+      "bands": [
+        "0",
+        "1",
+        "2"
+      ]
+    },
+    {
       "id": "q-ad90e949-9411-48b0-be42-8608e7ebc9f0",
       "kind": "choice",
-      "prompt": "Une question contient une erreur. Quel contrôle utiliser ?",
+      "prompt": "Une question ou un cours contient une erreur. Quel contrôle utiliser ?",
       "choices": [
         "Son drapeau de signalement",
         "Le bouton de révision de la notion",
@@ -86,7 +152,7 @@
         "Le bouton de lecture de la correction"
       ],
       "answer": 0,
-      "explanation": "Le signalement garde le contexte et l’identifiant de la question.",
+      "explanation": "Utilise le drapeau de la question ou de l’introduction du cours. Il ouvre le formulaire de signalement ; tu peux choisir d’y joindre ou non les données de diagnostic proposées.",
       "skillIds": [
         "hamigo-tools"
       ],
@@ -23082,6 +23148,67 @@
       "skillIds": [
         "learning-routine"
       ]
+    },
+    {
+      "id": "q-6df48b73-1d15-4561-8a3b-8f769f727e46",
+      "kind": "choice",
+      "prompt": "Où retrouver rapidement une formule déjà étudiée ?",
+      "choices": [
+        "Dans Mémo",
+        "Dans le classement d’Équipe",
+        "Dans le calendrier d’activité de Moi",
+        "Dans le suivi de l’objectif quotidien"
+      ],
+      "answer": 0,
+      "explanation": "Mémo conserve les connaissances et les outils consultables.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "archived": true,
+      "archiveReason": "Remplacée par une association des cinq onglets et de leurs usages ; la question Mémo séparée est absorbée sans réutiliser son UUID."
+    },
+    {
+      "id": "q-ebdcea70-a14f-40aa-9457-e862e31b20a1",
+      "kind": "choice",
+      "prompt": "Tu révises avec une flashcard. Quelle habitude fait travailler ta mémoire ?",
+      "choices": [
+        "Chercher la réponse avant de la révéler, puis réessayer plus tard",
+        "Relire plusieurs fois la réponse en la gardant affichée",
+        "Afficher d’abord la réponse, puis la recopier",
+        "Revoir seulement les cartes dont la réponse est visible"
+      ],
+      "answer": 0,
+      "explanation": "Essaie de retrouver la réponse avant de la lire. Un nouvel essai après un délai entraîne le rappel ; la correction aide ensuite à comprendre ce qui manque.",
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "archived": true,
+      "archiveReason": "Question de méthode flashcard retirée à la demande de l’utilisateur ; aucune réponse jugée meilleure sur une préférence d’apprentissage."
+    },
+    {
+      "id": "q-43915fda-a73a-4fe8-bc90-7605a230e502",
+      "kind": "text",
+      "prompt": "Quel onglet rassemble les examens blancs ?",
+      "choices": [],
+      "answer": 0,
+      "explanation": "Défis propose les entraînements et examens blancs.",
+      "acceptedAnswers": [
+        "Défis"
+      ],
+      "skillIds": [
+        "hamigo-tools"
+      ],
+      "source": "https://github.com/AlexMalfr/Hamigo",
+      "section": "technique",
+      "topic": "Choisir le bon outil Hamigo",
+      "archived": true,
+      "archiveReason": "Rappel libre du nom Défis remplacé par une association des cinq onglets ; nouveau format et nouvel UUID."
     }
   ]
 }

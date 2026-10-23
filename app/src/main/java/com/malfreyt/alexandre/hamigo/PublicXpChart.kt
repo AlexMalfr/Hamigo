@@ -56,10 +56,10 @@ import androidx.compose.ui.unit.sp
                         val width=step*.54f
                         drawLine(Mist,Offset(0f,baseline),Offset(size.width,baseline),1.dp.toPx())
                         values.forEachIndexed {i,x->
-                            val h=if(x==null)2.dp.toPx() else if(x==0)0f else maxOf(3.dp.toPx(),plotHeight*x/maximum)
+                            val h=if(x==null||x==0)0f else maxOf(3.dp.toPx(),plotHeight*x/maximum)
                             if(h>0) {
                                 val achieved=goal!=null&&x!=null&&x>=goal
-                                val color=if(x==null)Muted.copy(alpha=.35f) else if(i==todayIndex)Coral else Teal
+                                val color=if(i==todayIndex)Coral else Teal
                                 val colors=if(achieved)listOf(Color(0xFFEBC45E),Color(0xFFFFE4A0),Color(0xFFF2C354)) else listOf(color,color)
                                 drawRoundRect(Brush.horizontalGradient(colors),Offset(step*(i+.5f)-width/2,baseline-h),Size(width,h),CornerRadius(3.dp.toPx()))
                             }

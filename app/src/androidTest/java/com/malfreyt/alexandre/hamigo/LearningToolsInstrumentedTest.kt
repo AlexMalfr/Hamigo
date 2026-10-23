@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.dp
@@ -161,6 +162,27 @@ class LearningToolsInstrumentedTest {
         assertEquals(before,owner.progress.export())
     }
 
+    @Test fun theMemoLibraryEndsWithAnAccessibleCourseLinkRatherThanAnEmptyToolReserve() {
+        ui.runOnIdle {model.route="resources";model.lesson=null;model.resource=null}
+        val before=owner.progress.export()
+        show();tools()
+        ui.onNodeWithTag("memo-library-list").performScrollToNode(hasTestTag("memo-course-link"))
+        // The raised navigation button covers the default bottom-center swipe origin.
+        ui.onNodeWithTag("memo-library-list").performTouchInput {
+            swipe(Offset(width*.2f,height*.6f),Offset(width*.2f,height*.15f),durationMillis=300)
+        }
+        capture("memo-library-compact-footer")
+        val link=ui.onNodeWithTag("memo-course-link").assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+        val dock=ui.onNodeWithTag("learning-tools",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        val finalMemo=content.references.groupBy {it.group.ifBlank {"Repères radio"}}.values.last().last()
+        val row=ui.onNodeWithTag("memo-row-${finalMemo.id}").assertIsDisplayed().fetchSemanticsNode().boundsInRoot
+        assertTrue("The final memo must clear the floating tools: row=$row, tools=$dock",row.bottom<=dock.top)
+        assertFalse("The centered source remains tappable beside the tools",link.overlaps(dock))
+        assertTrue("The source must follow the final memo at the top of the footer",
+            link.top-row.bottom in 0f..with(ui.density){32.dp.toPx()})
+        assertEquals(before,owner.progress.export())
+    }
+
     @Test fun eachMemoReallyHasBothToolsAndChangingTheFicheResetsTheirLocalWork() {
         val first=content.references.first {it.id=="units"}
         val second=content.references.first {it.id=="resistors"}
@@ -193,8 +215,10 @@ class LearningToolsInstrumentedTest {
         ui.onNodeWithTag("memo-footer-pico").assertIsDisplayed()
         val pico=ui.onNodeWithTag("memo-footer-pico",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
         val dock=ui.onNodeWithTag("learning-tools",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
-        assertTrue("End-of-scroll content needs full floating-tool clearance",pico.bottom<dock.top)
-        capture("memo-detail-end-clearance")
+        assertFalse("The centered Pico must remain outside the floating tools",pico.overlaps(dock))
+        val feedback=ui.onNodeWithTag("memo-feedback",useUnmergedTree=true).fetchSemanticsNode().boundsInRoot
+        assertTrue("The feedback action must remain above the floating tools",feedback.bottom<=dock.top)
+        capture("memo-detail-compact-footer")
         // Returning to the old fiche after visiting another one starts a fresh fiche document.
         ui.runOnIdle {model.resource=first}
         ui.onNodeWithTag("learning-tool-scratchpad").performClick()

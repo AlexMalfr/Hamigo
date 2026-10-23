@@ -21,7 +21,7 @@ object DeviceOAuth {
 
     suspend fun start(clientId: String): Session {
         validateClient(clientId)
-        val reply = GitHubHttp.oauth("/login/device/code", form("client_id" to clientId.trim(), "scope" to "gist"))
+        val reply = GitHubHttp.oauth("/login/device/code", form("client_id" to clientId.trim(), "scope" to GitHubApp.OAUTH_SCOPE))
         if (reply.has("error")) throw SocialException(oauthError(reply.optString("error")))
         val expires = reply.optInt("expires_in", 900).coerceIn(1, 3600)
         val verification = reply.optString("verification_uri")
@@ -60,8 +60,8 @@ object DeviceOAuth {
             interrupted=0;onNetworkWait(null)
             val token = reply.optString("access_token")
             if (token.isNotBlank()) {
-                if ("gist" !in reply.optString("scope").split(',', ' ').filter { it.isNotBlank() })
-                    throw SocialException("L'autorisation Gist n'a pas été accordée. Relance la connexion.")
+                if (!GitHubApp.hasRequiredScopes(reply.optString("scope")))
+                    throw SocialException("L’autorisation Gists et profil n’a pas été accordée. Relance la connexion.")
                 return token
             }
             when (val error = reply.optString("error")) {

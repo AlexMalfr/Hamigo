@@ -73,12 +73,19 @@ import java.time.format.DateTimeFormatter
 
 /** Only confirmation visibility is saved; friends and their data stay in the model. */
 internal val FriendActionUiSaver=listSaver<FriendActionState,Boolean>(
-    save={listOf(it.removal,it.request)},
-    restore={values->FriendActionState().apply {removal=values[0];request=values[1]}}
+    save={listOf(it.removal,it.request,it.report)},
+    restore={values->FriendActionState().apply {removal=values[0];request=values[1];report=values.getOrNull(2)==true}}
 )
 
 fun openLink(context: Context, url: String) {
-    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+    if(context.applicationContext is DiagnosticContext || DiagnosticAccess.networkPaused)return
+    val host=Uri.parse(url).host
+    if(ReviewAccess.active(context) && host in setOf("github.com","gist.github.com","support.github.com","help.github.com") && !url.startsWith(HamigoLinks.REPOSITORY)) {
+        android.widget.Toast.makeText(context,"Démonstration : aucune action sur un compte GitHub réel.",android.widget.Toast.LENGTH_LONG).show();return
+    }
+    val intent=Intent(Intent.ACTION_VIEW,Uri.parse(url)).addCategory(Intent.CATEGORY_BROWSABLE)
+    if(host in setOf("github.com","gist.github.com","support.github.com","help.github.com"))intent.setPackage(GitHubBrowser.defaultBrowser(context))
+    runCatching {context.startActivity(intent)}
 }
 
 internal fun syncDate(value: String?): String = value?.let {
@@ -130,9 +137,10 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
                     Text("Synchronisation automatique", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     if(!controlsOnly)Text("Dernière synchro : ${syncDate(lastSync)}", color = Muted, fontSize = 12.sp)
                 }
-                Switch(automatic, { model.setAutoSync(it) }, modifier=Modifier.height(40.dp), enabled = !model.busy)
+                Switch(automatic, { model.setAutoSync(it) }, modifier=Modifier.height(40.dp), enabled = !model.busy&&!SocialRules.deletionPending(model.storageContext))
             }
-            if (!controlsOnly) Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy) {
+            if(SocialRules.deletionPending(model.storageContext))Text("La synchronisation est suspendue pendant la suppression des Gists.",fontSize=12.sp,lineHeight=17.sp,color=MaterialTheme.colorScheme.error)
+            if (!controlsOnly) Action(if (model.busy) "Synchronisation…" else "Synchroniser maintenant", enabled = !model.busy&&!SocialRules.deletionPending(model.storageContext)) {
                 model.refreshSocial(manual = true)
             }
         } else if (model.oauthSession != null) {
@@ -147,7 +155,7 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
         } else {
             Text("Connecte ton compte pour sauvegarder tes leçons, ton XP et tes révisions, et partager ta progression avec ton équipe.",
                 color = Muted, fontSize = 13.sp, lineHeight = 19.sp)
-            Action(if (model.busy) "Connexion en cours…" else "Se connecter avec GitHub", enabled = !model.busy) {
+            Action(if (model.busy) "Connexion en cours…" else if(model.reviewMode) "Connecter le compte démo" else "Se connecter avec GitHub", enabled = !model.busy) {
                 model.startGitHubConnection()
             }
             Text("Le compte GitHub est facultatif. Ton apprentissage reste enregistré sur ce téléphone.",
@@ -173,6 +181,11 @@ fun GitHubConnection(model: AppModel, modifier: Modifier = Modifier, controlsOnl
                 }
             }
             if (connected) ActionLink("Déconnecter GitHub",enabled=!model.busy,color=MaterialTheme.colorScheme.error){model.disconnectGitHub()}
+            ActionLinks {
+                ActionLink("Politique de confidentialité",icon=Icons.Rounded.PrivacyTip){openLink(context,HamigoLinks.PRIVACY)}
+                ActionLink("Règles de l’équipe",icon=Icons.Rounded.Groups){openLink(context,HamigoLinks.COMMUNITY_RULES)}
+                if(connected)RemoteDataDeletionAction(model)
+            }
         }
     }
 }
@@ -346,9 +359,10 @@ fun FriendsScreen(model: AppModel) {
     })
     if (showQr && invitation != null) {
         val qr = remember(invitation) { FriendInvite.qr(invitation).asImageBitmap() }
-        AlertDialog(onDismissRequest = { showQr = false }, title = { Text("Invite ton équipe") }, text = {
+        val qrSize=(with(androidx.compose.ui.platform.LocalDensity.current){androidx.compose.ui.platform.LocalWindowInfo.current.containerSize.height.toDp()}-220.dp).coerceIn(96.dp,224.dp)
+        HamigoSheet(title="Invite ton équipe",onDismiss={showQr=false},actions={TextButton(feedbackClick {showQr=false}){Text("Fermer")}}) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(qr, "QR code d’invitation Hamigo", Modifier.size(224.dp))
+                Image(qr, "QR code d’invitation Hamigo", Modifier.size(qrSize))
                 Text("Ton ami ouvre ce lien ou scanne le QR avec l’appareil photo. Hamigo proposera de t’ajouter à son équipe.", fontSize = 13.sp, lineHeight = 19.sp)
                 OutlinedButton(feedbackClick { NativeShare.text(context, invitation, "Mon invitation Hamigo") }, Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Link, null); Spacer(Modifier.width(8.dp)); Text("Partager le lien")
@@ -357,10 +371,18 @@ fun FriendsScreen(model: AppModel) {
                     Icon(Icons.Rounded.Share, null); Spacer(Modifier.width(8.dp)); Text("Partager le QR")
                 }
             }
-        }, confirmButton = { TextButton(feedbackClick { showQr = false }) { Text("Fermer") } })
+        }
     }
     if (addOpen && !scanOpen) {
-        AlertDialog(onDismissRequest = { addOpen = false }, title = { Text("Ajouter un équipier") }, text = {
+        HamigoSheet(title="Ajouter un équipier",onDismiss={addOpen=false},actions={
+            TextButton(feedbackClick {addOpen=false}){Text("Annuler")}
+            TextButton(feedbackClick {
+                cameraDenied=false
+                val parsed=FriendInvite.parse(receivedLink.trim())
+                if(parsed==null)inviteError="Ce lien n’est pas une invitation Hamigo valide."
+                else {model.pendingInvite=parsed;addOpen=false;receivedLink=""}
+            },enabled=receivedLink.isNotBlank()&&!model.busy){Text("Continuer")}
+        }) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Button(feedbackClick {
                     inviteError=null;cameraDenied=false
@@ -371,21 +393,14 @@ fun FriendsScreen(model: AppModel) {
                 }
                 Text("Ou colle le lien d’invitation reçu.", fontSize = 13.sp, lineHeight = 19.sp)
                 OutlinedTextField(receivedLink, { receivedLink = it.take(512); inviteError = null;cameraDenied=false },
-                    label = { Text("Lien d’invitation Hamigo") }, modifier = Modifier.fillMaxWidth(), singleLine = true,
+                    label = { Text("Lien d’invitation Hamigo") }, modifier = Modifier.fillMaxWidth().testTag("friend-invitation-link"), singleLine = true,
                     isError = inviteError != null && !cameraDenied, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                 inviteError?.let { Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp) }
                 if(cameraDenied)TextButton(feedbackClick {
                     context.startActivity(Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:${context.packageName}")))
                 },contentPadding=PaddingValues(0.dp)) {Text("Autoriser la caméra dans les réglages",fontSize=12.sp)}
             }
-        }, confirmButton = {
-            TextButton(feedbackClick {
-                cameraDenied=false
-                val parsed = FriendInvite.parse(receivedLink.trim())
-                if (parsed == null) inviteError = "Ce lien n’est pas une invitation Hamigo valide."
-                else { model.pendingInvite = parsed; addOpen = false; receivedLink = "" }
-            }, enabled = receivedLink.isNotBlank() && !model.busy) { Text("Continuer") }
-        }, dismissButton = { TextButton(feedbackClick { addOpen = false }) { Text("Annuler") } })
+        }
     }
 }
 
@@ -411,6 +426,7 @@ private fun FriendRequestsPanel(model: AppModel) {
                                 Text(request.profile.name,fontWeight=FontWeight.Bold,fontSize=15.sp)
                                 Text("@${request.author.login}",fontSize=12.sp,color=Muted)
                             }
+                            IncomingAccountSafety(request)
                         }
                         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                             Button(feedbackClick {model.acceptFriendRequest(request)},Modifier.weight(1f),enabled=!model.busy,
@@ -451,6 +467,7 @@ private fun FriendRequestsPanel(model: AppModel) {
 fun SettingsScreen(model: AppModel) {
     val context = LocalContext.current
     val feedbackViewport=rememberFeedbackViewport()
+    val openFeedback=rememberFeedbackLauncher {ContentFeedback.app(context,"settings",feedbackViewport)}
     val animatedBack = LocalAnimatedBack.current
     val p = model.displayedProgress ?: model.progress
     val listState=rememberLazyListState()
@@ -629,24 +646,21 @@ fun SettingsScreen(model: AppModel) {
                     fontSize = 12.sp, lineHeight = 18.sp, color = Muted)
             }
         }
-        item { SettingsCategory("Contact & Projet", Icons.Rounded.Forum) }
-        item {ActionLinks(Modifier.testTag("settings-project-links")) {
-            OutlinedButton(feedbackClick {NativeShare.application(context)},Modifier.fillMaxWidth().testTag("share-application")) {
-                Icon(Icons.Rounded.Share,null,Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Partager Hamigo",fontSize=14.sp)
-            }
-            OutlinedButton(feedbackClick { openLink(context, ContentFeedback.app(context,"settings",feedbackViewport)) },
-                Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Rounded.MailOutline, null, Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Contacter / faire un retour", fontSize = 14.sp)
-            }
-            OutlinedButton(feedbackClick { openLink(context, "https://github.com/AlexMalfr/Hamigo") }, Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.Code, null, Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text("Code source de Hamigo · GitHub", fontSize = 14.sp)
-            }
-        }}
+        item { SettingsCategory("À propos de Hamigo", Icons.Rounded.Forum) }
+        item {Panel {ActionLinks(Modifier.testTag("settings-project-links")) {
+            PlayStoreButtons()
+            ActionLink("Partager Hamigo",Modifier.testTag("share-application"),icon=Icons.Rounded.Share){NativeShare.application(context)}
+            ActionLink("Contacter / faire un retour",Modifier.testTag("contact-feedback"),icon=Icons.Rounded.MailOutline,onClick=openFeedback)
+            ActionLink("Code source · GitHub",icon=Icons.Rounded.Code){openLink(context,HamigoLinks.REPOSITORY)}
+            LicenseNoticesAction()
+        }}}
+        item { SettingsCategory("Données et confidentialité", Icons.Rounded.PrivacyTip) }
+        item {Panel {ActionLinks {
+            ActionLink("Politique de confidentialité",icon=Icons.Rounded.PrivacyTip){openLink(context,HamigoLinks.PRIVACY)}
+            ActionLink("Règles de l’équipe",icon=Icons.Rounded.Groups){openLink(context,HamigoLinks.COMMUNITY_RULES)}
+            PersonalDataAction(model)
+            ActionLink("Comptes bloqués sur GitHub",icon=Icons.Rounded.Block){openLink(context,"https://github.com/settings/blocked_users")}
+        }}}
     }
     }
     if (picoVisible) Dialog(onDismissRequest = { picoDismissing = true },

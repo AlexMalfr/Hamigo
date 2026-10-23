@@ -45,7 +45,7 @@ internal class AvatarImageCache(private val directory:File,private val client:Ok
                 if(onCached!=null)withContext(Dispatchers.Main){onCached(saved.bitmap)}
                 if((now()-saved.fetched).coerceAtLeast(0)<FRESH_MS)return@withLock saved.bitmap
             }
-            if((retryAfter[url] ?: 0)>now())return@withLock saved?.bitmap
+            if(DiagnosticAccess.networkPaused||ReviewAccess.networkPaused||(retryAfter[url] ?: 0)>now())return@withLock saved?.bitmap
             runCatching {
                 val request=Request.Builder().url(url).header("User-Agent","Hamigo-Android")
                     .cacheControl(CacheControl.Builder().maxAge(0,TimeUnit.SECONDS).build()).build()

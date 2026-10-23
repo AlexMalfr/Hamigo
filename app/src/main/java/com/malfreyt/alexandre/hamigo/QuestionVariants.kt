@@ -28,7 +28,7 @@ internal object QuestionVariants {
     val nato = "Alfa Bravo Charlie Delta Echo Foxtrot Golf Hotel India Juliett Kilo Lima Mike November Oscar Papa Quebec Romeo Sierra Tango Uniform Victor Whiskey X-ray Yankee Zulu".split(' ')
     private val digitsFr="zéro un deux trois quatre cinq six sept huit neuf".split(' ')
     private val digitsEn="zero one two three four five six seven eight nine".split(' ')
-    private val names=listOf("Emma","Léo","Mia","Tom","Tim","Mimi","Sam","Nina","Anne","Luc","Émile","Alex","Lina","Marc")
+    private val names=listOf("Emma","Léo","Mia","Tom","Tim","Mimi","Sam","Nina","Anne","Luc","Émile","Alex","Lina","Marc","Julien")
     private fun letters(value:String) = Normalizer.normalize(value,Normalizer.Form.NFD).replace(Regex("\\p{M}+"),"").uppercase(Locale.ROOT)
     fun spell(value:String,digits:List<String>?=null) = letters(value).map {c ->
         when {c in 'A'..'Z'->nato[c-'A'];c.isDigit()&&digits!=null->digits[c-'0'];else->c.toString()}

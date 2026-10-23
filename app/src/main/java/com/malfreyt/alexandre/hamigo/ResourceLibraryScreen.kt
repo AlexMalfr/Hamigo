@@ -25,12 +25,15 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.filterNotNull
@@ -160,7 +163,13 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         onDispose {}
     }
     LearningToolsLayout(model to "memo-library",enabled=returnTarget==null,toolsState=LearningToolsNavigation.library(model)) {bottomClearance->
-        LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = bottomClearance+tourClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        val horizontalTools=questionToolsHorizontal()
+        val width=LocalConfiguration.current.screenWidthDp.dp
+        val narrowToolRow=horizontalTools&&width<380.dp
+        val footerBottom=if(narrowToolRow)bottomClearance else 16.dp+overlap
+        val footerHeight=if(narrowToolRow)0.dp else bottomClearance-footerBottom
+        val linkWidth=if(narrowToolRow)280.dp else (width-if(horizontalTools)304.dp else 172.dp).coerceIn(120.dp,280.dp)
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-library-list").onGloballyPositioned { viewportBounds = it.boundsInWindow() }, state = state.list, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = footerBottom+tourClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-library-header").stickyHeaderShadow(state.list).background(Cream).padding(top=if(compactSearch)16.dp else 0.dp,end=if(compactSearch)144.dp else 0.dp,bottom = 10.dp).onGloballyPositioned { headerBounds = it.boundsInWindow() }) {
                     if(!compactSearch) {
@@ -198,7 +207,12 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
                 }
             }
             if (categories.isEmpty()) item { Text("Aucun mémo trouvé. Essaie un autre mot.", color = Muted, fontSize = 14.sp) }
-            item { CompleteCourseLink() }
+            item {
+                // The source follows the last memo; the remaining footer clears the tools.
+                Box(Modifier.fillMaxWidth().heightIn(min=footerHeight),contentAlignment=Alignment.TopCenter) {
+                    CompleteCourseLink(maxLinkWidth=linkWidth)
+                }
+            }
         }
     }
 }
@@ -219,7 +233,11 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
         }.groupBy { it.group }
     }
     LearningToolsLayout(model to cat.id,toolsState=LearningToolsNavigation.fiche(model,cat.id)) {bottomClearance->
-        LazyColumn(Modifier.fillMaxSize().testTag("memo-detail-list"), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = bottomClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // Links and Pico already separate the last learning entry from the floating tools.
+        // Only a short, narrow window needs the full reserve: its two tools sit beside Pico.
+        val footerClearance = if (questionToolsHorizontal() && LocalConfiguration.current.screenWidthDp < 380)
+            bottomClearance else 32.dp + LocalNavigationContentOverlap.current
+        LazyColumn(Modifier.fillMaxSize().testTag("memo-detail-list"), state=listState, contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = footerClearance), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             stickyHeader {
                 Column(Modifier.fillMaxWidth().testTag("memo-detail-header").stickyHeaderShadow(listState).background(Cream).padding(bottom = 10.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -345,12 +363,12 @@ private fun matchesMemo(category: RefCategory, search: String) = category.title.
     else Surface(color = background, shape = RoundedCornerShape(16.dp)) { body() }
 }
 
-@Composable private fun CompleteCourseLink(source: String = "", courseSource:String = "") {
+@Composable private fun CompleteCourseLink(source: String = "", courseSource:String = "",maxLinkWidth:Dp=280.dp) {
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         val target=courseSource.ifBlank {courseUrl}
-        if (source.isNotBlank() && source != target) TextButton(tourNavigation { openLink(context, source) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted) }
-        TextButton(tourNavigation { openLink(context,target) }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted) }
+        if (source.isNotBlank() && source != target) TextButton(tourNavigation { openLink(context, source) }, Modifier.widthIn(max = maxLinkWidth), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text("Source de cette fiche", fontSize = 11.sp, color = Muted, textAlign = TextAlign.Center) }
+        TextButton(tourNavigation { openLink(context,target) }, Modifier.widthIn(max = maxLinkWidth).testTag("memo-course-link"), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) { Text(if(courseSource.isBlank())"Consulter le cours complet F6KGL/F5KFF" else "Consulter ce chapitre du cours F6KGL/F5KFF", fontSize = 11.sp, color = Muted, textAlign = TextAlign.Center) }
     }
 }
 

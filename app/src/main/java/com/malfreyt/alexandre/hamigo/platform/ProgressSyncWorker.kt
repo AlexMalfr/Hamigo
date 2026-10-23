@@ -21,10 +21,10 @@ import java.util.concurrent.TimeUnit
 /** Durable hourly refresh. Android may defer it for battery, Doze, or a missing connection. */
 class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
     override suspend fun doWork(): Result {
-        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(applicationContext))return Result.success()
+        if(com.malfreyt.alexandre.hamigo.ReviewAccess.active(applicationContext)||com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(applicationContext))return Result.success()
         val progress = Progress(applicationContext)
         val sync = GitHubSync(applicationContext)
-        if (!progress.prefs.getBoolean("autoSync", true) || !sync.tokens.hasToken()) return Result.success()
+        if (!progress.prefs.getBoolean("autoSync", true) || !sync.tokens.hasToken() || !SocialRules.accepted(applicationContext) || SocialRules.deletionPending(applicationContext)) return Result.success()
         return try {
             sync.synchronize(progress)
             refreshFriends(progress, sync)
@@ -50,6 +50,7 @@ class ProgressSyncWorker(context: Context, parameters: WorkerParameters) : Corou
         }
         synchronized(Progress.CLOUD_LOCK) {
             // Reload after the network calls: never restore a friend removed while the worker was running.
+            sync.applyBlocks(progress)
             val latest = readFriends(progress)
             val merged = latest.map { entry ->
                 val update = refreshed[entry.optString("gist")]
@@ -82,10 +83,10 @@ object ProgressSyncScheduler {
         .setRequiresBatteryNotLow(true).build()
 
     fun schedule(context: Context) {
-        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
-        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context)){cancel(context);return}
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext || context.applicationContext is com.malfreyt.alexandre.hamigo.ReviewContext)return
+        if(com.malfreyt.alexandre.hamigo.ReviewAccess.active(context)||com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context)){cancel(context);return}
         val progress = Progress(context.applicationContext)
-        if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken()) {
+        if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken() || !SocialRules.accepted(context) || SocialRules.deletionPending(context)) {
             cancel(context); return
         }
         val request = PeriodicWorkRequestBuilder<ProgressSyncWorker>(1, TimeUnit.HOURS, 15, TimeUnit.MINUTES)
@@ -98,10 +99,10 @@ object ProgressSyncScheduler {
 
     /** Debounced answer/save events persist even if the app closes before the connection returns. */
     fun enqueue(context: Context, delaySeconds: Long = 8) {
-        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext)return
-        if(com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context))return
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.DiagnosticContext || context.applicationContext is com.malfreyt.alexandre.hamigo.ReviewContext)return
+        if(com.malfreyt.alexandre.hamigo.ReviewAccess.active(context)||com.malfreyt.alexandre.hamigo.DiagnosticAccess.syncPaused(context))return
         val progress = Progress(context.applicationContext)
-        if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken()) return
+        if (!progress.prefs.getBoolean("autoSync", true) || !SecureTokenStore(context).hasToken() || !SocialRules.accepted(context) || SocialRules.deletionPending(context)) return
         val request = OneTimeWorkRequestBuilder<ProgressSyncWorker>().setConstraints(constraints)
             .setInitialDelay(delaySeconds.coerceIn(0, 60), TimeUnit.SECONDS)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
@@ -110,6 +111,7 @@ object ProgressSyncScheduler {
     }
 
     fun cancel(context: Context) {
+        if(context.applicationContext is com.malfreyt.alexandre.hamigo.ReviewContext)return
         WorkManager.getInstance(context.applicationContext).cancelUniqueWork(PERIODIC_NAME)
         WorkManager.getInstance(context.applicationContext).cancelUniqueWork(PENDING_NAME)
     }

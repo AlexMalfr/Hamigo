@@ -77,7 +77,7 @@ import kotlinx.coroutines.launch
                     item {
                         val today=SocialActivity.todayXp(profile,date)
                         if(today!=null&&profile.dailyGoal!=null)DailyGoalSummary(today,profile.dailyGoal)
-                        else Panel {Text("Aujourd’hui",fontWeight=FontWeight.Bold,fontSize=19.sp);Text(today?.let {"$it XP"} ?: "Données du jour non disponibles",color=Teal);if(profile.dailyGoal==null)Text("L’objectif n’est pas encore partagé par cette version de Hamigo.",color=Muted,fontSize=12.sp)}
+                        else Panel {Text("Aujourd’hui",fontWeight=FontWeight.Bold,fontSize=19.sp);Text(today?.let {"$it XP"} ?: "Données du jour non disponibles",color=Teal);if(profile.dailyGoal==null)Text("Objectif non partagé.",color=Muted,fontSize=12.sp)}
                     }
                     item {
                         OutlinedButton(feedbackClick {NativeShare.nudge(context,profile.name,model.progress.name,model.sync.accountIdentity,friend.githubIdentity,profile)},Modifier.fillMaxWidth().testTag("encourage-friend")) {
@@ -103,11 +103,10 @@ import kotlinx.coroutines.launch
                                 PublicXpChart(series.map {it.second},series.map {it.first.dayOfWeek.getDisplayName(TextStyle.NARROW,Locale.FRENCH)},profile.dailyGoal,"Pas de progression cette semaine.",
                                     todayIndex=series.indexOfFirst {it.first==date}.takeIf {it>=0},
                                     comparison=series.map {if(it.first>StudyDay.date())0 else ownProgress.dayXp(it.first)})
-                                if(series.any {it.second==null})Text("— : journée sans données partagées",fontSize=11.sp,color=Muted)
                             }
                         }
                     }}
-                    item {Panel {
+                    item {Panel(modifier=Modifier.testTag("friend-hourly-activity")) {
                         Text("Aujourd’hui · heure par heure",fontSize=19.sp,fontWeight=FontWeight.Bold)
                         val current=profile.hourlyDay==date.toString()
                         if(current&&(profile.hourlyComplete||profile.hourlyXp.isNotEmpty())) {
@@ -119,7 +118,11 @@ import kotlinx.coroutines.launch
                                 comparison=if(comparable)order.map {ownHours[it] ?: if(own.hourlyComplete)0 else null} else null)
                             if(!comparable)Text("Comparaison horaire indisponible : jours ou fuseaux différents.",color=Muted,fontSize=11.sp)
                             if(!profile.hourlyComplete)Text("Historique partiel : ${profile.hourlyXp.sumOf {it.xp}} XP horodatés. Le total du jour reste affiché au-dessus.",fontSize=12.sp,color=Muted)
-                        } else Text(if(current)"Le total du jour est connu, mais sa répartition horaire n’a pas été enregistrée." else "La courbe horaire sera disponible après une synchronisation depuis une version récente de Hamigo.",color=Muted,fontSize=13.sp,lineHeight=19.sp)
+                        } else Text(when(SocialActivity.todayXp(profile,date)) {
+                            0->"Pas de progression aujourd’hui."
+                            null->"Aucune activité partagée aujourd’hui."
+                            else->"La répartition horaire du jour n’est pas disponible."
+                        },Modifier.testTag("friend-hourly-status"),color=Muted,fontSize=13.sp,lineHeight=19.sp)
                     }}
                     item {Panel {
                         Text("Statistiques",fontWeight=FontWeight.Bold,fontSize=19.sp)
@@ -143,7 +146,7 @@ import kotlinx.coroutines.launch
                         FriendActionItems(model,friend,actions,group=FriendActionGroup.GITHUB)
                     }}
                     item {Column(Modifier.padding(horizontal=4.dp,vertical=4.dp).testTag("friend-technical-info"),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                            Text("Hamigo ${profile.appVersion ?: "≤0.49+8ed1305d"}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
+                            Text(profile.appVersion?.let {"Hamigo $it"} ?: "Version de Hamigo non renseignée",fontSize=12.sp,lineHeight=16.sp,color=Muted)
                             profile.appVersionCode?.let {Text("Code de version : $it",fontSize=12.sp,lineHeight=16.sp,color=Muted)}
                             Text("Dernière vérification : ${friendTechnicalDate(readStatus.checkedAt)}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
                             Text("Modification du Gist : ${friendTechnicalDate(readStatus.updatedAt)}",fontSize=12.sp,lineHeight=16.sp,color=Muted)
@@ -166,7 +169,7 @@ import kotlinx.coroutines.launch
         val lessons=friendPathLessonLabel(profile)
         if(section!=null)Text(section,fontSize=16.sp,fontWeight=FontWeight.Bold,color=Teal)
         if(lessons!=null)Text(lessons,fontSize=13.sp,color=Muted)
-        if(section==null&&lessons==null)Text("La progression détaillée sera disponible après une synchronisation depuis une version récente de Hamigo.",fontSize=13.sp,lineHeight=19.sp,color=Muted)
+        if(section==null&&lessons==null)Text("Progression du parcours non partagée.",fontSize=13.sp,lineHeight=19.sp,color=Muted)
     }
 }
 

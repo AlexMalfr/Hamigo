@@ -45,6 +45,16 @@ else if(System.getProperty("os.name").startsWith("Windows",ignoreCase=true)) {
 }
 tasks.register("printBuildDirectory"){doLast{println(layout.buildDirectory.get().asFile)}}
 
+// Ship the legal texts with the APK so they remain readable without a browser or network.
+val licenseAssets=layout.buildDirectory.dir("generated/hamigo-licenses")
+val prepareLicenseAssets=tasks.register<Sync>("prepareLicenseAssets") {
+    into(licenseAssets.map {it.dir("licenses")})
+    from(rootProject.file("LICENSE"))
+    from(rootProject.file("THIRD_PARTY_NOTICES.md"))
+    from(rootProject.file("LICENSES/README.md")){rename {"PERIMETERS.md"}}
+    from(rootProject.file("LICENSES")){include("*.txt")}
+}
+
 android {
     namespace = "com.malfreyt.alexandre.hamigo"
     compileSdk = 36
@@ -58,6 +68,7 @@ android {
         buildConfigField("String", "GITHUB_CLIENT_SECRET", "\"$gitHubClientSecret\"")
     }
     buildFeatures { compose = true; buildConfig = true }
+    sourceSets.getByName("main").assets.srcDir(licenseAssets.get().asFile)
     val signingFile = rootProject.file(".tools/signing.properties")
     if (signingFile.exists()) {
         val secrets = Properties().apply { signingFile.inputStream().use { load(it) } }
@@ -81,6 +92,7 @@ android {
         }
     }
 }
+tasks.named("preBuild"){dependsOn(prepareLicenseAssets)}
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.activity:activity-compose:1.10.1")
@@ -96,6 +108,8 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("org.commonmark:commonmark:0.31.0")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.31.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test:runner:1.6.2")

@@ -1,4 +1,4 @@
 <resources>
-    <!-- Full-bleed adaptive background; keep transparency in the separate foreground artwork. -->
+    <!-- Ordinary adaptive icons need an explicit background; the foreground stays separate. -->
     <color name="ic_launcher_background">#087F82</color>
 </resources>

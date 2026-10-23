@@ -1,8 +1,9 @@
 [CmdletBinding()]
-param([string]$ApiKeyFile,[string]$FormId='9NqlpK',[switch]$Publish,[switch]$SnapshotOnly)
+param([string]$ApiKeyFile,[string]$FormId='9NqlpK',[switch]$Publish,[switch]$SnapshotOnly,[string]$ExpectedUpdatedAt,[switch]$IncludeReviewedDraft)
 $ErrorActionPreference='Stop'
 if($FormId -ne '9NqlpK'){throw 'Ce script met à jour uniquement le formulaire Hamigo existant.'}
 $tallyRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
+$tallyNode=(Get-Command node -ErrorAction Stop).Source
 $tallyOutput=Join-Path $tallyRoot 'output/tally-retours-22'
 New-Item -ItemType Directory -Path $tallyOutput -Force | Out-Null
 if(-not $ApiKeyFile){$ApiKeyFile=Join-Path $tallyRoot 'tools/.env'}
@@ -30,7 +31,7 @@ try {
  try {
   $tallyBefore=Invoke-RestMethod -Method Get -Uri "https://api.tally.so/forms/$FormId" -Headers $tallyHeaders -TimeoutSec 45
   if($tallyBefore.id -ne $FormId){throw 'Unexpected form ID'}
-  $tallySnapshot=[ordered]@{id=$tallyBefore.id;name=$tallyBefore.name;status=$tallyBefore.status;settings=$tallyBefore.settings;blocks=$tallyBefore.blocks}
+  $tallySnapshot=[ordered]@{id=$tallyBefore.id;name=$tallyBefore.name;status=$tallyBefore.status;updatedAt=$tallyBefore.updatedAt;hasDraftBlocks=$tallyBefore.hasDraftBlocks;settings=$tallyBefore.settings;blocks=$tallyBefore.blocks}
   $tallySnapshotPath=Join-Path $tallyOutput 'before-form.json'
   if(-not(Test-Path -LiteralPath $tallySnapshotPath)){$tallySnapshot | ConvertTo-Json -Depth 90 | Set-Content -LiteralPath $tallySnapshotPath -Encoding utf8}
   $tallyCurrentPath=Join-Path $tallyOutput 'latest-before-form.json'
@@ -40,16 +41,22 @@ try {
    return
   }
   if(-not $Publish){throw 'Employer -SnapshotOnly pour la lecture ou -Publish pour appliquer la configuration relue.'}
+  if($IncludeReviewedDraft -and -not $ExpectedUpdatedAt){throw 'Un brouillon relu exige sa date de sauvegarde attendue.'}
+  if($tallyBefore.hasDraftBlocks -and -not $IncludeReviewedDraft){throw 'Un brouillon existe : le relire dans Tally avant publication.'}
+  if($ExpectedUpdatedAt -and ([DateTimeOffset]$tallyBefore.updatedAt -ne [DateTimeOffset]::Parse($ExpectedUpdatedAt))){throw 'Le formulaire a changé depuis la sauvegarde attendue.'}
   $tallyTemplate=Get-Content -LiteralPath (Join-Path $tallyRoot 'data/tally/hamigo-feedback.create.json') -Raw -Encoding utf8 | ConvertFrom-Json
-  $tallySettings=$tallyBefore.settings
-  foreach($tallyProperty in $tallyTemplate.settings.PSObject.Properties){$tallySettings | Add-Member -NotePropertyName $tallyProperty.Name -NotePropertyValue $tallyProperty.Value -Force}
+  # Patch only documented template settings. Editor theme styles are returned as an
+  # object although the public API schema accepts a string; leave them untouched.
+  $tallySettings=[ordered]@{}
+  foreach($tallyProperty in $tallyTemplate.settings.PSObject.Properties){$tallySettings[$tallyProperty.Name]=$tallyProperty.Value}
   $tallyPatch=[ordered]@{status='PUBLISHED';blocks=$tallyTemplate.blocks;settings=$tallySettings}
   $tallyPatch | ConvertTo-Json -Depth 90 | Set-Content -LiteralPath (Join-Path $tallyOutput 'published-request.json') -Encoding utf8
   $null=Invoke-RestMethod -Method Patch -Uri "https://api.tally.so/forms/$FormId" -Headers $tallyHeaders -ContentType 'application/json; charset=utf-8' -Body ([Text.Encoding]::UTF8.GetBytes(($tallyPatch | ConvertTo-Json -Depth 90))) -TimeoutSec 45
   $tallyAfter=Invoke-RestMethod -Method Get -Uri "https://api.tally.so/forms/$FormId" -Headers $tallyHeaders -TimeoutSec 45
   [ordered]@{id=$tallyAfter.id;name=$tallyAfter.name;status=$tallyAfter.status;settings=$tallyAfter.settings;blocks=$tallyAfter.blocks} | ConvertTo-Json -Depth 90 | Set-Content -LiteralPath (Join-Path $tallyOutput 'published-form.readback.json') -Encoding utf8
   if($tallyAfter.status -ne 'PUBLISHED' -or @($tallyAfter.blocks).Count -ne @($tallyTemplate.blocks).Count){throw 'Readback mismatch'}
-  foreach($tallyProperty in $tallyTemplate.settings.PSObject.Properties){if($tallyAfter.settings.($tallyProperty.Name) -ne $tallyProperty.Value){throw 'Settings readback mismatch'}}
+  & $tallyNode (Join-Path $tallyRoot 'tools/tally/verify_readback.mjs')
+  if($LASTEXITCODE -ne 0){throw 'Readback validation failed'}
   [ordered]@{id=$tallyAfter.id;status=$tallyAfter.status;publicUrl="https://tally.so/r/$FormId";updatedAt=(Get-Date).ToString('o');blocks=@($tallyAfter.blocks).Count;ownerEmailNotificationsEnabled=$tallyAfter.settings.hasSelfEmailNotifications;restoreOldFormProgressEnabled=$tallyAfter.settings.saveForLater;realSubmissionSent=$false;testEmailSent=$false} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $tallyOutput 'published-form.json') -Encoding utf8
   Write-Output "Formulaire Hamigo mis à jour et relu : $(@($tallyAfter.blocks).Count) blocs, notifications propriétaire $($tallyAfter.settings.hasSelfEmailNotifications)."
  }catch {

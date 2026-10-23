@@ -16,12 +16,13 @@ import com.malfreyt.alexandre.hamigo.platform.GitHubSync
 @Stable internal class FriendActionState {
     var removal by mutableStateOf(false)
     var request by mutableStateOf(false)
+    var report by mutableStateOf(false)
 }
 internal enum class FriendActionGroup { ALL, GITHUB, TEAM }
 
 /** Same availability, labels, URLs and confirmations in the menu and full-screen profile. */
 @Composable internal fun FriendActionItems(model:AppModel,friend:Friend,state:FriendActionState,asMenu:Boolean=false,group:FriendActionGroup=FriendActionGroup.ALL,onAction:()->Unit={}) {
-    val context=LocalContext.current
+    val context=if(model.diagnosticModel)model.diagnosticContext else LocalContext.current
     val gist=remember(friend.gist){runCatching {GitHubSync.gistPageUrl(friend.gist)}.getOrNull()}
     val rows:@Composable ()->Unit={
     if(group!=FriendActionGroup.GITHUB&&model.sync.tokens.hasToken()&&model.sync.savedGistUrl!=null) {
@@ -32,6 +33,8 @@ internal enum class FriendActionGroup { ALL, GITHUB, TEAM }
     if(group!=FriendActionGroup.TEAM) {
         friend.githubIdentity?.let {identity->FriendActionRow("Ouvrir le profil GitHub",Icons.AutoMirrored.Rounded.OpenInNew,asMenu){onAction();openLink(context,identity.profileUrl)}}
         gist?.let {url->FriendActionRow("Ouvrir le Gist social",Icons.AutoMirrored.Rounded.OpenInNew,asMenu){onAction();openLink(context,url)}}
+        friend.githubIdentity?.let {identity->FriendActionRow("Bloquer sur GitHub",Icons.Rounded.Block,asMenu){onAction();openLink(context,githubBlockUrl(identity))}}
+        friend.githubIdentity?.let {FriendActionRow("Signaler à GitHub",Icons.Rounded.Flag,asMenu){onAction();state.report=true}}
     }
     if(group!=FriendActionGroup.GITHUB)FriendActionRow("Retirer cet équipier",Icons.Rounded.PersonRemove,asMenu,color=MaterialTheme.colorScheme.error){onAction();state.removal=true}
     }
@@ -44,6 +47,8 @@ internal enum class FriendActionGroup { ALL, GITHUB, TEAM }
 }
 
 @Composable internal fun FriendActionDialogs(model:AppModel,friend:Friend,state:FriendActionState,onRemoved:()->Unit={}) {
+    val context=if(model.diagnosticModel)model.diagnosticContext else LocalContext.current
+    if(state.report)friend.githubIdentity?.let {GitHubReportSheet(it,friend.gist,context){state.report=false}}
     if(state.removal)AlertDialog(onDismissRequest={state.removal=false},title={Text("Retirer ${friend.progress.name} ?")},
         text={Text("Sa progression n’apparaîtra plus dans ton équipe. Tu pourras l’ajouter à nouveau avec son lien d’invitation.")},
         confirmButton={TextButton(feedbackClick {state.removal=false;model.removeFriend(friend);onRemoved()},colors=ButtonDefaults.textButtonColors(contentColor=MaterialTheme.colorScheme.error)){Text("Retirer")}},

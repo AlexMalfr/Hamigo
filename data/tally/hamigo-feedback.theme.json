@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "plan": "free",
+  "logoUrl": "https://alexandre.malfre.yt/projects/Hamigo/pico.png",
+  "styles": {
+    "theme": "CUSTOM",
+    "color": {
+      "background": "#faf8f2",
+      "text": "#173F42",
+      "accent": "#087F82",
+      "buttonBackground": "#FF7869",
+      "buttonText": "#173F42"
+    }
+  },
+  "customCssUsed": false,
+  "tallyBrandingRetained": true
+}

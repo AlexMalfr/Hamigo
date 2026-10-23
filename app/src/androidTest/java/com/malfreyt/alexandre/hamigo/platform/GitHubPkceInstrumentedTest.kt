@@ -20,7 +20,7 @@ class GitHubPkceInstrumentedTest {
     private val clientId = "test-client-id"
     private val secret = "fake-app-secret+&/="
     private val code = "fake_authorization-code"
-    private fun success() = JSONObject().put("access_token", "fake_test_token").put("token_type", "bearer").put("scope", "gist")
+    private fun success() = JSONObject().put("access_token", "fake_test_token").put("token_type", "bearer").put("scope", "gist user")
 
     @Before fun requireEmulator() {
         check(Build.HARDWARE in listOf("ranchu", "goldfish") || Build.FINGERPRINT.contains("generic")) {
@@ -63,11 +63,11 @@ class GitHubPkceInstrumentedTest {
 
     @Test fun missingOrMalformedTokenMetadataIsRejectedBeforeTheTokenCanBeSaved() = runBlocking {
         val replies = listOf(
-            JSONObject().put("access_token", "fake_test_token").put("scope", "gist"),
+            JSONObject().put("access_token", "fake_test_token").put("scope", "gist user"),
             success().put("token_type", "mac"), success().put("token_type", 123),
             success().put("access_token", 123), success().put("access_token", ""),
             success().put("access_token", "fake\r\ntoken"), success().put("access_token", "x".repeat(4097)),
-            success().put("scope", 123), success().put("scope", "read:user"), success().put("scope", "gist:write"),
+            success().put("scope", "gist"), success().put("scope", "user"), success().put("scope", 123), success().put("scope", "read:user"), success().put("scope", "gist:write"),
             success().put("error", "access_denied"), success().put("scope", "gist\nread:user")
         )
         for (reply in replies) expectFailure {
@@ -76,7 +76,7 @@ class GitHubPkceInstrumentedTest {
     }
 
     @Test fun gistMustBeAnExactScopeWhileBearerTypeIsCaseInsensitive() = runBlocking {
-        val reply = success().put("token_type", "Bearer").put("scope", "read:user,gist user:email")
+        val reply = success().put("token_type", "Bearer").put("scope", "read:user,gist user user:email")
         assertEquals("fake_test_token", GitHubPkce.exchange(clientId, secret, GitHubPkce.start(), code) { _, _ -> reply })
     }
 

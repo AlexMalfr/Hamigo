@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-24",
+  "scope": "Retouches du seul cours de bienvenue avant publication Play",
+  "lessonId": "l-hamigo-bienvenue",
+  "additions": [
+    {"questionId": "q-32f55ac6-298b-450e-b23e-984df118f96f", "reason": "Associer les cinq onglets à leur usage remplace deux questions de rappel isolées, sans exiger de mémoriser un nom après le premier accueil."},
+    {"questionId": "q-050433d8-7816-4a21-8011-740c8a0ebc69", "reason": "Un texte à trou rappelle que le clavier reste disponible pour les réponses vocales facultatives."},
+    {"questionId": "q-3b4f8fc7-fd38-4d36-a58a-2700d7a2f8f5", "reason": "Un choix multiple identifie les deux outils accessibles pendant les questions."},
+    {"questionId": "q-2f99076c-a0c4-4fab-bc6f-6d4a625e959b", "reason": "Distinguer le repère Utile au certificat des découvertes Explorer la radio, sans promettre une réussite à l’examen."},
+    {"questionId": "q-2d16cbad-09c7-4da6-8cd0-1d844f680890", "reason": "Retrouver les repères dans Parcours et les introductions, et les deux barres de progression dans Moi."}
+  ]
+}

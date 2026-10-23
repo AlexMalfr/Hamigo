@@ -35,7 +35,7 @@ import kotlin.math.pow
 
 /** Share cards are drawn locally, with the same Pico artwork as the app and notifications. */
 object NativeShare {
-    const val APP_DOWNLOAD_URL="https://github.com/AlexMalfr/Hamigo/releases/latest"
+    const val APP_DOWNLOAD_URL=com.malfreyt.alexandre.hamigo.HamigoLinks.PLAY_STORE
     private val sharing=CoroutineScope(SupervisorJob()+Dispatchers.Main)
     private var pendingShare:Job?=null
     private fun imageWithAvatars(context:Context,identities:Map<Int,GitHubIdentity?>,title:String,text:String,render:(Map<Int,Bitmap>)->File) {

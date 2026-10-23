@@ -81,6 +81,7 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
     val currentDismiss by rememberUpdatedState(onDismiss)
     val currentInsert by rememberUpdatedState(onInsertResult)
     val openDiagnostics=LocalOpenDiagnostics.current
+    val openReview=LocalOpenReview.current
     LaunchedEffect(isOpen) {
         if (isOpen) {
             rendered = true
@@ -98,6 +99,9 @@ fun FloatingCalculator(isOpen: Boolean, onDismiss: () -> Unit, onInsertResult: (
         }
     }
     fun calculate(): Double? {
+        if(openReview!=null&&ReviewAccess.matches(expression)) {
+            requestDismiss();openReview(true);input=TextFieldValue("");result=null;error=null;return null
+        }
         if(openDiagnostics!=null&&DiagnosticAccess.matches(expression)) {
             requestDismiss();openDiagnostics();input=TextFieldValue("");result=null;error=null;return null
         }

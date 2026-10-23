@@ -40,6 +40,7 @@ class AppModelGitHubAuthorizationTest {
             "These isolated authorization tests must run on an emulator, never the user’s phone."
         }
         isolated = IsolatedContext(baseContext)
+        com.malfreyt.alexandre.hamigo.platform.SocialRules.accept(isolated)
         check(isolated.getSharedPreferences("hamigo", Context.MODE_PRIVATE).edit()
             .putBoolean("welcomed", true).putBoolean("autoSync", false)
             .putBoolean("reminderEnabled", false).putString("name", "Témoin OAuth").commit())
@@ -51,6 +52,61 @@ class AppModelGitHubAuthorizationTest {
         // Initialization disables common emulator alarms/jobs; restore their actual preferences.
         DailyReminder.schedule(baseContext)
         ProgressSyncScheduler.schedule(baseContext)
+    }
+
+    @Test fun acceptingTeamRulesAloneNeverAuthorizesDataUploadsOrStartsOAuth() {
+        isolated.getSharedPreferences("hamigo_privacy",Context.MODE_PRIVATE).edit().clear().commit()
+        val fake=HeldAuthorizationClient()
+        val model=createModel(fake)
+        onMain {
+            model.startGitHubConnection()
+            assertTrue(model.socialConsentPending)
+            assertNull(model.authSession)
+            model.acceptSocialRules()
+            assertTrue(model.socialDataConsentPending)
+            assertFalse(com.malfreyt.alexandre.hamigo.platform.SocialRules.accepted(isolated))
+            assertNull(model.authSession)
+            assertNull(model.githubBrowserCommands.value)
+            model.dismissSocialRules()
+            assertFalse(com.malfreyt.alexandre.hamigo.platform.SocialRules.accepted(isolated))
+            model.startGitHubConnection();model.acceptSocialRules();model.acceptSocialData()
+            assertTrue(com.malfreyt.alexandre.hamigo.platform.SocialRules.accepted(isolated))
+            assertNotNull(model.authSession)
+            assertTrue(model.githubBrowserCommands.value is GitHubBrowserCommand.OpenAuthorization)
+            model.cancelTask()
+        }
+        await("Cancelling consent fixture must end OAuth."){!model.busy&&model.authSession==null}
+        assertEquals(0,fake.calls.get())
+    }
+
+    @Test fun onboardingFinishesOnlyAfterTheAccountIsValidatedAndSynced() {
+        val fake=HeldAuthorizationClient(ReviewAccess.TOKEN)
+        val model=createModel(fake)
+        await("Content unavailable for the onboarding fixture"){model.content!=null}
+        val active=onMain {
+            isolated.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",false).putInt("onboardingStep",5).commit()
+            model.showWelcome=true;model.tour.finish()
+            // Reuse the isolated local service, with no HTTP fallback or real credentials.
+            model.sync=com.malfreyt.alexandre.hamigo.platform.GitHubSync(isolated,ReviewGitHubGateway(ReviewContext(isolated)))
+            model.startGitHubConnection()
+            assertTrue(model.showWelcome);assertFalse(model.tour.active)
+            model.authSession!!
+        }
+        onMain {model.receiveGitHubAuthorization(callback(active))}
+        await("The held exchange was not reached"){fake.calls.get()==1}
+        onMain {
+            assertTrue(model.showWelcome);assertFalse(model.tour.active)
+            assertFalse(model.sync.tokens.hasToken())
+            assertFalse(model.progress.prefs.getBoolean("welcomed",true))
+        }
+        fake.release.complete(Unit)
+        await("A validated account did not finish onboarding"){!model.busy}
+        onMain {
+            assertTrue(model.sync.tokens.hasToken());assertFalse(model.showWelcome)
+            assertTrue(model.progress.prefs.getBoolean("welcomed",false))
+            assertFalse(model.progress.prefs.contains("onboardingStep"))
+            assertEquals(0,model.tour.step);assertEquals("path",model.route)
+        }
     }
 
     @Test fun aPersistedAttemptConsumesAValidCallbackOnlyOnceAndClosesBeforeExchangeFinishes() {
@@ -227,7 +283,7 @@ class AppModelGitHubAuthorizationTest {
         return result.get().getOrThrow()
     }
 
-    private class HeldAuthorizationClient : GitHubAuthorizationClient {
+    private class HeldAuthorizationClient(private val token:String?=null) : GitHubAuthorizationClient {
         override val enabled = true
         val calls = AtomicInteger()
         val lastSession = AtomicReference<GitHubPkce.Session>()
@@ -236,8 +292,8 @@ class AppModelGitHubAuthorizationTest {
         override suspend fun exchange(session: GitHubPkce.Session, code: String): String {
             lastSession.set(session); lastCode.set(code); calls.incrementAndGet()
             release.await()
-            // This deliberately stops before the model can call its real GitHubSync gateway.
-            throw SocialException(FAILURE)
+            // Default fixtures stop before transport; the success case injects a local gateway.
+            return token ?: throw SocialException(FAILURE)
         }
         companion object { const val FAILURE = "Échange interrompu par le client de test local." }
     }

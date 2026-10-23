@@ -45,7 +45,7 @@ class AuthFlowInstrumentedTest {
         try {
             server.enqueue(jsonResponse(400, JSONObject().put("error", "authorization_pending")))
             server.enqueue(jsonResponse(400, JSONObject().put("error", "slow_down").put("interval", 10)))
-            server.enqueue(jsonResponse(200, JSONObject().put("access_token", "test_only_token").put("scope", "gist")))
+            server.enqueue(jsonResponse(200, JSONObject().put("access_token", "test_only_token").put("scope", "gist user")))
             val transport = GitHubHttpClient(apiOrigin = server.url("/").toString().trimEnd('/'), oauthOrigin = server.url("/").toString().trimEnd('/'))
             var elapsed = 0L
             val waits = mutableListOf<Long>()
@@ -71,7 +71,7 @@ class AuthFlowInstrumentedTest {
         server.start()
         try {
             server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START))
-            server.enqueue(jsonResponse(200, JSONObject().put("access_token", "recovered_test_token").put("scope", "gist")))
+            server.enqueue(jsonResponse(200, JSONObject().put("access_token", "recovered_test_token").put("scope", "gist user")))
             val http = OkHttpClient.Builder().retryOnConnectionFailure(false).followRedirects(false).followSslRedirects(false)
                 .connectTimeout(2, TimeUnit.SECONDS).readTimeout(2, TimeUnit.SECONDS).callTimeout(3, TimeUnit.SECONDS).build()
             val transport = GitHubHttpClient(http, server.url("/").toString().trimEnd('/'), server.url("/").toString().trimEnd('/'))
@@ -97,7 +97,7 @@ class AuthFlowInstrumentedTest {
                 1 -> throw SocialException("temporarily unavailable", 503)
                 2 -> throw SocialException("rate limited", 429)
                 3 -> JSONObject().put("error", "authorization_pending")
-                else -> JSONObject().put("access_token", "test_token_after_retry").put("scope", "gist read:user")
+                else -> JSONObject().put("access_token", "test_token_after_retry").put("scope", "gist user")
             }
         }, wait = { waits += it; elapsed += it }, elapsed = { elapsed }, onNetworkWait = { statuses += it })
         assertEquals("test_token_after_retry", token)
@@ -303,6 +303,7 @@ class AuthFlowInstrumentedTest {
         private var serial = 0
         override suspend fun api(method: String, path: String, token: String?, body: String?): String {
             check(token == "fake_token_for_local_test")
+            if (path.startsWith("/user/blocks?")) return "[]"
             if (path == "/user") return JSONObject().put("login", "test-account").toString()
             if (method == "GET" && path.startsWith("/gists?")) return JSONArray(gists.values.map { JSONObject(it.toString()) }).toString()
             if (method == "GET") return gists[path.substringAfterLast('/')]?.toString() ?: throw SocialException("not found", 404)

@@ -766,12 +766,28 @@ class DiagnosticsInstrumentedTest {
             capture("mock-team-top")
             ui.onNodeWithTag("diagnostic-interactive-preview").performTouchInput {swipeUp()}
             capture("mock-team-friends")
+            ui.onNodeWithTag("friends-list").performScrollToNode(hasContentDescription("Options de Léa · Démo"))
+            ui.onNodeWithContentDescription("Options de Léa · Démo").performClick()
+            ui.onNodeWithText("Bloquer sur GitHub").assertIsDisplayed()
+            ui.onNodeWithText("Signaler à GitHub").assertIsDisplayed()
+            capture("mock-team-account-actions")
+            ui.onNodeWithText("Bloquer sur GitHub").performClick()
+            assertEquals(0,outgoing.get())
+            ui.onNodeWithTag("friend-card-https://gist.github.com/00000000000000000000000000000001").performClick()
+            ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Signaler à GitHub"))
+            ui.onNodeWithText("Bloquer sur GitHub").assertIsDisplayed()
+            capture("mock-friend-account-actions")
+            ui.onNodeWithText("Signaler à GitHub").performClick()
+            ui.onNodeWithTag("github-report-template").assertTextContains("hamigo-demo-lea",substring=true)
+            ui.onNodeWithText("Ouvrir GitHub").performClick()
+            assertEquals(0,outgoing.get())
+            ui.onNodeWithContentDescription("Revenir à l’équipe").performClick()
             ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
             ui.onNodeWithContentDescription("Retour des diagnostics").performClick()
             ui.runOnIdle {model.startClientSandbox();model.diagnostics.sandbox!!.route="friends"}
             ui.onNodeWithTag("friends-list").assertIsDisplayed();capture("sandbox-team")
             ui.runOnIdle {model.diagnostics.sandbox!!.route="settings"}
-            ui.onNodeWithContentDescription("Aperçu de démonstration, défilement uniquement").assertIsDisplayed();capture("sandbox-settings")
+            ui.onNodeWithTag("settings-list").assertIsDisplayed();capture("sandbox-settings")
             ui.runOnIdle {model.stopClientSandbox()}
             assertEquals(before,raw());assertEquals(0,outgoing.get())
         } finally {instrumentation.removeMonitor(monitor);instrumentation.runOnMainSync {launcher?.unregister()}}

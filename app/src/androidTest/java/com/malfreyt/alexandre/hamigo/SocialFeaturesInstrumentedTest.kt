@@ -50,24 +50,25 @@ class SocialFeaturesInstrumentedTest {
     private val sent=CopyOnWriteArrayList<Intent>()
     private val monitor=object:Instrumentation.ActivityMonitor() {
         override fun onStartActivity(intent:Intent):Instrumentation.ActivityResult? {
-            if(intent.action==Intent.ACTION_CHOOSER){sent+=intent;return Instrumentation.ActivityResult(Activity.RESULT_CANCELED,null)}
+            if(intent.action in listOf(Intent.ACTION_CHOOSER,Intent.ACTION_VIEW)){sent+=intent;return Instrumentation.ActivityResult(Activity.RESULT_CANCELED,null)}
             return null
         }
     }
     private val fixture=object:ExternalResource() {
         override fun before() {
             check(Build.HARDWARE in listOf("ranchu","goldfish"))
-            listOf("hamigo","hamigo_social","hamigo_secure","hamigo_diagnostics").forEach {file->
+            (listOf("hamigo","hamigo_social","hamigo_secure","hamigo_diagnostics","hamigo_privacy","hamigo_review_access","hamigo_pending_oauth","hamigo_exam_download")+listOf("hamigo","hamigo_social","hamigo_secure","hamigo_diagnostics","hamigo_privacy","hamigo_pending_oauth","review_state","review_cloud").map {"play_review_$it"}).forEach {file->
                 val p=context.getSharedPreferences(file,Context.MODE_PRIVATE);saved[file]=p.all.toMap();check(p.edit().clear().commit())
             }
             context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putBoolean("welcomed",true).putBoolean("autoSync",false).putBoolean("reminderEnabled",false).putBoolean("interactionSound",false).putBoolean("interactionHaptics",false).commit()
-            ProgressSyncScheduler.cancel(context);instrumentation.addMonitor(monitor)
+            ReviewAccess.setActive(context,false);ProgressSyncScheduler.cancel(context);instrumentation.addMonitor(monitor)
         }
         override fun after() {
             instrumentation.removeMonitor(monitor)
             saved.forEach {(file,data)->val e=context.getSharedPreferences(file,Context.MODE_PRIVATE).edit().clear()
                 data.forEach {(key,v)->when(v){is String->e.putString(key,v);is Boolean->e.putBoolean(key,v);is Int->e.putInt(key,v);is Long->e.putLong(key,v);is Float->e.putFloat(key,v);is Set<*>->e.putStringSet(key,v.filterIsInstance<String>().toSet())}}
                 e.commit()}
+            ReviewAccess.context(context)
         }
     }
     @get:Rule val rules:RuleChain=RuleChain.outerRule(fixture).around(ui)
@@ -104,11 +105,348 @@ class SocialFeaturesInstrumentedTest {
         File(dir,"$digest.img").outputStream().use {image.compress(Bitmap.CompressFormat.PNG,100,it)};image.recycle()
     }
     private fun before()=model.progress.prefs.getString("progress",null)
+    @Test fun licensesRemainReadableWithoutOpeningTheBrowser() {
+        ui.runOnIdle {model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("license-notices"))
+        ui.onNodeWithTag("license-notices").performClick()
+        capture("review-licenses-index")
+        ui.onNodeWithText("Code · GNU GPL version 3 ou ultérieure").performScrollTo().performClick()
+        ui.onNodeWithTag("license-text").assertTextContains("GNU GENERAL PUBLIC LICENSE",substring=true)
+        capture("review-licenses-offline");ui.onNodeWithText("Retour",useUnmergedTree=true).performClick()
+        ui.onNodeWithText("Contenus adaptés · CC BY-NC-SA 4.0").performScrollTo().performClick()
+        ui.onNodeWithTag("license-text").assertTextContains("Attribution-NonCommercial-ShareAlike",substring=true)
+        assertTrue(sent.isEmpty())
+    }
+    @Test fun connectionExplainsBackgroundUploadsBeforeAnyAuthorization() {
+        ui.runOnIdle {model.startGitHubConnection()}
+        capture("review-team-rules-styled")
+        ui.onNodeWithTag("accept-social-rules").performClick()
+        ui.onNodeWithText("Tes données sur GitHub").assertIsDisplayed()
+        ui.onNodeWithText("Gists (gist)").assertIsDisplayed()
+        ui.onNodeWithText("Profil (user)").assertExists()
+        ui.onNodeWithText("sauvegarder ta progression",substring=true).assertExists()
+        ui.onNodeWithText("en arrière-plan",substring=true).assertExists()
+        assertFalse(SocialRules.accepted(context));assertFalse(model.sync.tokens.hasToken())
+        capture("review-data-disclosure")
+        ui.onNodeWithText("Tu peux arrêter la synchro",substring=true).performScrollTo().assertIsDisplayed()
+        ui.onNodeWithTag("accept-social-data").assertIsDisplayed()
+        capture("review-data-disclosure-end")
+        ui.onNodeWithText("Sans connexion").performClick()
+        assertFalse(SocialRules.accepted(context));assertTrue(sent.isEmpty())
+    }
+    @Test fun friendHourlyEmptyStatesDescribeSharedActivityWithoutGuessingAnAppVersion() {
+        val original=before();val friend=seededFriends.first();val today=SocialActivity.date(friend.progress)
+        val stale=friend.copy(progress=friend.progress.copy(
+            dailyXp=listOf(DailyPoint(today.minusDays(1).toString(),12)),activityHistory=null,
+            hourlyDay=today.minusDays(1).toString(),hourlyXp=listOf(HourlyPoint(9,12)),hourlyComplete=true,
+            appVersion=BuildConfig.VERSION_NAME,appVersionCode=BuildConfig.VERSION_CODE))
+        ui.runOnIdle {model.friends=listOf(stale);model.route="friends"}
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("friend-card-${friend.gist}"))
+        ui.onNodeWithTag("friend-card-${friend.gist}").performClick()
+        val list=ui.onNodeWithTag("friend-progress-list")
+        list.performScrollToNode(hasTestTag("friend-hourly-activity"))
+        ui.onNodeWithTag("friend-hourly-status").assertTextEquals("Aucune activité partagée aujourd’hui.")
+        capture("friend-hours-not-shared")
+        ui.runOnIdle {model.friends=listOf(stale.copy(progress=stale.progress.copy(dailyXp=stale.progress.dailyXp+DailyPoint(today.toString(),0))))}
+        ui.onNodeWithTag("friend-hourly-status").assertTextEquals("Pas de progression aujourd’hui.")
+        capture("friend-hours-zero")
+        ui.runOnIdle {model.friends=listOf(stale.copy(progress=stale.progress.copy(dailyXp=stale.progress.dailyXp+DailyPoint(today.toString(),6))))}
+        ui.onNodeWithTag("friend-hourly-status").assertTextEquals("La répartition horaire du jour n’est pas disponible.")
+        capture("friend-hours-missing-detail")
+        ui.runOnIdle {model.friends=listOf(stale.copy(progress=stale.progress.copy(
+            dailyXp=stale.progress.dailyXp+DailyPoint(today.toString(),6),hourlyDay=today.toString(),hourlyXp=listOf(HourlyPoint(9,6)))))}
+        list.performScrollToNode(hasTestTag("friend-hourly-activity"))
+        ui.onNodeWithTag("friend-hourly-status").assertDoesNotExist()
+        capture("friend-hours-current")
+        assertEquals(original,before());assertTrue(sent.isEmpty())
+    }
+    @Test fun markdownLicenseDocumentsRenderTablesAndOpenPackagedLinksOffline() {
+        ui.runOnIdle {model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("license-notices"))
+        ui.onNodeWithTag("license-notices").performClick()
+        ui.onNodeWithText("Périmètre des licences et attribution du cours").performScrollTo().performClick()
+        ui.onNodeWithText("Licences de Hamigo").assertIsDisplayed()
+        ui.onNodeWithText("Périmètre · Conditions").assertIsDisplayed()
+        ui.onNodeWithText("Banque Exam’1 et illustrations téléchargées depuis le REF").performScrollTo().assertIsDisplayed()
+        capture("review-licenses-markdown-table")
+        ui.onNodeWithText("Les fichiers personnels de sauvegarde",substring=true).performScrollTo().assertIsDisplayed()
+        capture("review-licenses-markdown-end")
+        ui.onNodeWithText("Retour",useUnmergedTree=true).performClick()
+        ui.onNodeWithText("Attributions et ressources tierces").performScrollTo().performClick()
+        val paragraph=ui.onNodeWithText("Le code original de Hamigo est sous GPL-3.0-or-later",substring=true).performScrollTo()
+        val layouts=mutableListOf<androidx.compose.ui.text.TextLayoutResult>()
+        paragraph.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.GetTextLayoutResult){it(layouts)}
+        val layout=layouts.single();val offset=layout.layoutInput.text.text.indexOf("LICENSES/README.md")
+        assertTrue(offset>=0)
+        paragraph.performTouchInput {click(layout.getBoundingBox(offset+3).center)}
+        ui.onNodeWithText("Licences de Hamigo").assertIsDisplayed()
+        assertTrue(sent.isEmpty())
+    }
+    @Test fun reviewAccessSurvivesRecreationAndRestoresThePersonalProfile() {
+        val original=before();val originalName=model.progress.name
+        ui.runOnIdle {model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasText("Données et confidentialité"))
+        ui.onNodeWithText("Accès de démonstration").assertDoesNotExist()
+        ui.runOnIdle {model.route="resources"}
+        ui.onNodeWithTag("learning-tool-calculator").performClick()
+        CalculatorEditorDriver(ui).performTextReplacement(ReviewAccess.CODE+"0")
+        ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
+        ui.onNodeWithTag("review-enter").assertDoesNotExist()
+        CalculatorEditorDriver(ui).performTextReplacement(ReviewAccess.CODE)
+        ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
+        ui.onNodeWithTag("review-enter").assertIsEnabled().assertIsDisplayed()
+        capture("review-code-entry")
+        ui.onNodeWithTag("review-enter").performClick()
+        ui.waitUntil(30000){ui.onAllNodesWithTag("review-banner").fetchSemanticsNodes().isNotEmpty()}
+        ui.waitUntil(30000){ViewModelProvider(ui.activity)[AppModel::class.java].let {it.reviewMode && it.content!=null && !it.socialRefreshing}}
+        var active=ViewModelProvider(ui.activity)[AppModel::class.java]
+        assertTrue(active.sync.tokens.hasToken());assertEquals("Camille · Démo",active.progress.name)
+        capture("review-team")
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasText("Inviter"))
+        ui.onNodeWithText("Inviter",useUnmergedTree=true).performClick()
+        ui.onNodeWithContentDescription("QR code d’invitation Hamigo").assertIsDisplayed()
+        val qrNode=ui.onNodeWithContentDescription("QR code d’invitation Hamigo")
+        val qrBounds=qrNode.getUnclippedBoundsInRoot()
+        assertEquals("The entire QR must be visible for scanning",(qrBounds.bottom-qrBounds.top).value,
+            qrNode.fetchSemanticsNode().boundsInRoot.height/ui.activity.resources.displayMetrics.density,1f)
+        capture("review-invite-sheet");ui.onNodeWithText("Fermer").performClick()
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasText("Ajouter"))
+        ui.onNodeWithText("Ajouter",useUnmergedTree=true).performClick()
+        ui.onNodeWithText("Lien d’invitation Hamigo").performClick().performTextInput("invalide")
+        ui.waitUntil(10000){ui.runOnIdle {WindowInspector.getGlobalWindowViews().any {
+            androidx.core.view.ViewCompat.getRootWindowInsets(it)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())==true
+        }}}
+        ui.onNodeWithTag("friend-invitation-link").performScrollTo()
+        ui.onNodeWithTag("friend-invitation-link").assertHeightIsAtLeast(56.dp)
+        val inputNode=ui.onNodeWithTag("friend-invitation-link")
+        val inputBounds=inputNode.getUnclippedBoundsInRoot()
+        assertEquals("The whole invitation input is visible",(inputBounds.bottom-inputBounds.top).value,
+            inputNode.fetchSemanticsNode().boundsInRoot.height/ui.activity.resources.displayMetrics.density,1f)
+        val imeTop=ui.runOnIdle {
+            val foreground=WindowInspector.getGlobalWindowViews().last {it.hasWindowFocus()}
+            foreground.height-(androidx.core.view.ViewCompat.getRootWindowInsets(foreground)?.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())?.bottom ?: 0)
+        }
+        assertTrue("Continue remains above the actual IME",ui.onNodeWithText("Continuer").fetchSemanticsNode().boundsInWindow.bottom<=imeTop+1)
+        capture("review-add-sheet-keyboard")
+        hideKeyboardInForeground()
+        ui.onNodeWithText("Continuer").performClick()
+        ui.onNodeWithText("Ce lien n’est pas une invitation Hamigo valide.").assertExists()
+        ui.onNodeWithText("Annuler").performClick()
+        ui.activityRule.scenario.recreate()
+        ui.waitUntil(30000){ViewModelProvider(ui.activity)[AppModel::class.java].let {it.reviewMode&&it.content!=null&&!it.socialRefreshing}}
+        active=ViewModelProvider(ui.activity)[AppModel::class.java]
+        assertEquals("Camille · Démo",active.progress.name);assertTrue(active.sync.tokens.hasToken())
+        ui.runOnIdle {active.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("personal-data"))
+        ui.onNodeWithTag("personal-data").performClick()
+        val confirmationStartedAt=android.os.SystemClock.elapsedRealtime()
+        ui.onNodeWithTag("delete-remote-data").performScrollTo().performClick()
+        ui.onNodeWithTag("confirm-delete-remote-data").assertIsNotEnabled().performClick()
+        assertTrue(active.sync.tokens.hasToken())
+        ui.onNodeWithText("Suppression définitive des Gists",substring=true).assertIsDisplayed()
+        val notice=ui.onNodeWithText("Suppression définitive des Gists",substring=true)
+        val noticeBounds=notice.getUnclippedBoundsInRoot()
+        assertEquals("The complete deletion warning is visible",(noticeBounds.bottom-noticeBounds.top).value,
+            notice.fetchSemanticsNode().boundsInRoot.height/ui.activity.resources.displayMetrics.density,1f)
+        capture("review-deletion-confirmation")
+        ui.waitUntil(4_000){ui.onAllNodesWithText("Supprimer (3 s)").fetchSemanticsNodes().isNotEmpty()}
+        capture("review-deletion-countdown")
+        ui.waitUntil(8_000){ui.onAllNodes(hasTestTag("confirm-delete-remote-data") and isEnabled()).fetchSemanticsNodes().isNotEmpty()}
+        assertTrue("No animation clock can bypass the reading delay",android.os.SystemClock.elapsedRealtime()-confirmationStartedAt>=5_000)
+        capture("review-deletion-ready")
+        ui.onNodeWithText("Annuler").performClick()
+        assertTrue(active.sync.tokens.hasToken())
+        ui.onNodeWithTag("delete-remote-data").performScrollTo().performClick()
+        ui.onNodeWithTag("confirm-delete-remote-data").assertIsNotEnabled()
+        ui.onNodeWithText("Annuler").performClick();ui.onNodeWithText("Fermer").performClick()
+        ui.onNodeWithTag("review-exit").performClick()
+        ui.waitUntil(30000){ViewModelProvider(ui.activity)[AppModel::class.java].let {!it.reviewMode&&it.content!=null}}
+        active=ViewModelProvider(ui.activity)[AppModel::class.java]
+        assertEquals(originalName,active.progress.name);assertEquals(original,active.progress.prefs.getString("progress",null))
+        assertFalse(active.sync.tokens.hasToken());assertFalse(ReviewAccess.active(context))
+        assertTrue(sent.isEmpty())
+    }
+    @Test fun playPrivacyAndDataActionsPreserveProgressAndUseExpectedDestinations() {
+        val original=before();ui.runOnIdle {model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("open-play-store"))
+        capture("play56-settings-links")
+        ui.onNodeWithTag("open-play-store").performClick()
+        assertEquals("com.malfreyt.alexandre.hamigo",sent.last().data!!.getQueryParameter("id"))
+        ui.onNodeWithTag("review-play-store").performClick()
+        assertEquals("true",sent.last().data!!.getQueryParameter("showAllReviews"))
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("personal-data"))
+        ui.onNodeWithText("Politique de confidentialité").performClick()
+        assertEquals(HamigoLinks.PRIVACY,sent.last().dataString)
+        ui.onNodeWithTag("personal-data").performClick()
+        ui.onNodeWithTag("delete-remote-data").assertIsNotEnabled()
+        capture("play56-local-data-dialog")
+        ui.onNodeWithText("Fermer").performClick();assertEquals(original,before())
+    }
+    @Test fun githubBlockingOpensTheServiceWithoutChangingTheLocalTeam() {
+        val original=before();val friends=model.friends
+        ui.runOnIdle {model.route="friends"}
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasContentDescription("Options de Camille Démo"))
+        ui.onNodeWithContentDescription("Options de Camille Démo").performClick()
+        ui.onNodeWithText("Bloquer sur GitHub").assertIsDisplayed()
+        ui.onNodeWithText("Signaler à Hamigo").assertDoesNotExist()
+        capture("play56-github-actions")
+        ui.onNodeWithText("Bloquer sur GitHub").performClick()
+        val uri=sent.single().data!!
+        assertEquals("github.com",uri.host);assertEquals("/settings/blocked_users",uri.path)
+        assertEquals(friends.first().githubIdentity!!.login,uri.getQueryParameter("block_user"))
+        assertEquals(GitHubBrowser.defaultBrowser(context),sent.single().`package`)
+        ui.onNodeWithContentDescription("Options de Camille Démo").performClick()
+        ui.onNodeWithText("Signaler à GitHub").performClick()
+        ui.onNodeWithTag("github-report-template").assertTextContains(friends.first().githubIdentity!!.profileUrl,substring=true)
+        assertEquals(1,sent.size)
+        capture("play56-report-sheet")
+        ui.onNodeWithText("Ouvrir GitHub").performClick()
+        assertEquals("${friends.first().githubIdentity!!.login} (user)",sent.last().data!!.getQueryParameter("report"))
+        assertEquals(GitHubBrowser.defaultBrowser(context),sent.last().`package`)
+        assertEquals(friends,model.friends);assertEquals(original,before())
+    }
+    @Test fun firstOnboardingStepAnnouncesTheBackgroundDownloadBesideContinueWithoutAnExtraStep() {
+        val original=before()
+        ui.runOnIdle {
+            model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",0).putString("onboardingName","").commit()
+            model.tour.finish();model.showWelcome=true
+        }
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("1/6 · Pseudo")
+        ui.onNodeWithTag("onboarding-exam-download").assertTextContains("en arrière-plan",substring=true)
+        ui.onNodeWithTag("onboarding-exam-download").assertTextContains("Mo).",substring=true)
+        ui.onNodeWithTag("onboarding-continue").assertIsDisplayed()
+        capture("review-onboarding-exam-download")
+        ui.onNodeWithTag("onboarding-name").performClick()
+        ui.onNodeWithTag("onboarding-name").performTextInput("Alex")
+        ui.runOnIdle {androidx.core.view.ViewCompat.getWindowInsetsController(ui.activity.window.decorView)?.show(androidx.core.view.WindowInsetsCompat.Type.ime())}
+        ui.waitUntil(10_000){ui.runOnIdle {WindowInspector.getGlobalWindowViews().any {
+            androidx.core.view.ViewCompat.getRootWindowInsets(it)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())==true
+        }}}
+        capture("review-onboarding-exam-download-keyboard")
+        ui.onNodeWithTag("onboarding-continue").assertIsDisplayed()
+        val continueButton=ui.onNodeWithTag("onboarding-continue")
+        val unclipped=continueButton.getUnclippedBoundsInRoot()
+        val expectedHeight=(unclipped.bottom-unclipped.top).value
+        assertEquals("The whole Continue button must remain visible",expectedHeight,
+            continueButton.fetchSemanticsNode().boundsInRoot.height/ui.activity.resources.displayMetrics.density,1f)
+        val imeTop=ui.runOnIdle {ui.activity.window.decorView.let {view->view.height-
+            (androidx.core.view.ViewCompat.getRootWindowInsets(view)?.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())?.bottom ?: 0)}}
+        assertTrue("Continue must be entirely above the real keyboard",continueButton.fetchSemanticsNode().boundsInWindow.bottom<=imeTop+1)
+        val nickname=ui.onNodeWithTag("onboarding-name")
+        val nicknameBounds=nickname.getUnclippedBoundsInRoot()
+        assertEquals("The whole nickname field must remain visible",(nicknameBounds.bottom-nicknameBounds.top).value,
+            nickname.fetchSemanticsNode().boundsInRoot.height/ui.activity.resources.displayMetrics.density,1f)
+        assertTrue("Nickname must be above the keyboard",nickname.fetchSemanticsNode().boundsInWindow.bottom<=imeTop+1)
+        hideKeyboardInForeground()
+        assertEquals(original,before())
+    }
+    @Test fun onboardingDisclosureStartsCollapsedAndRulesCanBeDeclinedWithoutConnecting() {
+        val original=before()
+        ui.runOnIdle {model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",5).commit();model.tour.finish();model.showWelcome=true}
+        ui.onNodeWithTag("social-data-disclosure").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Politique de confidentialité").assertDoesNotExist()
+        capture("play56-onboarding-collapsed")
+        ui.onNodeWithTag("social-data-disclosure").performClick()
+        ui.onNodeWithText("Politique de confidentialité").performScrollTo().assertIsDisplayed()
+        capture("play56-onboarding-expanded")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        assertTrue(model.showWelcome);assertFalse(model.progress.prefs.getBoolean("welcomed",true));assertFalse(model.tour.active)
+        ui.onNodeWithTag("onboarding").assertExists()
+        capture("play56-social-rules")
+        ui.onNodeWithText("Pas maintenant").performClick()
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("6/6 · GitHub")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.onNodeWithTag("accept-social-rules").performClick()
+        assertTrue(model.showWelcome);assertFalse(model.tour.active)
+        capture("onboarding-data-consent-stays")
+        ui.onNodeWithText("Sans connexion").performClick()
+        ui.onNodeWithTag("onboarding-stage").assertTextEquals("6/6 · GitHub")
+        assertFalse(SocialRules.accepted(context));assertFalse(model.sync.tokens.hasToken())
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        assertFalse(model.showWelcome);assertTrue(model.progress.prefs.getBoolean("welcomed",false))
+        assertEquals(0,model.tour.step);assertEquals("path",model.route)
+        assertTrue(sent.isEmpty())
+        assertEquals(original,before())
+    }
+    @Test fun onboardingStaysOnGitHubDuringAuthorizationFailureRetryAndExplicitSkip() {
+        Assume.assumeTrue("The UI fixture must intercept PKCE before any network exchange",GitHubApp.directConnectionEnabled)
+        val original=before()
+        ui.runOnIdle {
+            SocialRules.accept(context)
+            model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",5).commit()
+            model.tour.finish();model.showWelcome=true
+        }
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.waitUntil(10_000){model.authSession!=null&&sent.isNotEmpty()}
+        assertTrue(model.showWelcome);assertFalse(model.tour.active)
+        ui.onNodeWithTag("onboarding-continue").assertIsNotEnabled()
+        ui.onNodeWithText("Rouvrir GitHub").performScrollTo().assertIsDisplayed()
+        capture("onboarding-oauth-pending")
+        ui.runOnIdle {model.githubBrowserFailed("Connexion interrompue pour ce test local.")}
+        ui.waitUntil(10_000){!model.busy&&model.authSession==null}
+        assertTrue(model.showWelcome);assertFalse(model.tour.active)
+        ui.onNodeWithText("Connexion interrompue pour ce test local.").performScrollTo().assertIsDisplayed()
+        capture("onboarding-oauth-retry")
+        ui.onNodeWithTag("onboarding-continue").performClick()
+        ui.waitUntil(10_000){model.authSession!=null}
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.waitUntil(10_000){!model.busy&&model.authSession==null}
+        assertFalse(model.showWelcome);assertEquals(0,model.tour.step)
+        assertNull(PendingGitHubAuthorization(context).restore());assertFalse(model.sync.tokens.hasToken())
+        assertEquals(original,before())
+    }
+    @Test fun reviewerCanUseTheCalculatorAfterSkippingOnboardingAndReturnToPersonalData() {
+        val original=before();val originalName=model.progress.name
+        ui.runOnIdle {
+            model.progress.prefs.edit().putBoolean("welcomed",false).putInt("onboardingStep",5).commit()
+            model.tour.finish();model.showWelcome=true
+        }
+        ui.onNodeWithTag("social-data-disclosure").performScrollTo().performClick()
+        ui.onNodeWithText("Politique de confidentialité").performScrollTo().assertIsDisplayed()
+        ui.onNodeWithText("Accès de démonstration").assertDoesNotExist()
+        ui.onNodeWithTag("onboarding-skip").performClick()
+        ui.onNodeWithTag("hamigo-tour-skip-all").performClick()
+        ui.onNodeWithTag("hamigo-tour-confirm-skip").performClick()
+        ui.onNodeWithTag("hamigo-tour-finish").performClick()
+        ui.onNodeWithText("Mémo").performClick()
+        ui.onNodeWithTag("learning-tool-calculator").performClick()
+        CalculatorEditorDriver(ui).performTextReplacement(ReviewAccess.CODE)
+        ui.onNodeWithTag("calculator-key-=").performScrollTo().performClick()
+        capture("reviewer-calculator-entry")
+        ui.onNodeWithTag("review-enter").performClick()
+        ui.waitUntil(30_000){ViewModelProvider(ui.activity)[AppModel::class.java].let {it.reviewMode&&it.content!=null&&!it.socialRefreshing}}
+        ui.onNodeWithTag("review-banner").assertIsDisplayed()
+        ui.onNodeWithTag("friends-list").assertExists();capture("reviewer-calculator-team")
+        ui.onNodeWithTag("review-exit").performClick()
+        ui.waitUntil(30_000){ViewModelProvider(ui.activity)[AppModel::class.java].let {!it.reviewMode&&it.content!=null}}
+        val restored=ViewModelProvider(ui.activity)[AppModel::class.java]
+        assertFalse(restored.showWelcome);assertFalse(restored.tour.active)
+        assertEquals("path",restored.route)
+        ui.onNodeWithTag("onboarding").assertDoesNotExist()
+        assertTrue(restored.progress.prefs.getBoolean("welcomed",false));assertFalse(restored.sync.tokens.hasToken())
+        assertEquals(originalName,restored.progress.name);assertEquals(original,restored.progress.prefs.getString("progress",null))
+        assertTrue(sent.isEmpty());capture("reviewer-calculator-restored")
+    }
+    private fun hideKeyboardInForeground() {
+        ui.waitUntil(10_000){ui.runOnIdle {WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()}?.let {
+            androidx.core.view.ViewCompat.getRootWindowInsets(it)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+        }==true}}
+        ui.runOnIdle {WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()}?.let {
+            androidx.core.view.ViewCompat.getWindowInsetsController(it)?.hide(androidx.core.view.WindowInsetsCompat.Type.ime())
+        }}
+        ui.waitUntil(10_000){ui.runOnIdle {WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()}?.let {
+            androidx.core.view.ViewCompat.getRootWindowInsets(it)?.isVisible(androidx.core.view.WindowInsetsCompat.Type.ime())
+        }==false}}
+        // WindowManager can still be moving the sheet after the IME becomes invisible.
+        android.os.SystemClock.sleep(500);ui.waitForIdle()
+    }
     private fun capture(name:String) {
         ui.waitForIdle();repeat(2) {val latch=CountDownLatch(1);instrumentation.runOnMainSync {
             val view=if(Build.VERSION.SDK_INT>=29)WindowInspector.getGlobalWindowViews().lastOrNull {it.hasWindowFocus()} else null
             (view ?: ui.activity.window.decorView).let {v->v.viewTreeObserver.registerFrameCommitCallback {latch.countDown()};v.invalidate()}
         };assertTrue(latch.await(5,TimeUnit.SECONDS))}
+        // WindowManager's enter animation runs on real time, independently of the Compose test clock.
+        android.os.SystemClock.sleep(500)
         val bitmap=instrumentation.uiAutomation.takeScreenshot();val dir=File(context.getExternalFilesDir(null),"social-0.49").apply {mkdirs()}
         File(dir,"$name.png").outputStream().use {bitmap.compress(Bitmap.CompressFormat.PNG,100,it)};bitmap.recycle()
     }
@@ -161,6 +499,27 @@ class SocialFeaturesInstrumentedTest {
         capture("goal-settings-focused")
         assertEquals(goal,model.progress.dailyGoal);assertEquals(original,before())
     }
+    @Test fun missingFriendDaysHaveNoGrayActivityBarsOrExtraLegend() {
+        val original=before();val today=LocalDate.now()
+        val friend=seededFriends.first().let {it.copy(progress=it.progress.copy(
+            activityHistory=null,dailyXp=listOf(DailyPoint(today.toString(),60))))}
+        val series=SocialActivity.week(friend.progress,today)
+        val missing=series.indexOfFirst {it.second==null&&model.progress.dayXp(it.first)==0}
+        assertTrue("Fixture includes an unknown day without a comparison bar",missing>=0)
+        ui.runOnIdle {model.friends=listOf(friend);model.route="friends"}
+        val card="friend-card-${friend.gist}"
+        ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag(card))
+        ui.onNodeWithTag(card).performClick()
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Cette semaine"))
+        ui.onNodeWithTag("weekly-goal-line",useUnmergedTree=true).performScrollTo()
+        ui.onNodeWithText("— : journée sans données partagées").assertDoesNotExist()
+        val chart=ui.onNodeWithTag("weekly-goal-line",useUnmergedTree=true).captureToImage().toPixelMap()
+        val step=chart.width/7f;val y=(chart.height-with(ui.density){7.dp.toPx()}).toInt()
+        val center=(step*(missing+.5f)).toInt();val beside=(step*(missing+.12f)).toInt()
+        assertEquals("An unknown day must leave the plot empty",chart[beside,y],chart[center,y])
+        capture("friend-week-without-missing-day-bars")
+        assertEquals(original,before());assertTrue(sent.isEmpty())
+    }
     @Test fun friendCalendarAndWeeksBrowseHistoryAndRemovalStillNeedsConfirmation() {
         val original=before();ui.runOnIdle {model.route="friends"}
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
@@ -180,6 +539,7 @@ class SocialFeaturesInstrumentedTest {
     @Test fun friendActionsAreGroupedVersionIsVisibleAndEncouragementIncludesTheirStats() {
         val original=before();ui.runOnIdle {model.route="friends"}
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-1"));ui.onNodeWithTag("team-rank-1").performClick()
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasTestTag("encourage-friend"))
         val goal=ui.onNodeWithTag("daily-goal-summary").fetchSemanticsNode().boundsInRoot
         val nudge=ui.onNodeWithTag("encourage-friend");nudge.assertIsDisplayed();assertTrue(nudge.fetchSemanticsNode().boundsInRoot.top>=goal.bottom)
         capture("friend-top-encouragement");nudge.performClick();ui.waitUntil(20_000){sent.size==1}
@@ -196,8 +556,8 @@ class SocialFeaturesInstrumentedTest {
         ui.onNodeWithText("Code de version : 49").assertExists();capture("friend-grouped-actions-version")
         androidx.test.espresso.Espresso.pressBackUnconditionally()
         ui.onNodeWithTag("friends-list").performScrollToNode(hasTestTag("team-rank-2"));ui.onNodeWithTag("team-rank-2").performClick()
-        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Hamigo ≤0.49+8ed1305d"))
-        ui.onNodeWithText("Hamigo ≤0.49+8ed1305d").assertIsDisplayed();capture("friend-legacy-version")
+        ui.onNodeWithTag("friend-progress-list").performScrollToNode(hasText("Version de Hamigo non renseignée"))
+        ui.onNodeWithText("Version de Hamigo non renseignée").assertIsDisplayed();capture("friend-version-unspecified")
         assertEquals(original,before())
     }
     @Test fun friendPullRefreshReadsOnlyThatGistAndKeepsSuccessfulDatesOnFailure() {

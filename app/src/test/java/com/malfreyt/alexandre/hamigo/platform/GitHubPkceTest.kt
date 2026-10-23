@@ -32,7 +32,7 @@ class GitHubPkceTest {
         assertEquals("/login/oauth/authorize", uri.path)
         assertEquals(mapOf(
             "client_id" to "test-client-id", "redirect_uri" to GitHubPkce.CALLBACK,
-            "scope" to "gist", "state" to state,
+            "scope" to "gist user", "state" to state,
             "code_challenge" to "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM", "code_challenge_method" to "S256"
         ), query(uri.rawQuery))
         assertFalse(uri.toString().contains(verifier))
@@ -44,14 +44,15 @@ class GitHubPkceTest {
         assertTrue(GitHubPkce.isCallback(GitHubPkce.CALLBACK))
         assertTrue(GitHubPkce.isCallback(callback()))
         val impostors = listOf(
-            "http://alexmalfr.github.io/hamigo/oauth/", "HTTPS://alexmalfr.github.io/hamigo/oauth/",
-            "https://ALEXMALFR.github.io/hamigo/oauth/", "https://alexmalfr.github.io:443/hamigo/oauth/",
-            "https://user@alexmalfr.github.io/hamigo/oauth/", "https://alexmalfr.github.io.attacker.example/hamigo/oauth/",
-            "https://alexmalfr.github.io/hamigo/oauth", "https://alexmalfr.github.io/hamigo/oauth/extra",
-            "https://alexmalfr.github.io/hamigo/%6fAuth/", "https://alexmalfr.github.io/hamigo/%6fauth/",
-            "https://alexmalfr.github.io/hamigo/other/../oauth/", "https://alexmalfr.github.io//hamigo/oauth/",
+            "https://alexmalfr.github.io/hamigo/oauth/",
+            "http://alexandre.malfre.yt/projects/Hamigo/oauth/", "HTTPS://alexandre.malfre.yt/projects/Hamigo/oauth/",
+            "https://ALEXANDRE.malfre.yt/projects/Hamigo/oauth/", "https://alexandre.malfre.yt:443/projects/Hamigo/oauth/",
+            "https://user@alexandre.malfre.yt/projects/Hamigo/oauth/", "https://alexandre.malfre.yt.attacker.example/projects/Hamigo/oauth/",
+            "https://alexandre.malfre.yt/projects/Hamigo/oauth", "https://alexandre.malfre.yt/projects/Hamigo/oauth/extra",
+            "https://alexandre.malfre.yt/projects/Hamigo/%6fAuth/", "https://alexandre.malfre.yt/projects/Hamigo/%6fauth/",
+            "https://alexandre.malfre.yt/projects/Hamigo/other/../oauth/", "https://alexandre.malfre.yt//projects/Hamigo/oauth/",
             GitHubPkce.CALLBACK + "#state=$state&code=valid-code", GitHubPkce.CALLBACK + "#",
-            "https://alexmalfr.github.io\\@attacker.example/hamigo/oauth/", " " + GitHubPkce.CALLBACK
+            "https://alexandre.malfre.yt\\@attacker.example/projects/Hamigo/oauth/", " " + GitHubPkce.CALLBACK
         )
         impostors.forEach { assertFalse("Accepted unexpected callback origin/path", GitHubPkce.isCallback(it)) }
     }

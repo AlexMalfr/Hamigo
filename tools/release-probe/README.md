@@ -35,8 +35,8 @@ Ajouter `-e hamigoRotation 0` pour imposer le portrait après ouverture de Hamig
 
 Le scénario utilise exclusivement le framework Android, les assets installés et l’interface accessible. Il ne référence aucune classe interne de Hamigo ou de Compose susceptible d’être renommée par R8. Il contrôle :
 
-- les assets attendus (173 cours, 1 231 questions actives et 139 compétences), le nombre de cours réellement chargé dans Diagnostics et le catalogue de questions incluant les archives, distinct des exemples fictifs ;
-- le bouton « Commencer le cours » du nouveau Parcours, l’introduction de bienvenue et ses cinq questions réellement jouées malgré leur ordre aléatoire, dont une réponse libre ; les UUID enregistrés, les cinq réponses justes, les 21 XP, la validation et des données de compétences v2 doivent apparaître dans la progression de la fixture ;
+- les assets attendus (173 cours, 1 233 questions actives et 139 compétences), le nombre de cours réellement chargé dans Diagnostics et le catalogue de questions incluant les archives, distinct des exemples fictifs ;
+- le bouton « Commencer le cours » du nouveau Parcours, l’introduction de bienvenue et ses sept questions réellement jouées malgré leur ordre aléatoire : association, texte à trou, choix multiples et choix unique. Les UUID enregistrés, les sept réponses justes, les 27 XP, la validation et des données de compétences v2 doivent apparaître dans la progression de la fixture ;
 - une introduction sans outils flottants, puis le résultat `2+3=5` et la saisie du brouillon dans Mémo, sans progression supplémentaire ;
 - l’historique d’examens vide, le bilan d’apprentissage, les deux barres de progression de Moi avec leurs valeurs accessibles, puis l’astuce finale. Les panneaux sont recherchés successivement : une fenêtre courte n’a pas à afficher le bilan et les barres dans un seul viewport ; leur ordre est vérifié séparément dans les tests Compose ;
 - les valeurs de la compétence réellement acquise dans Diagnostics, puis le JSON source/résolu et une vraie réponse vocale saisie par le bouton clavier : l’IME doit être visible et le verdict doit être « Signal reçu ! », sans changer la progression de la fixture. Le microphone de Diagnostics utilise aussi le vrai service Android ; ce probe vérifie seulement le repli clavier et ne mesure pas une transcription acoustique.
@@ -47,8 +47,19 @@ La progression de ce scénario appartient à une fixture temporaire : les quatre
 
 Un succès produit `OK: learning` et `learning-release/learning-probe.json` dans le dossier externe de Hamigo, avec les captures `learning-*.png`. Une assertion interrompue produit un échec, pas un rapport de succès. Ce probe complète les tests de logique et l’inspection visuelle : il ne valide pas chaque question ou compétence individuellement, le moteur de reconnaissance vocale, un examen complet ni l’historique non vide. Son ajout au code ne constitue pas une exécution réussie ; consigner séparément la version effectivement testée et le résultat dans `docs/VALIDATION.md`.
 
+Le mode `welcome` isole le premier cours : mêmes sept réponses natives, UUID,
+27 XP et bilan, puis restauration de la fixture sans parcourir Mémo et Diagnostics.
+Il produit `welcome-release/welcome-probe.json` et convient notamment au contrôle
+du cours en petit paysage avec police agrandie. Le résultat précise son périmètre.
+
 Les captures du scénario learning attendent le focus puis deux frames de la fenêtre au premier plan, avec attente bornée et contrôle de stabilité. Une fenêtre en transition produit un échec sur le thread d’instrumentation si elle ne devient pas prête ; une assertion de capture ne doit jamais tuer le thread principal de l’app ni empêcher la restauration de la fixture. Le rapport vérifie aussi les 173 présentations d’introduction distribuées.
 
 Le mode learning prépare RECORD_AUDIO sur l’émulateur : la question vocale demande normalement cette autorisation à son ouverture et sa fenêtre système ne fait pas partie des fenêtres de Hamigo. Le probe reste au clavier et ne lance jamais la reconnaissance. L’autorisation peut être révoquée après la suite, lorsque l’instrumentation est terminée.
 
 Les sélecteurs repartent d’un arbre d’accessibilité frais sur les versions Android récentes et rafraîchissent les parents avant d’utiliser leur action : le changement de question peut réutiliser des informations virtuelles mises en cache. En cas d’échec de clic, la hiérarchie et les états des actions sont enregistrés dans la fixture pour distinguer une sélection périmée d’un bouton réellement désactivé.
+
+Le mode `feedback` vérifie le dialogue de diagnostic sur la release R8 : case cochée par défaut, annulation, réinitialisation au prochain retour, URL strictement sans paramètres après opt-out et contexte conservé si coché. Les intents de navigateur sont interceptés, aucun formulaire ni e-mail réel n’est envoyé. Les préférences sont isolées et restaurées ; rapport `feedback-release/feedback-probe.json`.
+
+Le mode `icons` rend les ressources réellement empaquetées via AdaptiveIconDrawable : fond couleur transparent, couche monochrome présente, masque Android et aperçus couleur/thèmes clair et sombre en 384 et 48 px. Il ne change aucun réglage du launcher ; rapport et PNG dans `icons-release/`.
+
+Le mode `review` ouvre l’accès de démonstration par les paramètres et son code public. Il vérifie les licences dans le vrai APK, la création des Gists fictifs par la synchro native, l’acceptation d’une demande, la persistance après fermeture/réouverture, la synchro manuelle, la suppression des Gists de démo et le retour au profil personnel inchangé. Les quatorze magasins de préférences concernés sont isolés puis restaurés en finally. Aucun compte GitHub réel n’est utilisé. Rapport et captures dans `review-release/`. Comme les autres modes avec fixture, il est réservé à l’émulateur ; une exécution réussie doit être consignée séparément de sa compilation.

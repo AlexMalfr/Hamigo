@@ -1,0 +1,26 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#087f82"><title>Rejoins mon équipe · Hamigo</title><meta name="description" content="Ouvre cette invitation dans Hamigo pour apprendre la radio et suivre les progrès de ton équipe."><meta property="og:type" content="website"><meta property="og:site_name" content="Hamigo"><meta property="og:locale" content="fr_FR"><meta property="og:title" content="Rejoins mon équipe Hamigo !"><meta property="og:description" content="Ouvre cette invitation dans Hamigo pour apprendre la radio et suivre les progrès de ton équipe."><meta property="og:url" content="https://alexandre.malfre.yt/projects/Hamigo/rejoindre.html"><meta property="og:image" content="https://alexandre.malfre.yt/projects/Hamigo/icon-512.png?v=14d30ea587a2"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="512"><meta property="og:image:height" content="512"><meta property="og:image:alt" content="Pico, la mascotte de Hamigo, sur le fond turquoise de l’application."><link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=734ffcd285f8"><link rel="stylesheet" href="hamigo.css?v=5bce3b6ea3b4"><meta name="referrer" content="no-referrer"><style>[hidden]{display:none!important}</style></head><body><main class="page"><a class="back-link" href="./" aria-label="Retour à l’accueil Hamigo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h12"/></svg><span>Accueil</span></a><header class="hero"><a class="pico" href="./" aria-label="Accueil Hamigo · Pico te fait coucou"><picture><source media="(prefers-reduced-motion: no-preference)" srcset="pico.webp"><img src="pico.png" alt="" width="560" height="560"></picture></a><p class="eyebrow">Hamigo · invitation</p><h1>Sur la même fréquence.</h1><p class="intro" id="intro">Apprends la radio avec Pico et ton équipe.</p></header>
+<div class="content-region"><article class="paper">
+<p id="status">Cette page ouvre les invitations Hamigo. Utilise le lien ou le QR code envoyé par ton équipier.</p>
+<a id="open" class="primary-action" hidden>Rejoindre l’équipe dans Hamigo</a>
+<p id="desktop" hidden>Ouvre ce même lien sur le téléphone où Hamigo est installé, ou scanne le QR code de ton équipier.</p>
+<p>Pas encore Hamigo ? <a href="https://play.google.com/store/apps/details?id=com.malfreyt.alexandre.hamigo">Installe l’app sur Google Play</a> ou <a href="https://github.com/AlexMalfr/Hamigo/releases/latest">télécharge l’APK sur GitHub</a>.</p>
+<p class="small">Cette page ne lit aucun Gist et ne conserve aucune progression. Les profils partagés dans l’app sont des Gists GitHub non répertoriés, lisibles avec leur lien. Tu confirmes l’ajout dans Hamigo.</p>
+</article><aside class="floating-rail"><nav class="floating-links" aria-label="Retrouver Hamigo"><a class="floating-link" href="https://github.com/AlexMalfr/Hamigo" aria-label="Code source de Hamigo sur GitHub"><img src="github.svg" alt="" width="28" height="28"><span class="tooltip">Code source · GitHub</span></a><a class="floating-link" href="https://play.google.com/store/apps/details?id=com.malfreyt.alexandre.hamigo" aria-label="Hamigo sur Google Play"><img src="playstore.svg" alt="" width="28" height="28"><span class="tooltip">Google Play</span></a></nav></aside></div>
+<nav class="links" aria-label="Informations Hamigo"><a href="confidentialite.html">Confidentialité</a><a href="conditions.html">Règles de l’équipe</a><a href="donnees.html">Supprimer mes données</a></nav>
+<p class="site-footer">Hamigo · Alexandre Malfreyt</p></main>
+<script>
+const parameters=new URL(location.href).searchParams;
+const invites=parameters.getAll('invite');
+const invite=invites[0];
+if(invites.length===1 && [...parameters.keys()].every(key=>key==='invite') && /^[a-f0-9]{5,64}$/i.test(invite)){
+  document.querySelector('#intro').textContent='Ton équipier t’invite à apprendre la radio ensemble !';
+  document.querySelector('#status').textContent='Ouvre Hamigo pour consulter et confirmer cette invitation.';
+  const link=document.querySelector('#open');
+  link.href='hamigo://join?invite='+encodeURIComponent(invite.toLowerCase());
+  if(/Android/i.test(navigator.userAgent)) link.href='intent://join?invite='+encodeURIComponent(invite.toLowerCase())+'#Intent;scheme=hamigo;package=com.malfreyt.alexandre.hamigo;end';
+  link.hidden=false; document.querySelector('#desktop').hidden=/Android/i.test(navigator.userAgent);
+}else if(invites.length){
+  document.querySelector('#intro').textContent='Cette invitation semble incomplète.';
+  document.querySelector('#status').textContent='Demande un nouveau lien à ton équipier.';
+}
+</script></body></html>

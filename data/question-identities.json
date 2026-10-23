@@ -3415,11 +3415,11 @@
     },
     "q-81b000df-b465-4abc-be6c-c46d60eff363": {
       "legacyId": "",
-      "fingerprint": "b1f7a49fb7f517342c301106169fb192ba75f91d45e89d083f660f638bbcf846"
+      "fingerprint": "9c1066db91b96cc58b0c62cc30f94422960128885a76ab839bb4e8e49df7750c"
     },
     "q-ad90e949-9411-48b0-be42-8608e7ebc9f0": {
       "legacyId": "",
-      "fingerprint": "5b5fda9cf4c63d899efcb053d3e0ca5c296383f139266fe262368df4d9030cb4"
+      "fingerprint": "4db687b2ea24b06a97f1ac6fc545a028edcde7038938fdb1caae08ae67a6abad"
     },
     "q-2430d215-5830-4714-a996-00be8de5160f": {
       "legacyId": "",
@@ -4980,6 +4980,26 @@
     "q-8eed9418-9670-4e47-b441-3f991dbf45b2": {
       "legacyId": "",
       "fingerprint": "c9f665c069fd3a9371b1475420e540943f9347df72e2773c2111c7ad02da7662"
+    },
+    "q-32f55ac6-298b-450e-b23e-984df118f96f": {
+      "legacyId": "",
+      "fingerprint": "a862bc99296ee725ca919cb4adf2daf858088b127e3fa3b888b75afd1a4bb03b"
+    },
+    "q-050433d8-7816-4a21-8011-740c8a0ebc69": {
+      "legacyId": "",
+      "fingerprint": "c3e239d63da10552c7739fa25a794d7ab5294e7382bcc313df7d20d8ad8e1a72"
+    },
+    "q-3b4f8fc7-fd38-4d36-a58a-2700d7a2f8f5": {
+      "legacyId": "",
+      "fingerprint": "a9ec75dafca4f7973064cee1c253a9e0c499ba74aaeae92e5eee11255caba499"
+    },
+    "q-2f99076c-a0c4-4fab-bc6f-6d4a625e959b": {
+      "legacyId": "",
+      "fingerprint": "878a46c019d152f4607bd61712ea066a6442f0c03538e979aef0d27ba9e7796d"
+    },
+    "q-2d16cbad-09c7-4da6-8cd0-1d844f680890": {
+      "legacyId": "",
+      "fingerprint": "6f521a5bf1633d0b7f59d154cde04b16570d0fcd25562c5b6eb894072c3cd8bb"
     }
   },
   "bindings": {
@@ -5840,6 +5860,11 @@
     "redesign-2026-sstv-slant": "q-8f23b3cf-3e89-4e3d-9568-0604ba3fc5ee",
     "redesign-2026-sstv-missing-lines": "q-e6edcf9a-4e15-47bf-87be-98a82e45ac9d",
     "redesign-2026-cw-reports-listen": "q-8001fe61-7a6d-4eae-a9d1-5bba6935091e",
-    "redesign-2026-cw-request-listen": "q-3f0d35a2-b2e5-45c8-80c5-335e84627999"
+    "redesign-2026-cw-request-listen": "q-3f0d35a2-b2e5-45c8-80c5-335e84627999",
+    "welcome-tabs-map-056": "q-32f55ac6-298b-450e-b23e-984df118f96f",
+    "welcome-keyboard-fallback-056": "q-050433d8-7816-4a21-8011-740c8a0ebc69",
+    "welcome-answer-tools-056": "q-3b4f8fc7-fd38-4d36-a58a-2700d7a2f8f5",
+    "welcome-purpose-056": "q-2f99076c-a0c4-4fab-bc6f-6d4a625e959b",
+    "welcome-purpose-locations-056": "q-2d16cbad-09c7-4da6-8cd0-1d844f680890"
   }
 }

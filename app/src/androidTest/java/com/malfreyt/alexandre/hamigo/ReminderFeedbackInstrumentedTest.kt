@@ -127,6 +127,8 @@ class ReminderFeedbackInstrumentedTest {
         ui.onNodeWithTag("question-feedback").assertIsDisplayed()
         capture("question-flag-header")
         ui.onNodeWithTag("question-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("feedback-open-form").performClick()
         assertEquals(1,intents.size)
         val uri=intents.last().data!!
         assertEquals(Uri.parse(ContentFeedback.FORM_URL).host,uri.host)
@@ -145,6 +147,8 @@ class ReminderFeedbackInstrumentedTest {
         ui.onNodeWithTag("memo-feedback").assertIsDisplayed()
         capture("memo-report-footer")
         ui.onNodeWithTag("memo-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("feedback-open-form").performClick()
         assertEquals(2,intents.size)
         assertEquals(cat.id,intents.last().data!!.getQueryParameter("memo_id"))
         assertEquals(cat.title,intents.last().data!!.getQueryParameter("title"))
@@ -162,6 +166,8 @@ class ReminderFeedbackInstrumentedTest {
             ui.runOnIdle {session.index=index;model.refresh()}
             val q=session.current!!
             ui.onNodeWithTag("question-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("feedback-open-form").performClick()
             val uri=intents.last().data!!
             assertEquals(q.id,uri.getQueryParameter("question_id"))
             assertEquals(q.prompt,uri.getQueryParameter("title"))
@@ -195,6 +201,8 @@ class ReminderFeedbackInstrumentedTest {
         ui.runOnIdle {model.startQuestions("Exam1",listOf(q))}
         val presented=checkNotNull(model.session!!.current)
         ui.onNodeWithTag("question-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("feedback-open-form").performClick()
         assertEquals(Intent.ACTION_VIEW,intents.single().action)
         assertEquals("tally.so",intents.last().data!!.host)
         assertEquals("exam1",intents.last().data!!.getQueryParameter("source_kind"))
@@ -202,6 +210,8 @@ class ReminderFeedbackInstrumentedTest {
         val lesson=model.content!!.lessons.first()
         ui.runOnIdle {model.session=null;model.startLesson(lesson)}
         ui.onNodeWithTag("lesson-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+        ui.onNodeWithTag("feedback-open-form").performClick()
         val uri=intents.last().data!!
         assertEquals("lesson",uri.getQueryParameter("content"));assertEquals(lesson.id,uri.getQueryParameter("lesson_id"))
         assertEquals(lesson.title,uri.getQueryParameter("title"))
@@ -209,6 +219,51 @@ class ReminderFeedbackInstrumentedTest {
         assertTrue(uri.getQueryParameter("window_height_dp")!!.toInt()>0)
         assertNotNull(uri.getQueryParameter("orientation"))
         ui.runOnIdle {assertEquals(lesson,model.lesson)}
+    }
+
+    @Test fun feedbackReturnKeepsTheCurrentQuestionAndLocalProgress() {
+        val q=Question("feedback-return-fixture","Question de retour",listOf("A","B"),0,"Explication")
+        ui.runOnIdle {model.startQuestions("Retour du formulaire",listOf(q))}
+        val session=model.session;val before=model.progress.export()
+        ui.runOnIdle {instrumentation.callActivityOnNewIntent(ui.activity,Intent(Intent.ACTION_VIEW,Uri.parse("hamigo://return")))}
+        ui.waitForIdle()
+        assertSame(session,model.session);assertEquals(before,model.progress.export())
+        assertNull(model.pendingInvite);assertNull(ui.activity.intent.data)
+        assertTrue(intents.isEmpty())
+    }
+    @Test fun diagnosticsChoiceCanCancelAndOmitEveryParameterAtAllFourEntryPoints() {
+        val q=Question("opt-out-fixture","Question de test",listOf("A","B"),0,"Explication")
+        ui.runOnIdle {model.startQuestions("Signalements",listOf(q))}
+        val before=model.progress.export()
+        ui.onNodeWithTag("question-feedback").performClick()
+        ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn().performClick().assertIsOff()
+        assertTrue(intents.isEmpty())
+        capture("feedback-diagnostics-opt-out")
+        ui.onNodeWithText("Annuler").performClick()
+        assertTrue(intents.isEmpty())
+        ui.runOnIdle {assertEquals(before,model.progress.export());assertEquals(0,model.session!!.index);assertTrue(model.session!!.responses.isEmpty())}
+        fun openWithoutDiagnostics(tag:String) {
+            ui.onNodeWithTag(tag).performClick()
+            ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().assertIsOn()
+            if(tag=="question-feedback")capture("feedback-diagnostics-default")
+            ui.onNodeWithTag("feedback-include-diagnostics").performScrollTo().performClick().assertIsOff()
+            val count=intents.size
+            ui.onNodeWithTag("feedback-open-form").performClick()
+            assertEquals(count+1,intents.size)
+            assertEquals(ContentFeedback.FORM_URL,intents.last().dataString)
+            assertNull(intents.last().data!!.query)
+        }
+        openWithoutDiagnostics("question-feedback")
+        ui.runOnIdle {model.session=null;model.lesson=null;model.route="resources";model.resource=model.content!!.references.first()}
+        ui.onNodeWithTag("memo-detail-list").performScrollToNode(hasTestTag("memo-feedback"))
+        openWithoutDiagnostics("memo-feedback")
+        ui.runOnIdle {model.resource=null;model.startLesson(model.content!!.lessons.first())}
+        openWithoutDiagnostics("lesson-feedback")
+        ui.runOnIdle {model.lesson=null;model.session=null;model.route="settings"}
+        ui.onNodeWithTag("settings-list").performScrollToNode(hasTestTag("contact-feedback"))
+        openWithoutDiagnostics("contact-feedback")
+        ui.runOnIdle {assertEquals(before,model.progress.export())}
+        assertEquals(ContentFeedback.FORM_URL,ContentFeedback.formUrl(false){error("Diagnostic data must not be collected for opt-out")})
     }
 
     @Test fun goalCompletionAndCompactTeamDateAreVisibleWithoutDuplicatingSyncSubtitle() {
@@ -248,7 +303,10 @@ class ReminderFeedbackInstrumentedTest {
         ui.waitForIdle()
         repeat(2) {
             val frame=CountDownLatch(1)
-            instrumentation.runOnMainSync {ui.activity.window.decorView.let {v->v.viewTreeObserver.registerFrameCommitCallback {frame.countDown()};v.invalidate()} }
+            instrumentation.runOnMainSync {
+                val foreground=if(Build.VERSION.SDK_INT>=29) android.view.inspector.WindowInspector.getGlobalWindowViews().lastOrNull {it.isAttachedToWindow&&it.isShown&&it.hasWindowFocus()} else null
+                (foreground ?: ui.activity.window.decorView).let {v->v.viewTreeObserver.registerFrameCommitCallback {frame.countDown()};v.postInvalidateOnAnimation()}
+            }
             assertTrue(frame.await(5,TimeUnit.SECONDS))
         }
         val dir=File(context.getExternalFilesDir(null),"ui-0.42-correction").apply {mkdirs()}

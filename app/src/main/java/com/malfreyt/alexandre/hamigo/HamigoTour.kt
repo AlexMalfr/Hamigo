@@ -46,15 +46,14 @@ internal class HamigoTourState(private val prefs:SharedPreferences) {
         if(prefs.getInt("hamigoTourVersion",1)<2&&old>=3)3 else old.takeIf {it in -1..8} ?: -1
     });private set
     var skipRequested by mutableStateOf(false);private set
-    var skipExitToPath by mutableStateOf(false);private set
     val active get()=step>=0
     val navigationPhase get()=step in 3..7
     val destination get()=listOf("practice","resources","friends","profile","path").getOrNull(step-3)
     val currentRoute get()=listOf("path","practice","resources","friends","profile").getOrNull(step-3)
     fun start(){cancelSkip();move(0)}
     fun move(value:Int){require(value in -1..8);step=value;prefs.edit().putInt("hamigoTourVersion",2).putInt("hamigoTourStep",value).apply()}
-    fun requestSkip(exitToPath:Boolean=false){if(active){skipExitToPath=exitToPath;skipRequested=true}}
-    fun cancelSkip(){skipRequested=false;skipExitToPath=false}
+    fun requestSkip(){if(active)skipRequested=true}
+    fun cancelSkip(){skipRequested=false}
     fun finish(){cancelSkip();move(-1)}
 }
 
@@ -98,7 +97,7 @@ internal val LocalTourNavigationGuard=staticCompositionLocalOf<()->Boolean> {{tr
             Column(Modifier.padding(horizontal=12.dp,vertical=8.dp)) {
                 Column(Modifier.weight(1f,fill=false).verticalScroll(rememberScrollState())) {
                     Text(if(concise)"Lis, puis joue" else "Lis, puis à toi de jouer",Modifier.padding(end=64.dp),fontSize=14.sp,lineHeight=18.sp,fontWeight=FontWeight.Bold,color=Teal)
-                    if(!concise)Text("Découvre l’introduction, puis lance les cinq questions pour essayer Hamigo.",Modifier.padding(top=6.dp),fontSize=12.sp,lineHeight=17.sp)
+                    if(!concise)Text("Découvre l’introduction, puis essaie les exercices de ce premier cours.",Modifier.padding(top=6.dp),fontSize=12.sp,lineHeight=17.sp)
                 }
                 TourActions(model,compact=true)
             }
@@ -110,12 +109,8 @@ internal val LocalTourNavigationGuard=staticCompositionLocalOf<()->Boolean> {{tr
 @Composable private fun TourSkipConfirmation(model:AppModel) {
     if(!model.tour.skipRequested)return
     AlertDialog(onDismissRequest={model.tour.cancelSkip()},title={Text("Passer le tutoriel ?")},
-        text={Text(if(model.tour.skipExitToPath)"Tu reviendras au Parcours. Ta progression reste conservée et tu pourras reprendre la visite depuis les paramètres." else "Tu pourras reprendre la visite depuis les paramètres. Le cours et ta progression restent conservés.")},
-        confirmButton={TextButton(feedbackClick {
-            val exitToPath=model.tour.skipExitToPath
-            model.tour.finish()
-            if(exitToPath){if(model.session!=null)model.leaveSession();model.lesson=null;model.resource=null;model.route="path"}
-        },Modifier.testTag("hamigo-tour-confirm-skip")){Text(if(model.tour.skipExitToPath)"Quitter le tutoriel" else "Passer le tutoriel",color=MaterialTheme.colorScheme.error)}},
+        text={Text("Tu passes directement au dernier message de Pico, sur Parcours. Ta progression est conservée et tu pourras reprendre la visite depuis les paramètres.")},
+        confirmButton={TextButton(feedbackClick(model::skipTourToWelcome),Modifier.testTag("hamigo-tour-confirm-skip")){Text("Passer le tutoriel",color=MaterialTheme.colorScheme.error)}},
         dismissButton={TextButton(feedbackClick {model.tour.cancelSkip()},Modifier.testTag("hamigo-tour-continue-guide")){Text("Continuer la visite")}})
 }
 

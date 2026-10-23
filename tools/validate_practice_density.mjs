@@ -43,8 +43,14 @@ const baselineQuestionIds=new Set(review.candidateBaseline.flatMap(l=>l.question
 const actualNew=lessons.flatMap(l=>l.questions).filter(q=>!baselineQuestionIds.has(q.id));
 const finishing=read('data/finishing-review-55.json');
 const finishingIds=finishing.result.newQuestionIds;
-assert.equal(actualNew.length,review.stats.addedQuestions+finishingIds.length);
-assert.deepEqual(new Set([...review.additions.flatMap(a=>a.questionIds),...finishingIds]),new Set(actualNew.map(q=>q.id)),'Every authored addition has an explicit pedagogical rationale');
+const welcome=read('data/welcome-review-56.json');
+const welcomeIds=welcome.additions.map(q=>q.questionId);
+for(const q of welcome.additions){
+ assert(q.reason?.trim(),'Welcome rationale '+q.questionId);
+ assert.equal(membership.get(q.questionId),welcome.lessonId,'Welcome addition membership '+q.questionId);
+}
+assert.equal(actualNew.length,review.stats.addedQuestions+finishingIds.length+welcomeIds.length);
+assert.deepEqual(new Set([...review.additions.flatMap(a=>a.questionIds),...finishingIds,...welcomeIds]),new Set(actualNew.map(q=>q.id)),'Every authored addition has an explicit pedagogical rationale');
 for(const id of finishingIds)assert(finishing.additions.some(q=>q.questionId===id&&q.reason?.trim()),'Finishing rationale '+id);
 const skillLocations=new Map();
 lessons.forEach((l,index)=>l.questions.forEach(q=>q.skillIds.forEach(skill=>{

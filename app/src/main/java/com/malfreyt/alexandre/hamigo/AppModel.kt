@@ -208,16 +208,23 @@ class AppModel internal constructor(
         else message = notice
     }
     var pendingInvite by mutableStateOf<String?>(null)
+    var socialConsentPending by mutableStateOf(false)
+    var socialDataConsentPending by mutableStateOf(false)
+    internal val reviewMode get()=::context.isInitialized && context is ReviewContext
+    internal val storageContext get()=context
+    private var connectAfterSocialConsent=false
     var practiceFocusRequest by mutableStateOf<Long?>(null)
     var settingsGoalFocusRequest by mutableStateOf<Long?>(null)
     fun initialize(ctx: Context, startExamUpdates:Boolean=true) {
         if (::progress.isInitialized) return
-        context = ctx.applicationContext
-        progress = Progress(context); sync = GitHubSync(context)
+        context = ReviewAccess.context(ctx)
+        progress = Progress(context,sideEffects=!reviewMode)
+        val reviewGateway=(context as? ReviewContext)?.let(::ReviewGitHubGateway)
+        sync=if(reviewGateway!=null)GitHubSync(context,reviewGateway) else GitHubSync(context)
         interactionFeedback = AppFeedback(context)
         diagnostics = DiagnosticSettings(context)
         tour=HamigoTourState(progress.prefs)
-        friendInbox = FriendInboxCoordinator(context,progress,sync,friendInboxGateway)
+        friendInbox = FriendInboxCoordinator(context,progress,sync,if(reviewGateway!=null)FriendInbox(reviewGateway) else friendInboxGateway)
         pendingAuthorization = PendingGitHubAuthorization(context)
         val savedAuthorization = pendingAuthorization.restore()
         if (savedAuthorization != null && authorizationClient.enabled) {
@@ -236,7 +243,9 @@ class AppModel internal constructor(
                 Content(context,repository.status.value.snapshot)
             } }
                 .onSuccess {
-                    content = it;progress.prepareLearning(it);examBank=examRepository!!.status.value
+                    content = it
+                    if(reviewMode){ReviewAccess.prepare(context as ReviewContext,it);progress.reload();showWelcome=false;tour.finish();route="friends"}
+                    progress.prepareLearning(it);examBank=examRepository!!.status.value
                     loadFriends(); loadFriendRequests(); ProgressSyncScheduler.schedule(context); refreshSocial()
                     scope.launch {examRepository!!.status.collect {state->
                         examBank=state
@@ -247,11 +256,16 @@ class AppModel internal constructor(
                 }
                 .onFailure { error = "Chargement impossible : ${it.message}" }
         }
-        // Scheduled immediately, including during onboarding; it survives closing the app.
+        // New installations wait for Continue on step 1; existing profiles keep automatic updates.
         if(startExamUpdates)ExamBankScheduler.schedule(context)
     }
     fun welcome(name: String) { if(name.isNotBlank()) progress.name = name; progress.prefs.edit().putBoolean("welcomed", true).remove("onboardingStep").remove("onboardingName").remove("onboardingReminderHour").remove("onboardingReminderMinute").apply(); showWelcome=false;beginTour();revision++ }
     internal fun beginTour(){tour.finish();lesson=null;resource=null;session=null;route="path";tour.start();revision++}
+    internal fun skipTourToWelcome() {
+        tour.cancelSkip();tour.move(8)
+        session=null;lesson=null;resource=null;route="path"
+        revision++
+    }
     internal fun navigateTab(destination:String) {
         if(tour.step==8)tour.finish()
         if(tour.navigationPhase) {
@@ -425,7 +439,7 @@ class AppModel internal constructor(
         revision++
     }
     internal fun revealNextPathLesson(){val catalog=content ?: return;val next=catalog.nextLesson(pathCompletedLessons) ?: return;val chapter=catalog.chapters.firstOrNull {c->c.lessons.any {it.id==next.id}} ?: return;val state=pathNavigationState ?: PathNavigationState(chapter.id).also {pathNavigationState=it};state.revealLesson(chapter.id,next.id)}
-    internal fun backFromLesson(){if(tour.step==1)tour.requestSkip(exitToPath=true) else lesson=null}
+    internal fun backFromLesson(){if(tour.step==1)tour.requestSkip() else lesson=null}
     fun leaveSession() {
         val revealNext=session?.let {it.done&&it.lessonId!=null&&it.returnRoute=="path"}==true
         val guided=tour.step==2&&session!=null
@@ -463,6 +477,7 @@ class AppModel internal constructor(
         progress.saveFriendRecords(CloudProgress.localFriends(active, deleted))
     }
     fun addFriend(friend: Friend) {
+        require(!sync.isBlocked(friend.githubIdentity)&&!sync.isBlockedGist(friend.gist)){"Ce compte est bloqué sur GitHub."}
         synchronized(Progress.CLOUD_LOCK) {
             loadFriends()
             val identity = GitHubSync.gistId(friend.gist)
@@ -487,10 +502,42 @@ class AppModel internal constructor(
         }
         ProgressSyncScheduler.enqueue(context)
     }
-    fun startGitHubConnection() {if(allowTourNavigation())connectGitHub()}
+    fun startGitHubConnection() {
+        if(!allowTourNavigation())return
+        message=null
+        if(SocialRules.accepted(context))connectGitHub()
+        else {connectAfterSocialConsent=true;socialConsentPending=true}
+    }
+    fun acceptSocialRules() {
+        socialConsentPending=false;socialDataConsentPending=true
+    }
+    fun acceptSocialData() {
+        SocialRules.accept(context);socialDataConsentPending=false
+        if(connectAfterSocialConsent){connectAfterSocialConsent=false;connectGitHub()}
+        else {ProgressSyncScheduler.schedule(context);refreshSocial()}
+    }
+    fun dismissSocialRules(){socialConsentPending=false;socialDataConsentPending=false;connectAfterSocialConsent=false}
+    fun deleteGitHubData() {
+        if(busy||diagnosticModel||diagnostics.sandbox!=null)return
+        SocialRules.setDeletionPending(context,true)
+        SyncedAppSettings.save(progress.prefs,mapOf("autoSync" to false))
+        ProgressSyncScheduler.cancel(context);socialJob?.cancel();friendRefreshJob?.cancel()
+        task {
+            try {
+                val deleted=sync.deleteRemoteData()
+                refresh();message="$deleted Gist${if(deleted>1)"s" else ""} Hamigo supprimé${if(deleted>1)"s" else ""}. Ta progression reste sur cet appareil."
+            } catch(e:CancellationException){throw e}
+            catch(e:Exception){throw SocialException("Suppression non terminée. La synchronisation reste suspendue ; tu peux réessayer. ${e.message.orEmpty()}")}
+        }
+    }
     private fun connectGitHub(savedAuthorization: GitHubPkce.Session? = null) = task {
+        if(reviewMode) {
+            sync.connect(ReviewAccess.TOKEN)
+            if(SocialRules.deletionPending(context)){refresh();message="Compte démo reconnecté. Termine la suppression dans Mes données.";return@task}
+            sync.synchronize(progress);refresh();message="Compte de démonstration connecté · échanges GitHub simulés localement.";return@task
+        }
         try {
-            route="friends"
+            if(!showWelcome)route="friends"
             oauthStatus="Préparation de la connexion…"
             val token = if (authorizationClient.enabled) {
                 val authorization = savedAuthorization ?: GitHubPkce.start()
@@ -522,6 +569,14 @@ class AppModel internal constructor(
                     delay((attempt+1)*1500L)
                 }
             }
+            if(SocialRules.deletionPending(context)) {
+                refresh();message="GitHub est reconnecté. Termine la suppression dans Paramètres → Mes données."
+                return@task
+            }
+            if(!SocialRules.accepted(context)) {
+                socialConsentPending=true;refresh()
+                return@task
+            }
             oauthStatus="Compte connecté. Première sauvegarde…"
             ProgressSyncScheduler.schedule(context)
             try {
@@ -536,6 +591,8 @@ class AppModel internal constructor(
             oauthSession = null; authSession = null; authorizationCode = null
             pendingAuthorization.clear(); oauthStatus = null
             githubBrowserCommands.value = GitHubBrowserCommand.Close
+            // Consent and browser return alone do not finish first-run setup.
+            if(currentCoroutineContext().isActive&&showWelcome&&sync.tokens.hasToken()&&SocialRules.accepted(context))welcome(progress.name)
         }
     }
     fun disconnectGitHub() { taskJob?.cancel();socialJob?.cancel();friendRefreshJob?.cancel();sync.disconnect(); ProgressSyncScheduler.cancel(context); busy=false;refresh() }
@@ -545,6 +602,7 @@ class AppModel internal constructor(
         pendingInvite=null
         task {
             if(sync.savedGistUrl?.let { GitHubSync.gistId(it) } == invite) {message="C'est ton propre lien d'invitation.";return@task}
+            sync.refreshBlocks(progress)
             val friend=sync.readProfile(invite)
             addFriend(Friend(friend.progress,"https://gist.github.com/$invite",githubIdentity=friend.identity,
                 githubIdentityCheckedAt=System.currentTimeMillis()));route="friends"
@@ -613,6 +671,8 @@ class AppModel internal constructor(
     fun refreshSocial(manual: Boolean = false) {
         if(diagnosticModel){refresh();return}
         if(diagnostics.sandbox!=null)return
+        if(SocialRules.deletionPending(context))return
+        if(sync.tokens.hasToken()&&!SocialRules.accepted(context)){socialConsentPending=true;return}
         if(busy || socialJob?.isActive==true || refreshingFriend!=null) return
         // Foreground and finished sessions: network remains optional and never blocks learning.
         socialJob=scope.launch {
@@ -632,6 +692,7 @@ class AppModel internal constructor(
             }
             val byGist=updates.filter{it.gist.isNotBlank()}.associateBy{it.gist}
             synchronized(Progress.CLOUD_LOCK) {
+                sync.applyBlocks(progress)
                 loadFriends()
                 friends=friends.map { previous ->
                     val updated=byGist[previous.gist]
@@ -658,7 +719,7 @@ class AppModel internal constructor(
         taskJob=scope.launch { try { action() } catch(e: CancellationException) {throw e} catch(e:Exception){message=e.message ?: "Opération impossible."} finally {busy=false;revision++} }
     }
     fun cancelTask() { taskJob?.cancel() }
-    fun restore(json: String) { runCatching { progress.import(json);content?.let {progress.prepareLearning(it)};refresh();message="Sauvegarde restaurée." }.onFailure {message=it.message} }
+    fun restore(json: String) { runCatching { progress.import(json);sync.applyBlocks(progress);content?.let {progress.prepareLearning(it)};refresh();message="Sauvegarde restaurée." }.onFailure {message=it.message} }
     override fun onCleared() {
         diagnosticUiState.disposeInspector()
         pathNavigationState=null

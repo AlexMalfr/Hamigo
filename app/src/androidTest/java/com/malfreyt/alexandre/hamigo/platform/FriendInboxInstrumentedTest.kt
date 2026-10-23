@@ -177,6 +177,28 @@ class FriendInboxInstrumentedTest {
         assertEquals(1, gateway.posts)
     }
 
+    @Test fun readableRequestAndAcceptanceKeepVerifiedPayloadAndInvitationLinks() = runBlocking {
+        val gateway=FakeGitHub()
+        val content=gateway.gists.getValue(mine).getJSONObject("files").getJSONObject(GitHubSync.FILE_NAME)
+        content.put("content",ShareProgress("Alex @all <b> [test]",12,1,2,updatedAt=clock.toString()).toJson())
+        val inbox=FriendInbox(gateway){clock}
+        inbox.sendRequest(mine,theirs,uuid(8),token)
+        val requestBody=gateway.comments.getValue(theirs).single().getString("body")
+        assertTrue(requestBody.startsWith("Vous avez reçu une demande d’ami sur Hamigo"))
+        assertFalse(requestBody.contains("@all"));assertFalse(requestBody.contains("<b>"))
+        assertTrue(requestBody.contains(FriendInvite.link(mine)))
+        assertTrue(requestBody.contains("<!-- hamigo-friends:v1\n"))
+        assertFalse(requestBody.contains("```json"))
+        // A retry must recognize the hidden payload, not post another email notification.
+        inbox.sendRequest(mine,theirs,uuid(8),token);assertEquals(1,gateway.posts)
+        gateway.comments[mine]=mutableListOf(comment(1,uuid(9),other,theirs,mine))
+        inbox.acknowledgeAccepted(inbox.readIncoming(mine,token).single(),mine,token)
+        val accepted=gateway.comments.getValue(mine).last().getString("body")
+        assertTrue(accepted.contains("a accepté votre demande d’ami sur Hamigo !"))
+        assertTrue(accepted.contains(FriendInvite.link(mine)))
+        assertEquals(2,gateway.posts)
+    }
+
     @Test fun sameUuidWithDifferentSenderAndExpiredUuidDoNotPostAgain() = runBlocking {
         val gateway = FakeGitHub()
         gateway.comments[theirs] = mutableListOf(comment(1, uuid(1), me, "ccccc", theirs))

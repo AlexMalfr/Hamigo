@@ -132,10 +132,13 @@ internal class GitHubBrowser(private val activity: Activity, private val state: 
             }
 
         /** Generic HTTPS resolution avoids choosing an installed GitHub deep-link handler. */
-        private fun defaultBrowser(context: Context): String? = context.packageManager.resolveActivity(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/"))
-                .addCategory(Intent.CATEGORY_BROWSABLE), PackageManager.MATCH_DEFAULT_ONLY)
-            ?.activityInfo?.packageName?.takeUnless { it == "android" }
+        internal fun defaultBrowser(context: Context): String? = listOf("http","https").firstNotNullOfOrNull {scheme->
+            // Resolve only: no request is sent. Some launchers resolve HTTPS to their chooser
+            // while the generic HTTP handler correctly identifies the configured browser.
+            context.packageManager.resolveActivity(Intent(Intent.ACTION_VIEW,Uri.parse("$scheme://example.com/"))
+                .addCategory(Intent.CATEGORY_BROWSABLE),PackageManager.MATCH_DEFAULT_ONLY)
+                ?.activityInfo?.packageName?.takeUnless {it=="android"}
+        }
 
         internal fun returnIntent(context: Context) = Intent(context, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)

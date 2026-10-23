@@ -12,7 +12,7 @@ import java.util.Base64
 
 /** OAuth authorization-code flow for the registered native client, with RFC 7636 S256. */
 internal object GitHubPkce {
-    const val CALLBACK = "https://alexmalfr.github.io/hamigo/oauth/"
+    const val CALLBACK = "https://alexandre.malfre.yt/projects/Hamigo/oauth/"
     const val SESSION_TTL_MILLIS = 10 * 60 * 1000L
     private const val MAX_URL_LENGTH = 8192
     private const val MAX_CODE_LENGTH = 512
@@ -43,7 +43,7 @@ internal object GitHubPkce {
         return "https://github.com/login/oauth/authorize?" + form(
             "client_id" to clientId,
             "redirect_uri" to CALLBACK,
-            "scope" to "gist",
+            "scope" to GitHubApp.OAUTH_SCOPE,
             "state" to session.state,
             "code_challenge" to challenge(session.verifier),
             "code_challenge_method" to "S256"
@@ -105,8 +105,8 @@ internal object GitHubPkce {
         if (!type.equals("bearer", ignoreCase = true)) invalidReply()
         val scope = reply.opt("scope") as? String ?: invalidReply()
         if (scope.length > 4096 || scope.any { it.code !in 32..126 }) invalidReply()
-        if ("gist" !in scope.split(Regex("[, ]+")).filter(String::isNotEmpty)) {
-            throw SocialException("L’autorisation GitHub doit inclure l’accès aux Gists. Relance la connexion.")
+        if (!GitHubApp.hasRequiredScopes(scope)) {
+            throw SocialException("L’autorisation GitHub doit inclure les Gists et le profil pour lire les blocages. Relance la connexion.")
         }
         return token
     }
@@ -136,9 +136,9 @@ internal object GitHubPkce {
         if (url.length !in 1..MAX_URL_LENGTH || url.any { it.code !in 33..126 }) return null
         val uri = runCatching { URI(url) }.getOrNull() ?: return null
         return uri.takeIf {
-            it.scheme == "https" && it.rawAuthority == "alexmalfr.github.io" &&
-                it.host == "alexmalfr.github.io" && it.port == -1 && it.rawUserInfo == null &&
-                it.rawPath == "/hamigo/oauth/" && it.rawFragment == null && !it.isOpaque
+            it.scheme == "https" && it.rawAuthority == "alexandre.malfre.yt" &&
+                it.host == "alexandre.malfre.yt" && it.port == -1 && it.rawUserInfo == null &&
+                it.rawPath == "/projects/Hamigo/oauth/" && it.rawFragment == null && !it.isOpaque
         }
     }
     private fun callbackValues(url: String): Map<String, String> {

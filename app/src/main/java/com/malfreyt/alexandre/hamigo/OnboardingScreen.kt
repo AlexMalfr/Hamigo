@@ -66,9 +66,14 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
 @Composable internal fun OnboardingScreen(model:AppModel,simulation:Boolean=false,onSimulationFinished:()->Unit={}) {
     val context=LocalContext.current
     val focus=LocalFocusManager.current
+    val configuration=androidx.compose.ui.platform.LocalConfiguration.current
     val prefs=model.progress.prefs
     val speechMode=remember(model.revision){SpeechInputPreferences.read(prefs)}
     var step by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingStep",0).coerceIn(0,5))}
+    // Keep the field in one host while the IME opens, including short portrait windows.
+    val compactInputLayout=step==0&&questionToolsHorizontal()
+    val compactContinue=compactInputLayout&&configuration.screenWidthDp<500
+    val compactImeHeader=compactInputLayout&&WindowInsets.isImeVisible
     var name by rememberSaveable {mutableStateOf(prefs.getString("onboardingName",prefs.getString("name","")) ?: "")}
     var goal by rememberSaveable {mutableIntStateOf(model.progress.dailyGoal.takeIf {it in DailyGoals.values} ?: DailyGoals.values[1])}
     var hour by rememberSaveable {mutableIntStateOf(prefs.getInt("onboardingReminderHour",prefs.getInt("reminderHour",20)).coerceIn(0,23))}
@@ -78,6 +83,13 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
     var showMorsePreview by rememberSaveable {mutableStateOf(false)}
     var permissionPending by remember {mutableStateOf(false)}
     var permissionError by rememberSaveable {mutableStateOf(false)}
+    var downloadBytes by rememberSaveable {mutableLongStateOf(ExamBankDownloads.ESTIMATED_BYTES)}
+    var estimatedDownload by rememberSaveable {mutableStateOf(true)}
+    LaunchedEffect(step,simulation) {
+        if(step==0&&!simulation)try {
+            downloadBytes=ExamBankDownloads.size();estimatedDownload=false
+        } catch(e:kotlinx.coroutines.CancellationException){throw e} catch(_:Exception){/* Keep the explicitly estimated size offline. */}
+    }
     fun moveTo(next:Int) {
         focus.clearFocus()
         step=next
@@ -95,13 +107,18 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
     }
     fun finish(connect:Boolean) {
         if(simulation){onSimulationFinished();return}
-        model.welcome(name.trim())
-        if(connect) {model.route="friends";model.startGitHubConnection()}
-        else model.route="path"
+        if(connect)model.startGitHubConnection()
+        else {
+            model.cancelTask();model.dismissSocialRules()
+            model.welcome(name.trim())
+        }
     }
     fun continueStep() {
         when(step) {
-            0 -> if(name.isNotBlank()) {model.progress.name=name.trim();moveTo(1)}
+            0 -> if(name.isNotBlank()) {
+                if(!simulation) {ExamBankDownloads.confirm(context);com.malfreyt.alexandre.hamigo.platform.ExamBankScheduler.schedule(context)}
+                model.progress.name=name.trim();moveTo(1)
+            }
             1 -> {model.progress.setDailyGoalChoice(DailyGoals.values.indexOf(goal));model.refresh();moveTo(2)}
             2 -> {
                 permissionError=false
@@ -117,10 +134,17 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
             5 -> finish(!model.sync.tokens.hasToken())
         }
     }
+    val nicknameInput=remember(model) {movableContentOf<Modifier> {modifier->
+        OutlinedTextField(name,{name=it.take(40);prefs.edit().putString("onboardingName",name).apply()},
+            label={Text("Ton pseudo")},singleLine=true,
+            modifier=modifier.testTag("onboarding-name"),
+            keyboardOptions=KeyboardOptions(capitalization=KeyboardCapitalization.Words,imeAction=ImeAction.Next),
+            keyboardActions=KeyboardActions(onNext={continueStep()}))
+    }}
     BackHandler(enabled=step>0 && !permissionPending) {moveTo(step-1)}
     Column(Modifier.fillMaxSize().background(Cream).windowInsetsPadding(WindowInsets.systemBars).imePadding()
         .testTag("onboarding")) {
-        Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+        if(!compactImeHeader)Column(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement=Arrangement.spacedBy(5.dp)) {
                 onboardingSteps.forEachIndexed {index,label ->
                     val fraction by animateFloatAsState(if(index<step)1f else if(index==step).16f else 0f,tween(280),label="onboarding-bar")
@@ -167,11 +191,7 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
                         Text(title,fontSize=28.sp,lineHeight=32.sp,fontWeight=FontWeight.ExtraBold,color=Ink,textAlign=TextAlign.Center)
                         Text(description,color=Muted,fontSize=15.sp,lineHeight=22.sp,textAlign=TextAlign.Center)
                         when(page) {
-                            0->OutlinedTextField(name,{name=it.take(40);prefs.edit().putString("onboardingName",name).apply()},
-                                label={Text("Ton pseudo")},placeholder={Text("Par exemple, Alex")},singleLine=true,
-                                modifier=Modifier.fillMaxWidth().widthIn(max=480.dp).testTag("onboarding-name"),
-                                keyboardOptions=KeyboardOptions(capitalization=KeyboardCapitalization.Words,imeAction=ImeAction.Next),
-                                keyboardActions=KeyboardActions(onNext={continueStep()}))
+                            0->if(!compactInputLayout)nicknameInput(Modifier.fillMaxWidth().widthIn(max=480.dp))
                             1->Column(verticalArrangement=Arrangement.spacedBy(10.dp)) {
                                 DailyGoals.values.zip(listOf("Léger","Régulier","Soutenu","Intensif")).chunked(2).forEach {row ->
                                     Row(Modifier.height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
@@ -239,6 +259,19 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
                                     }
                                 }
                                 Text("GitHub est facultatif. Tu peux le connecter plus tard.",fontSize=12.sp,lineHeight=16.sp,color=Muted,textAlign=TextAlign.Center)
+                                SocialDataDisclosure()
+                                if(!simulation&&model.busy)Panel(color=Mist,spacing=8.dp) {
+                                    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
+                                        CircularProgressIndicator(Modifier.size(20.dp),strokeWidth=2.dp)
+                                        Text(model.oauthStatus ?: "Préparation de la connexion…",fontSize=13.sp,lineHeight=18.sp,color=Ink)
+                                    }
+                                    if(model.oauthSession!=null)GitHubDeviceCode(model)
+                                    else ActionLinks {
+                                        if(model.authSession!=null)ActionLink("Rouvrir GitHub",icon=Icons.Rounded.OpenInBrowser){model.openGitHubBrowser()}
+                                        ActionLink("Annuler la connexion",icon=Icons.Rounded.Close){model.cancelTask()}
+                                    }
+                                }
+                                if(!simulation)model.message?.let {Text(it,fontSize=12.sp,lineHeight=17.sp,color=Muted,textAlign=TextAlign.Center)}
                             }
                         }
                         Spacer(Modifier.height(4.dp))
@@ -264,14 +297,37 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
                 }
             }
         }
-        Column(Modifier.fillMaxWidth().padding(horizontal=24.dp,vertical=12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-            Button(feedbackClick {continueStep()},Modifier.fillMaxWidth().heightIn(min=54.dp).testTag("onboarding-continue"),
-                enabled=(step!=0 || name.isNotBlank()) && !permissionPending,shape=RoundedCornerShape(16.dp)) {
-                Text(when(step){2->if(permissionPending)"Autorisation…" else "Activer le rappel";5->if(model.sync.tokens.hasToken())"C’est parti !" else "Se connecter avec GitHub";else->"Continuer"},fontWeight=FontWeight.Bold,fontSize=16.sp)
-                Spacer(Modifier.width(8.dp));Icon(if(step==2)Icons.Rounded.NotificationsActive else Icons.AutoMirrored.Rounded.ArrowForward,null,Modifier.size(20.dp))
+        val downloadNotice="En continuant, les questions Exam’1 se téléchargent en arrière-plan pour les examens blancs ("+
+            (if(estimatedDownload)"environ " else "")+String.format(java.util.Locale.FRANCE,"%.2f",downloadBytes/1_000_000.0)+" Mo)."
+        val continueAction:@Composable (Modifier)->Unit={buttonModifier->
+            Button(feedbackClick {continueStep()},buttonModifier.heightIn(min=54.dp).testTag("onboarding-continue"),
+                contentPadding=if(compactContinue)PaddingValues(8.dp) else ButtonDefaults.ContentPadding,
+                enabled=(step!=0 || name.isNotBlank()) && !permissionPending && (step!=5||simulation||!model.busy),shape=RoundedCornerShape(16.dp)) {
+                if(!compactContinue) {
+                    Text(when(step){2->if(permissionPending)"Autorisation…" else "Activer le rappel";5->if(!simulation&&model.busy)"Connexion en cours…" else if(model.sync.tokens.hasToken())"C’est parti !" else "Se connecter avec GitHub";else->"Continuer"},fontWeight=FontWeight.Bold,fontSize=16.sp)
+                    Spacer(Modifier.width(8.dp))
+                }
+                Icon(if(step==2)Icons.Rounded.NotificationsActive else Icons.AutoMirrored.Rounded.ArrowForward,
+                    if(compactContinue)"Continuer" else null,Modifier.size(20.dp))
             }
-            if(step==2||step==4||step==5)TextButton(feedbackClick {when(step){2->confirmReminder(false);4->moveTo(5);else->finish(false)}},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
-                Text(when(step){2->"Pas maintenant";4->"Continuer sans microphone";else->"Commencer sans compte"})
+        }
+        Box(Modifier.fillMaxWidth().padding(horizontal=24.dp,vertical=if(compactInputLayout)4.dp else 12.dp)) {
+            if(compactInputLayout) {
+                Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(16.dp)) {
+                        nicknameInput(Modifier.weight(1f))
+                        continueAction(Modifier.width(if(compactContinue)56.dp else 190.dp))
+                    }
+                    Text("Exam’1 se téléchargera en arrière-plan ("+(if(estimatedDownload)"environ " else "")+
+                        String.format(java.util.Locale.FRANCE,"%.2f",downloadBytes/1_000_000.0)+" Mo).",
+                        Modifier.fillMaxWidth().testTag("onboarding-exam-download"),color=Muted,fontSize=11.sp,lineHeight=15.sp)
+                }
+            } else Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                if(step==0)Text(downloadNotice,Modifier.fillMaxWidth().testTag("onboarding-exam-download"),color=Muted,fontSize=11.sp,lineHeight=15.sp,textAlign=TextAlign.Center)
+                continueAction(Modifier.fillMaxWidth())
+                if(step==2||step==4||step==5)TextButton(feedbackClick {when(step){2->confirmReminder(false);4->moveTo(5);else->finish(false)}},Modifier.fillMaxWidth().testTag("onboarding-skip"),enabled=!permissionPending) {
+                    Text(when(step){2->"Pas maintenant";4->"Continuer sans microphone";else->if(model.sync.tokens.hasToken())"Continuer" else "Commencer sans compte"})
+                }
             }
         }
     }
@@ -295,6 +351,7 @@ private val onboardingMorseSaver=listSaver<MorseInputSettings,Any>(
         TalkingPico(Modifier.size(80.dp),talking=false,listening=state.recognition.listening,
             mood=if(state.recognition.listening)MascotMood.LISTENING else MascotMood.HAPPY,pose=if(state.recognition.listening)MascotPose.LISTEN else MascotPose.WAVE)
         Text("Essaie « Alfa Bravo ».",fontSize=13.sp,lineHeight=18.sp,color=Muted,textAlign=TextAlign.Center)
+        Text("Le service vocal Android transforme ta voix en texte et peut utiliser ses serveurs. Hamigo ne conserve pas l’audio. Tu peux toujours répondre au clavier.",fontSize=12.sp,lineHeight=17.sp,color=Muted,textAlign=TextAlign.Center)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().testTag("onboarding-speech-mode")) {
             listOf(SpeechInputMode.PUSH_TO_TALK to "Maintenir",SpeechInputMode.TOGGLE to "Bascule").forEachIndexed {index,(value,label)->
                 SegmentedButton(selected=mode==value,onClick=feedbackClick {onModeChanged(value)},
