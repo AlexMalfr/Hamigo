@@ -83,9 +83,9 @@ pwsh -File tools/create_signing.ps1
 
 La clé et ses propriétés sont dans `.tools/`, exclus du dépôt. Les conserver ensemble pour signer les futures mises à jour. Le téléphone reçoit l’APK release ; les tests instrumentés utilisent l’émulateur et l’APK debug.
 
-`versionCode` est le nombre de commits Git, comme PoPS-App. `versionName` vaut `0.<nombre>+<SHA>`, avec `-dev` si la copie de travail est modifiée. Compiler les versions distribuées à partir d’un commit propre et d’un historique complet.
+À partir du cycle 1.0, la version produit est déclarée dans `version.properties`. Le nom public ne contient plus le SHA ; le dev garde sa révision et une identité Android indépendante. `versionCode` combine le rang prévu du squash sur `main` et une réservation de build commune à tous les canaux. Voir [VERSIONING.md](VERSIONING.md) pour les commandes, les contraintes et la CI Play préparée mais inactive.
 
-Pour une révision explicitement demandée sous le même numéro, ajouter `-PhamigoVersionCommit=16` au build conserve `versionCode=16` et `0.16`, avec le nouveau SHA pour identifier l'APK. La révision de la 0.16 utilise cette option ; les builds ordinaires continuent à suivre les commits.
+Historique 0.x : le code suivait le nombre de commits et le nom valait `0.<nombre>+<SHA>`. L’ancienne option `hamigoVersionCommit` permettait certaines révisions expressément demandées. Elle appartient aux sources historiques et n’est plus acceptée par le build 1.0 ; un AAB déjà envoyé sur Play ne peut pas être remplacé sous le même code.
 
 ## Tests et sources
 

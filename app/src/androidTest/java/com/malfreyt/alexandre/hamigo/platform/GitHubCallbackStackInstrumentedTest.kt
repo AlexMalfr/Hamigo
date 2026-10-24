@@ -46,7 +46,7 @@ class GitHubCallbackStackInstrumentedTest {
                 activityRecords().none { it.contains(browser!!) && it.contains(" t${original.taskId}") }
             }
             val records = activityRecords()
-            val mains = records.filter { it.contains("${context.packageName}/.MainActivity") }
+            val mains = records.filter { it.contains(android.content.ComponentName(context,MainActivity::class.java).flattenToShortString()) }
             assertEquals("OAuth fallback must retain one MainActivity; records=$records", 1, mains.size)
             assertFalse("Returning must remove the temporary browser from Hamigo's task",
                 records.any { it.contains(browser!!) && it.contains(" t${original.taskId}") })

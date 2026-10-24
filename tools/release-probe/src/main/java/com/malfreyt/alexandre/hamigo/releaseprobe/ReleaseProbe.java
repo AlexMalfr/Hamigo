@@ -55,6 +55,7 @@ public final class ReleaseProbe extends Instrumentation {
             context=getTargetContext();
             ((Application)context.getApplicationContext()).registerActivityLifecycleCallbacks(lifecycle);
             check((context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE)==0,"Install the signed production release");
+            if(mode.equals("identity"))identity();
             if(mode.equals("flow"))flow();
             if(mode.equals("diagnostics"))diagnostics();
             if(mode.equals("catalog"))catalog();
@@ -73,6 +74,24 @@ public final class ReleaseProbe extends Instrumentation {
             output.putString("stream",text.toString());finish(Activity.RESULT_CANCELED,output);
         }
     }
+    /** Confirms that installing optimized dev over debug preserved its private data. */
+    private void identity() throws Exception {
+        String packageName=context.getPackageName();
+        check(packageName.equals("com.malfreyt.alexandre.hamigo.dev"),"Identity fixture targets dev only");
+        check(context.getApplicationInfo().loadLabel(context.getPackageManager()).toString().equals("Hamigo Dev"),"Distinct dev label");
+        String marker=new String(Files.readAllBytes(new File(context.getFilesDir(),"versioning-upgrade-sentinel.txt").toPath()),StandardCharsets.UTF_8);
+        check(marker.equals("hamigo-dev-upgrade-fixture-v1"),"Debug-to-R8 update preserves private files");
+        android.content.pm.PackageInfo info=context.getPackageManager().getPackageInfo(packageName,0);
+        check(info.versionName.contains("-dev"),"Dev version remains explicit");
+        android.content.pm.ProviderInfo provider=context.getPackageManager().resolveContentProvider(packageName+".files",0);
+        check(provider!=null&&provider.packageName.equals(packageName),"FileProvider belongs to dev");
+        Intent launch=context.getPackageManager().getLaunchIntentForPackage(packageName);
+        check(launch!=null&&launch.getComponent().getClassName().equals("com.malfreyt.alexandre.hamigo.MainActivity"),"Launcher resolves the original class namespace");
+        JSONObject report=new JSONObject().put("applicationId",packageName).put("versionName",info.versionName)
+            .put("versionCode",Build.VERSION.SDK_INT>=28?info.getLongVersionCode():info.versionCode).put("uid",context.getApplicationInfo().uid)
+            .put("dataDirectory",context.getApplicationInfo().dataDir).put("privateFilePreserved",true);
+        try(FileOutputStream out=new FileOutputStream(new File(context.getExternalFilesDir(null),"identity-probe.json"))){out.write(report.toString(2).getBytes(StandardCharsets.UTF_8));}
+    }
     private void applyRequestedRotation() {
         if(requestedRotation==null)return;
         int rotation=Integer.parseInt(requestedRotation);check(rotation>=0&&rotation<=3,"Rotation must be 0..3");
@@ -89,7 +108,7 @@ public final class ReleaseProbe extends Instrumentation {
         throw new AssertionError("Display did not reach rotation "+rotation);
     }
     private Activity open() {
-        Activity activity=startActivitySync(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        Activity activity=startActivitySync(new Intent().setClassName(context.getPackageName(),"com.malfreyt.alexandre.hamigo.MainActivity").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         applyRequestedRotation();
         // The launcher can stay portrait; rotate only after the app is open and follow its recreation.
         long until=SystemClock.uptimeMillis()+15000;
@@ -147,6 +166,7 @@ public final class ReleaseProbe extends Instrumentation {
             waitText("Progressions actualisées.",10000);
             String demoBefore=context.getSharedPreferences("play_review_hamigo",Context.MODE_PRIVATE).getString("progress","");
             reveal("Licences et attributions",false);click("Licences et attributions",false);
+            captureLearning("review-licenses-menu");
             click("Périmètre des licences et attribution du cours",false);waitText("Licences de Hamigo",10000);
             reveal("Banque Exam’1 et illustrations téléchargées depuis le REF",false);captureLearning("review-licenses-markdown");
             click("Fermer",false);
@@ -593,12 +613,12 @@ public final class ReleaseProbe extends Instrumentation {
         calculator();
         check(java.util.Objects.equals(before,context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).getString("progress",null)),"Social browsing preserves progression");
         context.getSharedPreferences("hamigo",Context.MODE_PRIVATE).edit().putString("friends","[]").commit();
-        runOnMainSync(()->activity.startActivity(new Intent().setClassName(context.getPackageName(),context.getPackageName()+".MainActivity").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("hamigo_route","friends")));
+        runOnMainSync(()->activity.startActivity(new Intent().setClassName(context.getPackageName(),"com.malfreyt.alexandre.hamigo.MainActivity").addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP).putExtra("hamigo_route","friends")));
         waitText("Sur la même fréquence",10000);
         AppWidgetManager manager=AppWidgetManager.getInstance(context);AppWidgetHost host=new AppWidgetHost(context,2849);int id=-1;
         getUiAutomation().adoptShellPermissionIdentity(android.Manifest.permission.BIND_APPWIDGET);
         try {
-            id=host.allocateAppWidgetId();ComponentName provider=new ComponentName(context.getPackageName(),context.getPackageName()+".platform.SocialWidgetProvider");
+            id=host.allocateAppWidgetId();ComponentName provider=new ComponentName(context.getPackageName(),"com.malfreyt.alexandre.hamigo.platform.SocialWidgetProvider");
             check(manager.bindAppWidgetIdIfAllowed(id,provider),"Social provider binds in the optimized release");
             ComponentName configuration=manager.getAppWidgetInfo(id).configure;check(configuration!=null,"Social widget is configurable");
             startActivitySync(new Intent().setComponent(configuration).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,id));

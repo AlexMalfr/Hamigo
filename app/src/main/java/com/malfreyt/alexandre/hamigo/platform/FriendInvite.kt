@@ -10,7 +10,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 /** Only the shareable statistics Gist ID belongs in an invitation; the complete backup ID never does. */
 object FriendInvite {
-    const val HTTPS_BASE = "https://alexmalfr.github.io/hamigo/"
+    const val HTTPS_BASE = com.malfreyt.alexandre.hamigo.BuildConfig.INVITE_BASE
     private val idPattern = Regex("[a-fA-F0-9]{5,64}")
 
     fun link(gistIdOrUrl: String): String = HTTPS_BASE + "?invite=" + GitHubSync.gistId(gistIdOrUrl).lowercase()
@@ -20,8 +20,8 @@ object FriendInvite {
         val uri = Uri.parse(value)
         if (uri.userInfo != null || uri.port != -1 || uri.fragment != null) return null
         val expected = when {
-            uri.scheme == "https" && uri.host == "alexmalfr.github.io" && uri.path in listOf("/hamigo/", "/hamigo") -> true
-            uri.scheme == "hamigo" && uri.host == "join" && uri.path in listOf("", "/") -> true
+            uri.scheme == "https" && uri.host == "alexmalfr.github.io" && uri.path in listOf(Uri.parse(HTTPS_BASE).path, Uri.parse(HTTPS_BASE).path?.trimEnd('/')) -> true
+            uri.scheme == com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME && uri.host == "join" && uri.path in listOf("", "/") -> true
             else -> false
         }
         if (!expected || uri.queryParameterNames != setOf("invite") || uri.getQueryParameters("invite").size != 1) return null

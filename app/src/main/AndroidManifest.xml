@@ -23,7 +23,7 @@
             <data android:scheme="https" />
         </intent>
     </queries>
-    <application android:allowBackup="false" android:label="Hamigo" android:icon="@mipmap/ic_launcher"
+    <application android:allowBackup="false" android:label="${hamigoLabel}" android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher" android:theme="@style/Theme.Hamigo" android:supportsRtl="true" android:enableOnBackInvokedCallback="true">
         <!-- App Links must return to the pending OAuth ViewModel beneath a Custom Tab. -->
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask" android:windowSoftInputMode="adjustResize">
@@ -35,19 +35,19 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="alexmalfr.github.io" android:pathPrefix="/hamigo/" />
+                <data android:scheme="https" android:host="alexmalfr.github.io" android:pathPrefix="${hamigoLinkPath}" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="hamigo" android:host="join" />
+                <data android:scheme="${hamigoScheme}" android:host="join" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="hamigo" android:host="return" />
+                <data android:scheme="${hamigoScheme}" android:host="return" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

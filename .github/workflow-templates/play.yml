@@ -1,0 +1,83 @@
+# INACTIVE TEMPLATE. Move to .github/workflows only after the documented Console bootstrap.
+name: Play candidates
+on:
+  push:
+    branches: [main, alpha, beta]
+  workflow_dispatch:
+permissions:
+  contents: read
+# Global serialization across all three tracks; never cancel an edit in flight.
+concurrency:
+  group: hamigo-play
+  cancel-in-progress: false
+jobs:
+  candidate:
+    if: vars.PLAY_UPLOAD_ENABLED == 'true' && vars.PLAY_FIRST_RELEASE_COMPLETED == 'true' && (github.ref_name == 'main' || github.ref_name == 'alpha' || github.ref_name == 'beta')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ github.ref_name == 'main' && 'play-production' || github.ref_name == 'beta' && 'play-beta' || 'play-alpha' }}
+    env:
+      PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+      PLAY_FIRST_RELEASE_COMPLETED: ${{ vars.PLAY_FIRST_RELEASE_COMPLETED }}
+      PLAY_TRACK: ${{ vars.PLAY_TRACK }}
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/.tools/play-service-account.json
+      HAMIGO_UPLOAD_CERT_SHA256: ${{ vars.HAMIGO_UPLOAD_CERT_SHA256 }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Validate source and run checks without credentials
+        run: |
+          python tools/play/check_source.py
+          python -m unittest discover -s tools/play -p 'test_*.py' -v
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+          bash gradlew -p buildSrc test --no-daemon
+          bash gradlew :app:testDebugUnitTest :app:lintDebug --no-daemon
+      - name: Materialize existing upload key and credentials
+        env:
+          HAMIGO_KEYSTORE_BASE64: ${{ secrets.HAMIGO_KEYSTORE_BASE64 }}
+          HAMIGO_STORE_PASSWORD: ${{ secrets.HAMIGO_STORE_PASSWORD }}
+          HAMIGO_KEY_PASSWORD: ${{ secrets.HAMIGO_KEY_PASSWORD }}
+          HAMIGO_OAUTH_CLIENT_SECRET: ${{ secrets.HAMIGO_OAUTH_CLIENT_SECRET }}
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: python tools/play/prepare_ci.py
+      - name: Build signed optimized candidate
+        shell: bash
+        run: |
+          case "$GITHUB_REF_NAME" in
+            main) channel=release ;;
+            alpha|beta) channel="$GITHUB_REF_NAME" ;;
+            *) exit 1 ;;
+          esac
+          bash gradlew :app:bundleRelease :app:assembleRelease :app:writeVersionMetadata -PhamigoChannel="$channel" --no-daemon
+          python tools/play/verify_signature.py app/build/outputs/bundle/release/app-release.aab
+          sha256sum app/build/outputs/bundle/release/app-release.aab > app/build/outputs/bundle/release/SHA256SUMS
+      - name: Archive candidate before any Play API call
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: play-${{ github.ref_name }}-${{ github.sha }}
+          path: |
+            app/build/outputs/bundle/release/
+            app/build/outputs/apk/release/
+            app/build/outputs/mapping/release/mapping.txt
+            app/build/outputs/version.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload a draft for Console approval
+        # The first publication remains manual. This template never auto-submits a review.
+        run: |
+          python -m pip install 'google-auth[requests]>=2,<3'
+          python tools/play/publish.py --metadata app/build/outputs/version.json --aab app/build/outputs/bundle/release/app-release.aab --upload --status draft
+      - name: Remove temporary credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f -- .tools/hamigo-release.jks .tools/signing.properties .tools/oauth.properties .tools/play-service-account.json
