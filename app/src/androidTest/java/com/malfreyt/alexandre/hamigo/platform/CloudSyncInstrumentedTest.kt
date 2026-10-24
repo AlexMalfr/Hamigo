@@ -117,10 +117,11 @@ class CloudSyncInstrumentedTest {
     @Test fun invitationLinksRoundTripAndRejectOtherHostsAmbiguousQueriesAndCredentials() {
         val id = "0123456789abcdef0123456789abcdef"
         val link = FriendInvite.link("https://gist.github.com/ami/$id")
-        assertEquals("https://alexandre.malfre.yt/projects/Hamigo/rejoindre.html?invite=$id", link)
-        assertEquals(id, FriendInvite.parse(link)); assertEquals(id, FriendInvite.parse("hamigo://join?invite=$id"))
-        assertEquals(id, FriendInvite.parse("https://alexmalfr.github.io/hamigo/?invite=$id"))
-        assertEquals(id, FriendInvite.parse("https://alexmalfr.github.io/hamigo?invite=$id"))
+        assertEquals("${FriendInvite.HTTPS_BASE}?invite=$id", link)
+        assertEquals(id, FriendInvite.parse(link)); assertEquals(id, FriendInvite.parse("${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://join?invite=$id"))
+        val legacyPath = if (com.malfreyt.alexandre.hamigo.BuildConfig.CHANNEL == "dev") "hamigo-dev" else "hamigo"
+        assertEquals(id, FriendInvite.parse("https://alexmalfr.github.io/$legacyPath/?invite=$id"))
+        assertEquals(id, FriendInvite.parse("https://alexmalfr.github.io/$legacyPath?invite=$id"))
         listOf("http://alexmalfr.github.io/hamigo/?invite=$id", "https://other.github.io/hamigo/?invite=$id",
             "https://alexmalfr.github.io.evil.test/hamigo/?invite=$id", "$link&invite=$id", "$link&x=1",
             "$link#fragment", "https://user@alexmalfr.github.io/hamigo/?invite=$id", "hamigo://other?invite=$id",

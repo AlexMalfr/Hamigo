@@ -3,6 +3,7 @@ package com.malfreyt.alexandre.hamigo.platform
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
+import com.malfreyt.alexandre.hamigo.BuildConfig
 import com.malfreyt.alexandre.hamigo.HamigoLinks
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -13,6 +14,8 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 object FriendInvite {
     const val HTTPS_BASE = HamigoLinks.INVITATION
     private val idPattern = Regex("[a-fA-F0-9]{5,64}")
+    private val httpsBase = Uri.parse(HTTPS_BASE)
+    private val legacyPath = if (BuildConfig.CHANNEL == "dev") "/hamigo-dev" else "/hamigo"
 
     fun link(gistIdOrUrl: String): String = HTTPS_BASE + "?invite=" + GitHubSync.gistId(gistIdOrUrl).lowercase()
 
@@ -21,9 +24,9 @@ object FriendInvite {
         val uri = Uri.parse(value)
         if (uri.userInfo != null || uri.port != -1 || uri.fragment != null) return null
         val expected = when {
-            uri.scheme == "https" && uri.host == "alexandre.malfre.yt" && uri.path == "/projects/Hamigo/rejoindre.html" -> true
-            uri.scheme == "https" && uri.host == "alexmalfr.github.io" && uri.path in listOf("/hamigo/", "/hamigo") -> true
-            uri.scheme == "hamigo" && uri.host == "join" && uri.path in listOf("", "/") -> true
+            uri.scheme == "https" && uri.host == httpsBase.host && uri.path == httpsBase.path -> true
+            uri.scheme == "https" && uri.host == "alexmalfr.github.io" && uri.path in listOf(legacyPath, "$legacyPath/") -> true
+            uri.scheme == BuildConfig.LINK_SCHEME && uri.host == "join" && uri.path in listOf("", "/") -> true
             else -> false
         }
         if (!expected || uri.queryParameterNames != setOf("invite") || uri.getQueryParameters("invite").size != 1) return null

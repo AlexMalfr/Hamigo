@@ -12,7 +12,8 @@ import java.util.Base64
 
 /** OAuth authorization-code flow for the registered native client, with RFC 7636 S256. */
 internal object GitHubPkce {
-    const val CALLBACK = "https://alexandre.malfre.yt/projects/Hamigo/oauth/"
+    const val CALLBACK = com.malfreyt.alexandre.hamigo.BuildConfig.GITHUB_CALLBACK
+    private val callbackEndpoint = URI(CALLBACK)
     const val SESSION_TTL_MILLIS = 10 * 60 * 1000L
     private const val MAX_URL_LENGTH = 8192
     private const val MAX_CODE_LENGTH = 512
@@ -136,9 +137,9 @@ internal object GitHubPkce {
         if (url.length !in 1..MAX_URL_LENGTH || url.any { it.code !in 33..126 }) return null
         val uri = runCatching { URI(url) }.getOrNull() ?: return null
         return uri.takeIf {
-            it.scheme == "https" && it.rawAuthority == "alexandre.malfre.yt" &&
-                it.host == "alexandre.malfre.yt" && it.port == -1 && it.rawUserInfo == null &&
-                it.rawPath == "/projects/Hamigo/oauth/" && it.rawFragment == null && !it.isOpaque
+            it.scheme == "https" && it.rawAuthority == callbackEndpoint.rawAuthority &&
+                it.host == callbackEndpoint.host && it.port == -1 && it.rawUserInfo == null &&
+                it.rawPath == callbackEndpoint.rawPath && it.rawFragment == null && !it.isOpaque
         }
     }
     private fun callbackValues(url: String): Map<String, String> {

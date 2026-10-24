@@ -54,7 +54,10 @@ class GitHubPkceTest {
             GitHubPkce.CALLBACK + "#state=$state&code=valid-code", GitHubPkce.CALLBACK + "#",
             "https://alexandre.malfre.yt\\@attacker.example/projects/Hamigo/oauth/", " " + GitHubPkce.CALLBACK
         )
-        impostors.forEach { assertFalse("Accepted unexpected callback origin/path", GitHubPkce.isCallback(it)) }
+        val prefix = URI(GitHubPkce.CALLBACK).rawPath.removeSuffix("oauth/")
+        impostors.map { it.replace("/projects/Hamigo/", prefix) }.forEach {
+            assertFalse("Accepted unexpected callback origin/path", GitHubPkce.isCallback(it))
+        }
     }
 
     @Test fun validEncodedCallbackMatchesTheSessionAndDecodesTheAuthorizationCode() {

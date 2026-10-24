@@ -85,6 +85,8 @@ Sous Windows, utilise `gradlew.bat`. Les builds Windows sont isolés hors de One
 
 La signature, la configuration OAuth, les versions et les vérifications Android sont expliquées dans [les notes techniques](docs/APP-DETAILS.md) et [la documentation OAuth](docs/GITHUB-PKCE.md).
 
+Le prochain cycle utilise une version produit `1.0`, des canaux release/bêta ouverte/alpha interne et une app dev indépendante. Les builds locaux sont dev par défaut (`Hamigo Dev`, identifiant `.dev`). Le [contrat de versionnement et de CI](docs/VERSIONING.md) décrit les codes techniques, les builds publics et l’activation Play différée ; il ne signifie pas que la 1.0 est publiée.
+
 Pour tester directement un identifiant de question, parcourir les formats ou inspecter des données fictives sans modifier sa progression : [outils de diagnostics sur appareil](docs/DIAGNOSTICS.md). Pour personnaliser le fond des widgets : [configuration des widgets](docs/WIDGET-CONFIGURATION.md).
 
 Les questions originales du Parcours utilisent des [UUID stables séparés de leur position](docs/QUESTION-IDENTITIES.md). Déplacer une question conserve son historique ; la conversion temporaire des sauvegardes 0.47–0.51 a été retirée en 0.52, comme prévu.

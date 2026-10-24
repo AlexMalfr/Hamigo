@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.sp
                         }
                         ActionLink(title,icon=icon){selected=file}
                     }
-                    ActionLink("Sources de la version ${BuildConfig.VERSION_NAME}",icon=Icons.Rounded.Code){openLink(context,"${HamigoLinks.REPOSITORY}/tree/v0.${BuildConfig.VERSION_CODE}")}
+                    ActionLink("Sources de la version ${BuildConfig.VERSION_NAME}",icon=Icons.Rounded.Code){openLink(context,"${HamigoLinks.REPOSITORY}/tree/${BuildConfig.SOURCE_REVISION}")}
                 }
             } else SelectionContainer {
                 if(selected?.endsWith(".md")==true)LicenseMarkdown(text,Modifier.testTag("license-markdown")){href->
