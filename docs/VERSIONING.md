@@ -82,6 +82,8 @@ Pour activer les envois après bootstrap : lire `python tools/play/publish.py --
 
 Le workflow manuel **Play API preflight**, exécuté uniquement depuis `main` protégé, récupère l'AAB existante d'un tag choisi, vérifie source gelée, réservation, métadonnées, hashes et certificat, puis lit les IDs avec Publisher API. Il n'utilise aucun secret de build, ne reconstruit rien, n'upload rien et ne soumet aucune revue. La lecture utilise un edit temporaire supprimé sans commit. Sa fédération doit autoriser exactement `play-preflight.yml@refs/heads/main`, en plus du workflow de livraison sur tags. Les trois variables publiques WIF/compte/certificat sont aussi définies au niveau dépôt pour ce contrôle sans environnement secret. Une relance du workflow de construction refuse les binaires déjà archivés ; employer ce préflight pour contrôler leur liaison Play.
 
+Le jeton GitHub de ce contrôle garde seulement `contents: read` et `actions: read`. Les assets d'une release publiée sont privilégiés ; une release encore en brouillon n'est pas visible avec ce jeton. Dans ce cas, récupérer l'unique artefact CI `release-<tag>` non expiré du commit exact, par son ID. Refuser une archive absente ou ambiguë, puis appliquer les mêmes contrôles de source, hashes et certificat. Les artefacts CI restent 90 jours : publier la release GitHub avant leur expiration pour conserver ce contrôle, sans reconstruire ni réutiliser son numéro.
+
 Une publication entièrement automatique peut ensuite utiliser `--status completed --send-for-review`, avec une décision explicite de l'éditeur sur les destinations et les protections des environnements. Elle n'est pas activée pour la première 1.0. Le managed publishing ne retient pas les sorties internes.
 
 ## Échec avant toute distribution

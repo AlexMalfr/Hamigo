@@ -9,6 +9,7 @@ on:
         type: string
 permissions:
   contents: read
+  actions: read
   id-token: write
 concurrency:
   group: hamigo-play
@@ -40,7 +41,7 @@ jobs:
       - name: Retrieve and verify exact archived bundle
         run: |
           mkdir -p output/preflight
-          gh release download "$RELEASE_TAG" --dir output/preflight --pattern "Hamigo-${RELEASE_TAG}.aab" --pattern version.json --pattern SHA256SUMS.txt
+          python tools/play/download_archive.py --repo "$GITHUB_REPOSITORY" --tag "$RELEASE_TAG" --folder output/preflight
           python tools/play/check_archive.py --tag "$RELEASE_TAG" --folder output/preflight
           python tools/play/verify_signature.py "output/preflight/Hamigo-${RELEASE_TAG}.aab"
       - name: Authenticate from protected main without build secrets
