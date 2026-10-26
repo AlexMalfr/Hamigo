@@ -94,7 +94,7 @@ class SocialPrivacyInstrumentedTest {
         assertEquals(2,sync.deleteRemoteData());assertFalse(SocialRules.deletionPending(c))
     }
     @Test fun feedbackReturnAcceptsOnlyTheDedicatedEmptyRoute() {
-        listOf("hamigo://return","hamigo://return/").forEach {assertTrue(HamigoLinks.isFeedbackReturn(it))}
-        listOf("hamigo://return?invite=abcde","hamigo://return/extra","hamigo://user@return","hamigo://return:80","hamigo://return#x","https://return","hamigo://invite/abcde").forEach {assertFalse(it,HamigoLinks.isFeedbackReturn(it))}
+        listOf("${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return/").forEach {assertTrue(HamigoLinks.isFeedbackReturn(it))}
+        listOf("${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return?invite=abcde","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return/extra","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://user@return","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return:80","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://return#x","https://return","${com.malfreyt.alexandre.hamigo.BuildConfig.LINK_SCHEME}://invite/abcde").forEach {assertFalse(it,HamigoLinks.isFeedbackReturn(it))}
     }
 }

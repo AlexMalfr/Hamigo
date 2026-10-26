@@ -7,6 +7,13 @@ import java.time.LocalDate
 
 /** Permanent streak projection, independent of calendar-day XP and reward identities. */
 internal object StreakHistory {
+    /** New progress starts empty; saved history is validated and kept byte-for-byte. */
+    fun initialize(state:JSONObject):Boolean {
+        if(state.has("streakHistory")){validate(state.getJSONObject("streakHistory"));return false}
+        state.put("streakHistory",JSONObject().put("version",1).put("seedDays",JSONArray())
+            .put("bridges",JSONObject()).put("cutoverAt",0L))
+        return true
+    }
     fun merge(a:JSONObject,b:JSONObject):JSONObject {
         val left=a.getJSONObject("streakHistory");val right=b.getJSONObject("streakHistory")
         val seeds=(days(left)+days(right)).sorted()
@@ -14,7 +21,7 @@ internal object StreakHistory {
         listOf(left,right).forEach { h->h.getJSONObject("bridges").let {map->map.keys().forEach {day->bridges.put(day,maxOf(bridges.optInt(day),map.getInt(day)))}} }
         val sorted=JSONObject();bridges.keys().asSequence().sorted().forEach {sorted.put(it,bridges.getInt(it))}
         return JSONObject().put("version",1).put("seedDays",JSONArray(seeds)).put("bridges",sorted)
-            .put("cutoverAt",minOf(left.getLong("cutoverAt"),right.getLong("cutoverAt")))
+            .put("cutoverAt",listOf(left.getLong("cutoverAt"),right.getLong("cutoverAt")).filter {it>0L}.minOrNull() ?: 0L)
     }
     private fun days(history:JSONObject):Set<String> = history.getJSONArray("seedDays").let {array->(0 until array.length()).map {array.getString(it)}.toSet()}
     fun count(state:JSONObject,today:LocalDate=StudyDay.date()):Int {

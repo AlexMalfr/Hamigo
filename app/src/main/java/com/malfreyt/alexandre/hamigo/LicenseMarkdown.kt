@@ -23,7 +23,7 @@ import org.commonmark.parser.Parser
 private val licenseParser=Parser.builder().extensions(listOf(TablesExtension.create())).build()
 private fun Node.children():List<Node> = buildList {var child=firstChild;while(child!=null){add(child);child=child.next}}
 
-/** Repository links to packaged licenses stay offline; other paths point at the shipped tag. */
+/** Repository links to packaged licenses stay offline; other paths point at the shipped commit. */
 internal fun licenseLinkTarget(document:String,href:String):String {
     if(href.startsWith("https://")||href.startsWith("http://"))return href
     val path=when(document){"PERIMETERS.md"->"LICENSES/README.md";else->document}
@@ -38,7 +38,7 @@ internal fun licenseLinkTarget(document:String,href:String):String {
         "LICENSES/Apache-2.0.txt"->"Apache-2.0.txt"
         "LICENSES/CC-BY-NC-SA-4.0.txt"->"CC-BY-NC-SA-4.0.txt"
         "LICENSES/BSD-2-Clause-commonmark.txt"->"BSD-2-Clause-commonmark.txt"
-        else->"${HamigoLinks.REPOSITORY}/blob/v0.${BuildConfig.VERSION_CODE}/$resolved"
+        else->"${HamigoLinks.REPOSITORY}/blob/${BuildConfig.SOURCE_REVISION}/$resolved"
     }
 }
 

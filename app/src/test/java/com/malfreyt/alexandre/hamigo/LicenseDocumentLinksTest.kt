@@ -11,8 +11,8 @@ class LicenseDocumentLinksTest {
         assertEquals("LICENSE",licenseLinkTarget("PERIMETERS.md","../LICENSE"))
         assertEquals("THIRD_PARTY_NOTICES.md",licenseLinkTarget("PERIMETERS.md","../THIRD_PARTY_NOTICES.md"))
     }
-    @Test fun sourceReferencesResolveAgainstTheShippedTagAndExternalUrlsStayExact() {
-        assertEquals("${HamigoLinks.REPOSITORY}/blob/v0.${BuildConfig.VERSION_CODE}/docs/SOURCES-EXAM1.md",
+    @Test fun sourceReferencesResolveAgainstTheShippedCommitAndExternalUrlsStayExact() {
+        assertEquals("${HamigoLinks.REPOSITORY}/blob/${BuildConfig.SOURCE_REVISION}/docs/SOURCES-EXAM1.md",
             licenseLinkTarget("PERIMETERS.md","../docs/SOURCES-EXAM1.md"))
         val url="https://github.com/commonmark/commonmark-java?tab=readme-ov-file#usage"
         assertEquals(url,licenseLinkTarget("THIRD_PARTY_NOTICES.md",url))

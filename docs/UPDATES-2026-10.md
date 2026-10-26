@@ -586,3 +586,18 @@ La première bulle du tutoriel est limitée par la position réellement mesurée
 - La bibliothèque Mémo utilise son pied de page pour dégager la dernière fiche. Le lien de cours reste centré, plus étroit et placé juste après le dernier mémo, en haut de cet espace ; le dégagement des outils vient en dessous. La réserve des fiches ouvertes conserve le signalement accessible.
 - Le champ de pseudo de l’onboarding ne suggère plus de prénom. Alex reste dans le tirage aléatoire des exercices, auquel Julien est ajouté.
 - Sur une petite fenêtre, le premier écran d’onboarding garde le pseudo et une flèche Continuer accessible sur une même ligne ; leur position reste stable à l’ouverture du clavier. Les écrans plus hauts conservent leur présentation.
+
+## Préparation du cycle 1.0 — versionnement et CI
+
+- Version produit déclarée dans `version.properties`, indépendante des commits de développement. Les noms publics sont `1.0`, `1.0-betaN` et `1.0-alphaN` ; le nom dev conserve numéro et révision. Le code technique combine le rang prévu du squash sur `main` et un numéro de build croissant commun aux canaux publics, compatible avec les installations 0.55/0.56.
+- La branche `beta` vise un test ouvert ; `alpha` vise le test interne avec la liste de testeurs de l’éditeur. `main` peut déclencher la CI à chaque squash sans imposer de tag. Les tracks réels seront vérifiés depuis l’API/Console avant activation.
+- Les builds locaux appartiennent au canal dev par défaut : identifiant `.dev`, libellé Hamigo Dev, liens et callback dédiés, configuration OAuth distincte et facultative. Les liens vers les sources des licences utilisent désormais le commit distribué. Le probe R8 peut cibler l’app dev sans renommer les classes Kotlin.
+- Checks GitHub Actions sans secrets et modèle de workflow Play **inactif**, avec signature existante, contrôle de certificat, archive des artefacts et brouillon à approuver dans Console. Aucun accès, track, secret, première publication ni envoi Play n’est créé par cette préparation. Contrat, limites et activation : `docs/VERSIONING.md`.
+- Reprise sur la RC finale du 25 octobre : domaine social canonique conservé pour les canaux publics, chemins `/projects/Hamigo-dev/` distincts pour la dev et compatibilité des anciennes invitations de chaque identité. Le manifeste dev ne capture pas les nouveaux liens publics. Les sept questions de bienvenue, icônes et derniers ajustements Mémo/graphe/pseudo restent ceux de la 0.56 livrée.
+
+## Mise en place de la 1.0 — 26 octobre 2026
+
+- Une branche durable par version conserve les commits détaillés ; `main` reçoit un squash par version, `alpha` et `beta` servent de branches de distribution. Les livraisons sont déclenchées par des tags annotés. Le contrat complet des agents est dans `docs/VERSIONING.md`.
+- Le code Android public devient un compteur automatique global simple (57 et suivants), réservé atomiquement dans des tags `ci-build/N`, sans commit artificiel ni plage par canal. Le nom produit reste indépendant ; les locaux sont dev par défaut.
+- La signature historique a été importée dans Play App Signing après le choix explicite de l'éditeur. Une clé d'import distincte sert à la CI ; la clé historique ne lui est pas transférée. Les trois environnements GitHub et leurs secrets de build sont configurés. La fédération OIDC et la première réception Console font l'objet de preuves de livraison distinctes ; les portes d'upload restent fermées jusqu'au bootstrap.
+- `StreakMigration52`, ses appels, ses tests temporaires et son garde-fou de livraison sont supprimés. Les historiques déjà enregistrés restent conservés et fusionnés ; une structure absente s'initialise vide et de façon déterministe. La migration distincte de journée d'étude n'est pas concernée.
