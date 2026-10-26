@@ -27,6 +27,9 @@ def check(tag, product):
         raise ValueError("Fetch the complete Git history")
     if git("status", "--porcelain"):
         raise ValueError("Source checkout is dirty")
+    # actions/checkout replaces an annotated event tag with its peeled commit.
+    # Restore only this local ref from the authoritative remote before validating it.
+    git("fetch", "--no-tags", "origin", "+refs/tags/" + tag + ":refs/tags/" + tag)
     head = git("rev-parse", "HEAD")
     if git("rev-parse", tag + "^{commit}") != head:
         raise ValueError("Release tag does not point at the source commit")

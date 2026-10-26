@@ -31,6 +31,8 @@ class SourceTests(unittest.TestCase):
         self.assertEqual((61,False),choose(records,'v1.0','c'*40,60))
         self.assertEqual((57,True),choose(records,'v1.0-alpha1','a'*40))
         with self.assertRaises(ValueError): choose(records,'v1.0-alpha1','c'*40)
+        records[57]['retired']=True
+        self.assertEqual((59,False),choose(records,'v1.0-alpha1','c'*40))
         with self.assertRaises(ValueError): choose({},'v1.0','a'*40,2100000000)
 
 

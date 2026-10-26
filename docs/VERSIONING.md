@@ -78,6 +78,10 @@ Pour activer les envois après bootstrap : lire `python tools/play/publish.py --
 
 Une publication entièrement automatique peut ensuite utiliser `--status completed --send-for-review`, avec une décision explicite de l'éditeur sur les destinations et les protections des environnements. Elle n'est pas activée pour la première 1.0. Le managed publishing ne retient pas les sorties internes.
 
+## Échec avant toute distribution
+
+Un tag final ne se corrige avant distribution qu'après preuve qu'aucun AAB n'a été importé ni archivé dans une release. Conserver l'ancien commit et tag annoté sous `preflight/`, conserver sa réservation `ci-build/N`, puis ajouter un tag annoté `ci-retired/N` sur le même commit, expliquant l'échec et sa preuve. L'allocateur ignore cette réservation pour les relances mais continue de compter son numéro comme consommé. Le tag corrigé reçoit un code supérieur. Ne jamais employer cette procédure après un upload ou une livraison ; ne jamais supprimer/réutiliser le numéro. La première réservation 57 a été abandonnée après l'échec du contrôle de tag dans CI40275087338, avant construction/envoi ; le défaut de checkout est corrigé dans le validateur.
+
 ## Promotion et revue
 
 Promouvoir le même AAB conserve les octets testés, le code et le suffixe embarqué. Changer le nom privé de la release Console ne change pas `versionName`. Pour avoir `1.0-betaN` puis `1.0`, reconstruire avec un nouveau code, tester le **bundle final** en interne puis réutiliser ce même bundle en production, sans nouvelle reconstruction. C'est le compromis retenu pour garder les noms de canal demandés. [Préparer une release](https://support.google.com/googleplay/android-developer/answer/9859348).

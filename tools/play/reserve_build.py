@@ -20,7 +20,7 @@ def run(*args, check=True):
 
 def choose(reservations, tag, revision, floor=56):
     floor = max(56, floor)
-    existing = [(code, data) for code, data in reservations.items() if data["releaseTag"] == tag]
+    existing = [(code, data) for code, data in reservations.items() if data["releaseTag"] == tag and not data.get("retired", False)]
     if existing:
         if len(existing) != 1 or existing[0][1]["sourceRevision"] != revision:
             raise ValueError("Release tag was moved or has conflicting reservations; never rewrite a released tag")
@@ -34,6 +34,7 @@ def choose(reservations, tag, revision, floor=56):
 def read_reservations(remote):
     # Never force-fetch a changed immutable reservation.
     run("fetch", remote, "refs/tags/ci-build/*:refs/tags/ci-build/*")
+    run("fetch", remote, "refs/tags/ci-retired/*:refs/tags/ci-retired/*")
     result = {}
     for ref in run("for-each-ref", "--format=%(refname:strip=2)", "refs/tags/ci-build/").stdout.splitlines():
         suffix = ref.removeprefix(PREFIX)
@@ -45,6 +46,8 @@ def read_reservations(remote):
             raise ValueError("Unreadable build reservation " + ref) from error
         if run("rev-parse", ref + "^{commit}").stdout.strip() != data["sourceRevision"]:
             raise ValueError("Reservation does not point at its recorded source")
+        retirement = run("rev-parse", "--verify", "refs/tags/ci-retired/" + suffix + "^{commit}", check=False)
+        data["retired"] = retirement.returncode == 0 and retirement.stdout.strip() == data["sourceRevision"]
         result[int(suffix)] = data
     return result
 
