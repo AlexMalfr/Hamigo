@@ -22,23 +22,31 @@ def parse_tag(tag, product):
 
 
 def check(tag, product):
-    result = parse_tag(tag, product)
     if git("rev-parse", "--is-shallow-repository") != "false":
         raise ValueError("Fetch the complete Git history")
     if git("status", "--porcelain"):
         raise ValueError("Source checkout is dirty")
+    result = validate_tag(tag, product)
+    if result["sourceRevision"] != git("rev-parse", "HEAD"):
+        raise ValueError("Release tag does not point at the source commit")
+    return result
+
+
+def validate_tag(tag, product):
+    """Validate an archived source ref without pretending that it is the current checkout."""
+    result = parse_tag(tag, product)
+    if git("rev-parse", "--is-shallow-repository") != "false":
+        raise ValueError("Fetch the complete Git history")
     # actions/checkout replaces an annotated event tag with its peeled commit.
     # Restore only this local ref from the authoritative remote before validating it.
     git("fetch", "--no-tags", "origin", "+refs/tags/" + tag + ":refs/tags/" + tag)
-    head = git("rev-parse", "HEAD")
-    if git("rev-parse", "refs/tags/" + tag + "^{commit}") != head:
-        raise ValueError("Release tag does not point at the source commit")
+    head = git("rev-parse", "refs/tags/" + tag + "^{commit}")
     if git("cat-file", "-t", "refs/tags/" + tag) != "tag":
         raise ValueError("Use an annotated release tag")
     git("merge-base", "--is-ancestor", head, "refs/remotes/origin/" + result["branch"])
     version_ref = "refs/remotes/origin/" + result["versionBranch"]
     if result["channel"] == "release":
-        if git("rev-parse", "HEAD^{tree}") != git("rev-parse", version_ref + "^{tree}"):
+        if git("rev-parse", "refs/tags/" + tag + "^{tree}") != git("rev-parse", version_ref + "^{tree}"):
             raise ValueError("Final squash must preserve exactly the frozen version branch tree")
     else:
         git("merge-base", "--is-ancestor", head, version_ref)

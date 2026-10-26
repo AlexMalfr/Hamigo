@@ -28,6 +28,8 @@ Branche et tag portent le même nom, par exemple `v1.0`, mais sont des référen
 
 La CI de vérification `android.yml` tourne sur les pushes/PR. La CI de livraison `play.yml` tourne **seulement sur les tags `v*`** (ou relance explicite du même tag). Un push de branche ne crée pas un autre AAB. Les anciens tags 0.x n'embarquent pas ce workflow et les tags modernes invalides sont refusés.
 
+Une maintenance de CI peut avancer `main` par un commit dédié après le gel d'une version, sans modifier son tag, sa branche détaillée ni ses binaires. Elle ne crée pas une nouvelle version produit. Vérifier la CI sur une branche de maintenance puis avancer `main` sans réécriture. Ne pas attribuer ces nouveaux outils aux sources du binaire déjà livré.
+
 ## Numéro de build automatique
 
 Le `versionCode` public est un simple entier global croissant : **57, 58, 59…**, indépendant de la version produit et du canal. Android autorise cette séparation, jusqu'à 2 100 000 000. Les codes 0.x distribués s'arrêtent à 56. L'encodage `releaseOrdinal × 10 000` de la préparation initiale a été abandonné avant tout upload public. [Versionnement Android](https://developer.android.com/studio/publish/versioning).
@@ -77,6 +79,8 @@ Secrets des trois environnements : `HAMIGO_KEYSTORE_BASE64`, `HAMIGO_STORE_PASSW
 La première réception AAB reste coordonnée avec l'agent de publication : import manuel dans Console, vérification de la signature distribuée, de la version, des tracks et de l'accès API. `PLAY_FIRST_RELEASE_COMPLETED` et `PLAY_UPLOAD_ENABLED` restent faux jusqu'à cette vérification. Le workflow construit et archive avant ce bootstrap, puis vérifie réellement l'échange OIDC en demandant un jeton court au seul scope Android Publisher ; cette authentification seule ne prouve pas l'accès à l'app ni un upload. L'API Android Publisher est activée dans le projet dédié `hamigo-play-ci`.
 
 Pour activer les envois après bootstrap : lire `python tools/play/publish.py --list-tracks`, vérifier les IDs, définir les variables de track et les deux portes à `true`. Les envois actuels créent un **brouillon**, sans soumettre de revue. Le script refuse un track avec un brouillon/publication inachevée, une collision de code et une revue concurrente ; il supprime son edit temporaire si aucun commit ne réussit. Ne jamais supprimer une release Console existante pour débloquer la CI sans comprendre son état.
+
+Le workflow manuel **Play API preflight**, exécuté uniquement depuis `main` protégé, récupère l'AAB existante d'un tag choisi, vérifie source gelée, réservation, métadonnées, hashes et certificat, puis lit les IDs avec Publisher API. Il n'utilise aucun secret de build, ne reconstruit rien, n'upload rien et ne soumet aucune revue. La lecture utilise un edit temporaire supprimé sans commit. Sa fédération doit autoriser exactement `play-preflight.yml@refs/heads/main`, en plus du workflow de livraison sur tags. Les trois variables publiques WIF/compte/certificat sont aussi définies au niveau dépôt pour ce contrôle sans environnement secret. Une relance du workflow de construction refuse les binaires déjà archivés ; employer ce préflight pour contrôler leur liaison Play.
 
 Une publication entièrement automatique peut ensuite utiliser `--status completed --send-for-review`, avec une décision explicite de l'éditeur sur les destinations et les protections des environnements. Elle n'est pas activée pour la première 1.0. Le managed publishing ne retient pas les sorties internes.
 
