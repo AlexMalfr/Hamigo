@@ -168,7 +168,7 @@ object DailyReminder {
             context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) return false
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
-            ?: Intent().setClassName(context.packageName, "${context.packageName}.MainActivity")
+            ?: Intent(context, com.malfreyt.alexandre.hamigo.MainActivity::class.java)
         launch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         launch.putExtra("hamigo_route", "path")
         val content = PendingIntent.getActivity(context, REQUEST_CODE, launch,

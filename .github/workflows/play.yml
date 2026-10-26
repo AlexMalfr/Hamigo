@@ -1,0 +1,105 @@
+name: Play release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+  id-token: write
+concurrency:
+  group: hamigo-play
+  cancel-in-progress: false
+jobs:
+  candidate:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: ${{ contains(github.ref_name, '-alpha') && 'play-alpha' || contains(github.ref_name, '-beta') && 'play-beta' || 'play-production' }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PLAY_UPLOAD_ENABLED: ${{ vars.PLAY_UPLOAD_ENABLED }}
+      PLAY_FIRST_RELEASE_COMPLETED: ${{ vars.PLAY_FIRST_RELEASE_COMPLETED }}
+      PLAY_TRACK: ${{ vars.PLAY_TRACK }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Check immutable tag and durable version branch
+        id: source
+        run: python tools/play/check_source.py
+      - name: Contract and unit tests
+        run: |
+          python -m unittest discover -s tools/play -p 'test_*.py' -v
+          bash gradlew -p buildSrc test --no-daemon
+          bash gradlew :app:testDebugUnitTest :app:lintDebug --no-daemon
+      - name: Refuse rebuilding an archived release
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo 'Release already archived. Retrieve its existing assets; do not rebuild the same versionCode.' >&2
+            exit 1
+          fi
+      - name: Reserve global Android build number
+        id: number
+        run: |
+          git config credential.helper '!gh auth git-credential'
+          python tools/play/reserve_build.py
+      - name: Prepare upload signing and public OAuth
+        env:
+          HAMIGO_KEYSTORE_BASE64: ${{ secrets.HAMIGO_KEYSTORE_BASE64 }}
+          HAMIGO_STORE_PASSWORD: ${{ secrets.HAMIGO_STORE_PASSWORD }}
+          HAMIGO_KEY_PASSWORD: ${{ secrets.HAMIGO_KEY_PASSWORD }}
+          HAMIGO_OAUTH_CLIENT_SECRET: ${{ secrets.HAMIGO_OAUTH_CLIENT_SECRET }}
+        run: python tools/play/prepare_ci.py
+      - name: Build optimized public bundle
+        env:
+          CHANNEL: ${{ steps.source.outputs.channel }}
+          BUILD: ${{ steps.number.outputs.build }}
+          PRERELEASE: ${{ steps.source.outputs.prerelease }}
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+          bash gradlew :app:bundleRelease :app:writeVersionMetadata -PhamigoChannel="$CHANNEL" -PhamigoBuildNumber="$BUILD" -PhamigoPrereleaseNumber="$PRERELEASE" -PhamigoSigningProfile=upload --no-daemon
+      - name: Verify signer and archive exact bytes
+        env:
+          HAMIGO_UPLOAD_CERT_SHA256: ${{ vars.HAMIGO_UPLOAD_CERT_SHA256 }}
+        run: |
+          python tools/play/verify_signature.py app/build/outputs/bundle/release/app-release.aab
+          mkdir -p output/release
+          cp app/build/outputs/bundle/release/app-release.aab "output/release/Hamigo-${GITHUB_REF_NAME}.aab"
+          cp app/build/outputs/version.json app/build/outputs/mapping/release/mapping.txt output/release/
+          cd output/release
+          sha256sum ./* > SHA256SUMS.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: output/release/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Retain signed bundle and mapping in a draft GitHub release
+        run: gh release create "$GITHUB_REF_NAME" output/release/* --verify-tag --draft --title "Hamigo $GITHUB_REF_NAME" --notes-file docs/RELEASE-NOTES.md
+      - name: Authenticate to Google through short-lived GitHub OIDC
+        if: vars.PLAY_WIF_PROVIDER != ''
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ vars.PLAY_WIF_PROVIDER }}
+          service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
+      # First AAB is imported manually by the publication agent. These gates remain off until bootstrap is verified.
+      - name: Upload a Play draft
+        if: vars.PLAY_UPLOAD_ENABLED == 'true' && vars.PLAY_FIRST_RELEASE_COMPLETED == 'true'
+        env:
+          SOURCE_BRANCH: ${{ steps.source.outputs.branch }}
+        run: |
+          python -m pip install 'google-auth[requests]>=2,<3'
+          python tools/play/publish.py --metadata output/release/version.json --aab "output/release/Hamigo-${GITHUB_REF_NAME}.aab" --branch "$SOURCE_BRANCH" --upload --status draft
+      - name: Remove temporary credentials
+        if: always()
+        run: rm -f -- .tools/hamigo-upload.jks .tools/upload-signing.properties .tools/oauth.properties

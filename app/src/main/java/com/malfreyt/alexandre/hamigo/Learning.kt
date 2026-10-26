@@ -179,7 +179,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
     val prefs = context.getSharedPreferences("hamigo", Context.MODE_PRIVATE)
     private var root = loadState()
     private var preparedContent:Content?=null
-    // Persist the temporary streak bridge before another reader can load the old state.
+    // Persist initialized fields before another reader loads the same progress.
     @android.annotation.SuppressLint("ApplySharedPref")
     private fun loadState():JSONObject = synchronized(CLOUD_LOCK) {
         val state=runCatching {JSONObject(prefs.getString("progress","{}")!!)}.getOrElse {JSONObject()}
@@ -187,7 +187,7 @@ class Progress(private val context: Context, private val sideEffects:Boolean=tru
         if(state.has("skillReviewsVersion"))require(state.getInt("skillReviewsVersion") in 1..SkillLearning.FORMAT_VERSION)
         val skipBonusChanged=IgnoredLessons.repairLegacyBonuses(state)
         val skillChanged=SkillLearning.normalize(state)
-        val streakChanged=StreakMigration52.apply(state,activityClock.instant(),activityClock.zone)
+        val streakChanged=StreakHistory.initialize(state)
         val dayChanged=StudyDayMigration52.apply(state)
         val lessonHistoryChanged=LessonCompletionMigration55.capture(state)
         val changed=skipBonusChanged||streakChanged||dayChanged||skillChanged||lessonHistoryChanged||!state.has("questionIdsVersion")
