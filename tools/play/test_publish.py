@@ -10,8 +10,8 @@ import publish
 
 def candidate(channel="beta", build=8):
     return {"applicationId": publish.PACKAGE, "channel": channel, "dirty": False,
-            "sourceRevision": "a" * 40, "releaseOrdinal": 57, "buildNumber": build,
-            "versionCode": 570000 + build, "versionName": "1.0" if channel == "release" else "1.0-" + channel + "2"}
+            "sourceRevision": "a" * 40, "buildNumber": 56 + build,
+            "versionCode": 56 + build, "versionName": "1.0" if channel == "release" else "1.0-" + channel + "2"}
 
 
 TRACKS = [{"track": "production", "releases": [{"versionCodes": ["56"], "status": "completed"}]},
@@ -41,12 +41,12 @@ class PlayTests(unittest.TestCase):
 
     def test_all_tracks_and_bundles_prevent_reuse_or_downgrade(self):
         tracks = copy.deepcopy(TRACKS)
-        tracks[1]["releases"] = [{"versionCodes": ["570009"]}]
-        for args in ({"tracks": tracks}, {"bundles": [{"versionCode": 570008}]}):
+        tracks[1]["releases"] = [{"versionCodes": ["65"]}]
+        for args in ({"tracks": tracks}, {"bundles": [{"versionCode": 64}]}):
             with self.assertRaises(ValueError): self.validate(**args)
 
     def test_corrupted_reservation_rejected(self):
-        with self.assertRaises(ValueError): self.validate(candidate() | {"versionCode": 570009})
+        with self.assertRaises(ValueError): self.validate(candidate() | {"versionCode": 65})
         for name in ("1.0", "1.0-dev8+a1b2c3d4", "1.0-beta2+a1b2c3d4"):
             with self.assertRaises(ValueError): self.validate(candidate() | {"versionName": name})
 
@@ -85,7 +85,7 @@ class PlayTests(unittest.TestCase):
             if url.endswith("/edits"): return {"id": "fixture"}
             if method == "GET" and url.endswith("/tracks"): return {"tracks": TRACKS}
             if method == "POST" and url.endswith("/bundles"):
-                return {"versionCode": 570008, "sha256": hashlib.sha256(b"fixture").hexdigest()}
+                return {"versionCode": 64, "sha256": hashlib.sha256(b"fixture").hexdigest()}
             return {}
         gates = {"PLAY_UPLOAD_ENABLED": "true", "PLAY_FIRST_RELEASE_COMPLETED": "true"}
         with tempfile.TemporaryDirectory() as folder, patch.object(publish, "request", request), patch.dict(os.environ, gates):
@@ -95,14 +95,14 @@ class PlayTests(unittest.TestCase):
         self.assertTrue(result["uploaded"])
         update = next(kwargs["json"] for method, url, kwargs in calls if method == "PUT")
         self.assertEqual("draft", update["releases"][0]["status"])
-        self.assertEqual(["570008"], update["releases"][0]["versionCodes"])
+        self.assertEqual(["64"], update["releases"][0]["versionCodes"])
         commit = calls[-1]
         self.assertTrue(commit[1].endswith(":commit"))
         self.assertEqual({"changesNotSentForReview": "true", "changesInReviewBehavior": "ERROR_IF_IN_REVIEW"}, commit[2]["params"])
 
     def test_unfinished_track_cannot_be_overwritten(self):
         tracks = copy.deepcopy(TRACKS)
-        tracks[-1]["releases"] = [{"status": "draft", "versionCodes": ["570007"]}]
+        tracks[-1]["releases"] = [{"status": "draft", "versionCodes": ["63"]}]
         calls = []
         def request(session, method, url, **kwargs):
             calls.append((method, url))

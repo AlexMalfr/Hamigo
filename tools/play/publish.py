@@ -27,7 +27,7 @@ def validate_candidate(metadata, branch, track, tracks, bundles):
     if not re.fullmatch(r"[1-9][0-9]*\.[0-9]+(?:\.[0-9]+)?" + suffix, metadata["versionName"]):
         raise ValueError("Public version name does not match its channel")
     code = metadata["versionCode"]
-    if code != metadata["releaseOrdinal"] * 10000 + metadata["buildNumber"] or not 56 < code <= 2100000000:
+    if code != metadata["buildNumber"] or not 56 < code <= 2100000000:
         raise ValueError("Invalid version code reservation")
     if track not in {item["track"] for item in tracks}:
         raise ValueError("Track not found: copy its exact ID from edits.tracks.list")

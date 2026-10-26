@@ -17,13 +17,12 @@ def main():
     key = base64.b64decode(os.environ["HAMIGO_KEYSTORE_BASE64"], validate=True)
     if not key:
         raise ValueError("Empty upload keystore")
-    (target / "hamigo-release.jks").write_bytes(key)
-    (target / "signing.properties").write_text(
-        "storePassword=" + property_value("HAMIGO_STORE_PASSWORD") + "\nkeyPassword=" + property_value("HAMIGO_KEY_PASSWORD") + "\n", encoding="utf-8")
+    (target / "hamigo-upload.jks").write_bytes(key)
+    (target / "upload-signing.properties").write_text(
+        "storeFile=hamigo-upload.jks\nkeyAlias=hamigo-upload\nstorePassword=" + property_value("HAMIGO_STORE_PASSWORD") + "\nkeyPassword=" + property_value("HAMIGO_KEY_PASSWORD") + "\n", encoding="utf-8")
     (target / "oauth.properties").write_text(
         "githubClientSecret=" + property_value("HAMIGO_OAUTH_CLIENT_SECRET") + "\n", encoding="utf-8")
-    (target / "play-service-account.json").write_text(os.environ["PLAY_SERVICE_ACCOUNT_JSON"], encoding="utf-8")
-    for name in ("hamigo-release.jks", "signing.properties", "oauth.properties", "play-service-account.json"):
+    for name in ("hamigo-upload.jks", "upload-signing.properties", "oauth.properties"):
         (target / name).chmod(0o600)
 
 

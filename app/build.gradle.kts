@@ -23,10 +23,9 @@ val channel = providers.gradleProperty("hamigoChannel").getOrElse("dev")
 val revision = runCatching {git("rev-parse", "HEAD")}.getOrDefault("local").ifEmpty { "local" }
 val gitStatus = runCatching {git("status", "--porcelain")}.getOrNull()
 val dirty = gitStatus == null || gitStatus.isNotEmpty()
+val buildNumber = providers.gradleProperty("hamigoBuildNumber").getOrElse(versionProperties.getProperty("buildNumber")).toInt()
 val appVersion = HamigoVersion.create(versionProperties.getProperty("version"),
-    versionProperties.getProperty("releaseOrdinal").toInt(),
-    providers.gradleProperty("hamigoBuildNumber").getOrElse(versionProperties.getProperty("buildNumber")).toInt(),
-    channel, versionProperties.getProperty("prereleaseNumber").toInt(), revision.take(8), dirty)
+    buildNumber, channel, providers.gradleProperty("hamigoPrereleaseNumber").getOrElse(versionProperties.getProperty("prereleaseNumber")).toInt(), revision.take(8), dirty)
 val isDev = !appVersion.isPublic
 val appId = "com.malfreyt.alexandre.hamigo" + if (isDev) ".dev" else ""
 val legacyLinkPath = if(isDev) "/hamigo-dev/" else "/hamigo/"
@@ -89,13 +88,17 @@ android {
     }
     buildFeatures { compose = true; buildConfig = true }
     sourceSets.getByName("main").assets.directories.add(licenseAssets.get().asFile.absolutePath)
-    val signingFile = rootProject.file(".tools/signing.properties")
+    val signingProfile = providers.gradleProperty("hamigoSigningProfile").getOrElse("distribution")
+    require(signingProfile in setOf("distribution", "upload")) { "Unknown signing profile." }
+    val signingFile = rootProject.file(if(signingProfile == "upload") ".tools/upload-signing.properties" else ".tools/signing.properties")
     if (signingFile.exists()) {
         val secrets = Properties().apply { signingFile.inputStream().use { load(it) } }
         signingConfigs.create("localRelease") {
-            storeFile = rootProject.file(".tools/hamigo-release.jks")
+            val keyFile = secrets.getProperty("storeFile", "hamigo-release.jks")
+            require(keyFile in setOf("hamigo-release.jks", "hamigo-upload.jks")) { "Unexpected signing keystore." }
+            storeFile = rootProject.file(".tools/$keyFile")
             storePassword = secrets.getProperty("storePassword")
-            keyAlias = "hamigo"
+            keyAlias = secrets.getProperty("keyAlias", "hamigo")
             keyPassword = secrets.getProperty("keyPassword")
         }
     }
@@ -118,15 +121,13 @@ androidComponents.beforeVariants(androidComponents.selector().withBuildType("deb
 val verifyPublicBuild = tasks.register("verifyPublicBuild") {
     doLast {
         if(appVersion.isPublic) {
+            check(providers.gradleProperty("hamigoBuildNumber").isPresent) { "Reserve a build number with tools/play/reserve_build.py before building a public candidate." }
             check(git("rev-parse", "--is-shallow-repository") == "false") { "Public builds require complete Git history." }
             check(!dirty) { "Public builds require a clean commit; use the dev channel while editing." }
             check(revision != "local") { "Public builds require a source commit." }
+            check(git("rev-parse", "refs/tags/ci-build/$buildNumber^{commit}") == revision) { "Build number reservation belongs to another commit." }
             check(android.signingConfigs.findByName("localRelease") != null) { "Configure the existing upload key before a public build." }
             check(gitHubClientSecret.isNotBlank()) { "Configure public OAuth before a public build." }
-            // Preserve the existing delivery guard until the separate cleanup removes this migration.
-            check(!rootProject.file("app/src/main/java/com/malfreyt/alexandre/hamigo/StreakMigration52.kt").exists()) {
-                "Before 1.0: complete the separately scheduled StreakMigration52 cleanup."
-            }
         }
     }
 }
@@ -171,7 +172,7 @@ tasks.register("writeVersionMetadata") {
         target.get().asFile.apply { parentFile.mkdirs(); writeText("""
             {"versionName":"${appVersion.name()}","versionCode":${appVersion.code()},"channel":"$channel",
              "applicationId":"$appId","sourceRevision":"$revision","dirty":$dirty,
-             "releaseOrdinal":${versionProperties.getProperty("releaseOrdinal")},"buildNumber":${appVersion.code()%10000}}
+             "buildNumber":$buildNumber}
         """.trimIndent()) }
         println(target.get().asFile)
     }
