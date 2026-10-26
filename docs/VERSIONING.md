@@ -9,7 +9,7 @@ Contrat du cycle 1.0, à suivre par tous les agents. L'état réellement exécut
 | release | `main` | `v1.0` | `1.0` | production |
 | beta | `beta` | `v1.0-beta2` | `1.0-beta2` | **test ouvert** |
 | alpha | `alpha` | `v1.0-alpha5` | `1.0-alpha5` | **test interne**, liste fournie par l'éditeur |
-| dev | `codex/version-1.0` et autres branches de travail | aucun tag public | `1.0-dev57+abcdef12[-dirty]` | aucune distribution Play |
+| dev | `v1.0` et autres branches de travail | aucun tag public | `1.0-dev57+abcdef12[-dirty]` | aucune distribution Play |
 
 Les canaux publics partagent `com.malfreyt.alexandre.hamigo`, les données et la signature historique. La dev, choisie par défaut, est une installation indépendante `.dev`, libellée Hamigo Dev, avec ses fichiers, préférences, tâches, widgets et clés Android. Le namespace Kotlin reste public : ne pas déduire les noms de classes de l'applicationId.
 
@@ -17,10 +17,12 @@ Une inscription au test interne exclut les tests ouverts/fermés. Pour passer d'
 
 ## Une branche durable par version, un squash sur main
 
-1. Créer `codex/version-<version>` depuis `main`, mettre `version.properties` à jour, travailler et conserver les commits utiles dans cette branche. Les branches de sous-tâches peuvent s'y intégrer. Ne jamais supprimer cette branche après livraison : elle garde la granularité masquée par le squash.
+1. Créer la branche `v<version>` depuis `main`, mettre `version.properties` à jour, travailler et conserver les commits utiles dans cette branche. Les branches de sous-tâches peuvent s'y intégrer. Ne jamais supprimer cette branche après livraison : elle garde la granularité masquée par le squash.
 2. Préparer chaque candidat alpha/bêta dans un commit propre. Vérifier tests et vraie release optimisée. Avancer la branche `alpha`/`beta` vers ce commit, pousser la branche de version et la branche de canal, puis créer/pousser un **tag annoté** correspondant. Les branches de canal sont des pointeurs de distribution, pas une deuxième histoire de développement. Si un ancien squash rend le fast-forward impossible au cycle suivant, créer un merge explicite du nouveau candidat conservant exactement son arbre ; ne pas faire de force push.
 3. Pour la finale, geler la branche de version, intégrer son arbre par **un squash** sur `main`, vérifier que les arbres sont identiques et pousser `main`. Créer le tag annoté `v<version>` sur ce squash. Conserver la branche de version gelée. Le SHA de livraison est celui du squash, même si les sources ont aussi un historique détaillé ailleurs.
 4. Après un upload Play, ne jamais amender/déplacer/supprimer le tag de livraison ni son tag de réservation. Toute correction est une nouvelle version/tag/candidat et un code supérieur. Les anciennes règles de remplacement des 0.x restent seulement historiques.
+
+Branche et tag portent le même nom, par exemple `v1.0`, mais sont des références différentes : `refs/heads/v1.0` garde les commits détaillés et `refs/tags/v1.0` désigne le squash livré. Toujours préciser ces références dans les commandes automatisées (`git switch v1.0` pour travailler, `git switch --detach refs/tags/v1.0` pour construire). Les branches historiques `v0.xx` pointent aux commits de leurs tags d'origine ; elles ne recréent pas des commits intermédiaires absents. Les branches de sauvegarde existantes restent conservées ; leur renommage enlève uniquement `codex/`.
 
 `tools/play/check_source.py` exige le tag conforme à `version.properties`, l'historique complet, un checkout propre, l'appartenance à la branche de canal et à la branche de version. Pour la finale, il compare les arbres du squash et de la branche gelée. Le SHA complet reste dans les métadonnées et les liens vers les sources ; aucun SHA dans le nom public.
 
@@ -36,7 +38,7 @@ Tout upload manuel doit **d'abord utiliser cet allocateur**. Si un code a été 
 
 Le `buildNumber=57` de `version.properties` est uniquement une valeur de repli pour la dev. Les builds publics exigent une propriété explicite et le tag de réservation correspondant au commit. Le numéro visible alpha/bêta vient du tag, via `hamigoPrereleaseNumber`. La dev garde un plancher technique 570001, car une précédente dev de préparation avait déjà ce code ; ce package est distinct et ce plancher ne concerne pas Play.
 
-Exemple : `v1.0-alpha1` → code57, `v1.0-beta1` → code58, `v1.0` → code59. Si la première livraison est directement la finale, `v1.0` reçoit57.
+Exemple de cycle futur : trois tags successifs alpha, bêta et finale reçoivent trois codes croissants. Pour la première 1.0, les réservations 57 et 58 ont été abandonnées avant construction d'un AAB et distribution ; le prochain code disponible est 59. Toujours utiliser le résultat de l'allocateur.
 
 ## Construire et livrer
 
@@ -72,7 +74,7 @@ Le workflow utilise des environnements `play-alpha`, `play-beta`, `play-producti
 
 Secrets des trois environnements : `HAMIGO_KEYSTORE_BASE64`, `HAMIGO_STORE_PASSWORD`, `HAMIGO_KEY_PASSWORD`, `HAMIGO_OAUTH_CLIENT_SECRET`. Variables publiques : `HAMIGO_UPLOAD_CERT_SHA256`, `PLAY_WIF_PROVIDER`, `PLAY_SERVICE_ACCOUNT`, `PLAY_TRACK` (ID exact retourné par l'API, pas déduit du nom de branche).
 
-La première réception AAB reste coordonnée avec l'agent de publication : import manuel dans Console, vérification de la signature distribuée, de la version, des tracks et de l'accès API. `PLAY_FIRST_RELEASE_COMPLETED` et `PLAY_UPLOAD_ENABLED` restent faux jusqu'à cette vérification. La présence du workflow actif permet de construire et archiver avant ce bootstrap ; elle ne prétend pas que l'accès API est déjà validé.
+La première réception AAB reste coordonnée avec l'agent de publication : import manuel dans Console, vérification de la signature distribuée, de la version, des tracks et de l'accès API. `PLAY_FIRST_RELEASE_COMPLETED` et `PLAY_UPLOAD_ENABLED` restent faux jusqu'à cette vérification. Le workflow construit et archive avant ce bootstrap, puis vérifie réellement l'échange OIDC en demandant un jeton court au seul scope Android Publisher ; cette authentification seule ne prouve pas l'accès à l'app ni un upload. L'API Android Publisher est activée dans le projet dédié `hamigo-play-ci`.
 
 Pour activer les envois après bootstrap : lire `python tools/play/publish.py --list-tracks`, vérifier les IDs, définir les variables de track et les deux portes à `true`. Les envois actuels créent un **brouillon**, sans soumettre de revue. Le script refuse un track avec un brouillon/publication inachevée, une collision de code et une revue concurrente ; il supprime son edit temporaire si aucun commit ne réussit. Ne jamais supprimer une release Console existante pour débloquer la CI sans comprendre son état.
 

@@ -18,7 +18,7 @@ def parse_tag(tag, product):
     channel = match[2] or "release"
     return {"tag": tag, "product": product, "channel": channel,
             "branch": "main" if channel == "release" else channel,
-            "prerelease": int(match[3] or 1), "versionBranch": "codex/version-" + product}
+            "prerelease": int(match[3] or 1), "versionBranch": "v" + product}
 
 
 def check(tag, product):
@@ -31,12 +31,12 @@ def check(tag, product):
     # Restore only this local ref from the authoritative remote before validating it.
     git("fetch", "--no-tags", "origin", "+refs/tags/" + tag + ":refs/tags/" + tag)
     head = git("rev-parse", "HEAD")
-    if git("rev-parse", tag + "^{commit}") != head:
+    if git("rev-parse", "refs/tags/" + tag + "^{commit}") != head:
         raise ValueError("Release tag does not point at the source commit")
     if git("cat-file", "-t", "refs/tags/" + tag) != "tag":
         raise ValueError("Use an annotated release tag")
-    git("merge-base", "--is-ancestor", head, "origin/" + result["branch"])
-    version_ref = "origin/" + result["versionBranch"]
+    git("merge-base", "--is-ancestor", head, "refs/remotes/origin/" + result["branch"])
+    version_ref = "refs/remotes/origin/" + result["versionBranch"]
     if result["channel"] == "release":
         if git("rev-parse", "HEAD^{tree}") != git("rev-parse", version_ref + "^{tree}"):
             raise ValueError("Final squash must preserve exactly the frozen version branch tree")

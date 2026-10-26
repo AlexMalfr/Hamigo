@@ -1,3 +1,7 @@
+import os
+from pathlib import Path
+import subprocess
+import tempfile
 import unittest
 from unittest.mock import patch
 import check_source
@@ -5,11 +9,50 @@ from reserve_build import choose
 
 
 class SourceTests(unittest.TestCase):
+    def test_real_same_named_branch_and_tag_keep_distinct_history_and_delivered_source(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / 'source'
+            remote = root / 'remote.git'
+            def git(*args, input=None, cwd=source):
+                return subprocess.run(['git', *args], cwd=cwd, input=input,
+                                      capture_output=True, text=True, check=True).stdout.strip()
+            git('init', '--bare', str(remote), cwd=root)
+            git('init', str(source), cwd=root)
+            git('config', 'user.name', 'Isolated fixture')
+            git('config', 'user.email', 'fixture@example.invalid')
+            (source / 'fixture.txt').write_text('unchanged application tree', encoding='utf-8')
+            git('add', 'fixture.txt')
+            git('commit', '-m', 'base')
+            base = git('rev-parse', 'HEAD')
+            tree = git('rev-parse', 'HEAD^{tree}')
+            detailed = git('commit-tree', tree, '-p', base, '-m', 'Detailed version history')
+            final = git('commit-tree', tree, '-p', base, '-m', 'Final squash')
+            git('branch', 'v1.0', detailed)
+            git('branch', 'main', final)
+            git('tag', '-a', 'v1.0', final, '-m', 'Delivered version')
+            git('remote', 'add', 'origin', str(remote))
+            git('push', 'origin', 'refs/heads/main', 'refs/heads/v1.0', 'refs/tags/v1.0')
+            git('switch', '--detach', final)
+            # Reproduce checkout's local lightweight replacement; validator restores the remote tag.
+            git('update-ref', 'refs/tags/v1.0', final)
+            previous = Path.cwd()
+            try:
+                os.chdir(source)
+                checked = check_source.check('v1.0', '1.0')
+                self.assertEqual(final, checked['sourceRevision'])
+                self.assertNotEqual(detailed, final)
+                self.assertEqual(detailed, git('rev-parse', 'refs/remotes/origin/v1.0'))
+                self.assertEqual('tag', git('cat-file', '-t', 'refs/tags/v1.0'))
+            finally:
+                os.chdir(previous)
+
     def test_tag_names_cannot_select_another_version_or_legacy_build(self):
         for tag in ('main', 'v0.56', 'v1.0-beta0', 'v1.1', 'v1.0-rc1', 'v1.0-alpha01'):
             with self.assertRaises(ValueError): check_source.parse_tag(tag, '1.0')
         self.assertEqual('beta', check_source.parse_tag('v1.0-beta2', '1.0')['branch'])
         self.assertEqual('main', check_source.parse_tag('v1.0', '1.0')['branch'])
+        self.assertEqual('v1.0', check_source.parse_tag('v1.0', '1.0')['versionBranch'])
 
     def test_final_squash_preserves_tree_despite_different_commit(self):
         def git(*args):

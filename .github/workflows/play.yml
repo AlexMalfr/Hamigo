@@ -85,11 +85,13 @@ jobs:
       - name: Retain signed bundle and mapping in a draft GitHub release
         run: gh release create "$GITHUB_REF_NAME" output/release/* --verify-tag --draft --title "Hamigo $GITHUB_REF_NAME" --notes-file docs/RELEASE-NOTES.md
       - name: Authenticate to Google through short-lived GitHub OIDC
-        if: vars.PLAY_UPLOAD_ENABLED == 'true' && vars.PLAY_FIRST_RELEASE_COMPLETED == 'true'
+        if: vars.PLAY_WIF_PROVIDER != ''
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           workload_identity_provider: ${{ vars.PLAY_WIF_PROVIDER }}
           service_account: ${{ vars.PLAY_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/androidpublisher
       # First AAB is imported manually by the publication agent. These gates remain off until bootstrap is verified.
       - name: Upload a Play draft
         if: vars.PLAY_UPLOAD_ENABLED == 'true' && vars.PLAY_FIRST_RELEASE_COMPLETED == 'true'
