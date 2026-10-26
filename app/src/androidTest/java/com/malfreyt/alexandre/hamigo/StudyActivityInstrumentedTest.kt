@@ -67,7 +67,10 @@ class StudyActivityInstrumentedTest {
     private fun wrapper(state:JSONObject)=JSONObject().put("app","hamigo").put("schema",2).put("name","Démo").put("progress",state)
     @Test fun midnightHistoryMovesWithoutChangingTotalsOrEventIdentitiesAndMergesIdempotently() {
         val old=legacy();val events=CloudProgress.canonical(old.getJSONObject("syncEvents"))
-        StreakMigration52.apply(old,LocalDate.of(2026,10,18).atTime(1,30).atZone(zone).toInstant(),zone)
+        old.put("streakHistory",JSONObject().put("version",1)
+            .put("seedDays",JSONArray(listOf("2026-10-10","2026-10-17")))
+            .put("bridges",JSONObject().put("2026-10-17",2))
+            .put("cutoverAt",LocalDate.of(2026,10,17).atTime(3,0).atZone(zone).toInstant().toEpochMilli()))
         val updated=JSONObject(old.toString())
         assertTrue(StudyDayMigration52.apply(updated));assertFalse(StudyDayMigration52.apply(updated))
         assertEquals(16,updated.getInt("xp"));assertEquals(2,updated.getInt("answers"))

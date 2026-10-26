@@ -4,7 +4,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 import java.util.UUID
-import com.malfreyt.alexandre.hamigo.StreakMigration52
 import com.malfreyt.alexandre.hamigo.StreakHistory
 import com.malfreyt.alexandre.hamigo.StudyDayMigration52
 import com.malfreyt.alexandre.hamigo.StudyActivity
@@ -331,7 +330,7 @@ object CloudProgress {
         if (preferences.has("morseThresholdMs")) require(int(preferences,"morseThresholdMs") in 150..600)
         if(state.has("questionIdsVersion"))require(int(state,"questionIdsVersion")==1) {"Version des identifiants de questions non reconnue."}
         IgnoredLessons.repairLegacyBonuses(state)
-        StreakMigration52.apply(state)
+        StreakHistory.initialize(state)
         StudyDayMigration52.apply(state)
         return wrapper
     }

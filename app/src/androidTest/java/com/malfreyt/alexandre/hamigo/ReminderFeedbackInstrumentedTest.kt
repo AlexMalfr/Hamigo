@@ -225,7 +225,7 @@ class ReminderFeedbackInstrumentedTest {
         val q=Question("feedback-return-fixture","Question de retour",listOf("A","B"),0,"Explication")
         ui.runOnIdle {model.startQuestions("Retour du formulaire",listOf(q))}
         val session=model.session;val before=model.progress.export()
-        ui.runOnIdle {instrumentation.callActivityOnNewIntent(ui.activity,Intent(Intent.ACTION_VIEW,Uri.parse("hamigo://return")))}
+        ui.runOnIdle {instrumentation.callActivityOnNewIntent(ui.activity,Intent(Intent.ACTION_VIEW,Uri.parse("${BuildConfig.LINK_SCHEME}://return")))}
         ui.waitForIdle()
         assertSame(session,model.session);assertEquals(before,model.progress.export())
         assertNull(model.pendingInvite);assertNull(ui.activity.intent.data)

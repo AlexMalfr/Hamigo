@@ -1,0 +1,48 @@
+name: Android checks
+on:
+  pull_request:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Version and Play contract tests
+        run: |
+          python -m unittest discover -s tools/play -p 'test_*.py' -v
+          bash gradlew -p buildSrc test --no-daemon
+      - name: Debug app, unit tests, Android test APK and lint
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+          bash gradlew :app:assembleDebug :app:testDebugUnitTest :app:assembleDebugAndroidTest :app:lintDebug :app:writeVersionMetadata --no-daemon
+      - name: Compile independent dev release probe
+        run: bash gradlew -p tools/release-probe assembleRelease -PhamigoTargetPackage=com.malfreyt.alexandre.hamigo.dev --no-daemon
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: checks-${{ github.sha }}
+          path: |
+            app/build/reports/
+            buildSrc/build/reports/tests/
+            tools/release-probe/build/reports/
+            app/build/outputs/version.json
+          if-no-files-found: warn
+          retention-days: 14

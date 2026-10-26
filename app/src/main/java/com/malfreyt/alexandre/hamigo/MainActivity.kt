@@ -146,10 +146,10 @@ class MainActivity : ComponentActivity() {
         if(intent?.action !in listOf(Intent.ACTION_SEND,Intent.ACTION_VIEW)) return
         @Suppress("DEPRECATION")
         val uri=if(intent?.action==Intent.ACTION_SEND) intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM) else intent?.data
-        if(uri!=null && uri.scheme in listOf("https","hamigo")) {
+        if(uri!=null && uri.scheme in listOf("https","hamigo","hamigo-dev")) {
             val id=FriendInvite.parse(uri.toString())
             if(id!=null) model.pendingInvite=id
-            else if(uri.scheme=="https" && uri.host=="alexmalfr.github.io" && uri.path=="/hamigo/" && uri.query==null) model.route="friends"
+            else if(uri.scheme=="https" && uri.host==Uri.parse(FriendInvite.HTTPS_BASE).host && uri.path==Uri.parse(FriendInvite.HTTPS_BASE).path && uri.query==null) model.route="friends"
             else model.message="Cette invitation Hamigo n’est pas valide."
             return
         }
