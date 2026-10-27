@@ -58,7 +58,15 @@ bash gradlew :app:bundleRelease :app:writeVersionMetadata -PhamigoChannel=releas
 bash gradlew :app:assembleRelease -PhamigoChannel=release -PhamigoBuildNumber=N
 ```
 
-Sous Windows, utiliser `gradlew.bat`, JDK17+, SDK36 et `printBuildDirectory` pour les sorties hors OneDrive. Les canaux publics utilisent exclusivement R8 et la réduction des ressources. Une recette dev n'est pas la recette du binaire public, dont les constantes OAuth diffèrent. Conserver l'AAB exact, son mapping, version.json, SHA256, certificat, commit/tag et résultats R8. Ne pas reconstruire un code déjà archivé : récupérer les artefacts existants. Les GitHub Releases en brouillon conservent l'AAB et le mapping au-delà de l'expiration des artefacts Actions (90 jours).
+Sous Windows, utiliser `gradlew.bat`, JDK17+, SDK36 et `printBuildDirectory` pour les sorties hors OneDrive. Les canaux publics utilisent exclusivement R8 et la réduction des ressources. Une recette dev n'est pas la recette du binaire public, dont les constantes OAuth diffèrent. Conserver l'AAB exact, son mapping, version.json, SHA256, certificat, commit/tag et résultats R8. Ne pas reconstruire un code déjà archivé : récupérer les artefacts existants. Les GitHub Releases conservent l'AAB et le mapping au-delà de l'expiration des artefacts Actions (90 jours).
+
+### Publication automatique sur GitHub
+
+La CI archive d'abord l'AAB et le mapping dans une release GitHub brouillon, marquée **préversion** pour alpha/bêta. Après le dépôt Play en brouillon, elle récupère l'APK universel généré par Google pour ce même code, sélectionne le certificat historique de distribution puis vérifie la signature effective, le package et la version dans le fichier téléchargé. L'APK, sa somme SHA-256 et `APK-PROVENANCE.json` sont joints avant de publier la release GitHub. Seules les finales deviennent **Latest** ; alpha/bêta gardent `prerelease=true` et ne remplacent pas la dernière stable. Une publication GitHub ne soumet aucune revue Play.
+
+L'**APK** est le téléchargement directement installable. L'**AAB** est conservée dès 1.0 comme archive exacte pour Play ; elle ne s'installe pas directement. L'APK universel signé par Google peut avoir des octets différents d'un APK construit localement, tout en venant du même AAB, avec le même code et le certificat historique. Ne jamais remplacer silencieusement un APK déjà distribué ; la 1.0 conserve son APK local déjà validé.
+
+La CI n'a toujours pas la clé historique privée. `HAMIGO_DISTRIBUTION_CERT_SHA256` est une variable publique de dépôt, distincte du certificat d'import. Les uploads Play doivent être activés pour obtenir l'APK automatiquement. En cas d'échec Play, de revue en cours ou d'APK universel indisponible après l'attente bornée, l'archive reste en brouillon et ne devient pas Latest. Ne pas relancer une reconstruction : utiliser le préflight depuis `main` avec `download_apk=true`, récupérer son artefact puis joindre/publier les fichiers existants après vérification. Ce contrôle ne fait que lire l'APK chez Google et ne remplace aucun asset public.
 
 ## Signature et secrets
 

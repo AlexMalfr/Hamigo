@@ -601,3 +601,8 @@ La première bulle du tutoriel est limitée par la position réellement mesurée
 - Le code Android public devient un compteur automatique global simple (57 et suivants), réservé atomiquement dans des tags `ci-build/N`, sans commit artificiel ni plage par canal. Le nom produit reste indépendant ; les locaux sont dev par défaut.
 - La signature historique a été importée dans Play App Signing après le choix explicite de l'éditeur. Une clé d'import distincte sert à la CI ; la clé historique ne lui est pas transférée. Les trois environnements GitHub et leurs secrets de build sont configurés. La fédération OIDC et la première réception Console font l'objet de preuves de livraison distinctes ; les portes d'upload restent fermées jusqu'au bootstrap.
 - `StreakMigration52`, ses appels, ses tests temporaires et son garde-fou de livraison sont supprimés. Les historiques déjà enregistrés restent conservés et fusionnés ; une structure absente s'initialise vide et de façon déterministe. La migration distincte de journée d'étude n'est pas concernée.
+
+### Releases GitHub après la 1.0
+
+- La 1.0 est publiée sur GitHub avec l'APK et l'AAB déjà vérifiés, sans nouvelle compilation ni modification du tag. L'APK est destiné à l'installation directe ; l'AAB reste archivée pour Play avec mapping, métadonnées et hashes.
+- Les livraisons CI suivantes publient automatiquement une préversion GitHub pour alpha/bêta et une release stable pour les finales. L'APK installable est récupéré parmi les APK universels signés par Google, puis vérifié ; la clé historique privée reste hors de GitHub. Un export indisponible ou un dépôt Play bloqué laisse la release en brouillon. Aucun de ces changements ne soumet une revue Play.

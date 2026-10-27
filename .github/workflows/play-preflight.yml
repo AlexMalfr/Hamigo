@@ -7,6 +7,10 @@ on:
         required: true
         default: v1.0
         type: string
+      download_apk:
+        description: Also download and verify the existing Play-signed universal APK (read only)
+        default: false
+        type: boolean
 permissions:
   contents: read
   actions: read
@@ -23,6 +27,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ inputs.release_tag }}
       HAMIGO_UPLOAD_CERT_SHA256: ${{ vars.HAMIGO_UPLOAD_CERT_SHA256 }}
+      HAMIGO_DISTRIBUTION_CERT_SHA256: ${{ vars.HAMIGO_DISTRIBUTION_CERT_SHA256 }}
     steps:
       - name: Validate release tag input
         run: |
@@ -55,9 +60,18 @@ jobs:
         run: |
           python -m pip install 'google-auth[requests]>=2,<3'
           python tools/play/publish.py --list-tracks | tee output/preflight/tracks.json
+      - name: Verify existing Play-signed APK without changing any release
+        if: inputs.download_apk
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'build-tools;36.0.0' >/dev/null
+          python tools/play/export_apk.py --metadata output/preflight/version.json --folder output/preflight
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: play-preflight-${{ inputs.release_tag }}
-          path: output/preflight/tracks.json
+          path: |
+            output/preflight/tracks.json
+            output/preflight/*.apk
+            output/preflight/APK-SHA256SUMS.txt
+            output/preflight/APK-PROVENANCE.json
           if-no-files-found: error
           retention-days: 14
